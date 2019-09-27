@@ -912,6 +912,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         script_dir = os.path.dirname(__file__)
         rel_path = "../docs/index.html"
         url = os.path.join(script_dir, rel_path)
+        if not os.path.isfile(url):
+            url = "https://seankmartin.github.io/NeuroChaT/"
         webbrowser.open_new(url)
 
     def tutorial(self):
