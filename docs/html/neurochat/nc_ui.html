@@ -941,6 +941,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         script_dir = os.path.dirname(__file__)
         rel_path = &#34;../docs/index.html&#34;
         url = os.path.join(script_dir, rel_path)
+        if not os.path.isfile(url):
+            url = &#34;https://seankmartin.github.io/NeuroChaT/&#34;
         webbrowser.open_new(url)
 
     def tutorial(self):
@@ -3717,6 +3719,8 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         script_dir = os.path.dirname(__file__)
         rel_path = &#34;../docs/index.html&#34;
         url = os.path.join(script_dir, rel_path)
+        if not os.path.isfile(url):
+            url = &#34;https://seankmartin.github.io/NeuroChaT/&#34;
         webbrowser.open_new(url)
 
     def tutorial(self):
@@ -6059,6 +6063,8 @@ and verifies the unit using the NeuroChaT().verify_units() method.</p>
     script_dir = os.path.dirname(__file__)
     rel_path = &#34;../docs/index.html&#34;
     url = os.path.join(script_dir, rel_path)
+    if not os.path.isfile(url):
+        url = &#34;https://seankmartin.github.io/NeuroChaT/&#34;
     webbrowser.open_new(url)</code></pre>
 </details>
 </dd>

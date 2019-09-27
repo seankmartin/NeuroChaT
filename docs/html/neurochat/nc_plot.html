@@ -1121,7 +1121,6 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
             np.ma.array(fmap, mask=np.isnan(fmap)),
             cmap=colormap, rasterized=True)
 
-    # TODO deal with NaNs better in interpolated
     elif style == &#34;interpolated&#34;:
         extent = (
             0, place_data[&#39;xedges&#39;].max(),
@@ -3555,7 +3554,6 @@ Returns</p>
             np.ma.array(fmap, mask=np.isnan(fmap)),
             cmap=colormap, rasterized=True)
 
-    # TODO deal with NaNs better in interpolated
     elif style == &#34;interpolated&#34;:
         extent = (
             0, place_data[&#39;xedges&#39;].max(),
