@@ -506,9 +506,10 @@ class NLfp(NBase):
             for spike in self._spikes:
                 spike.load()
         else:
-            for name in names:
-                spike = self.get_spikes_by_name(name)
-                spike.load()
+            logging.error("Spikes by name has yet to be implemented")
+            # for name in names:
+            #     spike = self.get_spikes_by_name(name)
+            #     spike.load()
 
     def add_lfp(self, lfp=None, **kwargs):
         """
@@ -551,9 +552,10 @@ class NLfp(NBase):
             for lfp in self._lfp:
                 lfp.load()
         else:
-            for name in names:
-                lfp = self.get_lfp_by_name(name)
-                lfp.load()
+            logging.error("Lfp by name has yet to be implemented")
+            # for name in names:
+            #     lfp = self.get_lfp_by_name(name)
+            #     lfp.load()
 
     def spectrum(self, **kwargs):
         """
@@ -1377,100 +1379,107 @@ class NLfp(NBase):
         self._set_data_source(file_name)
         self._set_source_format('Axona')
 
-        with open(file_name, 'rb') as f:
-            while True:
-                line = f.readline()
-                try:
-                    line = line.decode('UTF-8')
-                except:
-                    break
-
-                if line == '':
-                    break
-                if line.startswith('trial_date'):
-                    self._set_date(' '.join(line.replace(',', ' ').split()[1:]))
-                if line.startswith('trial_time'):
-                    self._set_time(line.split()[1])
-                if line.startswith('experimenter'):
-                    self._set_experiemnter(' '.join(line.split()[1:]))
-                if line.startswith('comments'):
-                    self._set_comments(' '.join(line.split()[1:]))
-                if line.startswith('duration'):
-                    self._set_duration(float(''.join(line.split()[1:])))
-                if line.startswith('sw_version'):
-                    self._set_file_version(line.split()[1])
-                if line.startswith('num_chans'):
-                    self._set_total_channel(int(''.join(line.split()[1:])))
-                if line.startswith('sample_rate'):
-                    self._set_sampling_rate(float(''.join(re.findall(r'\d+.\d+|\d+', line))))
-                if line.startswith('bytes_per_sample'):
-                    self._set_bytes_per_sample(int(''.join(line.split()[1:])))
-                if line.startswith('num_'+ file_extension[:3].upper() + '_samples'):
-                    self._set_total_samples(int(''.join(line.split()[1:])))
-
-            num_samples = self.get_total_samples()
-            bytes_per_sample = self.get_bytes_per_sample()
-
-            f.seek(0, 0)
-            header_offset = []
-            while True:
-                try:
-                    buff = f.read(10).decode('UTF-8')
-                except:
-                    break
-                if buff == 'data_start':
-                    header_offset = f.tell()
-                    break
-                else:
-                    f.seek(-9, 1)
-
-            eeg_ID = re.findall(r'\d+', file_extension)
-            self.set_file_tag(1 if not eeg_ID else int(eeg_ID[0]))
-            max_ADC_count = 2**(8*bytes_per_sample-1)-1
-            max_byte_value = 2**(8*bytes_per_sample)
-
-            with open(set_file, 'r') as f_set:
-                lines = f_set.readlines()
-                channel_lines = dict([tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))\
-                            for line in lines if line.startswith('EEG_ch_')])
-                channel_id = channel_lines[self.get_file_tag()]
-                self.set_channel_id(channel_id)
-
-                gain_lines = dict([tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))\
-                        for line in lines if 'gain_ch_' in line])
-                gain = gain_lines[channel_id-1]
-
-                for line in lines:
-                    if line.startswith('ADC_fullscale_mv'):
-                        self._set_fullscale_mv(int(re.findall(r'\d+.\d+|d+', line)[0]))
+        if os.path.isfile(file_name):
+            with open(file_name, 'rb') as f:
+                while True:
+                    line = f.readline()
+                    try:
+                        line = line.decode('latin-1')
+                    except:
                         break
-                AD_bit_uvolt = 2*self.get_fullscale_mv()/ \
-                                 (gain*np.power(2, 8*bytes_per_sample))
 
-            record_size = bytes_per_sample
-            sample_le = 256**(np.arange(0, bytes_per_sample, 1))
+                    if line == '':
+                        break
+                    if line.startswith('trial_date'):
+                        self._set_date(' '.join(line.replace(',', ' ').split()[1:]))
+                    if line.startswith('trial_time'):
+                        self._set_time(line.split()[1])
+                    if line.startswith('experimenter'):
+                        self._set_experiemnter(' '.join(line.split()[1:]))
+                    if line.startswith('comments'):
+                        self._set_comments(' '.join(line.split()[1:]))
+                    if line.startswith('duration'):
+                        self._set_duration(float(''.join(line.split()[1:])))
+                    if line.startswith('sw_version'):
+                        self._set_file_version(line.split()[1])
+                    if line.startswith('num_chans'):
+                        self._set_total_channel(int(''.join(line.split()[1:])))
+                    if line.startswith('sample_rate'):
+                        self._set_sampling_rate(float(''.join(re.findall(r'\d+.\d+|\d+', line))))
+                    if line.startswith('bytes_per_sample'):
+                        self._set_bytes_per_sample(int(''.join(line.split()[1:])))
+                    if line.startswith('num_'+ file_extension[:3].upper() + '_samples'):
+                        self._set_total_samples(int(''.join(line.split()[1:])))
+                    if line.startswith("data_start"):
+                        break
 
-            if not header_offset:
-                print('Error: data_start marker not found!')
-            else:
-                f.seek(header_offset, 0)
-                byte_buffer = np.fromfile(f, dtype='uint8')
-                len_bytebuffer = len(byte_buffer)
-                end_offset = len('\r\ndata_end\r')
-                lfp_wave = np.zeros([num_samples, ], dtype=np.float64)
-                for k in np.arange(0, bytes_per_sample, 1):
-                    byte_offset = k
-                    sample_value = (sample_le[k]* byte_buffer[byte_offset \
-                                  :byte_offset+ len_bytebuffer- end_offset- record_size\
-                                  :record_size])
-                    if sample_value.size < num_samples:
-                        sample_value = np.append(sample_value, np.zeros([num_samples-sample_value.size,]))
-                    sample_value = sample_value.astype(np.float64, casting='unsafe', copy=False)
-                    np.add(lfp_wave, sample_value, out=lfp_wave)
-                np.putmask(lfp_wave, lfp_wave > max_ADC_count, lfp_wave- max_byte_value)
+                num_samples = self.get_total_samples()
+                bytes_per_sample = self.get_bytes_per_sample()
 
-                self._set_samples(lfp_wave*AD_bit_uvolt)
-                self._set_timestamp(np.arange(0, num_samples, 1)/self.get_sampling_rate())
+                f.seek(0, 0)
+                header_offset = []
+                while True:
+                    try:
+                        buff = f.read(10).decode('UTF-8')
+                    except:
+                        break
+                    if buff == 'data_start':
+                        header_offset = f.tell()
+                        break
+                    else:
+                        f.seek(-9, 1)
+
+                eeg_ID = re.findall(r'\d+', file_extension)
+                self.set_file_tag(1 if not eeg_ID else int(eeg_ID[0]))
+                max_ADC_count = 2**(8*bytes_per_sample-1)-1
+                max_byte_value = 2**(8*bytes_per_sample)
+
+                with open(set_file, 'r', encoding='latin-1') as f_set:
+                    lines = f_set.readlines()
+                    channel_lines = dict([tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))\
+                                for line in lines if line.startswith('EEG_ch_')])
+                    channel_id = channel_lines[self.get_file_tag()]
+                    self.set_channel_id(channel_id)
+
+                    gain_lines = dict([tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))\
+                            for line in lines if 'gain_ch_' in line])
+                    gain = gain_lines[channel_id-1]
+
+                    for line in lines:
+                        if line.startswith('ADC_fullscale_mv'):
+                            self._set_fullscale_mv(int(re.findall(r'\d+.\d+|d+', line)[0]))
+                            break
+                    AD_bit_uvolt = 2*self.get_fullscale_mv()/ \
+                                    (gain*np.power(2, 8*bytes_per_sample))
+
+                record_size = bytes_per_sample
+                sample_le = 256**(np.arange(0, bytes_per_sample, 1))
+
+                if not header_offset:
+                    print('Error: data_start marker not found!')
+                else:
+                    f.seek(header_offset, 0)
+                    byte_buffer = np.fromfile(f, dtype='uint8')
+                    len_bytebuffer = len(byte_buffer)
+                    end_offset = len('\r\ndata_end\r')
+                    lfp_wave = np.zeros([num_samples, ], dtype=np.float64)
+                    for k in np.arange(0, bytes_per_sample, 1):
+                        byte_offset = k
+                        sample_value = (sample_le[k]* byte_buffer[byte_offset \
+                                    :byte_offset+ len_bytebuffer- end_offset- record_size\
+                                    :record_size])
+                        if sample_value.size < num_samples:
+                            sample_value = np.append(sample_value, np.zeros([num_samples-sample_value.size,]))
+                        sample_value = sample_value.astype(np.float64, casting='unsafe', copy=False)
+                        np.add(lfp_wave, sample_value, out=lfp_wave)
+                    np.putmask(lfp_wave, lfp_wave > max_ADC_count, lfp_wave- max_byte_value)
+
+                    self._set_samples(lfp_wave*AD_bit_uvolt)
+                    self._set_timestamp(np.arange(0, num_samples, 1)/self.get_sampling_rate())
+
+        else:
+            logging.error(
+                "No lfp file found for file {}".format(file_name))
 
     def load_lfp_Neuralynx(self, file_name):
         """

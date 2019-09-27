@@ -16,6 +16,7 @@ import pandas as pd
 from PyQt5 import QtCore
 
 from neurochat.nc_utils import NLog, angle_between_points, log_exception
+from neurochat.nc_utils import remove_extension
 from neurochat.nc_data import NData
 from neurochat.nc_datacontainer import NDataContainer
 from neurochat.nc_hdf import Nhdf
@@ -354,13 +355,14 @@ class NeuroChaT(QtCore.QThread):
             if os.path.exists(excel_file):
                 excel_info = pd.read_excel(excel_file)
                 for row in excel_info.itertuples():
-                    spike_file = row[1]+ os.sep+ row[3]
+                    spike_file = row[1] + os.sep + row[3]
                     unit_no = int(row[4])
-                    lfp_id = row[5]
+                    lfp_id = str(row[5])
 
                     if self.get_data_format() == 'Axona':
-                        spatial_file = row[1]+ os.sep+ row[2]+ '.txt'
-                        lfp_file = ''.join(spike_file.split('.')[:-1])+ '.'+ lfp_id
+                        end = "" if row[2][-4:] == ".txt" else ".txt"
+                        spatial_file = row[1] + os.sep + row[2] + end
+                        lfp_file = remove_extension(spike_file) + lfp_id
 
                     elif self.get_data_format() == 'Neuralynx':
                         spatial_file = row[1] + os.sep+ row[2]+ '.nvt'
@@ -391,8 +393,9 @@ class NeuroChaT(QtCore.QThread):
 
                 cell_id = self.hdf.resolve_analysis_path(spike=self.ndata.spike, lfp=self.ndata.lfp)
                 nwb_name = self.hdf.resolve_hdfname(data=self.ndata.spike)
-                pdf_name = ''.join(nwb_name.split('.')[:-1])+ '_'+ \
-                            cell_id+ '.'+ self.get_graphic_format()
+                pdf_name = (
+                    remove_extension(nwb_name, keep_dot=False) +
+                    '_' + cell_id+ '.' + self.get_graphic_format())
 
                 info['nwb'].append(nwb_name)
                 info['cellid'].append(cell_id)
@@ -852,8 +855,9 @@ class NeuroChaT(QtCore.QThread):
                 fig = nc_plot.multiple_regression(graph_data)
                 self.close_fig(fig)                
                 self.plot_data_to_hdf(name=name+ '/multiple_regression/', graph_data=graph_data)
-            except:
-                logging.error('Error in multiple-regression analysis')
+            except Exception as ex:
+                log_exception(
+                    ex, "in multiple-regression analysis")
 
         if self.get_analysis('inter_depend'):
             # No plot
@@ -976,7 +980,7 @@ class NeuroChaT(QtCore.QThread):
         """
         if not filename:
             filename = self.config.get_nwb_file()
-        
+            
         self.hdf.set_filename(filename=filename)
     
     def close_hdf_file(self):
@@ -1168,7 +1172,7 @@ class NeuroChaT(QtCore.QThread):
 
                 if self.get_data_format() == 'Axona':
                     spatial_file = row[1]+ os.sep+ row[2]+ '.txt'
-                    lfp_file = ''.join(spike_file.split('.')[:-1])+ '.'+ lfp_id
+                    lfp_file = remove_extension(spike_file) + lfp_id
 
                 elif self.get_data_format() == 'Neuralynx':
                     spatial_file = row[1] + os.sep+ row[2]+ '.nvt'
@@ -1222,12 +1226,12 @@ class NeuroChaT(QtCore.QThread):
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
             for row in excel_info.itertuples():
-                spike_file = row[1]+ os.sep+ row[2]
-                unit_no = int(row[3])
+                spike_file = row[1]+ os.sep+ row[3]
+                unit_no = int(row[4])
                 if self.get_data_format() == 'NWB':
                 # excel list: directory| spike group| unit_no
-                    hdf_name = row[1] + os.sep+ row[2]+ '.hdf5'
-                    spike_file = hdf_name+ '/processing/Shank'+ '/'+ row[3]
+                    hdf_name = row[1] + os.sep+ row[3]+ '.hdf5'
+                    spike_file = hdf_name+ '/processing/Shank'+ '/'+ row[4]
                 info['spike'].append(spike_file)
                 info['unit'].append(unit_no)
             n_units = excel_info.shape[0]
@@ -1248,7 +1252,7 @@ class NeuroChaT(QtCore.QThread):
                         if info['unit'][i] in units:
                             excel_info.loc[i, 'unitExists'] = True
 
-            excel_info.to_excel(excel_file)
+            excel_info.to_excel(excel_file, index=False)
             logging.info('Verification process completed!')
         else:
             logging.error('Excel  file does not exist!')
@@ -1286,7 +1290,12 @@ class NeuroChaT(QtCore.QThread):
 
         excel_info = excel_info.assign(CentroidX=pd.Series(np.zeros(n_units)))
         excel_info = excel_info.assign(CentroidY=pd.Series(np.zeros(n_units)))
-        excel_info = excel_info.assign(AngleInDegrees=pd.Series(np.zeros(n_units)))
+        excel_info = excel_info.assign(
+            AngleInDegrees=pd.Series(np.zeros(n_units)))
+        excel_info = excel_info.assign(
+            StrongPlaceField=pd.Series(np.zeros(n_units)))
+        excel_info = excel_info.assign(
+            Skaggs=pd.Series(np.zeros(n_units)))
         
         centroids = []
         figs = []
@@ -1302,6 +1311,10 @@ class NeuroChaT(QtCore.QThread):
             centroids.append(centroid)
             excel_info.loc[i, "CentroidX"] = centroid[0]
             excel_info.loc[i, "CentroidY"] = centroid[1]
+            _res = data.get_results()
+            excel_info.loc[i, "Skaggs"] = _res["Spatial Skaggs"]
+            excel_info.loc[i, "StrongPlaceField"] = (
+                _res["Found strong place field"])
             if should_plot:
                 fig = nc_plot.loc_firing_and_place(place_data)
                 figs.append(fig)
@@ -1324,7 +1337,8 @@ class NeuroChaT(QtCore.QThread):
             self.close_fig(figs)
 
         try:
-            split_up = excel_file.split(".")
+            split_up = remove_extension(
+                excel_file, keep_dot=False, return_ext=True)
             output_file = split_up[0] + "_result." + split_up[1]
             excel_info.to_excel(output_file, index=False)
         except PermissionError:
@@ -1382,7 +1396,7 @@ class NeuroChaT(QtCore.QThread):
                             bc, dh = nclust.cluster_separation(unit_no=info['unit'][i])
                             excel_info.loc[i, 'BC'] = np.max(bc)
                             excel_info.loc[i, 'Dh'] = np.min(dh)
-            excel_info.to_excel(excel_file)
+            excel_info.to_excel(excel_file, index=False)
             logging.info('Cluster evaluation completed!')
         else:
             logging.error('Excel  file does not exist!')
@@ -1442,7 +1456,7 @@ class NeuroChaT(QtCore.QThread):
                                 unit_1=info['unit_1'][i], unit_2=info['unit_2'][i])
                         excel_info.loc[i, 'BC'] = bc
                         excel_info.loc[i, 'Dh'] = dh
-            excel_info.to_excel(excel_file)
+            excel_info.to_excel(excel_file, index=False)
             logging.info('Cluster similarity analysis completed!')
         else:
             logging.error('Excel  file does not exist!')
@@ -1463,8 +1477,11 @@ class NeuroChaT(QtCore.QThread):
         """
         try:
             container = NDataContainer(load_on_fly=True)
-            container.add_axona_files_from_dir(directory)
-            nca.place_cell_summary(container, dpi=dpi)
+            container.add_axona_files_from_dir(
+                directory, tetrode_list = [i for i in range(1, 17)])
+            nca.place_cell_summary(
+                container, dpi=dpi, 
+                filter_place_cells=False, filter_low_freq=False)
         except Exception as ex:
             log_exception(ex, "In walking a directory for place cell summaries")
         return 

@@ -45,6 +45,8 @@ in NeuroChaT.
 import os
 import sys
 import logging
+import webbrowser
+
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 
@@ -66,6 +68,7 @@ from neurochat.nc_uimerge import UiMerge
 #reload(nc_control)
 from neurochat.nc_control import NeuroChaT
 from neurochat.nc_utils import make_dir_if_not_exists, log_exception
+from neurochat.nc_utils import remove_extension
 
 import pandas as pd
 
@@ -252,6 +255,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.angle_act.triggered.connect(self.angle_calculation)
         self.multi_place_cell_act.triggered.connect(self.place_cell_plots)
 
+        self.view_help_act.triggered.connect(self.view_help)
+        # self.tutorial_act.triggered.connect(self.tutorial)
+        self.about_nc_act.triggered.connect(self.about_nc)
+
         self.verify_units_act.triggered.connect(self.verify_units)
         self.evaluate_act.triggered.connect(self.cluster_evaluate)
         self.compare_units_act.triggered.connect(self.compare_units)
@@ -333,8 +340,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         self.view_help_act = self.help_menu.addAction(&#34;NeuroChaT documentation&#34;)
         self.view_help_act.setShortcut(QtGui.QKeySequence(&#34;F1&#34;))
-        self.tutorial_act = self.help_menu.addAction(&#34;NeuroChaT tutorial&#34;)
-        self.help_menu.addSeparator()
+        # self.tutorial_act = self.help_menu.addAction(&#34;NeuroChaT tutorial&#34;)
+        # self.help_menu.addSeparator()
         self.about_nc_act = self.help_menu.addAction(&#34;About NeuroChaT&#34;)
 
     def selectGraphicFormatUi(self):
@@ -519,7 +526,11 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         &#34;&#34;&#34;
 
         self.setWindowTitle(_translate(&#34;MainWindow&#34;, &#34;NeuroChaT&#34;, None))
-        self.setWindowIcon(QtGui.QIcon(&#34;icon_48.png&#34;))
+        # &lt;-- absolute dir the script is in
+        script_dir = os.path.dirname(__file__)
+        rel_path = &#34;../NeuroChat.png&#34;
+        abs_file_path = os.path.join(script_dir, rel_path)
+        self.setWindowIcon(QtGui.QIcon(abs_file_path))
 
     def start(self):
         &#34;&#34;&#34;
@@ -593,27 +604,36 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         session information in NeuroChaT configuration file (.ncfg).
 
         &#34;&#34;&#34;
-        try:
-            with open(self._default_loc, &#34;w&#34;) as f:
-                f.write(os.getcwd())
-        except Exception as e:
-            log_exception(e, &#34;Failed save last location {} in {}&#34;.format(
-                os.getcwd(), self._default_loc))
+        def save_last(event):
+            try:
+                with open(self._default_loc, &#34;w&#34;) as f:
+                    f.write(os.getcwd())
+                event.accept()
+            except Exception as e:
+                log_exception(e, &#34;Failed to save last location {} in {}&#34;.format(
+                    os.getcwd(), self._default_loc))
+                event.ignore()
+
         reply = QtWidgets.QMessageBox.question(self, &#34;Message&#34;, \
             &#34;Save current session before you quit?&#34;,\
             QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel,\
             QtWidgets.QMessageBox.Save)
         if reply == QtWidgets.QMessageBox.Save:
-            config_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getSaveFileName(self, \
-                        &#39;Save configuration to...&#39;, os.getcwd()+ os.sep+ &#39;nc_config.ncfg&#39;, &#34;.ncfg&#34;)[0])
+            config_file = QtCore.QDir.toNativeSeparators(
+                QtWidgets.QFileDialog.getSaveFileName(
+                    self, &#39;Save session as...&#39;, os.getcwd(), &#34;*.ncfg&#34;)[0])
             if config_file:
                 try:
-                    event.accept()
+                    self._get_config()
+                    self._control.save_config(config_file)
+                    logging.info(&#34;Session saved in: &#34; + config_file)
+                    os.chdir(os.path.dirname(config_file))
+                    save_last(event) 
                 except:
                     logging.error(&#39;Failed to save configuration!&#39;)
                     event.ignore()
         elif reply == QtWidgets.QMessageBox.Close:
-            event.accept()
+            save_last(event)
         else:
             event.ignore()
 
@@ -904,7 +924,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             data_format = self._control.get_data_format()
             if data_format == &#39;Axona&#39;:
                 spike_file = self._control.get_spike_file()
-                lfp_file = &#39;&#39;.join(spike_file.split(&#39;.&#39;)[:-1])+ &#39;.&#39;+ lfpID
+                lfp_file = remove_extension(spike_file) + lfpID
             elif data_format == &#39;Neuralynx&#39;:
                 spike_file = self._control.get_spike_file()
                 print(os.sep.join(spike_file.split(os.sep)[:-1])+ os.sep+ lfpID)
@@ -916,6 +936,19 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             else:
                 logging.error(&#39;The input data format not supported!&#39;)
             self._control.set_lfp_file(lfp_file)
+    
+    def view_help(self):
+        script_dir = os.path.dirname(__file__)
+        rel_path = &#34;../docs/index.html&#34;
+        url = os.path.join(script_dir, rel_path)
+        webbrowser.open_new(url)
+
+    def tutorial(self):
+        pass
+    
+    def about_nc(self):
+        url = &#34;https://github.com/seankmartin/NeuroChaT/wiki&#34;
+        webbrowser.open_new(url)
 
     def _set_dictation(self):
         &#34;&#34;&#34;
@@ -2998,6 +3031,10 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         self.angle_act.triggered.connect(self.angle_calculation)
         self.multi_place_cell_act.triggered.connect(self.place_cell_plots)
 
+        self.view_help_act.triggered.connect(self.view_help)
+        # self.tutorial_act.triggered.connect(self.tutorial)
+        self.about_nc_act.triggered.connect(self.about_nc)
+
         self.verify_units_act.triggered.connect(self.verify_units)
         self.evaluate_act.triggered.connect(self.cluster_evaluate)
         self.compare_units_act.triggered.connect(self.compare_units)
@@ -3079,8 +3116,8 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
 
         self.view_help_act = self.help_menu.addAction(&#34;NeuroChaT documentation&#34;)
         self.view_help_act.setShortcut(QtGui.QKeySequence(&#34;F1&#34;))
-        self.tutorial_act = self.help_menu.addAction(&#34;NeuroChaT tutorial&#34;)
-        self.help_menu.addSeparator()
+        # self.tutorial_act = self.help_menu.addAction(&#34;NeuroChaT tutorial&#34;)
+        # self.help_menu.addSeparator()
         self.about_nc_act = self.help_menu.addAction(&#34;About NeuroChaT&#34;)
 
     def selectGraphicFormatUi(self):
@@ -3265,7 +3302,11 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         &#34;&#34;&#34;
 
         self.setWindowTitle(_translate(&#34;MainWindow&#34;, &#34;NeuroChaT&#34;, None))
-        self.setWindowIcon(QtGui.QIcon(&#34;icon_48.png&#34;))
+        # &lt;-- absolute dir the script is in
+        script_dir = os.path.dirname(__file__)
+        rel_path = &#34;../NeuroChat.png&#34;
+        abs_file_path = os.path.join(script_dir, rel_path)
+        self.setWindowIcon(QtGui.QIcon(abs_file_path))
 
     def start(self):
         &#34;&#34;&#34;
@@ -3339,27 +3380,36 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         session information in NeuroChaT configuration file (.ncfg).
 
         &#34;&#34;&#34;
-        try:
-            with open(self._default_loc, &#34;w&#34;) as f:
-                f.write(os.getcwd())
-        except Exception as e:
-            log_exception(e, &#34;Failed save last location {} in {}&#34;.format(
-                os.getcwd(), self._default_loc))
+        def save_last(event):
+            try:
+                with open(self._default_loc, &#34;w&#34;) as f:
+                    f.write(os.getcwd())
+                event.accept()
+            except Exception as e:
+                log_exception(e, &#34;Failed to save last location {} in {}&#34;.format(
+                    os.getcwd(), self._default_loc))
+                event.ignore()
+
         reply = QtWidgets.QMessageBox.question(self, &#34;Message&#34;, \
             &#34;Save current session before you quit?&#34;,\
             QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel,\
             QtWidgets.QMessageBox.Save)
         if reply == QtWidgets.QMessageBox.Save:
-            config_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getSaveFileName(self, \
-                        &#39;Save configuration to...&#39;, os.getcwd()+ os.sep+ &#39;nc_config.ncfg&#39;, &#34;.ncfg&#34;)[0])
+            config_file = QtCore.QDir.toNativeSeparators(
+                QtWidgets.QFileDialog.getSaveFileName(
+                    self, &#39;Save session as...&#39;, os.getcwd(), &#34;*.ncfg&#34;)[0])
             if config_file:
                 try:
-                    event.accept()
+                    self._get_config()
+                    self._control.save_config(config_file)
+                    logging.info(&#34;Session saved in: &#34; + config_file)
+                    os.chdir(os.path.dirname(config_file))
+                    save_last(event) 
                 except:
                     logging.error(&#39;Failed to save configuration!&#39;)
                     event.ignore()
         elif reply == QtWidgets.QMessageBox.Close:
-            event.accept()
+            save_last(event)
         else:
             event.ignore()
 
@@ -3650,7 +3700,7 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
             data_format = self._control.get_data_format()
             if data_format == &#39;Axona&#39;:
                 spike_file = self._control.get_spike_file()
-                lfp_file = &#39;&#39;.join(spike_file.split(&#39;.&#39;)[:-1])+ &#39;.&#39;+ lfpID
+                lfp_file = remove_extension(spike_file) + lfpID
             elif data_format == &#39;Neuralynx&#39;:
                 spike_file = self._control.get_spike_file()
                 print(os.sep.join(spike_file.split(os.sep)[:-1])+ os.sep+ lfpID)
@@ -3662,6 +3712,19 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
             else:
                 logging.error(&#39;The input data format not supported!&#39;)
             self._control.set_lfp_file(lfp_file)
+    
+    def view_help(self):
+        script_dir = os.path.dirname(__file__)
+        rel_path = &#34;../docs/index.html&#34;
+        url = os.path.join(script_dir, rel_path)
+        webbrowser.open_new(url)
+
+    def tutorial(self):
+        pass
+    
+    def about_nc(self):
+        url = &#34;https://github.com/seankmartin/NeuroChaT/wiki&#34;
+        webbrowser.open_new(url)
 
     def _set_dictation(self):
         &#34;&#34;&#34;
@@ -4268,6 +4331,18 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="neurochat.nc_ui.NeuroChaT_Ui.about_nc"><code class="name flex">
+<span>def <span class="ident">about_nc</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def about_nc(self):
+    url = &#34;https://github.com/seankmartin/NeuroChaT/wiki&#34;
+    webbrowser.open_new(url)</code></pre>
+</details>
+</dd>
 <dt id="neurochat.nc_ui.NeuroChaT_Ui.accumulate_output"><code class="name flex">
 <span>def <span class="ident">accumulate_output</span></span>(<span>self)</span>
 </code></dt>
@@ -4363,6 +4438,10 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
 
     self.angle_act.triggered.connect(self.angle_calculation)
     self.multi_place_cell_act.triggered.connect(self.place_cell_plots)
+
+    self.view_help_act.triggered.connect(self.view_help)
+    # self.tutorial_act.triggered.connect(self.tutorial)
+    self.about_nc_act.triggered.connect(self.about_nc)
 
     self.verify_units_act.triggered.connect(self.verify_units)
     self.evaluate_act.triggered.connect(self.cluster_evaluate)
@@ -4859,27 +4938,36 @@ session information in NeuroChaT configuration file (.ncfg).</p></section>
     session information in NeuroChaT configuration file (.ncfg).
 
     &#34;&#34;&#34;
-    try:
-        with open(self._default_loc, &#34;w&#34;) as f:
-            f.write(os.getcwd())
-    except Exception as e:
-        log_exception(e, &#34;Failed save last location {} in {}&#34;.format(
-            os.getcwd(), self._default_loc))
+    def save_last(event):
+        try:
+            with open(self._default_loc, &#34;w&#34;) as f:
+                f.write(os.getcwd())
+            event.accept()
+        except Exception as e:
+            log_exception(e, &#34;Failed to save last location {} in {}&#34;.format(
+                os.getcwd(), self._default_loc))
+            event.ignore()
+
     reply = QtWidgets.QMessageBox.question(self, &#34;Message&#34;, \
         &#34;Save current session before you quit?&#34;,\
         QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel,\
         QtWidgets.QMessageBox.Save)
     if reply == QtWidgets.QMessageBox.Save:
-        config_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getSaveFileName(self, \
-                    &#39;Save configuration to...&#39;, os.getcwd()+ os.sep+ &#39;nc_config.ncfg&#39;, &#34;.ncfg&#34;)[0])
+        config_file = QtCore.QDir.toNativeSeparators(
+            QtWidgets.QFileDialog.getSaveFileName(
+                self, &#39;Save session as...&#39;, os.getcwd(), &#34;*.ncfg&#34;)[0])
         if config_file:
             try:
-                event.accept()
+                self._get_config()
+                self._control.save_config(config_file)
+                logging.info(&#34;Session saved in: &#34; + config_file)
+                os.chdir(os.path.dirname(config_file))
+                save_last(event) 
             except:
                 logging.error(&#39;Failed to save configuration!&#39;)
                 event.ignore()
     elif reply == QtWidgets.QMessageBox.Close:
-        event.accept()
+        save_last(event)
     else:
         event.ignore()</code></pre>
 </details>
@@ -5293,8 +5381,8 @@ once the spike data is set using the 'Browse' button</p></section>
 
     self.view_help_act = self.help_menu.addAction(&#34;NeuroChaT documentation&#34;)
     self.view_help_act.setShortcut(QtGui.QKeySequence(&#34;F1&#34;))
-    self.tutorial_act = self.help_menu.addAction(&#34;NeuroChaT tutorial&#34;)
-    self.help_menu.addSeparator()
+    # self.tutorial_act = self.help_menu.addAction(&#34;NeuroChaT tutorial&#34;)
+    # self.help_menu.addSeparator()
     self.about_nc_act = self.help_menu.addAction(&#34;About NeuroChaT&#34;)</code></pre>
 </details>
 </dd>
@@ -5394,7 +5482,11 @@ Sets the data analysis mode to the selected item.</p></section>
     &#34;&#34;&#34;
 
     self.setWindowTitle(_translate(&#34;MainWindow&#34;, &#34;NeuroChaT&#34;, None))
-    self.setWindowIcon(QtGui.QIcon(&#34;icon_48.png&#34;))</code></pre>
+    # &lt;-- absolute dir the script is in
+    script_dir = os.path.dirname(__file__)
+    rel_path = &#34;../NeuroChat.png&#34;
+    abs_file_path = os.path.join(script_dir, rel_path)
+    self.setWindowIcon(QtGui.QIcon(abs_file_path))</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_ui.NeuroChaT_Ui.save_log"><code class="name flex">
@@ -5690,7 +5782,7 @@ texts of the log-box are exported</p></section>
         data_format = self._control.get_data_format()
         if data_format == &#39;Axona&#39;:
             spike_file = self._control.get_spike_file()
-            lfp_file = &#39;&#39;.join(spike_file.split(&#39;.&#39;)[:-1])+ &#39;.&#39;+ lfpID
+            lfp_file = remove_extension(spike_file) + lfpID
         elif data_format == &#39;Neuralynx&#39;:
             spike_file = self._control.get_spike_file()
             print(os.sep.join(spike_file.split(os.sep)[:-1])+ os.sep+ lfpID)
@@ -5879,6 +5971,17 @@ in NeuroChaT</p></section>
     self._control.start()</code></pre>
 </details>
 </dd>
+<dt id="neurochat.nc_ui.NeuroChaT_Ui.tutorial"><code class="name flex">
+<span>def <span class="ident">tutorial</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def tutorial(self):
+    pass</code></pre>
+</details>
+</dd>
 <dt id="neurochat.nc_ui.NeuroChaT_Ui.update_log"><code class="name flex">
 <span>def <span class="ident">update_log</span></span>(<span>self, msg)</span>
 </code></dt>
@@ -5943,6 +6046,20 @@ and verifies the unit using the NeuroChaT().verify_units() method.</p>
         logging.info(&#34;New excel file added: &#34;+ \
                                     excel_file.rstrip(&#34;\n\r&#34;).split(os.sep)[-1])
         self._control.verify_units(excel_file)</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_ui.NeuroChaT_Ui.view_help"><code class="name flex">
+<span>def <span class="ident">view_help</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def view_help(self):
+    script_dir = os.path.dirname(__file__)
+    rel_path = &#34;../docs/index.html&#34;
+    url = os.path.join(script_dir, rel_path)
+    webbrowser.open_new(url)</code></pre>
 </details>
 </dd>
 </dl>
@@ -8831,6 +8948,7 @@ underneath.</p></section>
 <li>
 <h4><code><a title="neurochat.nc_ui.NeuroChaT_Ui" href="#neurochat.nc_ui.NeuroChaT_Ui">NeuroChaT_Ui</a></code></h4>
 <ul class="">
+<li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.about_nc" href="#neurochat.nc_ui.NeuroChaT_Ui.about_nc">about_nc</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.accumulate_output" href="#neurochat.nc_ui.NeuroChaT_Ui.accumulate_output">accumulate_output</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.angle_calculation" href="#neurochat.nc_ui.NeuroChaT_Ui.angle_calculation">angle_calculation</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.behaviour_ui" href="#neurochat.nc_ui.NeuroChaT_Ui.behaviour_ui">behaviour_ui</a></code></li>
@@ -8866,8 +8984,10 @@ underneath.</p></section>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.set_unit_no" href="#neurochat.nc_ui.NeuroChaT_Ui.set_unit_no">set_unit_no</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.setup_ui" href="#neurochat.nc_ui.NeuroChaT_Ui.setup_ui">setup_ui</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.start" href="#neurochat.nc_ui.NeuroChaT_Ui.start">start</a></code></li>
+<li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.tutorial" href="#neurochat.nc_ui.NeuroChaT_Ui.tutorial">tutorial</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.update_log" href="#neurochat.nc_ui.NeuroChaT_Ui.update_log">update_log</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.verify_units" href="#neurochat.nc_ui.NeuroChaT_Ui.verify_units">verify_units</a></code></li>
+<li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.view_help" href="#neurochat.nc_ui.NeuroChaT_Ui.view_help">view_help</a></code></li>
 </ul>
 </li>
 <li>

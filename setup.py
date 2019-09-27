@@ -12,8 +12,8 @@ LONG_DESCRIPTION = """NeuroChaT is a neuroscience toolbox written in Python.
 DISTNAME = 'neurochat'
 MAINTAINER = 'Md Nurul Islam and Sean Martin'
 MAINTAINER_EMAIL = 'martins7@tcd.ie'
-URL = 'https://github.com/flabby99/NeuroChaT'
-DOWNLOAD_URL = 'https://github.com/flabby99/NeuroChaT'
+URL = 'https://github.com/seankmartin/NeuroChaT'
+DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT'
 VERSION = '1.0'
 
 INSTALL_REQUIRES = [
@@ -21,14 +21,13 @@ INSTALL_REQUIRES = [
     'PyQt5 >= 5.11.3',
     'h5py >= 2.9.0',
     'matplotlib >= 3.0.2',
-    'numpy >= 1.16.0',
+    'numpy >= 1.15.0',
     'pandas >= 0.24.0',
     'scipy >= 1.2.0',
     'scikit_learn >= 0.20.2',
     'PyYAML >= 4.2b1',
     'xlrd',
-    'openpyxl',
-    'pyinstaller'
+    'openpyxl'
 ]
 
 PACKAGES = [

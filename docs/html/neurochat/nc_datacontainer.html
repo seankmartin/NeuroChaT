@@ -35,20 +35,34 @@ from enum import Enum
 import copy
 import logging
 import os
+import pprint
+import re
 
 import pandas as pd
 import numpy as np
 
 from neurochat.nc_data import NData
-from neurochat.nc_utils import get_all_files_in_dir
-from neurochat.nc_utils import has_ext
+from neurochat.nc_utils import get_all_files_in_dir, make_dir_if_not_exists
+from neurochat.nc_utils import has_ext, log_exception, remove_extension
+
+
+class NDataContainerIterator():
+    def __init__(self, container):
+        self._index = 0
+        self._container = container
+
+    def __next__(self):
+        if self._index &lt; len(self._container):
+            self._index += 1
+            return self._container[self._index - 1]
+        raise StopIteration
 
 
 class NDataContainer():
     &#34;&#34;&#34;
     Class for storing multiple file locations for ndata objects.
 
-    Additionally the ndata objects themselves can be stored
+    Additionally the ndata objects themselves can be stored.
     &#34;&#34;&#34;
 
     def __init__(self, share_positions=False, load_on_fly=False):
@@ -68,7 +82,7 @@ class NDataContainer():
         _container : List
         _file_names_dict : Dict
         _units : List
-        _unit_count : int
+        _unit_count : List
         _share_positions : bool
         _load_on_fly : bool
         _smoothed_speed : bool
@@ -78,7 +92,7 @@ class NDataContainer():
         self._file_names_dict = {}
         self._units = []
         self._container = []
-        self._unit_count = 0
+        self._unit_count = []
         self._share_positions = share_positions
         self._load_on_fly = load_on_fly
         self._last_data_pt = (1, None)
@@ -98,8 +112,10 @@ class NDataContainer():
                 return len(vals)
         return len(self._container)
 
-    def get_file_dict(self):
+    def get_file_dict(self, key=None):
         &#34;&#34;&#34;Return the key value filename dictionary for this collection.&#34;&#34;&#34;
+        if key:
+            return self._file_names_dict.get(key, None)
         return self._file_names_dict
 
     def get_units(self, index=None):
@@ -251,6 +267,9 @@ class NDataContainer():
     def set_units(self, units=&#39;all&#39;):
         &#34;&#34;&#34;Set the list of units for the collection.&#34;&#34;&#34;
         self._units = []
+        if self.get_file_dict() == {}:
+            print(&#34;Error: Can&#39;t set units for empty collection&#34;)
+            return
         if units == &#39;all&#39;:
             if self._load_on_fly:
                 vals = self.get_file_dict()[&#34;Spike&#34;]
@@ -365,7 +384,7 @@ class NDataContainer():
                     lfp_ext = row[4]
                     if lfp_ext[0] != &#34;.&#34;:
                         lfp_ext = &#34;.&#34; + lfp_ext
-                    spike_name = spike_file.split(&#34;.&#34;)[0]
+                    spike_name = remove_extension(spike_file, keep_dot=False)
                     lfp_file = spike_name + lfp_ext
 
                     pos_files.append(spat_file)
@@ -393,14 +412,19 @@ class NDataContainer():
             return None
 
     # Created by Sean Martin with help from Matheus Cafalchio
-    def add_axona_files_from_dir(self, directory, **kwargs):
+    def add_axona_files_from_dir(
+            self, directory, recursive=False, verbose=False, **kwargs):
         &#34;&#34;&#34;
-        Go through a directory, extracting files from it
+        Go through a directory, extracting files from it.
 
         Parameters
         ----------
         directory : str
             The directory to parse through
+        recursive : bool, optional. Defaults to False.
+            Whether to recurse through dirs
+        verbose: bool, optional. Defaults to False.
+            Whether to print the files being added.
 
         **kwargs: keyword arguments
             tetrode_list : list
@@ -409,39 +433,65 @@ class NDataContainer():
             cluster_extension : str default .cut
             pos_extension : str default .txt
             lfp_extension : str default .eeg
+            re_filter : str default None 
+                regex string for matching filenames
+            save_result : bool default True
+                should save the resulting collection to a file
+            unit_cutoff : tuple of ints
+                don&#39;t consider any recordings with units outside this range
+
         Returns
         -------
         None
 
         &#34;&#34;&#34;
-        default_tetrode_list = [1, 2, 3, 4, 9, 10, 11, 12]
+        default_tetrode_list = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
         tetrode_list = kwargs.get(&#34;tetrode_list&#34;, default_tetrode_list)
         data_extension = kwargs.get(&#34;data_extension&#34;, &#34;.set&#34;)
         cluster_extension = kwargs.get(&#34;cluster_extension&#34;, &#34;.cut&#34;)
+        clu_extension = kwargs.get(&#34;clu_extension&#34;, &#34;.clu.X&#34;)
         pos_extension = kwargs.get(&#34;pos_extension&#34;, &#34;.txt&#34;)
         lfp_extension = kwargs.get(&#34;lfp_extension&#34;, &#34;.eeg&#34;)
+        re_filter = kwargs.get(&#34;re_filter&#34;, None)
+        save_result = kwargs.get(&#34;save_result&#34;, True)
+        unit_cutoff = kwargs.get(&#34;unit_cutoff&#34;, None)
 
-        files = get_all_files_in_dir(directory, data_extension)
-        txt_files = get_all_files_in_dir(directory, pos_extension)
+        files = get_all_files_in_dir(
+            directory, data_extension,
+            recursive=recursive, verbose=verbose,
+            re_filter=re_filter, return_absolute=True)
+        txt_files = get_all_files_in_dir(
+            directory, pos_extension,
+            recursive=recursive, verbose=verbose,
+            re_filter=re_filter, return_absolute=True)
+
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
                 spike_name = filename + &#39;.&#39; + str(tetrode)
                 cut_name = filename + &#39;_&#39; + str(tetrode) + cluster_extension
+                clu_name = filename + clu_extension[:-1] + str(tetrode)
                 lfp_name = filename + lfp_extension
+
+                if not os.path.isfile(os.path.join(directory, spike_name)):
+                    continue
                 # Don&#39;t consider files that have not been clustered
-                if not os.path.isfile(os.path.join(directory, cut_name)):
+                if not (
+                        os.path.isfile(os.path.join(directory, cut_name)) or
+                        os.path.isfile(os.path.join(directory, clu_name))):
                     logging.info(
-                        &#34;Skipping this - no cluster file named {}&#34;.format(cut_name))
+                        &#34;Skipping tetrode {} - no cluster file named {} or {}&#34;.format(tetrode, cut_name, os.path.basename(clu_name)))
                     continue
 
                 for fname in txt_files:
                     if fname[:len(filename)] == filename:
                         pos_name = fname
                         break
+
                 else:
                     logging.info(
-                        &#34;Skipping this - no position file for {}&#34;.format(filename))
+                        &#34;Skipping tetrode {} - no position file for {}&#34;.format(tetrode, filename))
                     continue
 
                 self.add_files(NDataContainer.EFileType.Spike, [spike_name])
@@ -449,11 +499,30 @@ class NDataContainer():
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
         self.set_units()
 
+        if unit_cutoff:
+            self.remove_recordings_units(
+                unit_cutoff[0], unit_cutoff[1], verbose=verbose)
+        if save_result:
+            friendly_re = &#34;&#34;
+            if re_filter:
+                friendly_re = &#34;_&#34; + \
+                    &#34; &#34;.join(re.findall(&#34;[a-zA-Z]+&#34;, re_filter))
+            name = (
+                &#34;file_list_&#34; + os.path.basename(directory) +
+                friendly_re + &#34;.txt&#34;)
+            out_loc = os.path.join(directory, &#34;nc_results&#34;, name)
+            make_dir_if_not_exists(out_loc)
+            with open(out_loc, &#39;w&#39;) as f:
+                f.write(str(self))
+            print(&#34;Wrote list of files considered to {}&#34;.format(out_loc))
+            return out_loc
+        return None
+
     def merge(self, indices, force_equal_units=True):
         &#34;&#34;&#34;
         Merge the data from multiple indices together into the first index.
 
-        WORK IN PROGRESS - ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY
+        ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY - DOES NOT MERGE LFP.
         Only call this after loading the data, and not while loading on the fly
 
         Parameters
@@ -615,7 +684,115 @@ class NDataContainer():
                     zip(centroids, self.get_units()[idx]),
                     key=lambda pair: pair[0][h])]
 
+    def get_index_info(self, idx, absolute=False):
+        &#34;&#34;&#34;Return the Spike, LFP, Position and Unit info at idx.&#34;&#34;&#34;
+        str_info = {}
+        dirnames = []
+        if absolute:
+            idx, u_idx = self._index_to_data_pos(idx)
+
+        for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;]:
+            name = self.get_file_dict(key)[idx][0]
+            str_info[key] = (os.path.basename(name))
+            dirnames.append(os.path.dirname(name))
+
+        if absolute:
+            str_info[&#34;Units&#34;] = (self.get_units(idx)[u_idx])
+        else:
+            str_info[&#34;Units&#34;] = (self.get_units(idx))
+
+        if len(set(dirnames)) == 1:
+            str_info[&#34;Root&#34;] = dirnames[0]
+        else:
+            print(&#34;Not all files are in the same directory {} {}&#34;.format(
+                &#34;:Spike, LFP, Position: &#34;, dirnames))
+            str_info[&#34;Root&#34;] = dirnames
+        return str_info
+
+    def string_repr(self, pretty=True):
+        &#34;&#34;&#34;
+        Return a string representation of this class.
+        Parameters
+        ----------
+        pretty : str, Default True
+            Should return a pretty version or all the info.
+        &#34;&#34;&#34;
+        if pretty:
+            return self._pretty_string()
+        else:
+            return self._full_string()
+
+    def remove_recordings_units(
+            self, unit_lb=0, unit_ub=10000, verbose=False):
+        start_size = self.get_num_data()
+        start_total = len(self)
+        for i in range(self.get_num_data() - 1, -1, -1):
+            unit_count = len(self.get_units(i))
+            if (unit_count &gt; unit_ub) or (unit_count &lt; unit_lb):
+                for key in (&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;):
+                    name = self._file_names_dict[key].pop(i)
+                    if (key is &#34;Spike&#34;) and verbose:
+                        print(&#34;Removed {} with {} units&#34;.format(
+                            os.path.basename(name[0]), unit_count))
+                if self._unit_count.pop(i) != unit_count:
+                    print(&#34;Error in remove recording {}&#34;.format(name))
+                self._last_data_pt = (1, None)
+                self._units.pop(i)
+                if not self._load_on_fly:
+                    self._container.pop(i)
+        end_size = self.get_num_data()
+        self._count_num_units()
+        end_total = len(self)
+
+        print(&#34;{} with {} units reduced to {} with {} units&#34;.format(
+            start_size, start_total, end_size, end_total))
+
+    def get_data_at(self, data_index, unit_index):
+        if self._load_on_fly:
+            try:
+                if data_index == self._last_data_pt[0]:
+                    result = self._last_data_pt[1]
+                else:
+                    result = NData()
+                    for key, vals in self.get_file_dict().items():
+                        descriptor = vals[data_index]
+                        self._load(key, descriptor,
+                                   idx=data_index, ndata=result)
+                    self._last_data_pt = (data_index, result)
+            except Exception as e:
+                log_exception(e, &#34;During loading data&#34;)
+        else:
+            result = self.get_data(data_index)
+        if len(self.get_units()) &gt; 0:
+            result.set_unit_no(self.get_units(data_index)[unit_index])
+        return result
+
     # Methods from here on should be for private class use
+    def _pretty_string(self):
+        &#34;&#34;&#34;Alternative string representation should be prettier.&#34;&#34;&#34;
+        all_str_info = []
+        for i in range(self.get_num_data()):
+            str_info = self.get_index_info(i)
+            b_str = &#34;{}: \n\tSpk {}\n\tUnt {}: {}\n\tLfp {}\n\tPos {}\n\tDir {}&#34;.format(
+                i, str_info[&#34;Spike&#34;], len(str_info[&#34;Units&#34;]),
+                str_info[&#34;Units&#34;], str_info[&#34;LFP&#34;],
+                str_info[&#34;Position&#34;], str_info[&#34;Root&#34;])
+            all_str_info.append(b_str)
+        return &#34;\n&#34;.join(all_str_info)
+
+    def _full_string(self):
+        &#34;&#34;&#34;Full string representation of the container.&#34;&#34;&#34;
+        string = (
+            &#34;NData Container Object with {} objects:\n&#34; +
+            &#34;Set to Load on Fly? {}\n&#34; +
+            &#34;Files are:\n{}\n&#34; +
+            &#34;Units are:\n{}&#34;).format(
+                self.get_num_data(),
+                self._load_on_fly,
+                pprint.pformat(self.get_file_dict()),
+                pprint.pformat(self.get_units()))
+        return string
+
     def _load_all_data(self):
         &#34;&#34;&#34;Intended private function which loads all the data.&#34;&#34;&#34;
         if self._load_on_fly:
@@ -689,33 +866,20 @@ class NDataContainer():
 
     def __repr__(self):
         &#34;&#34;&#34;Return a string representation of the collection.&#34;&#34;&#34;
-        string = &#34;NData Container Object with {} objects:\nFiles are {}\nUnits are {}\nSet to Load on Fly? {}&#34;.format(
-            self.get_num_data(), self.get_file_dict(), self.get_units(), self._load_on_fly)
-        return string
+        return self.string_repr(pretty=True)
 
     def __getitem__(self, index):
         &#34;&#34;&#34;Return the data object with corresponding unit at index.&#34;&#34;&#34;
         data_index, unit_index = self._index_to_data_pos(index)
-        if self._load_on_fly:
-            if data_index == self._last_data_pt[0]:
-                result = self._last_data_pt[1]
-            else:
-                result = NData()
-                for key, vals in self.get_file_dict().items():
-                    descriptor = vals[data_index]
-                    self._load(key, descriptor, idx=data_index, ndata=result)
-                self._last_data_pt = (data_index, result)
-        else:
-            result = self.get_data(data_index)
-        if len(self.get_units()) &gt; 0:
-            result.set_unit_no(self.get_units(data_index)[unit_index])
-        return result
+        return self.get_data_at(data_index, unit_index)
 
     def __len__(self):
         &#34;&#34;&#34;Return the number of units in the collection.&#34;&#34;&#34;
         counts = self._unit_count
-        if counts == 0:
-            counts = [1 for _ in range(len(self._container))]
+        if len(counts) == 0:
+            print(&#34;Recounting units&#34;)
+            self._unit_count = self._count_num_units()
+            counts = self._unit_count
         return sum(counts)
 
     def _count_num_units(self):
@@ -741,9 +905,13 @@ class NDataContainer():
 
         &#34;&#34;&#34;
         counts = self._unit_count
-        if counts == 0:
-            counts = [1 for _ in range(len(self._container))]
+        if len(counts) == 0:
+            print(&#34;Recounting units&#34;)
+            self._unit_count = self._count_num_units()
+            counts = self._unit_count
         if index &gt;= len(self):
+            print(&#34;Error, index {} is out of range {} for {}&#34;.format(
+                index, len(self) - 1, self))
             raise IndexError
         else:
             running_sum, running_idx = 0, 0
@@ -752,7 +920,10 @@ class NDataContainer():
                     return running_idx, (index - running_sum)
                 else:
                     running_sum += count
-                    running_idx += 1</code></pre>
+                    running_idx += 1
+
+    def __iter__(self):
+        return NDataContainerIterator(self)</code></pre>
 </details>
 </section>
 <section>
@@ -770,7 +941,7 @@ class NDataContainer():
 </code></dt>
 <dd>
 <section class="desc"><p>Class for storing multiple file locations for ndata objects.</p>
-<p>Additionally the ndata objects themselves can be stored</p>
+<p>Additionally the ndata objects themselves can be stored.</p>
 <p>Initialise the class.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
@@ -788,7 +959,7 @@ instead load it as needed, on the fly</dd>
 <dd>&nbsp;</dd>
 <dt><strong><code>_units</code></strong> :&ensp;<code>List</code></dt>
 <dd>&nbsp;</dd>
-<dt><strong><code>_unit_count</code></strong> :&ensp;<code>int</code></dt>
+<dt><strong><code>_unit_count</code></strong> :&ensp;<code>List</code></dt>
 <dd>&nbsp;</dd>
 <dt><strong><code>_share_positions</code></strong> :&ensp;<code>bool</code></dt>
 <dd>&nbsp;</dd>
@@ -805,7 +976,7 @@ instead load it as needed, on the fly</dd>
     &#34;&#34;&#34;
     Class for storing multiple file locations for ndata objects.
 
-    Additionally the ndata objects themselves can be stored
+    Additionally the ndata objects themselves can be stored.
     &#34;&#34;&#34;
 
     def __init__(self, share_positions=False, load_on_fly=False):
@@ -825,7 +996,7 @@ instead load it as needed, on the fly</dd>
         _container : List
         _file_names_dict : Dict
         _units : List
-        _unit_count : int
+        _unit_count : List
         _share_positions : bool
         _load_on_fly : bool
         _smoothed_speed : bool
@@ -835,7 +1006,7 @@ instead load it as needed, on the fly</dd>
         self._file_names_dict = {}
         self._units = []
         self._container = []
-        self._unit_count = 0
+        self._unit_count = []
         self._share_positions = share_positions
         self._load_on_fly = load_on_fly
         self._last_data_pt = (1, None)
@@ -855,8 +1026,10 @@ instead load it as needed, on the fly</dd>
                 return len(vals)
         return len(self._container)
 
-    def get_file_dict(self):
+    def get_file_dict(self, key=None):
         &#34;&#34;&#34;Return the key value filename dictionary for this collection.&#34;&#34;&#34;
+        if key:
+            return self._file_names_dict.get(key, None)
         return self._file_names_dict
 
     def get_units(self, index=None):
@@ -1008,6 +1181,9 @@ instead load it as needed, on the fly</dd>
     def set_units(self, units=&#39;all&#39;):
         &#34;&#34;&#34;Set the list of units for the collection.&#34;&#34;&#34;
         self._units = []
+        if self.get_file_dict() == {}:
+            print(&#34;Error: Can&#39;t set units for empty collection&#34;)
+            return
         if units == &#39;all&#39;:
             if self._load_on_fly:
                 vals = self.get_file_dict()[&#34;Spike&#34;]
@@ -1122,7 +1298,7 @@ instead load it as needed, on the fly</dd>
                     lfp_ext = row[4]
                     if lfp_ext[0] != &#34;.&#34;:
                         lfp_ext = &#34;.&#34; + lfp_ext
-                    spike_name = spike_file.split(&#34;.&#34;)[0]
+                    spike_name = remove_extension(spike_file, keep_dot=False)
                     lfp_file = spike_name + lfp_ext
 
                     pos_files.append(spat_file)
@@ -1150,14 +1326,19 @@ instead load it as needed, on the fly</dd>
             return None
 
     # Created by Sean Martin with help from Matheus Cafalchio
-    def add_axona_files_from_dir(self, directory, **kwargs):
+    def add_axona_files_from_dir(
+            self, directory, recursive=False, verbose=False, **kwargs):
         &#34;&#34;&#34;
-        Go through a directory, extracting files from it
+        Go through a directory, extracting files from it.
 
         Parameters
         ----------
         directory : str
             The directory to parse through
+        recursive : bool, optional. Defaults to False.
+            Whether to recurse through dirs
+        verbose: bool, optional. Defaults to False.
+            Whether to print the files being added.
 
         **kwargs: keyword arguments
             tetrode_list : list
@@ -1166,39 +1347,65 @@ instead load it as needed, on the fly</dd>
             cluster_extension : str default .cut
             pos_extension : str default .txt
             lfp_extension : str default .eeg
+            re_filter : str default None 
+                regex string for matching filenames
+            save_result : bool default True
+                should save the resulting collection to a file
+            unit_cutoff : tuple of ints
+                don&#39;t consider any recordings with units outside this range
+
         Returns
         -------
         None
 
         &#34;&#34;&#34;
-        default_tetrode_list = [1, 2, 3, 4, 9, 10, 11, 12]
+        default_tetrode_list = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
         tetrode_list = kwargs.get(&#34;tetrode_list&#34;, default_tetrode_list)
         data_extension = kwargs.get(&#34;data_extension&#34;, &#34;.set&#34;)
         cluster_extension = kwargs.get(&#34;cluster_extension&#34;, &#34;.cut&#34;)
+        clu_extension = kwargs.get(&#34;clu_extension&#34;, &#34;.clu.X&#34;)
         pos_extension = kwargs.get(&#34;pos_extension&#34;, &#34;.txt&#34;)
         lfp_extension = kwargs.get(&#34;lfp_extension&#34;, &#34;.eeg&#34;)
+        re_filter = kwargs.get(&#34;re_filter&#34;, None)
+        save_result = kwargs.get(&#34;save_result&#34;, True)
+        unit_cutoff = kwargs.get(&#34;unit_cutoff&#34;, None)
 
-        files = get_all_files_in_dir(directory, data_extension)
-        txt_files = get_all_files_in_dir(directory, pos_extension)
+        files = get_all_files_in_dir(
+            directory, data_extension,
+            recursive=recursive, verbose=verbose,
+            re_filter=re_filter, return_absolute=True)
+        txt_files = get_all_files_in_dir(
+            directory, pos_extension,
+            recursive=recursive, verbose=verbose,
+            re_filter=re_filter, return_absolute=True)
+
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
                 spike_name = filename + &#39;.&#39; + str(tetrode)
                 cut_name = filename + &#39;_&#39; + str(tetrode) + cluster_extension
+                clu_name = filename + clu_extension[:-1] + str(tetrode)
                 lfp_name = filename + lfp_extension
+
+                if not os.path.isfile(os.path.join(directory, spike_name)):
+                    continue
                 # Don&#39;t consider files that have not been clustered
-                if not os.path.isfile(os.path.join(directory, cut_name)):
+                if not (
+                        os.path.isfile(os.path.join(directory, cut_name)) or
+                        os.path.isfile(os.path.join(directory, clu_name))):
                     logging.info(
-                        &#34;Skipping this - no cluster file named {}&#34;.format(cut_name))
+                        &#34;Skipping tetrode {} - no cluster file named {} or {}&#34;.format(tetrode, cut_name, os.path.basename(clu_name)))
                     continue
 
                 for fname in txt_files:
                     if fname[:len(filename)] == filename:
                         pos_name = fname
                         break
+
                 else:
                     logging.info(
-                        &#34;Skipping this - no position file for {}&#34;.format(filename))
+                        &#34;Skipping tetrode {} - no position file for {}&#34;.format(tetrode, filename))
                     continue
 
                 self.add_files(NDataContainer.EFileType.Spike, [spike_name])
@@ -1206,11 +1413,30 @@ instead load it as needed, on the fly</dd>
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
         self.set_units()
 
+        if unit_cutoff:
+            self.remove_recordings_units(
+                unit_cutoff[0], unit_cutoff[1], verbose=verbose)
+        if save_result:
+            friendly_re = &#34;&#34;
+            if re_filter:
+                friendly_re = &#34;_&#34; + \
+                    &#34; &#34;.join(re.findall(&#34;[a-zA-Z]+&#34;, re_filter))
+            name = (
+                &#34;file_list_&#34; + os.path.basename(directory) +
+                friendly_re + &#34;.txt&#34;)
+            out_loc = os.path.join(directory, &#34;nc_results&#34;, name)
+            make_dir_if_not_exists(out_loc)
+            with open(out_loc, &#39;w&#39;) as f:
+                f.write(str(self))
+            print(&#34;Wrote list of files considered to {}&#34;.format(out_loc))
+            return out_loc
+        return None
+
     def merge(self, indices, force_equal_units=True):
         &#34;&#34;&#34;
         Merge the data from multiple indices together into the first index.
 
-        WORK IN PROGRESS - ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY
+        ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY - DOES NOT MERGE LFP.
         Only call this after loading the data, and not while loading on the fly
 
         Parameters
@@ -1372,7 +1598,115 @@ instead load it as needed, on the fly</dd>
                     zip(centroids, self.get_units()[idx]),
                     key=lambda pair: pair[0][h])]
 
+    def get_index_info(self, idx, absolute=False):
+        &#34;&#34;&#34;Return the Spike, LFP, Position and Unit info at idx.&#34;&#34;&#34;
+        str_info = {}
+        dirnames = []
+        if absolute:
+            idx, u_idx = self._index_to_data_pos(idx)
+
+        for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;]:
+            name = self.get_file_dict(key)[idx][0]
+            str_info[key] = (os.path.basename(name))
+            dirnames.append(os.path.dirname(name))
+
+        if absolute:
+            str_info[&#34;Units&#34;] = (self.get_units(idx)[u_idx])
+        else:
+            str_info[&#34;Units&#34;] = (self.get_units(idx))
+
+        if len(set(dirnames)) == 1:
+            str_info[&#34;Root&#34;] = dirnames[0]
+        else:
+            print(&#34;Not all files are in the same directory {} {}&#34;.format(
+                &#34;:Spike, LFP, Position: &#34;, dirnames))
+            str_info[&#34;Root&#34;] = dirnames
+        return str_info
+
+    def string_repr(self, pretty=True):
+        &#34;&#34;&#34;
+        Return a string representation of this class.
+        Parameters
+        ----------
+        pretty : str, Default True
+            Should return a pretty version or all the info.
+        &#34;&#34;&#34;
+        if pretty:
+            return self._pretty_string()
+        else:
+            return self._full_string()
+
+    def remove_recordings_units(
+            self, unit_lb=0, unit_ub=10000, verbose=False):
+        start_size = self.get_num_data()
+        start_total = len(self)
+        for i in range(self.get_num_data() - 1, -1, -1):
+            unit_count = len(self.get_units(i))
+            if (unit_count &gt; unit_ub) or (unit_count &lt; unit_lb):
+                for key in (&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;):
+                    name = self._file_names_dict[key].pop(i)
+                    if (key is &#34;Spike&#34;) and verbose:
+                        print(&#34;Removed {} with {} units&#34;.format(
+                            os.path.basename(name[0]), unit_count))
+                if self._unit_count.pop(i) != unit_count:
+                    print(&#34;Error in remove recording {}&#34;.format(name))
+                self._last_data_pt = (1, None)
+                self._units.pop(i)
+                if not self._load_on_fly:
+                    self._container.pop(i)
+        end_size = self.get_num_data()
+        self._count_num_units()
+        end_total = len(self)
+
+        print(&#34;{} with {} units reduced to {} with {} units&#34;.format(
+            start_size, start_total, end_size, end_total))
+
+    def get_data_at(self, data_index, unit_index):
+        if self._load_on_fly:
+            try:
+                if data_index == self._last_data_pt[0]:
+                    result = self._last_data_pt[1]
+                else:
+                    result = NData()
+                    for key, vals in self.get_file_dict().items():
+                        descriptor = vals[data_index]
+                        self._load(key, descriptor,
+                                   idx=data_index, ndata=result)
+                    self._last_data_pt = (data_index, result)
+            except Exception as e:
+                log_exception(e, &#34;During loading data&#34;)
+        else:
+            result = self.get_data(data_index)
+        if len(self.get_units()) &gt; 0:
+            result.set_unit_no(self.get_units(data_index)[unit_index])
+        return result
+
     # Methods from here on should be for private class use
+    def _pretty_string(self):
+        &#34;&#34;&#34;Alternative string representation should be prettier.&#34;&#34;&#34;
+        all_str_info = []
+        for i in range(self.get_num_data()):
+            str_info = self.get_index_info(i)
+            b_str = &#34;{}: \n\tSpk {}\n\tUnt {}: {}\n\tLfp {}\n\tPos {}\n\tDir {}&#34;.format(
+                i, str_info[&#34;Spike&#34;], len(str_info[&#34;Units&#34;]),
+                str_info[&#34;Units&#34;], str_info[&#34;LFP&#34;],
+                str_info[&#34;Position&#34;], str_info[&#34;Root&#34;])
+            all_str_info.append(b_str)
+        return &#34;\n&#34;.join(all_str_info)
+
+    def _full_string(self):
+        &#34;&#34;&#34;Full string representation of the container.&#34;&#34;&#34;
+        string = (
+            &#34;NData Container Object with {} objects:\n&#34; +
+            &#34;Set to Load on Fly? {}\n&#34; +
+            &#34;Files are:\n{}\n&#34; +
+            &#34;Units are:\n{}&#34;).format(
+                self.get_num_data(),
+                self._load_on_fly,
+                pprint.pformat(self.get_file_dict()),
+                pprint.pformat(self.get_units()))
+        return string
+
     def _load_all_data(self):
         &#34;&#34;&#34;Intended private function which loads all the data.&#34;&#34;&#34;
         if self._load_on_fly:
@@ -1446,33 +1780,20 @@ instead load it as needed, on the fly</dd>
 
     def __repr__(self):
         &#34;&#34;&#34;Return a string representation of the collection.&#34;&#34;&#34;
-        string = &#34;NData Container Object with {} objects:\nFiles are {}\nUnits are {}\nSet to Load on Fly? {}&#34;.format(
-            self.get_num_data(), self.get_file_dict(), self.get_units(), self._load_on_fly)
-        return string
+        return self.string_repr(pretty=True)
 
     def __getitem__(self, index):
         &#34;&#34;&#34;Return the data object with corresponding unit at index.&#34;&#34;&#34;
         data_index, unit_index = self._index_to_data_pos(index)
-        if self._load_on_fly:
-            if data_index == self._last_data_pt[0]:
-                result = self._last_data_pt[1]
-            else:
-                result = NData()
-                for key, vals in self.get_file_dict().items():
-                    descriptor = vals[data_index]
-                    self._load(key, descriptor, idx=data_index, ndata=result)
-                self._last_data_pt = (data_index, result)
-        else:
-            result = self.get_data(data_index)
-        if len(self.get_units()) &gt; 0:
-            result.set_unit_no(self.get_units(data_index)[unit_index])
-        return result
+        return self.get_data_at(data_index, unit_index)
 
     def __len__(self):
         &#34;&#34;&#34;Return the number of units in the collection.&#34;&#34;&#34;
         counts = self._unit_count
-        if counts == 0:
-            counts = [1 for _ in range(len(self._container))]
+        if len(counts) == 0:
+            print(&#34;Recounting units&#34;)
+            self._unit_count = self._count_num_units()
+            counts = self._unit_count
         return sum(counts)
 
     def _count_num_units(self):
@@ -1498,9 +1819,13 @@ instead load it as needed, on the fly</dd>
 
         &#34;&#34;&#34;
         counts = self._unit_count
-        if counts == 0:
-            counts = [1 for _ in range(len(self._container))]
+        if len(counts) == 0:
+            print(&#34;Recounting units&#34;)
+            self._unit_count = self._count_num_units()
+            counts = self._unit_count
         if index &gt;= len(self):
+            print(&#34;Error, index {} is out of range {} for {}&#34;.format(
+                index, len(self) - 1, self))
             raise IndexError
         else:
             running_sum, running_idx = 0, 0
@@ -1509,7 +1834,10 @@ instead load it as needed, on the fly</dd>
                     return running_idx, (index - running_sum)
                 else:
                     running_sum += count
-                    running_idx += 1</code></pre>
+                    running_idx += 1
+
+    def __iter__(self):
+        return NDataContainerIterator(self)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1565,21 +1893,33 @@ instead load it as needed, on the fly</dd>
 </details>
 </dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.add_axona_files_from_dir"><code class="name flex">
-<span>def <span class="ident">add_axona_files_from_dir</span></span>(<span>self, directory, **kwargs)</span>
+<span>def <span class="ident">add_axona_files_from_dir</span></span>(<span>self, directory, recursive=False, verbose=False, **kwargs)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Go through a directory, extracting files from it</p>
+<section class="desc"><p>Go through a directory, extracting files from it.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>directory</code></strong> :&ensp;<code>str</code></dt>
 <dd>The directory to parse through</dd>
+</dl>
+<p>recursive : bool, optional. Defaults to False.
+Whether to recurse through dirs
+verbose: bool, optional. Defaults to False.
+Whether to print the files being added.</p>
+<dl>
 <dt><strong><code>**kwargs</code></strong> :&ensp;<code>keyword</code> <code>arguments</code></dt>
 <dd>tetrode_list : list
 list of tetrodes to consider
 data_extension : str default .set
 cluster_extension : str default .cut
 pos_extension : str default .txt
-lfp_extension : str default .eeg</dd>
+lfp_extension : str default .eeg
+re_filter : str default None
+regex string for matching filenames
+save_result : bool default True
+should save the resulting collection to a file
+unit_cutoff : tuple of ints
+don't consider any recordings with units outside this range</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1588,14 +1928,19 @@ lfp_extension : str default .eeg</dd>
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def add_axona_files_from_dir(self, directory, **kwargs):
+<pre><code class="python">def add_axona_files_from_dir(
+        self, directory, recursive=False, verbose=False, **kwargs):
     &#34;&#34;&#34;
-    Go through a directory, extracting files from it
+    Go through a directory, extracting files from it.
 
     Parameters
     ----------
     directory : str
         The directory to parse through
+    recursive : bool, optional. Defaults to False.
+        Whether to recurse through dirs
+    verbose: bool, optional. Defaults to False.
+        Whether to print the files being added.
 
     **kwargs: keyword arguments
         tetrode_list : list
@@ -1604,45 +1949,90 @@ lfp_extension : str default .eeg</dd>
         cluster_extension : str default .cut
         pos_extension : str default .txt
         lfp_extension : str default .eeg
+        re_filter : str default None 
+            regex string for matching filenames
+        save_result : bool default True
+            should save the resulting collection to a file
+        unit_cutoff : tuple of ints
+            don&#39;t consider any recordings with units outside this range
+
     Returns
     -------
     None
 
     &#34;&#34;&#34;
-    default_tetrode_list = [1, 2, 3, 4, 9, 10, 11, 12]
+    default_tetrode_list = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
     tetrode_list = kwargs.get(&#34;tetrode_list&#34;, default_tetrode_list)
     data_extension = kwargs.get(&#34;data_extension&#34;, &#34;.set&#34;)
     cluster_extension = kwargs.get(&#34;cluster_extension&#34;, &#34;.cut&#34;)
+    clu_extension = kwargs.get(&#34;clu_extension&#34;, &#34;.clu.X&#34;)
     pos_extension = kwargs.get(&#34;pos_extension&#34;, &#34;.txt&#34;)
     lfp_extension = kwargs.get(&#34;lfp_extension&#34;, &#34;.eeg&#34;)
+    re_filter = kwargs.get(&#34;re_filter&#34;, None)
+    save_result = kwargs.get(&#34;save_result&#34;, True)
+    unit_cutoff = kwargs.get(&#34;unit_cutoff&#34;, None)
 
-    files = get_all_files_in_dir(directory, data_extension)
-    txt_files = get_all_files_in_dir(directory, pos_extension)
+    files = get_all_files_in_dir(
+        directory, data_extension,
+        recursive=recursive, verbose=verbose,
+        re_filter=re_filter, return_absolute=True)
+    txt_files = get_all_files_in_dir(
+        directory, pos_extension,
+        recursive=recursive, verbose=verbose,
+        re_filter=re_filter, return_absolute=True)
+
     for filename in files:
         filename = filename[:-len(data_extension)]
         for tetrode in tetrode_list:
             spike_name = filename + &#39;.&#39; + str(tetrode)
             cut_name = filename + &#39;_&#39; + str(tetrode) + cluster_extension
+            clu_name = filename + clu_extension[:-1] + str(tetrode)
             lfp_name = filename + lfp_extension
+
+            if not os.path.isfile(os.path.join(directory, spike_name)):
+                continue
             # Don&#39;t consider files that have not been clustered
-            if not os.path.isfile(os.path.join(directory, cut_name)):
+            if not (
+                    os.path.isfile(os.path.join(directory, cut_name)) or
+                    os.path.isfile(os.path.join(directory, clu_name))):
                 logging.info(
-                    &#34;Skipping this - no cluster file named {}&#34;.format(cut_name))
+                    &#34;Skipping tetrode {} - no cluster file named {} or {}&#34;.format(tetrode, cut_name, os.path.basename(clu_name)))
                 continue
 
             for fname in txt_files:
                 if fname[:len(filename)] == filename:
                     pos_name = fname
                     break
+
             else:
                 logging.info(
-                    &#34;Skipping this - no position file for {}&#34;.format(filename))
+                    &#34;Skipping tetrode {} - no position file for {}&#34;.format(tetrode, filename))
                 continue
 
             self.add_files(NDataContainer.EFileType.Spike, [spike_name])
             self.add_files(NDataContainer.EFileType.Position, [pos_name])
             self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
-    self.set_units()</code></pre>
+    self.set_units()
+
+    if unit_cutoff:
+        self.remove_recordings_units(
+            unit_cutoff[0], unit_cutoff[1], verbose=verbose)
+    if save_result:
+        friendly_re = &#34;&#34;
+        if re_filter:
+            friendly_re = &#34;_&#34; + \
+                &#34; &#34;.join(re.findall(&#34;[a-zA-Z]+&#34;, re_filter))
+        name = (
+            &#34;file_list_&#34; + os.path.basename(directory) +
+            friendly_re + &#34;.txt&#34;)
+        out_loc = os.path.join(directory, &#34;nc_results&#34;, name)
+        make_dir_if_not_exists(out_loc)
+        with open(out_loc, &#39;w&#39;) as f:
+            f.write(str(self))
+        print(&#34;Wrote list of files considered to {}&#34;.format(out_loc))
+        return out_loc
+    return None</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.add_data"><code class="name flex">
@@ -1823,7 +2213,7 @@ directory | position file | spike file | unit numbers | eeg extension</p>
                 lfp_ext = row[4]
                 if lfp_ext[0] != &#34;.&#34;:
                     lfp_ext = &#34;.&#34; + lfp_ext
-                spike_name = spike_file.split(&#34;.&#34;)[0]
+                spike_name = remove_extension(spike_file, keep_dot=False)
                 lfp_file = spike_name + lfp_ext
 
                 pos_files.append(spat_file)
@@ -1901,16 +2291,79 @@ directory | position file | spike file | unit numbers | eeg extension</p>
     return self._container[index]</code></pre>
 </details>
 </dd>
+<dt id="neurochat.nc_datacontainer.NDataContainer.get_data_at"><code class="name flex">
+<span>def <span class="ident">get_data_at</span></span>(<span>self, data_index, unit_index)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_data_at(self, data_index, unit_index):
+    if self._load_on_fly:
+        try:
+            if data_index == self._last_data_pt[0]:
+                result = self._last_data_pt[1]
+            else:
+                result = NData()
+                for key, vals in self.get_file_dict().items():
+                    descriptor = vals[data_index]
+                    self._load(key, descriptor,
+                               idx=data_index, ndata=result)
+                self._last_data_pt = (data_index, result)
+        except Exception as e:
+            log_exception(e, &#34;During loading data&#34;)
+    else:
+        result = self.get_data(data_index)
+    if len(self.get_units()) &gt; 0:
+        result.set_unit_no(self.get_units(data_index)[unit_index])
+    return result</code></pre>
+</details>
+</dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.get_file_dict"><code class="name flex">
-<span>def <span class="ident">get_file_dict</span></span>(<span>self)</span>
+<span>def <span class="ident">get_file_dict</span></span>(<span>self, key=None)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Return the key value filename dictionary for this collection.</p></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def get_file_dict(self):
+<pre><code class="python">def get_file_dict(self, key=None):
     &#34;&#34;&#34;Return the key value filename dictionary for this collection.&#34;&#34;&#34;
+    if key:
+        return self._file_names_dict.get(key, None)
     return self._file_names_dict</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_datacontainer.NDataContainer.get_index_info"><code class="name flex">
+<span>def <span class="ident">get_index_info</span></span>(<span>self, idx, absolute=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return the Spike, LFP, Position and Unit info at idx.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_index_info(self, idx, absolute=False):
+    &#34;&#34;&#34;Return the Spike, LFP, Position and Unit info at idx.&#34;&#34;&#34;
+    str_info = {}
+    dirnames = []
+    if absolute:
+        idx, u_idx = self._index_to_data_pos(idx)
+
+    for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;]:
+        name = self.get_file_dict(key)[idx][0]
+        str_info[key] = (os.path.basename(name))
+        dirnames.append(os.path.dirname(name))
+
+    if absolute:
+        str_info[&#34;Units&#34;] = (self.get_units(idx)[u_idx])
+    else:
+        str_info[&#34;Units&#34;] = (self.get_units(idx))
+
+    if len(set(dirnames)) == 1:
+        str_info[&#34;Root&#34;] = dirnames[0]
+    else:
+        print(&#34;Not all files are in the same directory {} {}&#34;.format(
+            &#34;:Spike, LFP, Position: &#34;, dirnames))
+        str_info[&#34;Root&#34;] = dirnames
+    return str_info</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.get_num_data"><code class="name flex">
@@ -1996,7 +2449,7 @@ or the list of units for the given data index</dd>
 </code></dt>
 <dd>
 <section class="desc"><p>Merge the data from multiple indices together into the first index.</p>
-<p>WORK IN PROGRESS - ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY
+<p>ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY - DOES NOT MERGE LFP.
 Only call this after loading the data, and not while loading on the fly</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
@@ -2016,7 +2469,7 @@ The merged indexes must have the same unit numbers available</p>
     &#34;&#34;&#34;
     Merge the data from multiple indices together into the first index.
 
-    WORK IN PROGRESS - ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY
+    ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY - DOES NOT MERGE LFP.
     Only call this after loading the data, and not while loading on the fly
 
     Parameters
@@ -2101,6 +2554,39 @@ The merged indexes must have the same unit numbers available</p>
     return self.get_data(target_index)</code></pre>
 </details>
 </dd>
+<dt id="neurochat.nc_datacontainer.NDataContainer.remove_recordings_units"><code class="name flex">
+<span>def <span class="ident">remove_recordings_units</span></span>(<span>self, unit_lb=0, unit_ub=10000, verbose=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def remove_recordings_units(
+        self, unit_lb=0, unit_ub=10000, verbose=False):
+    start_size = self.get_num_data()
+    start_total = len(self)
+    for i in range(self.get_num_data() - 1, -1, -1):
+        unit_count = len(self.get_units(i))
+        if (unit_count &gt; unit_ub) or (unit_count &lt; unit_lb):
+            for key in (&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;):
+                name = self._file_names_dict[key].pop(i)
+                if (key is &#34;Spike&#34;) and verbose:
+                    print(&#34;Removed {} with {} units&#34;.format(
+                        os.path.basename(name[0]), unit_count))
+            if self._unit_count.pop(i) != unit_count:
+                print(&#34;Error in remove recording {}&#34;.format(name))
+            self._last_data_pt = (1, None)
+            self._units.pop(i)
+            if not self._load_on_fly:
+                self._container.pop(i)
+    end_size = self.get_num_data()
+    self._count_num_units()
+    end_total = len(self)
+
+    print(&#34;{} with {} units reduced to {} with {} units&#34;.format(
+        start_size, start_total, end_size, end_total))</code></pre>
+</details>
+</dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.set_units"><code class="name flex">
 <span>def <span class="ident">set_units</span></span>(<span>self, units='all')</span>
 </code></dt>
@@ -2111,6 +2597,9 @@ The merged indexes must have the same unit numbers available</p>
 <pre><code class="python">def set_units(self, units=&#39;all&#39;):
     &#34;&#34;&#34;Set the list of units for the collection.&#34;&#34;&#34;
     self._units = []
+    if self.get_file_dict() == {}:
+        print(&#34;Error: Can&#39;t set units for empty collection&#34;)
+        return
     if units == &#39;all&#39;:
         if self._load_on_fly:
             vals = self.get_file_dict()[&#34;Spike&#34;]
@@ -2224,6 +2713,33 @@ The merged indexes must have the same unit numbers available</p>
                 key=lambda pair: pair[0][h])]</code></pre>
 </details>
 </dd>
+<dt id="neurochat.nc_datacontainer.NDataContainer.string_repr"><code class="name flex">
+<span>def <span class="ident">string_repr</span></span>(<span>self, pretty=True)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return a string representation of this class.
+Parameters</p>
+<hr>
+<dl>
+<dt><strong><code>pretty</code></strong> :&ensp;<code>str</code>, <code>Default</code> <code>True</code></dt>
+<dd>Should return a pretty version or all the info.</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def string_repr(self, pretty=True):
+    &#34;&#34;&#34;
+    Return a string representation of this class.
+    Parameters
+    ----------
+    pretty : str, Default True
+        Should return a pretty version or all the info.
+    &#34;&#34;&#34;
+    if pretty:
+        return self._pretty_string()
+    else:
+        return self._full_string()</code></pre>
+</details>
+</dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.subsample"><code class="name flex">
 <span>def <span class="ident">subsample</span></span>(<span>self, key)</span>
 </code></dt>
@@ -2282,6 +2798,26 @@ The merged indexes must have the same unit numbers available</p>
 </dd>
 </dl>
 </dd>
+<dt id="neurochat.nc_datacontainer.NDataContainerIterator"><code class="flex name class">
+<span>class <span class="ident">NDataContainerIterator</span></span>
+<span>(</span><span>container)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class NDataContainerIterator():
+    def __init__(self, container):
+        self._index = 0
+        self._container = container
+
+    def __next__(self):
+        if self._index &lt; len(self._container):
+            self._index += 1
+            return self._container[self._index - 1]
+        raise StopIteration</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 </article>
@@ -2308,16 +2844,23 @@ The merged indexes must have the same unit numbers available</p>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.add_files" href="#neurochat.nc_datacontainer.NDataContainer.add_files">add_files</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.add_files_from_excel" href="#neurochat.nc_datacontainer.NDataContainer.add_files_from_excel">add_files_from_excel</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_data" href="#neurochat.nc_datacontainer.NDataContainer.get_data">get_data</a></code></li>
+<li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_data_at" href="#neurochat.nc_datacontainer.NDataContainer.get_data_at">get_data_at</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_file_dict" href="#neurochat.nc_datacontainer.NDataContainer.get_file_dict">get_file_dict</a></code></li>
+<li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_index_info" href="#neurochat.nc_datacontainer.NDataContainer.get_index_info">get_index_info</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_num_data" href="#neurochat.nc_datacontainer.NDataContainer.get_num_data">get_num_data</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_units" href="#neurochat.nc_datacontainer.NDataContainer.get_units">get_units</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.list_all_units" href="#neurochat.nc_datacontainer.NDataContainer.list_all_units">list_all_units</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.merge" href="#neurochat.nc_datacontainer.NDataContainer.merge">merge</a></code></li>
+<li><code><a title="neurochat.nc_datacontainer.NDataContainer.remove_recordings_units" href="#neurochat.nc_datacontainer.NDataContainer.remove_recordings_units">remove_recordings_units</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.set_units" href="#neurochat.nc_datacontainer.NDataContainer.set_units">set_units</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.setup" href="#neurochat.nc_datacontainer.NDataContainer.setup">setup</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.sort_units_spatially" href="#neurochat.nc_datacontainer.NDataContainer.sort_units_spatially">sort_units_spatially</a></code></li>
+<li><code><a title="neurochat.nc_datacontainer.NDataContainer.string_repr" href="#neurochat.nc_datacontainer.NDataContainer.string_repr">string_repr</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.subsample" href="#neurochat.nc_datacontainer.NDataContainer.subsample">subsample</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="neurochat.nc_datacontainer.NDataContainerIterator" href="#neurochat.nc_datacontainer.NDataContainerIterator">NDataContainerIterator</a></code></h4>
 </li>
 </ul>
 </li>

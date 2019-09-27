@@ -1,5 +1,4 @@
-import sys
-sys.path.insert(1, r'C:\Users\smartin5\Repos\myNeurochat')
+"""Simple example to plot the waveform of a cell."""
 from load_example_data import load_data
 
 import matplotlib.pyplot as plt

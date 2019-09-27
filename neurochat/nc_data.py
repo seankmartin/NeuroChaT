@@ -53,7 +53,6 @@ class NData():
 
         self.__type = 'data'
 
-    # TODO decide (or give param) to keep times or start at 0
     def subsample(self, sample_range):
         """
         Split up a data object in the collection into parts.

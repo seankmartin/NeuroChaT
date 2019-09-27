@@ -12,20 +12,19 @@ of the NeuroChaT software.
 import sys
 import logging
 from PyQt5 import QtWidgets
-
-sys.path.insert(1, r'C:\Users\smartin5\Repos\myNeurochat')
-
 from neurochat.nc_ui import NeuroChaT_Ui
+
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    mpl_logger = logging.getLogger("matplotlib") 
+    mpl_logger = logging.getLogger("matplotlib")
     mpl_logger.setLevel(level=logging.WARNING)
     app = QtWidgets.QApplication(sys.argv)
     app.quitOnLastWindowClosed()
-    ui= NeuroChaT_Ui()
+    ui = NeuroChaT_Ui()
     ui.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()

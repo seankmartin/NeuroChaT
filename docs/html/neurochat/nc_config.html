@@ -878,7 +878,7 @@ class Configuration(object):
         &#34;&#34;&#34;
 
         with open(self.filename, &#39;r&#39;) as f:
-            cfgData = yaml.load(f)
+            cfgData = yaml.load(f, Loader=yaml.FullLoader)
             settings = cfgData.get(&#39;settings&#39;)
             for key, val in settings.items():
                 self.__setattr__(key, val)
@@ -1762,7 +1762,7 @@ and 'Listed Units'</dd>
         &#34;&#34;&#34;
 
         with open(self.filename, &#39;r&#39;) as f:
-            cfgData = yaml.load(f)
+            cfgData = yaml.load(f, Loader=yaml.FullLoader)
             settings = cfgData.get(&#39;settings&#39;)
             for key, val in settings.items():
                 self.__setattr__(key, val)

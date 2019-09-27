@@ -1,7 +1,5 @@
-import sys
-sys.path.insert(1, r'C:\Users\smartin5\Repos\myNeurochat')
+"""Can set up this file to provide example data for tests."""
 import os
-
 from neurochat.nc_data import NData
 
 

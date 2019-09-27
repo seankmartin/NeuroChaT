@@ -1,5 +1,5 @@
 @echo off
-python3 -m PyInstaller ^
+python -m PyInstaller ^
     --noconfirm --log-level WARN ^
     --onefile --nowindow ^
     --hidden-import xlrd ^

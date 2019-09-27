@@ -1449,14 +1449,14 @@ class NSpatial(NAbstract):
         pmap[tmap == 0] = None
         pfield, largest_group = NSpatial.place_field(
             pmap, thresh, required_neighbours)
-        if largest_group == 0:
-            if smooth_place:
-                info = "where the place field was calculated from smoothed data"
-            else:
-                info = "where the place field was calculated from raw data"
-            logging.info(
-                "Lack of high firing neighbours to identify place field " +
-                info)
+        # if largest_group == 0:
+        #     if smooth_place:
+        #         info = "where the place field was calculated from smoothed data"
+        #     else:
+        #         info = "where the place field was calculated from raw data"
+        #     logging.info(
+        #         "Lack of high firing neighbours to identify place field " +
+        #         info)
         centroid = NSpatial.place_field_centroid(pfield, pmap, largest_group)
         #centroid is currently in co-ordinates, convert to pixels
         centroid = centroid * pixel + (pixel * 0.5)
@@ -1745,8 +1745,17 @@ class NSpatial(NAbstract):
 
             half_max = np.amin(rateInterp)+ (np.amax(rateInterp)- np.amin(rateInterp))/2
             d = np.sign(half_max - rateInterp[0:-1]) - np.sign(half_max - rateInterp[1:])
-            left_idx = find(d > 0)[0]
-            right_idx = find(d < 0)[-1]
+            left_possible = find(d > 0)
+            if len(left_possible) > 0:
+                left_idx = left_possible[0]
+            else:
+                left_idx = None
+            
+            right_possible = find(d < 0)
+            if len(right_possible) > 0:
+                right_idx = right_possible[-1]
+            else:
+                right_idx = None
             _results['HD Half Width'] = None if (not left_idx or not right_idx or left_idx > right_idx) \
                                         else binInterp[right_idx]- binInterp[left_idx]
 
@@ -2033,7 +2042,7 @@ class NSpatial(NAbstract):
         dfit_result = linfit(shift, delta)
         deltaFit = dfit_result['yfit']
         sortInd = np.argsort(deltaFit)
-        _results['HD ATI'] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result['Pearson R'] >= 0.85 else None
+        _results['HD ATI'] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result['Pearson R'] >= 0.85 else np.nan
 
         graph_data['deltaFit'] = deltaFit
         imax = sg.argrelmax(skaggsUpsamp)[0]
@@ -2462,7 +2471,7 @@ class NSpatial(NAbstract):
         """
         graph_data = {}
 
-        minPixel = kwargs.get('minPixel', 100)
+        minPixel = kwargs.get('minPixel', 20)
         pixel = kwargs.get('pixel', 3)
 
         if 'update' in kwargs.keys():
@@ -2618,7 +2627,6 @@ class NSpatial(NAbstract):
 
         distRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count),\
                             where=tcount != 0, casting='unsafe') # for skaggs only
-
         pixelCount = histogram(distMat[np.logical_not(nanInd)], distBins)[0]
         distCount = np.divide(histogram(distMat[fmap >= thresh], distBins)[0], pixelCount, \
                              out=np.zeros_like(distBins), where=pixelCount != 0, casting='unsafe')
@@ -2869,8 +2877,13 @@ class NSpatial(NAbstract):
         episode = kwargs.get('episode', 120)
         nrep = kwargs.get('nrep', 1000)
         sampRate = 1/subsampInterv
-        stamp = 1/sampRate
-        time = np.arange(0, self.get_duration(), stamp)
+        stamp = subsampInterv
+ 
+        a_size = np.round(self.get_duration(), 4)
+        time = np.linspace(
+            0, a_size, endpoint=True,
+            num=np.round(a_size/stamp)+1)
+        time = np.round(time, 4)
         Y = histogram(ftimes, time)[0]* sampRate # Instant firing rate
 
         nt = time.size
@@ -2880,6 +2893,8 @@ class NSpatial(NAbstract):
         placeRate[np.isnan(placeRate)] = 0
         for i in np.arange(nt):
             ind = find(np.logical_and(self.get_time() >= time[i], self.get_time() < time[i]+ stamp))
+            if len(ind) == 0:
+                continue
             xloc[i] = np.median(self.get_pos_x()[ind])
             yloc[i] = np.median(self.get_pos_y()[ind])
             if histogram(yloc[i], yedges)[1] < yedges.size and histogram(xloc[i], xedges)[1] < xedges.size:

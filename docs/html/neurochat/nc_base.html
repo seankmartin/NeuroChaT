@@ -40,23 +40,24 @@ import logging
 
 from collections import OrderedDict as oDict
 
+
 class NAbstract(object):
     &#34;&#34;&#34;
     Nabstract is the abstract class which includes number of attirbutes and methods commonly used by most other data types.
-        
+
     &#34;&#34;&#34;
-    
+
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Instantiate the `NAbstract` class
-        
+
         Parameters
         ---------
         **kwargs
             Keyword arguments
-        
+
         &#34;&#34;&#34;
-        
+
         self._filename = kwargs.get(&#39;filename&#39;, &#39;&#39;)
         self._system = kwargs.get(&#39;system&#39;, &#39;Axona&#39;)
         self._name = kwargs.get(&#39;name&#39;, &#39;c0&#39;)
@@ -70,8 +71,8 @@ class NAbstract(object):
                              &#39;Duration&#39;: 0,
                              &#39;Format&#39;: &#39;Axona&#39;,
                              &#39;Source&#39;: self._filename}
-        
-        self.__type= &#39;abstract&#39;
+
+        self.__type = &#39;abstract&#39;
 
     def get_type(self):
         &#34;&#34;&#34;Returns the type of data class, e.g., instance of Nabstract will return &#39;abstract&#39; as the type of the class.
@@ -79,7 +80,7 @@ class NAbstract(object):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str    
@@ -93,25 +94,26 @@ class NAbstract(object):
         ----------
         filename : str
             Name of the data file
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         if filename is not None:
             self._filename = filename
+
     def get_filename(self):
         &#34;&#34;&#34;Returns the filename of the data class.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str    
-        &#34;&#34;&#34;        
+        &#34;&#34;&#34;
         return self._filename
 
     def set_system(self, system=None):
@@ -121,12 +123,12 @@ class NAbstract(object):
         ----------
         system : str
             Recording system or data file format
-            
+
         Returns
         -------
         None    
-        &#34;&#34;&#34; 
-        
+        &#34;&#34;&#34;
+
         if system is not None:
             self._system = system
 
@@ -136,12 +138,12 @@ class NAbstract(object):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str    
         &#34;&#34;&#34;
-        
+
         return self._system
 
     def set_name(self, name=&#39;&#39;):
@@ -150,26 +152,26 @@ class NAbstract(object):
         Parameters
         ----------
         name : str
-        
+
         Returns
         -------
         None    
         &#34;&#34;&#34;
-        
+
         self._name = name
-        
+
     def get_name(self):
         &#34;&#34;&#34;Gets the name of the object.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._name
 
     def set_description(self, description=&#39;&#39;):
@@ -178,46 +180,46 @@ class NAbstract(object):
         Parameters
         ----------
         description : str
-        
+
         Returns
         -------
         None    
         &#34;&#34;&#34;
-        
+
         self._description = description
 
     def save_to_hdf5(self, parent_dir):
         &#34;&#34;&#34;
         Implemented in subclasses
         &#34;&#34;&#34;
-        pass #implement for each type
-        
+        pass  # implement for each type
+
     def load(self):
         &#34;&#34;&#34;
         Implemented in subclasses
         &#34;&#34;&#34;
         pass
-    
+
     @classmethod
     def _new_instance(cls, obj=None, **kwargs):
         &#34;&#34;&#34;Creates a new instance from the class `cls`. If `obj` is None, a new
         instance of `cls` is returned.  If the `obj` is an 
         instance of `cls`, the same is returned. If `obj` itself is a class, 
         it supersedes the `cls` and returns an object of `obj` class.
-        
+
         Parameters
         ----------
         cls
             Class of the new node
         obj
             Either an object of class `cls` or a Class to be instantiated
-            
+
         Returns
         -------
             New node of specified Class instance
-        
+
         &#34;&#34;&#34;
-        
+
         if obj is None:
             new_obj = cls(**kwargs)
         elif isinstance(obj, cls):
@@ -225,40 +227,39 @@ class NAbstract(object):
         elif inspect.isclass(obj):
             cls = obj
         new_obj = cls(**kwargs)
-        
+
         return new_obj
 
     def get_results(self):
         &#34;&#34;&#34;Returns the analysis results
-        
+
         Returns
         -------
         OrderedDict
-        
+
         &#34;&#34;&#34;
-        
+
         return self._results
-    
+
     def update_result(self, new_result={}):
         &#34;&#34;&#34;Updates the results.
 
         Parameters
         ----------
         description : str
-        
+
         Returns
         -------
         OrderedDict
-        
+
         See Also
         --------
         get_results
-        
+
         &#34;&#34;&#34;
-    
+
         self._results.update(new_result)
-        
-        
+
     def reset_results(self):
         &#34;&#34;&#34;Resets the results to an empty OrderedDict.
 
@@ -272,109 +273,105 @@ class NAbstract(object):
         Parameters
         ----------
         version : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
 
-        
         self._record_info[&#39;File version&#39;] = version
-        
-        
+
     def _set_date(self, date_str=&#39;&#39;):
         &#34;&#34;&#34;Sets the date of the experiment.
 
         Parameters
         ----------
         date_str : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
 
-        
         self._record_info[&#39;Date&#39;] = date_str
-        
-        
+
     def _set_time(self, time=&#39;&#39;):
         &#34;&#34;&#34;Sets the time of the experiment.
 
         Parameters
         ----------
         time : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Time&#39;] = time
-        
+
     def _set_experiemnter(self, experimenter=&#39;&#39;):
         &#34;&#34;&#34;Sets the name of the experimenter
-        
+
         Parameters
         ----------
         experimenter : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Experimenter&#39;] = experimenter
-        
+
     def _set_comments(self, comments=&#39;&#39;):
         &#34;&#34;&#34;Sets comments or notes of the experimenter
 
         Parameters
         ----------
         comments : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Comments&#39;] = comments
-        
+
     def _set_duration(self, duration=&#39;&#39;):
         &#34;&#34;&#34;Sets the duration of the experiment
 
         Parameters
         ----------
         duration : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Duration&#39;] = duration
-        
+
     def _set_source_format(self, system=&#39;Axona&#39;):
         &#34;&#34;&#34;Sets the recording format or the source-format of the data
 
         Parameters
         ----------
         system: str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Format&#39;] = system
-        
+
     def _set_data_source(self, filename=None):
         &#34;&#34;&#34;Sets the source of the original data file
 
         Parameters
         ----------
         filename : str
-        
+
         Returns
         -------
         None
@@ -387,108 +384,108 @@ class NAbstract(object):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
         return self._record_info[&#39;File version&#39;]
-    
+
     def get_date(self):
         &#34;&#34;&#34;Gets the recording date
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Date&#39;]
-    
+
     def get_time(self):
         &#34;&#34;&#34;Gets the time of the experiment
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Time&#39;]
-    
+
     def get_experimenter(self):
         &#34;&#34;&#34;Gets the name of the experimenter
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Experimenter&#39;]
-    
+
     def get_comments(self):
         &#34;&#34;&#34;Gets the comments or notes about the experiment
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Comments&#39;]
-    
+
     def get_duration(self):
         &#34;&#34;&#34;Gets the duration of the experiment
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
-        &#34;&#34;&#34;    
+        &#34;&#34;&#34;
         return self._record_info[&#39;Duration&#39;]
-    
+
     def get_source_format(self):
         &#34;&#34;&#34;Gets the recording system or native data format
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Format&#39;]
-    
+
     def get_data_source(self):
         &#34;&#34;&#34;Gets the source of the data
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Source&#39;]
 
     def set_record_info(self, new_info={}):
@@ -497,13 +494,13 @@ class NAbstract(object):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         dict
             Sets one of the recording information in `(name, value)` pair
         &#34;&#34;&#34;
-        
+
         self._record_info.update(new_info)
 
     def get_record_info(self, record_name=None):
@@ -512,7 +509,7 @@ class NAbstract(object):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
@@ -522,22 +519,23 @@ class NAbstract(object):
         else:
             return self._record_info.get(record_name, None)
 
+
 class NBase(NAbstract):
     &#34;&#34;&#34;
     Derived from NAbstract class, NBase implements additional functionalities 
     for managing multiple spike or LFP datasets.
-    
+
     &#34;&#34;&#34;
-    
+
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Instantiate the `NBase` class
-        
+
         Parameters
         ---------
         **kwargs
             Keyword arguments
-        
+
         &#34;&#34;&#34;
         super().__init__(**kwargs)
         self._spikes = []
@@ -558,8 +556,8 @@ class NBase(NAbstract):
                              &#39;ADC Fullscale mv&#39;: 1,
                              &#39;Format&#39;: &#39;Axona&#39;,
                              &#39;Source&#39;: self._filename}
-        self.__type= &#39;base&#39;
-        
+        self.__type = &#39;base&#39;
+
     def add_node(self, node, node_type=None, **kwargs):
         &#34;&#34;&#34;Adds a new dataset, called node to the spike and LFP dataset arrays
 
@@ -571,12 +569,12 @@ class NBase(NAbstract):
             Type of the dataset described in each class attributes
         **kwargs
             Keywrod arguments
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         name = node.get_name()
         _replace = kwargs.get(&#39;replace&#39;, False)
 
@@ -594,9 +592,9 @@ class NBase(NAbstract):
         if _replace:
             i = self.del_node(node)
         elif name in node_names:
-            logging.warning(node_type + &#39; with name {0} already exists, &#39;.format(name) + \
-                        &#39;cannot add another one.\r\n&#39; + \
-                        &#39;Try renaming or set replace True&#39;)
+            logging.warning(node_type + &#39; with name {0} already exists, &#39;.format(name) +
+                            &#39;cannot add another one.\r\n&#39; +
+                            &#39;Try renaming or set replace True&#39;)
         else:
             i = len(nodes)
 
@@ -610,12 +608,12 @@ class NBase(NAbstract):
         ----------
         node
             Data node to be deleted
-        
+
         Returns
         -------
         int
             Index of deleted node
-        &#34;&#34;&#34;        
+        &#34;&#34;&#34;
         i = None
         if node in self._spikes:
             i = self._spikes.index(node)
@@ -636,13 +634,13 @@ class NBase(NAbstract):
             List of the names of the data nodes to obtain
         node_type : str
             Type of the data node
-        
+
         Returns
         -------
         list
             List of the data nodes 
         &#34;&#34;&#34;
-        
+
         nodes = []
         not_nodes = []
         if node_type == &#39;spike&#39;:
@@ -655,7 +653,7 @@ class NBase(NAbstract):
             nodes.append(nodes[name]) if name in names\
                 else not_nodes.append(name)
         if not_nodes:
-            logging.warning(&#39;,&#39;.join(not_nodes)+ &#39; does not exist&#39;)
+            logging.warning(&#39;,&#39;.join(not_nodes) + &#39; does not exist&#39;)
         return nodes
 
     def get_spike(self, names=None):
@@ -665,19 +663,18 @@ class NBase(NAbstract):
         ----------
         names : list
             List of the names of the spike nodes to obtain
-        
+
         Returns
         -------
         list
             List of the spike nodes. Returns all the spike nodes if `names` is None 
         &#34;&#34;&#34;
-        
+
         if names is None:
             spikes = self._spikes
         else:
             spikes = self.get_node(names, &#39;spike&#39;)
         return spikes
-    
 
     def get_lfp(self, names=None):
         &#34;&#34;&#34;Gets the lfp nodes by name
@@ -686,19 +683,18 @@ class NBase(NAbstract):
         ----------
         names : list
             List of the names of the lfp nodes to obtain
-        
+
         Returns
         -------
         list
             List of the lfp nodes. Returns all the lfp nodes if `names` is None 
         &#34;&#34;&#34;
-        
+
         if names is None:
             lfp = self._lfp
         else:
             lfp = self.get_node(names, &#39;lfp&#39;)
         return lfp
-    
 
     def del_spike(self, spike):
         &#34;&#34;&#34;Deletes a node that represents spike dataset
@@ -707,20 +703,19 @@ class NBase(NAbstract):
         ----------
         spike
             Spike node to be deleted by name or the object
-        
+
         Returns
         -------
         i : int
             Index of the deleted node
         &#34;&#34;&#34;
-        
+
         if isinstance(spike, str):
             name = spike
             spike = self.get_spike(name)
         i = self.del_node(spike)
-    
+
         return i
-    
 
     def del_lfp(self, lfp):
         &#34;&#34;&#34;Deletes a node that represents LFP dataset
@@ -729,19 +724,19 @@ class NBase(NAbstract):
         ----------
         lfp
             LFP node to be deleted by name or the object
-        
+
         Returns
         -------
         int
             Index of the deleted node
         &#34;&#34;&#34;
-        
+
         i = 0
         if isinstance(lfp, str):
             name = lfp
             lfp = self.get_lfp(name)
         i = self.del_node(lfp)
-    
+
         return i
 
     def get_spike_names(self):
@@ -750,13 +745,13 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             Names of the spike nodes
         &#34;&#34;&#34;
-        
+
         return self._spikes_by_name.keys()
 
     def get_lfp_names(self):
@@ -765,13 +760,13 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             Names of the LFP nodes
         &#34;&#34;&#34;
-        
+
         return self._lfp_by_name.keys()
 
     def change_names(self, old_names, new_names, node_type=&#39;spike&#39;):
@@ -786,12 +781,12 @@ class NBase(NAbstract):
             List of the new names of nodes
         node_type
             Type of the data node
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         if len(new_names) != len(old_names):
             logging.error(&#39;Input names are not equal in numbers!&#39;)
         elif len(set(new_names)) &lt; len(old_names):
@@ -801,13 +796,15 @@ class NBase(NAbstract):
                 for i, name in enumerate(new_names):
                     node = self.get_spike(old_names[i])
                     node.set_name(name)
-                    self._spike_by_name[name] = self._spike_by_name.pop(old_names[i])
+                    self._spikes_by_name[name] = self._spikes_by_name.pop(
+                        old_names[i])
 
             elif node_type == &#39;lfp&#39;:
                 for i, name in enumerate(new_names):
                     node = self.get_lfp(old_names[i])
                     node.set_name(name)
-                    self._lfp_by_name[name] = self._spike_by_name.pop(old_names[i])
+                    self._lfp_by_name[name] = self._spikes_by_name.pop(
+                        old_names[i])
 
     def set_spike_names(self, names):
         &#34;&#34;&#34;Sets the names of the spike nodes. Old names are replaced
@@ -816,15 +813,14 @@ class NBase(NAbstract):
         ----------
         names : list of str
             List of new names of the spike nodes
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        self.change_names(self, self.get_spike_names(), names, &#39;lfp&#39;)
-        
+
+        self.change_names(self.get_spike_names(), names, &#39;lfp&#39;)
 
     def set_lfp_names(self, names):
         &#34;&#34;&#34;Sets the names of the lfp nodes. Old names are replaced.
@@ -833,14 +829,14 @@ class NBase(NAbstract):
         ----------
         names : list of str
             List of new names of the lfp nodes
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        self.change_names(self, self.get_lfp_names(), names, &#39;lfp&#39;)
+
+        self.change_names(self.get_lfp_names(), names, &#39;lfp&#39;)
 
     def set_node_file_names(self, node_names, filenames, node_type=&#39;spike&#39;):
         &#34;&#34;&#34;Sets the filenames for each data node. `node_names` must be of equal
@@ -854,13 +850,13 @@ class NBase(NAbstract):
             List of the filenames for each node
         node_type
             Type of the data node
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         if len(node_names) != len(filenames):
             logging.error(&#39;No. of names does not match with no. of filenames&#39;)
         elif len(set(node_names)) != len(node_names):
@@ -880,13 +876,13 @@ class NBase(NAbstract):
             Names of the spike nodes whose filenames are set
         filenames : list of str
             List of the filenames for each spike node
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.set_node_file_names(spike_names, filenames, &#39;spike&#39;)
 
     def set_lfp_file_names(self, lfp_names, filenames):
@@ -899,13 +895,13 @@ class NBase(NAbstract):
             Names of the lfp nodes whose filenames are set
         filenames : list of str
             List of the filenames for each lfp node
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.set_node_file_names(lfp_names, filenames, &#39;lfp&#39;)
 
     def count_spike(self):
@@ -914,7 +910,7 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         int
@@ -928,7 +924,7 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         int
@@ -949,22 +945,23 @@ class NBase(NAbstract):
             is added to the node list and returned
         node_type : str
             Type of the data node
-        
-        
+
+
         Returns
         -------
-        
+
             Newly added data node
-        
+
         See also
         --------
         add_node
-        
+
         &#34;&#34;&#34;
-        
-        new_node = self._new_instance(cls, node, **kwargs)
-        self.add_node(new_node, node_type, replace=kwargs.get(&#39;replace&#39;, False))
-        
+
+        new_node = self._new_instance(node, **kwargs)
+        self.add_node(new_node, node_type,
+                      replace=kwargs.get(&#39;replace&#39;, False))
+
         return new_node
 
     def _get_instance(self, cls, node, node_type):
@@ -980,16 +977,16 @@ class NBase(NAbstract):
             is returned
         node_type : str
             Type of the data node
-        
+
         Returns
         -------
-        
+
             Newly added data node
-        
+
         See also
         --------
         add_node
-        
+
         &#34;&#34;&#34;
         if isinstance(node, cls):
             new_node = node
@@ -1002,7 +999,7 @@ class NBase(NAbstract):
                 _get_node = self.get_spike
             if node in _get_node_names():
                 new_node = _get_node(node)
-        
+
         return new_node</code></pre>
 </details>
 </section>
@@ -1032,20 +1029,20 @@ class NBase(NAbstract):
 <pre><code class="python">class NAbstract(object):
     &#34;&#34;&#34;
     Nabstract is the abstract class which includes number of attirbutes and methods commonly used by most other data types.
-        
+
     &#34;&#34;&#34;
-    
+
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Instantiate the `NAbstract` class
-        
+
         Parameters
         ---------
         **kwargs
             Keyword arguments
-        
+
         &#34;&#34;&#34;
-        
+
         self._filename = kwargs.get(&#39;filename&#39;, &#39;&#39;)
         self._system = kwargs.get(&#39;system&#39;, &#39;Axona&#39;)
         self._name = kwargs.get(&#39;name&#39;, &#39;c0&#39;)
@@ -1059,8 +1056,8 @@ class NBase(NAbstract):
                              &#39;Duration&#39;: 0,
                              &#39;Format&#39;: &#39;Axona&#39;,
                              &#39;Source&#39;: self._filename}
-        
-        self.__type= &#39;abstract&#39;
+
+        self.__type = &#39;abstract&#39;
 
     def get_type(self):
         &#34;&#34;&#34;Returns the type of data class, e.g., instance of Nabstract will return &#39;abstract&#39; as the type of the class.
@@ -1068,7 +1065,7 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str    
@@ -1082,25 +1079,26 @@ class NBase(NAbstract):
         ----------
         filename : str
             Name of the data file
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         if filename is not None:
             self._filename = filename
+
     def get_filename(self):
         &#34;&#34;&#34;Returns the filename of the data class.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str    
-        &#34;&#34;&#34;        
+        &#34;&#34;&#34;
         return self._filename
 
     def set_system(self, system=None):
@@ -1110,12 +1108,12 @@ class NBase(NAbstract):
         ----------
         system : str
             Recording system or data file format
-            
+
         Returns
         -------
         None    
-        &#34;&#34;&#34; 
-        
+        &#34;&#34;&#34;
+
         if system is not None:
             self._system = system
 
@@ -1125,12 +1123,12 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str    
         &#34;&#34;&#34;
-        
+
         return self._system
 
     def set_name(self, name=&#39;&#39;):
@@ -1139,26 +1137,26 @@ class NBase(NAbstract):
         Parameters
         ----------
         name : str
-        
+
         Returns
         -------
         None    
         &#34;&#34;&#34;
-        
+
         self._name = name
-        
+
     def get_name(self):
         &#34;&#34;&#34;Gets the name of the object.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._name
 
     def set_description(self, description=&#39;&#39;):
@@ -1167,46 +1165,46 @@ class NBase(NAbstract):
         Parameters
         ----------
         description : str
-        
+
         Returns
         -------
         None    
         &#34;&#34;&#34;
-        
+
         self._description = description
 
     def save_to_hdf5(self, parent_dir):
         &#34;&#34;&#34;
         Implemented in subclasses
         &#34;&#34;&#34;
-        pass #implement for each type
-        
+        pass  # implement for each type
+
     def load(self):
         &#34;&#34;&#34;
         Implemented in subclasses
         &#34;&#34;&#34;
         pass
-    
+
     @classmethod
     def _new_instance(cls, obj=None, **kwargs):
         &#34;&#34;&#34;Creates a new instance from the class `cls`. If `obj` is None, a new
         instance of `cls` is returned.  If the `obj` is an 
         instance of `cls`, the same is returned. If `obj` itself is a class, 
         it supersedes the `cls` and returns an object of `obj` class.
-        
+
         Parameters
         ----------
         cls
             Class of the new node
         obj
             Either an object of class `cls` or a Class to be instantiated
-            
+
         Returns
         -------
             New node of specified Class instance
-        
+
         &#34;&#34;&#34;
-        
+
         if obj is None:
             new_obj = cls(**kwargs)
         elif isinstance(obj, cls):
@@ -1214,40 +1212,39 @@ class NBase(NAbstract):
         elif inspect.isclass(obj):
             cls = obj
         new_obj = cls(**kwargs)
-        
+
         return new_obj
 
     def get_results(self):
         &#34;&#34;&#34;Returns the analysis results
-        
+
         Returns
         -------
         OrderedDict
-        
+
         &#34;&#34;&#34;
-        
+
         return self._results
-    
+
     def update_result(self, new_result={}):
         &#34;&#34;&#34;Updates the results.
 
         Parameters
         ----------
         description : str
-        
+
         Returns
         -------
         OrderedDict
-        
+
         See Also
         --------
         get_results
-        
+
         &#34;&#34;&#34;
-    
+
         self._results.update(new_result)
-        
-        
+
     def reset_results(self):
         &#34;&#34;&#34;Resets the results to an empty OrderedDict.
 
@@ -1261,109 +1258,105 @@ class NBase(NAbstract):
         Parameters
         ----------
         version : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
 
-        
         self._record_info[&#39;File version&#39;] = version
-        
-        
+
     def _set_date(self, date_str=&#39;&#39;):
         &#34;&#34;&#34;Sets the date of the experiment.
 
         Parameters
         ----------
         date_str : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
 
-        
         self._record_info[&#39;Date&#39;] = date_str
-        
-        
+
     def _set_time(self, time=&#39;&#39;):
         &#34;&#34;&#34;Sets the time of the experiment.
 
         Parameters
         ----------
         time : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Time&#39;] = time
-        
+
     def _set_experiemnter(self, experimenter=&#39;&#39;):
         &#34;&#34;&#34;Sets the name of the experimenter
-        
+
         Parameters
         ----------
         experimenter : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Experimenter&#39;] = experimenter
-        
+
     def _set_comments(self, comments=&#39;&#39;):
         &#34;&#34;&#34;Sets comments or notes of the experimenter
 
         Parameters
         ----------
         comments : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Comments&#39;] = comments
-        
+
     def _set_duration(self, duration=&#39;&#39;):
         &#34;&#34;&#34;Sets the duration of the experiment
 
         Parameters
         ----------
         duration : str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Duration&#39;] = duration
-        
+
     def _set_source_format(self, system=&#39;Axona&#39;):
         &#34;&#34;&#34;Sets the recording format or the source-format of the data
 
         Parameters
         ----------
         system: str
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         self._record_info[&#39;Format&#39;] = system
-        
+
     def _set_data_source(self, filename=None):
         &#34;&#34;&#34;Sets the source of the original data file
 
         Parameters
         ----------
         filename : str
-        
+
         Returns
         -------
         None
@@ -1376,108 +1369,108 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
         return self._record_info[&#39;File version&#39;]
-    
+
     def get_date(self):
         &#34;&#34;&#34;Gets the recording date
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Date&#39;]
-    
+
     def get_time(self):
         &#34;&#34;&#34;Gets the time of the experiment
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Time&#39;]
-    
+
     def get_experimenter(self):
         &#34;&#34;&#34;Gets the name of the experimenter
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Experimenter&#39;]
-    
+
     def get_comments(self):
         &#34;&#34;&#34;Gets the comments or notes about the experiment
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Comments&#39;]
-    
+
     def get_duration(self):
         &#34;&#34;&#34;Gets the duration of the experiment
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
-        &#34;&#34;&#34;    
+        &#34;&#34;&#34;
         return self._record_info[&#39;Duration&#39;]
-    
+
     def get_source_format(self):
         &#34;&#34;&#34;Gets the recording system or native data format
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Format&#39;]
-    
+
     def get_data_source(self):
         &#34;&#34;&#34;Gets the source of the data
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
         &#34;&#34;&#34;
-        
+
         return self._record_info[&#39;Source&#39;]
 
     def set_record_info(self, new_info={}):
@@ -1486,13 +1479,13 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         dict
             Sets one of the recording information in `(name, value)` pair
         &#34;&#34;&#34;
-        
+
         self._record_info.update(new_info)
 
     def get_record_info(self, record_name=None):
@@ -1501,7 +1494,7 @@ class NBase(NAbstract):
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
@@ -1541,12 +1534,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
     &#34;&#34;&#34;
-    
+
     return self._record_info[&#39;Comments&#39;]</code></pre>
 </details>
 </dd>
@@ -1573,12 +1566,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
     &#34;&#34;&#34;
-    
+
     return self._record_info[&#39;Source&#39;]</code></pre>
 </details>
 </dd>
@@ -1605,12 +1598,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
     &#34;&#34;&#34;
-    
+
     return self._record_info[&#39;Date&#39;]</code></pre>
 </details>
 </dd>
@@ -1637,11 +1630,11 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
-    &#34;&#34;&#34;    
+    &#34;&#34;&#34;
     return self._record_info[&#39;Duration&#39;]</code></pre>
 </details>
 </dd>
@@ -1668,12 +1661,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
     &#34;&#34;&#34;
-    
+
     return self._record_info[&#39;Experimenter&#39;]</code></pre>
 </details>
 </dd>
@@ -1700,7 +1693,7 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
@@ -1731,11 +1724,11 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str    
-    &#34;&#34;&#34;        
+    &#34;&#34;&#34;
     return self._filename</code></pre>
 </details>
 </dd>
@@ -1762,12 +1755,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
     &#34;&#34;&#34;
-    
+
     return self._name</code></pre>
 </details>
 </dd>
@@ -1794,7 +1787,7 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
@@ -1819,13 +1812,13 @@ class NBase(NAbstract):
 <summary>Source code</summary>
 <pre><code class="python">def get_results(self):
     &#34;&#34;&#34;Returns the analysis results
-    
+
     Returns
     -------
     OrderedDict
-    
+
     &#34;&#34;&#34;
-    
+
     return self._results</code></pre>
 </details>
 </dd>
@@ -1852,12 +1845,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
     &#34;&#34;&#34;
-    
+
     return self._record_info[&#39;Format&#39;]</code></pre>
 </details>
 </dd>
@@ -1884,12 +1877,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str    
     &#34;&#34;&#34;
-    
+
     return self._system</code></pre>
 </details>
 </dd>
@@ -1916,12 +1909,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str
     &#34;&#34;&#34;
-    
+
     return self._record_info[&#39;Time&#39;]</code></pre>
 </details>
 </dd>
@@ -1948,7 +1941,7 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     str    
@@ -1996,7 +1989,7 @@ class NBase(NAbstract):
     &#34;&#34;&#34;
     Implemented in subclasses
     &#34;&#34;&#34;
-    pass #implement for each type</code></pre>
+    pass  # implement for each type</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_base.NAbstract.set_description"><code class="name flex">
@@ -2022,12 +2015,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     description : str
-    
+
     Returns
     -------
     None    
     &#34;&#34;&#34;
-    
+
     self._description = description</code></pre>
 </details>
 </dd>
@@ -2055,12 +2048,12 @@ class NBase(NAbstract):
     ----------
     filename : str
         Name of the data file
-    
+
     Returns
     -------
     None
     &#34;&#34;&#34;
-    
+
     if filename is not None:
         self._filename = filename</code></pre>
 </details>
@@ -2088,12 +2081,12 @@ class NBase(NAbstract):
     Parameters
     ----------
     name : str
-    
+
     Returns
     -------
     None    
     &#34;&#34;&#34;
-    
+
     self._name = name</code></pre>
 </details>
 </dd>
@@ -2120,13 +2113,13 @@ class NBase(NAbstract):
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     dict
         Sets one of the recording information in `(name, value)` pair
     &#34;&#34;&#34;
-    
+
     self._record_info.update(new_info)</code></pre>
 </details>
 </dd>
@@ -2154,12 +2147,12 @@ class NBase(NAbstract):
     ----------
     system : str
         Recording system or data file format
-        
+
     Returns
     -------
     None    
-    &#34;&#34;&#34; 
-    
+    &#34;&#34;&#34;
+
     if system is not None:
         self._system = system</code></pre>
 </details>
@@ -2189,15 +2182,15 @@ class NBase(NAbstract):
     Parameters
     ----------
     description : str
-    
+
     Returns
     -------
     OrderedDict
-    
+
     See Also
     --------
     get_results
-    
+
     &#34;&#34;&#34;
 
     self._results.update(new_result)</code></pre>
@@ -2224,18 +2217,18 @@ for managing multiple spike or LFP datasets.</p>
     &#34;&#34;&#34;
     Derived from NAbstract class, NBase implements additional functionalities 
     for managing multiple spike or LFP datasets.
-    
+
     &#34;&#34;&#34;
-    
+
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Instantiate the `NBase` class
-        
+
         Parameters
         ---------
         **kwargs
             Keyword arguments
-        
+
         &#34;&#34;&#34;
         super().__init__(**kwargs)
         self._spikes = []
@@ -2256,8 +2249,8 @@ for managing multiple spike or LFP datasets.</p>
                              &#39;ADC Fullscale mv&#39;: 1,
                              &#39;Format&#39;: &#39;Axona&#39;,
                              &#39;Source&#39;: self._filename}
-        self.__type= &#39;base&#39;
-        
+        self.__type = &#39;base&#39;
+
     def add_node(self, node, node_type=None, **kwargs):
         &#34;&#34;&#34;Adds a new dataset, called node to the spike and LFP dataset arrays
 
@@ -2269,12 +2262,12 @@ for managing multiple spike or LFP datasets.</p>
             Type of the dataset described in each class attributes
         **kwargs
             Keywrod arguments
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         name = node.get_name()
         _replace = kwargs.get(&#39;replace&#39;, False)
 
@@ -2292,9 +2285,9 @@ for managing multiple spike or LFP datasets.</p>
         if _replace:
             i = self.del_node(node)
         elif name in node_names:
-            logging.warning(node_type + &#39; with name {0} already exists, &#39;.format(name) + \
-                        &#39;cannot add another one.\r\n&#39; + \
-                        &#39;Try renaming or set replace True&#39;)
+            logging.warning(node_type + &#39; with name {0} already exists, &#39;.format(name) +
+                            &#39;cannot add another one.\r\n&#39; +
+                            &#39;Try renaming or set replace True&#39;)
         else:
             i = len(nodes)
 
@@ -2308,12 +2301,12 @@ for managing multiple spike or LFP datasets.</p>
         ----------
         node
             Data node to be deleted
-        
+
         Returns
         -------
         int
             Index of deleted node
-        &#34;&#34;&#34;        
+        &#34;&#34;&#34;
         i = None
         if node in self._spikes:
             i = self._spikes.index(node)
@@ -2334,13 +2327,13 @@ for managing multiple spike or LFP datasets.</p>
             List of the names of the data nodes to obtain
         node_type : str
             Type of the data node
-        
+
         Returns
         -------
         list
             List of the data nodes 
         &#34;&#34;&#34;
-        
+
         nodes = []
         not_nodes = []
         if node_type == &#39;spike&#39;:
@@ -2353,7 +2346,7 @@ for managing multiple spike or LFP datasets.</p>
             nodes.append(nodes[name]) if name in names\
                 else not_nodes.append(name)
         if not_nodes:
-            logging.warning(&#39;,&#39;.join(not_nodes)+ &#39; does not exist&#39;)
+            logging.warning(&#39;,&#39;.join(not_nodes) + &#39; does not exist&#39;)
         return nodes
 
     def get_spike(self, names=None):
@@ -2363,19 +2356,18 @@ for managing multiple spike or LFP datasets.</p>
         ----------
         names : list
             List of the names of the spike nodes to obtain
-        
+
         Returns
         -------
         list
             List of the spike nodes. Returns all the spike nodes if `names` is None 
         &#34;&#34;&#34;
-        
+
         if names is None:
             spikes = self._spikes
         else:
             spikes = self.get_node(names, &#39;spike&#39;)
         return spikes
-    
 
     def get_lfp(self, names=None):
         &#34;&#34;&#34;Gets the lfp nodes by name
@@ -2384,19 +2376,18 @@ for managing multiple spike or LFP datasets.</p>
         ----------
         names : list
             List of the names of the lfp nodes to obtain
-        
+
         Returns
         -------
         list
             List of the lfp nodes. Returns all the lfp nodes if `names` is None 
         &#34;&#34;&#34;
-        
+
         if names is None:
             lfp = self._lfp
         else:
             lfp = self.get_node(names, &#39;lfp&#39;)
         return lfp
-    
 
     def del_spike(self, spike):
         &#34;&#34;&#34;Deletes a node that represents spike dataset
@@ -2405,20 +2396,19 @@ for managing multiple spike or LFP datasets.</p>
         ----------
         spike
             Spike node to be deleted by name or the object
-        
+
         Returns
         -------
         i : int
             Index of the deleted node
         &#34;&#34;&#34;
-        
+
         if isinstance(spike, str):
             name = spike
             spike = self.get_spike(name)
         i = self.del_node(spike)
-    
+
         return i
-    
 
     def del_lfp(self, lfp):
         &#34;&#34;&#34;Deletes a node that represents LFP dataset
@@ -2427,19 +2417,19 @@ for managing multiple spike or LFP datasets.</p>
         ----------
         lfp
             LFP node to be deleted by name or the object
-        
+
         Returns
         -------
         int
             Index of the deleted node
         &#34;&#34;&#34;
-        
+
         i = 0
         if isinstance(lfp, str):
             name = lfp
             lfp = self.get_lfp(name)
         i = self.del_node(lfp)
-    
+
         return i
 
     def get_spike_names(self):
@@ -2448,13 +2438,13 @@ for managing multiple spike or LFP datasets.</p>
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             Names of the spike nodes
         &#34;&#34;&#34;
-        
+
         return self._spikes_by_name.keys()
 
     def get_lfp_names(self):
@@ -2463,13 +2453,13 @@ for managing multiple spike or LFP datasets.</p>
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             Names of the LFP nodes
         &#34;&#34;&#34;
-        
+
         return self._lfp_by_name.keys()
 
     def change_names(self, old_names, new_names, node_type=&#39;spike&#39;):
@@ -2484,12 +2474,12 @@ for managing multiple spike or LFP datasets.</p>
             List of the new names of nodes
         node_type
             Type of the data node
-        
+
         Returns
         -------
         None
         &#34;&#34;&#34;
-        
+
         if len(new_names) != len(old_names):
             logging.error(&#39;Input names are not equal in numbers!&#39;)
         elif len(set(new_names)) &lt; len(old_names):
@@ -2499,13 +2489,15 @@ for managing multiple spike or LFP datasets.</p>
                 for i, name in enumerate(new_names):
                     node = self.get_spike(old_names[i])
                     node.set_name(name)
-                    self._spike_by_name[name] = self._spike_by_name.pop(old_names[i])
+                    self._spikes_by_name[name] = self._spikes_by_name.pop(
+                        old_names[i])
 
             elif node_type == &#39;lfp&#39;:
                 for i, name in enumerate(new_names):
                     node = self.get_lfp(old_names[i])
                     node.set_name(name)
-                    self._lfp_by_name[name] = self._spike_by_name.pop(old_names[i])
+                    self._lfp_by_name[name] = self._spikes_by_name.pop(
+                        old_names[i])
 
     def set_spike_names(self, names):
         &#34;&#34;&#34;Sets the names of the spike nodes. Old names are replaced
@@ -2514,15 +2506,14 @@ for managing multiple spike or LFP datasets.</p>
         ----------
         names : list of str
             List of new names of the spike nodes
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        self.change_names(self, self.get_spike_names(), names, &#39;lfp&#39;)
-        
+
+        self.change_names(self.get_spike_names(), names, &#39;lfp&#39;)
 
     def set_lfp_names(self, names):
         &#34;&#34;&#34;Sets the names of the lfp nodes. Old names are replaced.
@@ -2531,14 +2522,14 @@ for managing multiple spike or LFP datasets.</p>
         ----------
         names : list of str
             List of new names of the lfp nodes
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        self.change_names(self, self.get_lfp_names(), names, &#39;lfp&#39;)
+
+        self.change_names(self.get_lfp_names(), names, &#39;lfp&#39;)
 
     def set_node_file_names(self, node_names, filenames, node_type=&#39;spike&#39;):
         &#34;&#34;&#34;Sets the filenames for each data node. `node_names` must be of equal
@@ -2552,13 +2543,13 @@ for managing multiple spike or LFP datasets.</p>
             List of the filenames for each node
         node_type
             Type of the data node
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         if len(node_names) != len(filenames):
             logging.error(&#39;No. of names does not match with no. of filenames&#39;)
         elif len(set(node_names)) != len(node_names):
@@ -2578,13 +2569,13 @@ for managing multiple spike or LFP datasets.</p>
             Names of the spike nodes whose filenames are set
         filenames : list of str
             List of the filenames for each spike node
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.set_node_file_names(spike_names, filenames, &#39;spike&#39;)
 
     def set_lfp_file_names(self, lfp_names, filenames):
@@ -2597,13 +2588,13 @@ for managing multiple spike or LFP datasets.</p>
             Names of the lfp nodes whose filenames are set
         filenames : list of str
             List of the filenames for each lfp node
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.set_node_file_names(lfp_names, filenames, &#39;lfp&#39;)
 
     def count_spike(self):
@@ -2612,7 +2603,7 @@ for managing multiple spike or LFP datasets.</p>
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         int
@@ -2626,7 +2617,7 @@ for managing multiple spike or LFP datasets.</p>
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         int
@@ -2647,22 +2638,23 @@ for managing multiple spike or LFP datasets.</p>
             is added to the node list and returned
         node_type : str
             Type of the data node
-        
-        
+
+
         Returns
         -------
-        
+
             Newly added data node
-        
+
         See also
         --------
         add_node
-        
+
         &#34;&#34;&#34;
-        
-        new_node = self._new_instance(cls, node, **kwargs)
-        self.add_node(new_node, node_type, replace=kwargs.get(&#39;replace&#39;, False))
-        
+
+        new_node = self._new_instance(node, **kwargs)
+        self.add_node(new_node, node_type,
+                      replace=kwargs.get(&#39;replace&#39;, False))
+
         return new_node
 
     def _get_instance(self, cls, node, node_type):
@@ -2678,16 +2670,16 @@ for managing multiple spike or LFP datasets.</p>
             is returned
         node_type : str
             Type of the data node
-        
+
         Returns
         -------
-        
+
             Newly added data node
-        
+
         See also
         --------
         add_node
-        
+
         &#34;&#34;&#34;
         if isinstance(node, cls):
             new_node = node
@@ -2700,7 +2692,7 @@ for managing multiple spike or LFP datasets.</p>
                 _get_node = self.get_spike
             if node in _get_node_names():
                 new_node = _get_node(node)
-        
+
         return new_node</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -2709,10 +2701,10 @@ for managing multiple spike or LFP datasets.</p>
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="neurochat.nc_lfp.NLfp" href="nc_lfp.html#neurochat.nc_lfp.NLfp">NLfp</a></li>
 <li><a title="neurochat.nc_spike.NSpike" href="nc_spike.html#neurochat.nc_spike.NSpike">NSpike</a></li>
-<li><a title="neurochat.nc_event.NEvent" href="nc_event.html#neurochat.nc_event.NEvent">NEvent</a></li>
 <li><a title="neurochat.nc_clust.NClust" href="nc_clust.html#neurochat.nc_clust.NClust">NClust</a></li>
+<li><a title="neurochat.nc_lfp.NLfp" href="nc_lfp.html#neurochat.nc_lfp.NLfp">NLfp</a></li>
+<li><a title="neurochat.nc_event.NEvent" href="nc_event.html#neurochat.nc_event.NEvent">NEvent</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2748,12 +2740,12 @@ for managing multiple spike or LFP datasets.</p>
         Type of the dataset described in each class attributes
     **kwargs
         Keywrod arguments
-    
+
     Returns
     -------
     None
     &#34;&#34;&#34;
-    
+
     name = node.get_name()
     _replace = kwargs.get(&#39;replace&#39;, False)
 
@@ -2771,9 +2763,9 @@ for managing multiple spike or LFP datasets.</p>
     if _replace:
         i = self.del_node(node)
     elif name in node_names:
-        logging.warning(node_type + &#39; with name {0} already exists, &#39;.format(name) + \
-                    &#39;cannot add another one.\r\n&#39; + \
-                    &#39;Try renaming or set replace True&#39;)
+        logging.warning(node_type + &#39; with name {0} already exists, &#39;.format(name) +
+                        &#39;cannot add another one.\r\n&#39; +
+                        &#39;Try renaming or set replace True&#39;)
     else:
         i = len(nodes)
 
@@ -2815,12 +2807,12 @@ as that of <code>new_length</code></p>
         List of the new names of nodes
     node_type
         Type of the data node
-    
+
     Returns
     -------
     None
     &#34;&#34;&#34;
-    
+
     if len(new_names) != len(old_names):
         logging.error(&#39;Input names are not equal in numbers!&#39;)
     elif len(set(new_names)) &lt; len(old_names):
@@ -2830,13 +2822,15 @@ as that of <code>new_length</code></p>
             for i, name in enumerate(new_names):
                 node = self.get_spike(old_names[i])
                 node.set_name(name)
-                self._spike_by_name[name] = self._spike_by_name.pop(old_names[i])
+                self._spikes_by_name[name] = self._spikes_by_name.pop(
+                    old_names[i])
 
         elif node_type == &#39;lfp&#39;:
             for i, name in enumerate(new_names):
                 node = self.get_lfp(old_names[i])
                 node.set_name(name)
-                self._lfp_by_name[name] = self._spike_by_name.pop(old_names[i])</code></pre>
+                self._lfp_by_name[name] = self._spikes_by_name.pop(
+                    old_names[i])</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_base.NBase.count_lfp"><code class="name flex">
@@ -2862,7 +2856,7 @@ as that of <code>new_length</code></p>
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     int
@@ -2894,7 +2888,7 @@ as that of <code>new_length</code></p>
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     int
@@ -2927,13 +2921,13 @@ as that of <code>new_length</code></p>
     ----------
     lfp
         LFP node to be deleted by name or the object
-    
+
     Returns
     -------
     int
         Index of the deleted node
     &#34;&#34;&#34;
-    
+
     i = 0
     if isinstance(lfp, str):
         name = lfp
@@ -2967,12 +2961,12 @@ as that of <code>new_length</code></p>
     ----------
     node
         Data node to be deleted
-    
+
     Returns
     -------
     int
         Index of deleted node
-    &#34;&#34;&#34;        
+    &#34;&#34;&#34;
     i = None
     if node in self._spikes:
         i = self._spikes.index(node)
@@ -3009,13 +3003,13 @@ as that of <code>new_length</code></p>
     ----------
     spike
         Spike node to be deleted by name or the object
-    
+
     Returns
     -------
     i : int
         Index of the deleted node
     &#34;&#34;&#34;
-    
+
     if isinstance(spike, str):
         name = spike
         spike = self.get_spike(name)
@@ -3048,13 +3042,13 @@ as that of <code>new_length</code></p>
     ----------
     names : list
         List of the names of the lfp nodes to obtain
-    
+
     Returns
     -------
     list
         List of the lfp nodes. Returns all the lfp nodes if `names` is None 
     &#34;&#34;&#34;
-    
+
     if names is None:
         lfp = self._lfp
     else:
@@ -3085,13 +3079,13 @@ as that of <code>new_length</code></p>
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     list
         Names of the LFP nodes
     &#34;&#34;&#34;
-    
+
     return self._lfp_by_name.keys()</code></pre>
 </details>
 </dd>
@@ -3123,13 +3117,13 @@ as that of <code>new_length</code></p>
         List of the names of the data nodes to obtain
     node_type : str
         Type of the data node
-    
+
     Returns
     -------
     list
         List of the data nodes 
     &#34;&#34;&#34;
-    
+
     nodes = []
     not_nodes = []
     if node_type == &#39;spike&#39;:
@@ -3142,7 +3136,7 @@ as that of <code>new_length</code></p>
         nodes.append(nodes[name]) if name in names\
             else not_nodes.append(name)
     if not_nodes:
-        logging.warning(&#39;,&#39;.join(not_nodes)+ &#39; does not exist&#39;)
+        logging.warning(&#39;,&#39;.join(not_nodes) + &#39; does not exist&#39;)
     return nodes</code></pre>
 </details>
 </dd>
@@ -3170,13 +3164,13 @@ as that of <code>new_length</code></p>
     ----------
     names : list
         List of the names of the spike nodes to obtain
-    
+
     Returns
     -------
     list
         List of the spike nodes. Returns all the spike nodes if `names` is None 
     &#34;&#34;&#34;
-    
+
     if names is None:
         spikes = self._spikes
     else:
@@ -3207,13 +3201,13 @@ as that of <code>new_length</code></p>
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     list
         Names of the spike nodes
     &#34;&#34;&#34;
-    
+
     return self._spikes_by_name.keys()</code></pre>
 </details>
 </dd>
@@ -3247,13 +3241,13 @@ length to <code>filenames</code></p>
         Names of the lfp nodes whose filenames are set
     filenames : list of str
         List of the filenames for each lfp node
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     self.set_node_file_names(lfp_names, filenames, &#39;lfp&#39;)</code></pre>
 </details>
 </dd>
@@ -3281,14 +3275,14 @@ length to <code>filenames</code></p>
     ----------
     names : list of str
         List of new names of the lfp nodes
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
-    self.change_names(self, self.get_lfp_names(), names, &#39;lfp&#39;)</code></pre>
+
+    self.change_names(self.get_lfp_names(), names, &#39;lfp&#39;)</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_base.NBase.set_node_file_names"><code class="name flex">
@@ -3325,13 +3319,13 @@ length to <code>filenames</code></p>
         List of the filenames for each node
     node_type
         Type of the data node
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     if len(node_names) != len(filenames):
         logging.error(&#39;No. of names does not match with no. of filenames&#39;)
     elif len(set(node_names)) != len(node_names):
@@ -3372,13 +3366,13 @@ length to <code>filenames</code></p>
         Names of the spike nodes whose filenames are set
     filenames : list of str
         List of the filenames for each spike node
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     self.set_node_file_names(spike_names, filenames, &#39;spike&#39;)</code></pre>
 </details>
 </dd>
@@ -3406,14 +3400,14 @@ length to <code>filenames</code></p>
     ----------
     names : list of str
         List of new names of the spike nodes
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
-    self.change_names(self, self.get_spike_names(), names, &#39;lfp&#39;)</code></pre>
+
+    self.change_names(self.get_spike_names(), names, &#39;lfp&#39;)</code></pre>
 </details>
 </dd>
 </dl>

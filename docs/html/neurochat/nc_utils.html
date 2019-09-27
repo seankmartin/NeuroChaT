@@ -38,6 +38,7 @@ from collections import OrderedDict as oDict
 import os
 from os import listdir
 from os.path import isfile, isdir, join
+import re
 
 import pandas as pd
 import numpy as np
@@ -1086,7 +1087,10 @@ def has_ext(filename, ext):
         ext = &#34;.&#34; + ext
     return filename[-len(ext):].lower() == ext.lower()
 
-def get_all_files_in_dir(in_dir, ext=None, return_absolute=True):
+
+def get_all_files_in_dir(
+        in_dir, ext=None, return_absolute=True, 
+        recursive=False, verbose=False, re_filter=None):
     &#34;&#34;&#34;
     Get all files in the directory with the given extension.
     
@@ -1094,23 +1098,80 @@ def get_all_files_in_dir(in_dir, ext=None, return_absolute=True):
     ----------
     in_dir : str
         The absolute path to the directory
-    ext : str
-        Default None, the extension of files to get
-    return_absolute : bool
-        Whether to return the absolute filename or not
+    ext : str, optional. Defaults to True.
+        The extension of files to get.
+    return_absolute : bool, optional. Defaults to True.
+        Whether to return the absolute filename or not.
+    recursive: bool, optional. Defaults to False.
+        Whether to recurse through directories.
+    verbose: bool, optional. Defaults to False.
+        Whether to print the files found.
+
+    Returns
+    -------
+    List : A list of filenames
     &#34;&#34;&#34;
     if not isdir(in_dir):
         print(&#34;Non existant directory &#34; + str(in_dir))
         return []
-    ok_file = lambda f : isfile(join(in_dir, f)) and has_ext(f, ext)
-    convert_to_path = lambda f : join(in_dir, f) if return_absolute else f
-    onlyfiles = [
-        convert_to_path(f) for f in sorted(listdir(in_dir)) if ok_file(f)]
+
+    def match_filter(f):
+        if re_filter is None:
+            return True
+        search_res = re.search(re_filter, f)
+        return search_res is not None
+
+    def ok_file(root_dir, f):
+        return has_ext(f, ext) and isfile(join(root_dir, f)) and match_filter(f)
+
+    def convert_to_path(root_dir, f): 
+        return join(root_dir, f) if return_absolute else f
+
+    if verbose:
+        print(&#34;Adding following files from {}&#34;.format(in_dir))
+
+    if recursive:
+        onlyfiles = []
+        for root, _, filenames in os.walk(in_dir):
+            start_root = root[:len(in_dir)]
+
+            if len(root) == len(start_root):
+                end_root = &#34;&#34;
+            else:
+                end_root = root[len(in_dir + os.sep):]
+            for filename in filenames:
+                filename = join(end_root, filename)
+                if ok_file(start_root, filename):
+                    to_add = convert_to_path(start_root, filename)
+                    if verbose:
+                        print(to_add)
+                    onlyfiles.append(to_add)
+
+    else:
+        onlyfiles = [
+            convert_to_path(in_dir, f) for f in sorted(listdir(in_dir))
+            if ok_file(in_dir, f)
+        ]
+        if verbose:
+            for f in onlyfiles:
+                print(f)
+
+    if verbose:
+        print()
     return onlyfiles
 
 def make_dir_if_not_exists(location):
     &#34;&#34;&#34;Makes directory structure for given location&#34;&#34;&#34;
-    os.makedirs(os.path.dirname(location), exist_ok=True)</code></pre>
+    os.makedirs(os.path.dirname(location), exist_ok=True)
+
+def remove_extension(filename, keep_dot=True, return_ext=False):
+    modifier = 0 if keep_dot else 1
+    ext = filename.split(&#34;.&#34;)[-1]
+    remove = len(ext) + modifier
+    if return_ext:
+        return filename[:-remove], ext
+    else:
+        return filename[:-remove]</code></pre>
 </details>
 </section>
 <section>
@@ -1978,7 +2039,7 @@ values from arr, arr is assumed to be a sorted list</p>
 </details>
 </dd>
 <dt id="neurochat.nc_utils.get_all_files_in_dir"><code class="name flex">
-<span>def <span class="ident">get_all_files_in_dir</span></span>(<span>in_dir, ext=None, return_absolute=True)</span>
+<span>def <span class="ident">get_all_files_in_dir</span></span>(<span>in_dir, ext=None, return_absolute=True, recursive=False, verbose=False, re_filter=None)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Get all files in the directory with the given extension.</p>
@@ -1986,14 +2047,25 @@ values from arr, arr is assumed to be a sorted list</p>
 <dl>
 <dt><strong><code>in_dir</code></strong> :&ensp;<code>str</code></dt>
 <dd>The absolute path to the directory</dd>
-<dt><strong><code>ext</code></strong> :&ensp;<code>str</code></dt>
-<dd>Default None, the extension of files to get</dd>
-<dt><strong><code>return_absolute</code></strong> :&ensp;<code>bool</code></dt>
-<dd>Whether to return the absolute filename or not</dd>
+</dl>
+<p>ext : str, optional. Defaults to True.
+The extension of files to get.
+return_absolute : bool, optional. Defaults to True.
+Whether to return the absolute filename or not.
+recursive: bool, optional. Defaults to False.
+Whether to recurse through directories.
+verbose: bool, optional. Defaults to False.
+Whether to print the files found.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>List</code></strong> :&ensp;<code>A</code> <code>list</code> of <code>filenames</code></dt>
+<dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def get_all_files_in_dir(in_dir, ext=None, return_absolute=True):
+<pre><code class="python">def get_all_files_in_dir(
+        in_dir, ext=None, return_absolute=True, 
+        recursive=False, verbose=False, re_filter=None):
     &#34;&#34;&#34;
     Get all files in the directory with the given extension.
     
@@ -2001,18 +2073,66 @@ values from arr, arr is assumed to be a sorted list</p>
     ----------
     in_dir : str
         The absolute path to the directory
-    ext : str
-        Default None, the extension of files to get
-    return_absolute : bool
-        Whether to return the absolute filename or not
+    ext : str, optional. Defaults to True.
+        The extension of files to get.
+    return_absolute : bool, optional. Defaults to True.
+        Whether to return the absolute filename or not.
+    recursive: bool, optional. Defaults to False.
+        Whether to recurse through directories.
+    verbose: bool, optional. Defaults to False.
+        Whether to print the files found.
+
+    Returns
+    -------
+    List : A list of filenames
     &#34;&#34;&#34;
     if not isdir(in_dir):
         print(&#34;Non existant directory &#34; + str(in_dir))
         return []
-    ok_file = lambda f : isfile(join(in_dir, f)) and has_ext(f, ext)
-    convert_to_path = lambda f : join(in_dir, f) if return_absolute else f
-    onlyfiles = [
-        convert_to_path(f) for f in sorted(listdir(in_dir)) if ok_file(f)]
+
+    def match_filter(f):
+        if re_filter is None:
+            return True
+        search_res = re.search(re_filter, f)
+        return search_res is not None
+
+    def ok_file(root_dir, f):
+        return has_ext(f, ext) and isfile(join(root_dir, f)) and match_filter(f)
+
+    def convert_to_path(root_dir, f): 
+        return join(root_dir, f) if return_absolute else f
+
+    if verbose:
+        print(&#34;Adding following files from {}&#34;.format(in_dir))
+
+    if recursive:
+        onlyfiles = []
+        for root, _, filenames in os.walk(in_dir):
+            start_root = root[:len(in_dir)]
+
+            if len(root) == len(start_root):
+                end_root = &#34;&#34;
+            else:
+                end_root = root[len(in_dir + os.sep):]
+            for filename in filenames:
+                filename = join(end_root, filename)
+                if ok_file(start_root, filename):
+                    to_add = convert_to_path(start_root, filename)
+                    if verbose:
+                        print(to_add)
+                    onlyfiles.append(to_add)
+
+    else:
+        onlyfiles = [
+            convert_to_path(in_dir, f) for f in sorted(listdir(in_dir))
+            if ok_file(in_dir, f)
+        ]
+        if verbose:
+            for f in onlyfiles:
+                print(f)
+
+    if verbose:
+        print()
     return onlyfiles</code></pre>
 </details>
 </dd>
@@ -2454,6 +2574,23 @@ def get_axona_colours(index=None):
     data_frame.to_excel(writer, sheet_name)
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_utils.remove_extension"><code class="name flex">
+<span>def <span class="ident">remove_extension</span></span>(<span>filename, keep_dot=True, return_ext=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def remove_extension(filename, keep_dot=True, return_ext=False):
+    modifier = 0 if keep_dot else 1
+    ext = filename.split(&#34;.&#34;)[-1]
+    remove = len(ext) + modifier
+    if return_ext:
+        return filename[:-remove], ext
+    else:
+        return filename[:-remove]</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_utils.residual_stat"><code class="name flex">
@@ -2937,6 +3074,7 @@ and the filter list to empty.</p></section>
 <li><code><a title="neurochat.nc_utils.log_exception" href="#neurochat.nc_utils.log_exception">log_exception</a></code></li>
 <li><code><a title="neurochat.nc_utils.make_dir_if_not_exists" href="#neurochat.nc_utils.make_dir_if_not_exists">make_dir_if_not_exists</a></code></li>
 <li><code><a title="neurochat.nc_utils.nxl_write" href="#neurochat.nc_utils.nxl_write">nxl_write</a></code></li>
+<li><code><a title="neurochat.nc_utils.remove_extension" href="#neurochat.nc_utils.remove_extension">remove_extension</a></code></li>
 <li><code><a title="neurochat.nc_utils.residual_stat" href="#neurochat.nc_utils.residual_stat">residual_stat</a></code></li>
 <li><code><a title="neurochat.nc_utils.rot_2d" href="#neurochat.nc_utils.rot_2d">rot_2d</a></code></li>
 <li><code><a title="neurochat.nc_utils.smooth_1d" href="#neurochat.nc_utils.smooth_1d">smooth_1d</a></code></li>

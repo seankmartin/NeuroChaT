@@ -474,9 +474,10 @@ class NSpike(NBase):
             for spike in self._spikes:
                 spike.load()
         else:
-            for name in names:
-                spike = self.get_spikes_by_name(name)
-                spike.load()
+            logging.error("Spikes by name has yet to be implemented")
+            # for name in names:
+            #     spike = self.get_spikes_by_name(name)
+            #     spike.load()
 
     def add_lfp(self, lfp=None, **kwargs):
         """
@@ -528,9 +529,10 @@ class NSpike(NBase):
             for lfp in self._lfp:
                 lfp.load()
         else:
-            for name in names:
-                lfp = self.get_lfp_by_name(name)
-                lfp.load()
+            logging.error("Lfp by name has yet to be implemented")
+            # for name in names:
+            #     lfp = self.get_lfp_by_name(name)
+            #     lfp.load()
 
     def wave_property(self):
         """
@@ -577,6 +579,7 @@ class NSpike(NBase):
             return w_end- w_start
 
         num_spikes = self.get_unit_spikes_count()
+        _result['Number of Spikes'] = num_spikes
         _result['Mean Spiking Freq'] = num_spikes/ self.get_duration()
         _waves = self.get_unit_waves()
         samples_per_spike = self.get_samples_per_spike()
@@ -593,6 +596,7 @@ class NSpike(NBase):
             slope = np.gradient(wave)[1][:, :-1]
             max_val = wave.max(1)
 
+            peak_val, trough1_val = 0, 0
             if max_val.max() > 0:
                 peak_loc = [argpeak(slope[I, :]) for I in range(num_spikes)]
                 peak_val = [wave[I, peak_loc[I]] for I in range(num_spikes)]
@@ -810,7 +814,8 @@ class NSpike(NBase):
                 ibi.append(unitStamp[burst_start[j+1]]- unitStamp[burst_end[j]])
             duty_cycle = np.divide(burst_duration[1:], ibi)/1000 # ibi in sec, burst_duration in ms
         else:
-            logging.warning('No burst detected')
+            logging.warning(
+                'No burst detected in {}'.format(self.get_filename()))
 
         spikesInBurst = np.array(spikesInBurst) if spikesInBurst else np.array([])
         bursting_isi = np.array(bursting_isi) if bursting_isi else np.array([])
@@ -881,11 +886,25 @@ class NSpike(NBase):
             return  a*np.cos(2*np.pi*f*x)*np.exp(-np.abs(x)/tau1)+ b+ \
                 c*np.exp(-(x/tau2)**2)
 
-        popt, pcov = curve_fit(fit_func, x, y, \
-							p0=[m, p_0[0], p_0[1], m, m, p_0[2]], \
-							bounds=([0, lb[0], lb[1], 0, -m, lb[2]], \
-							[m, ub[0], ub[1], m, m, ub[2]]),\
-							max_nfev=100000)
+        try:
+            popt, pcov = curve_fit(
+                fit_func, x, y,
+                p0=[m, p_0[0], p_0[1], m, m, p_0[2]], 
+                bounds=([0, lb[0], lb[1], 0, -m, lb[2]],
+                [m, ub[0], ub[1], m, m, ub[2]]),
+                max_nfev=100000)
+        except Exception as e:
+            logging.error("Failed curve_fit in theta_index: {} ".format(e))
+            _results['Theta Index'] = None
+            _results['TI fit freq Hz'] = None
+            _results['TI fit tau1 sec'] = None
+            _results['TI adj Rsq'] = None
+            _results['TI Pearse R'] = None
+            _results['TI Pearse P'] = None
+
+            self.update_result(_results)
+            return None
+
         a, f, tau1, b, c, tau2 = popt
 
         y_fit[center:] = fit_func(x, *popt)
@@ -1508,6 +1527,7 @@ class NSpike(NBase):
         tet_no = words[-1].split(sep='.')[1]
         set_file = file_directory + os.sep + file_tag + '.set'
         cut_file = file_directory + os.sep + file_tag + '_' + tet_no + '.cut'
+        clu_file = file_directory + os.sep + file_tag + '.clu.' + tet_no
 
         self._set_data_source(file_name)
         self._set_source_format('Axona')
@@ -1516,7 +1536,7 @@ class NSpike(NBase):
             while True:
                 line = f.readline()
                 try:
-                    line = line.decode('UTF-8')
+                    line = line.decode('latin-1')
                 except:
                     break
 
@@ -1548,6 +1568,8 @@ class NSpike(NBase):
                     self._set_bytes_per_sample(int(''.join(line.split()[1:])))
                 if line.startswith('num_spikes'):
                     self._set_total_spikes(int(''.join(line.split()[1:])))
+                if line.startswith('data_start'):
+                    break
 
             num_spikes = self.get_total_spikes()
             bytes_per_timestamp = self.get_timestamp_bytes()
@@ -1572,7 +1594,7 @@ class NSpike(NBase):
             max_ADC_count = 2**(8*bytes_per_sample - 1) - 1
             max_byte_value = 2**(8*bytes_per_sample)
 
-            with open(set_file, 'r') as f_set:
+            with open(set_file, 'r', encoding='latin-1') as f_set:
                 lines = f_set.readlines()
                 gain_lines = dict([tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))\
                             for line in lines if 'gain_ch_' in line])
@@ -1619,7 +1641,8 @@ class NSpike(NBase):
                             np.add(chan_wave[:, j], sample_value, out=chan_wave[:, j])
                         np.putmask(chan_wave[:, j], chan_wave[:, j] > max_ADC_count, chan_wave[:, j]- max_byte_value)
                     spike_wave['ch'+ str(i+1)] = chan_wave*AD_bit_uvolts[i]
-            try:
+
+            if os.path.isfile(cut_file):
                 with open(cut_file, 'r') as f_cut:
                     while True:
                         line = f_cut.readline()
@@ -1627,10 +1650,15 @@ class NSpike(NBase):
                             break
                         if line.startswith('Exact_cut'):
                             unit_ID = np.fromfile(f_cut, dtype='uint8', sep=' ')
-            except FileNotFoundError:
+            
+            elif os.path.isfile(clu_file):
+                data = np.loadtxt(clu_file)
+                unit_ID = data[1:].flatten() - 1
+                    
+            else:
                 logging.error(
-                    "No cut file found for spike file {} please make one at {}".format(
-                        file_name, cut_file))
+                    "No cluster file found for spike file {} please make one at {} or {}".format(
+                        file_name, cut_file, clu_file))
                 return
             self._set_timestamp(spike_time)
             self._set_waveform(spike_wave)

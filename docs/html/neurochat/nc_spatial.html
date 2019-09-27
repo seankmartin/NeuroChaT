@@ -1475,14 +1475,14 @@ class NSpatial(NAbstract):
         pmap[tmap == 0] = None
         pfield, largest_group = NSpatial.place_field(
             pmap, thresh, required_neighbours)
-        if largest_group == 0:
-            if smooth_place:
-                info = &#34;where the place field was calculated from smoothed data&#34;
-            else:
-                info = &#34;where the place field was calculated from raw data&#34;
-            logging.info(
-                &#34;Lack of high firing neighbours to identify place field &#34; +
-                info)
+        # if largest_group == 0:
+        #     if smooth_place:
+        #         info = &#34;where the place field was calculated from smoothed data&#34;
+        #     else:
+        #         info = &#34;where the place field was calculated from raw data&#34;
+        #     logging.info(
+        #         &#34;Lack of high firing neighbours to identify place field &#34; +
+        #         info)
         centroid = NSpatial.place_field_centroid(pfield, pmap, largest_group)
         #centroid is currently in co-ordinates, convert to pixels
         centroid = centroid * pixel + (pixel * 0.5)
@@ -1771,8 +1771,17 @@ class NSpatial(NAbstract):
 
             half_max = np.amin(rateInterp)+ (np.amax(rateInterp)- np.amin(rateInterp))/2
             d = np.sign(half_max - rateInterp[0:-1]) - np.sign(half_max - rateInterp[1:])
-            left_idx = find(d &gt; 0)[0]
-            right_idx = find(d &lt; 0)[-1]
+            left_possible = find(d &gt; 0)
+            if len(left_possible) &gt; 0:
+                left_idx = left_possible[0]
+            else:
+                left_idx = None
+            
+            right_possible = find(d &lt; 0)
+            if len(right_possible) &gt; 0:
+                right_idx = right_possible[-1]
+            else:
+                right_idx = None
             _results[&#39;HD Half Width&#39;] = None if (not left_idx or not right_idx or left_idx &gt; right_idx) \
                                         else binInterp[right_idx]- binInterp[left_idx]
 
@@ -2059,7 +2068,7 @@ class NSpatial(NAbstract):
         dfit_result = linfit(shift, delta)
         deltaFit = dfit_result[&#39;yfit&#39;]
         sortInd = np.argsort(deltaFit)
-        _results[&#39;HD ATI&#39;] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result[&#39;Pearson R&#39;] &gt;= 0.85 else None
+        _results[&#39;HD ATI&#39;] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result[&#39;Pearson R&#39;] &gt;= 0.85 else np.nan
 
         graph_data[&#39;deltaFit&#39;] = deltaFit
         imax = sg.argrelmax(skaggsUpsamp)[0]
@@ -2488,7 +2497,7 @@ class NSpatial(NAbstract):
         &#34;&#34;&#34;
         graph_data = {}
 
-        minPixel = kwargs.get(&#39;minPixel&#39;, 100)
+        minPixel = kwargs.get(&#39;minPixel&#39;, 20)
         pixel = kwargs.get(&#39;pixel&#39;, 3)
 
         if &#39;update&#39; in kwargs.keys():
@@ -2644,7 +2653,6 @@ class NSpatial(NAbstract):
 
         distRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count),\
                             where=tcount != 0, casting=&#39;unsafe&#39;) # for skaggs only
-
         pixelCount = histogram(distMat[np.logical_not(nanInd)], distBins)[0]
         distCount = np.divide(histogram(distMat[fmap &gt;= thresh], distBins)[0], pixelCount, \
                              out=np.zeros_like(distBins), where=pixelCount != 0, casting=&#39;unsafe&#39;)
@@ -2895,8 +2903,13 @@ class NSpatial(NAbstract):
         episode = kwargs.get(&#39;episode&#39;, 120)
         nrep = kwargs.get(&#39;nrep&#39;, 1000)
         sampRate = 1/subsampInterv
-        stamp = 1/sampRate
-        time = np.arange(0, self.get_duration(), stamp)
+        stamp = subsampInterv
+ 
+        a_size = np.round(self.get_duration(), 4)
+        time = np.linspace(
+            0, a_size, endpoint=True,
+            num=np.round(a_size/stamp)+1)
+        time = np.round(time, 4)
         Y = histogram(ftimes, time)[0]* sampRate # Instant firing rate
 
         nt = time.size
@@ -2906,6 +2919,8 @@ class NSpatial(NAbstract):
         placeRate[np.isnan(placeRate)] = 0
         for i in np.arange(nt):
             ind = find(np.logical_and(self.get_time() &gt;= time[i], self.get_time() &lt; time[i]+ stamp))
+            if len(ind) == 0:
+                continue
             xloc[i] = np.median(self.get_pos_x()[ind])
             yloc[i] = np.median(self.get_pos_y()[ind])
             if histogram(yloc[i], yedges)[1] &lt; yedges.size and histogram(xloc[i], xedges)[1] &lt; xedges.size:
@@ -4487,14 +4502,14 @@ activity of a unit.</p>
         pmap[tmap == 0] = None
         pfield, largest_group = NSpatial.place_field(
             pmap, thresh, required_neighbours)
-        if largest_group == 0:
-            if smooth_place:
-                info = &#34;where the place field was calculated from smoothed data&#34;
-            else:
-                info = &#34;where the place field was calculated from raw data&#34;
-            logging.info(
-                &#34;Lack of high firing neighbours to identify place field &#34; +
-                info)
+        # if largest_group == 0:
+        #     if smooth_place:
+        #         info = &#34;where the place field was calculated from smoothed data&#34;
+        #     else:
+        #         info = &#34;where the place field was calculated from raw data&#34;
+        #     logging.info(
+        #         &#34;Lack of high firing neighbours to identify place field &#34; +
+        #         info)
         centroid = NSpatial.place_field_centroid(pfield, pmap, largest_group)
         #centroid is currently in co-ordinates, convert to pixels
         centroid = centroid * pixel + (pixel * 0.5)
@@ -4783,8 +4798,17 @@ activity of a unit.</p>
 
             half_max = np.amin(rateInterp)+ (np.amax(rateInterp)- np.amin(rateInterp))/2
             d = np.sign(half_max - rateInterp[0:-1]) - np.sign(half_max - rateInterp[1:])
-            left_idx = find(d &gt; 0)[0]
-            right_idx = find(d &lt; 0)[-1]
+            left_possible = find(d &gt; 0)
+            if len(left_possible) &gt; 0:
+                left_idx = left_possible[0]
+            else:
+                left_idx = None
+            
+            right_possible = find(d &lt; 0)
+            if len(right_possible) &gt; 0:
+                right_idx = right_possible[-1]
+            else:
+                right_idx = None
             _results[&#39;HD Half Width&#39;] = None if (not left_idx or not right_idx or left_idx &gt; right_idx) \
                                         else binInterp[right_idx]- binInterp[left_idx]
 
@@ -5071,7 +5095,7 @@ activity of a unit.</p>
         dfit_result = linfit(shift, delta)
         deltaFit = dfit_result[&#39;yfit&#39;]
         sortInd = np.argsort(deltaFit)
-        _results[&#39;HD ATI&#39;] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result[&#39;Pearson R&#39;] &gt;= 0.85 else None
+        _results[&#39;HD ATI&#39;] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result[&#39;Pearson R&#39;] &gt;= 0.85 else np.nan
 
         graph_data[&#39;deltaFit&#39;] = deltaFit
         imax = sg.argrelmax(skaggsUpsamp)[0]
@@ -5500,7 +5524,7 @@ activity of a unit.</p>
         &#34;&#34;&#34;
         graph_data = {}
 
-        minPixel = kwargs.get(&#39;minPixel&#39;, 100)
+        minPixel = kwargs.get(&#39;minPixel&#39;, 20)
         pixel = kwargs.get(&#39;pixel&#39;, 3)
 
         if &#39;update&#39; in kwargs.keys():
@@ -5656,7 +5680,6 @@ activity of a unit.</p>
 
         distRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count),\
                             where=tcount != 0, casting=&#39;unsafe&#39;) # for skaggs only
-
         pixelCount = histogram(distMat[np.logical_not(nanInd)], distBins)[0]
         distCount = np.divide(histogram(distMat[fmap &gt;= thresh], distBins)[0], pixelCount, \
                              out=np.zeros_like(distBins), where=pixelCount != 0, casting=&#39;unsafe&#39;)
@@ -5907,8 +5930,13 @@ activity of a unit.</p>
         episode = kwargs.get(&#39;episode&#39;, 120)
         nrep = kwargs.get(&#39;nrep&#39;, 1000)
         sampRate = 1/subsampInterv
-        stamp = 1/sampRate
-        time = np.arange(0, self.get_duration(), stamp)
+        stamp = subsampInterv
+ 
+        a_size = np.round(self.get_duration(), 4)
+        time = np.linspace(
+            0, a_size, endpoint=True,
+            num=np.round(a_size/stamp)+1)
+        time = np.round(time, 4)
         Y = histogram(ftimes, time)[0]* sampRate # Instant firing rate
 
         nt = time.size
@@ -5918,6 +5946,8 @@ activity of a unit.</p>
         placeRate[np.isnan(placeRate)] = 0
         for i in np.arange(nt):
             ind = find(np.logical_and(self.get_time() &gt;= time[i], self.get_time() &lt; time[i]+ stamp))
+            if len(ind) == 0:
+                continue
             xloc[i] = np.median(self.get_pos_x()[ind])
             yloc[i] = np.median(self.get_pos_y()[ind])
             if histogram(yloc[i], yedges)[1] &lt; yedges.size and histogram(xloc[i], xedges)[1] &lt; xedges.size:
@@ -6575,7 +6605,6 @@ environmental border</p>
 
         distRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count),\
                             where=tcount != 0, casting=&#39;unsafe&#39;) # for skaggs only
-
         pixelCount = histogram(distMat[np.logical_not(nanInd)], distBins)[0]
         distCount = np.divide(histogram(distMat[fmap &gt;= thresh], distBins)[0], pixelCount, \
                              out=np.zeros_like(distBins), where=pixelCount != 0, casting=&#39;unsafe&#39;)
@@ -7671,8 +7700,17 @@ which shows the direction of the animal's head at each spike's occurring time.</
 
         half_max = np.amin(rateInterp)+ (np.amax(rateInterp)- np.amin(rateInterp))/2
         d = np.sign(half_max - rateInterp[0:-1]) - np.sign(half_max - rateInterp[1:])
-        left_idx = find(d &gt; 0)[0]
-        right_idx = find(d &lt; 0)[-1]
+        left_possible = find(d &gt; 0)
+        if len(left_possible) &gt; 0:
+            left_idx = left_possible[0]
+        else:
+            left_idx = None
+        
+        right_possible = find(d &lt; 0)
+        if len(right_possible) &gt; 0:
+            right_idx = right_possible[-1]
+        else:
+            right_idx = None
         _results[&#39;HD Half Width&#39;] = None if (not left_idx or not right_idx or left_idx &gt; right_idx) \
                                     else binInterp[right_idx]- binInterp[left_idx]
 
@@ -7888,7 +7926,7 @@ shift to the future by 2 spatial time resoultion.</dd>
     dfit_result = linfit(shift, delta)
     deltaFit = dfit_result[&#39;yfit&#39;]
     sortInd = np.argsort(deltaFit)
-    _results[&#39;HD ATI&#39;] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result[&#39;Pearson R&#39;] &gt;= 0.85 else None
+    _results[&#39;HD ATI&#39;] = np.interp(0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result[&#39;Pearson R&#39;] &gt;= 0.85 else np.nan
 
     graph_data[&#39;deltaFit&#39;] = deltaFit
     imax = sg.argrelmax(skaggsUpsamp)[0]
@@ -8605,7 +8643,7 @@ map of the firing rate of the animal with respect to its location</p>
     &#34;&#34;&#34;
     graph_data = {}
 
-    minPixel = kwargs.get(&#39;minPixel&#39;, 100)
+    minPixel = kwargs.get(&#39;minPixel&#39;, 20)
     pixel = kwargs.get(&#39;pixel&#39;, 3)
 
     if &#39;update&#39; in kwargs.keys():
@@ -9094,8 +9132,13 @@ to regress the instantaneous firing rate of the unit.</p>
         episode = kwargs.get(&#39;episode&#39;, 120)
         nrep = kwargs.get(&#39;nrep&#39;, 1000)
         sampRate = 1/subsampInterv
-        stamp = 1/sampRate
-        time = np.arange(0, self.get_duration(), stamp)
+        stamp = subsampInterv
+ 
+        a_size = np.round(self.get_duration(), 4)
+        time = np.linspace(
+            0, a_size, endpoint=True,
+            num=np.round(a_size/stamp)+1)
+        time = np.round(time, 4)
         Y = histogram(ftimes, time)[0]* sampRate # Instant firing rate
 
         nt = time.size
@@ -9105,6 +9148,8 @@ to regress the instantaneous firing rate of the unit.</p>
         placeRate[np.isnan(placeRate)] = 0
         for i in np.arange(nt):
             ind = find(np.logical_and(self.get_time() &gt;= time[i], self.get_time() &lt; time[i]+ stamp))
+            if len(ind) == 0:
+                continue
             xloc[i] = np.median(self.get_pos_x()[ind])
             yloc[i] = np.median(self.get_pos_y()[ind])
             if histogram(yloc[i], yedges)[1] &lt; yedges.size and histogram(xloc[i], xedges)[1] &lt; xedges.size:
@@ -9316,14 +9361,14 @@ trace of the animal in the arena, commonly known as Spike Plot.</p>
     pmap[tmap == 0] = None
     pfield, largest_group = NSpatial.place_field(
         pmap, thresh, required_neighbours)
-    if largest_group == 0:
-        if smooth_place:
-            info = &#34;where the place field was calculated from smoothed data&#34;
-        else:
-            info = &#34;where the place field was calculated from raw data&#34;
-        logging.info(
-            &#34;Lack of high firing neighbours to identify place field &#34; +
-            info)
+    # if largest_group == 0:
+    #     if smooth_place:
+    #         info = &#34;where the place field was calculated from smoothed data&#34;
+    #     else:
+    #         info = &#34;where the place field was calculated from raw data&#34;
+    #     logging.info(
+    #         &#34;Lack of high firing neighbours to identify place field &#34; +
+    #         info)
     centroid = NSpatial.place_field_centroid(pfield, pmap, largest_group)
     #centroid is currently in co-ordinates, convert to pixels
     centroid = centroid * pixel + (pixel * 0.5)
