@@ -920,7 +920,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         pass
     
     def about_nc(self):
-        url = "https://github.com/seankmartin/NeuroChaT/wiki"
+        url = "https://github.com/shanemomara/omaraneurolab/wiki/NeuroChaT"
         webbrowser.open_new(url)
 
     def _set_dictation(self):
