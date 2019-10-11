@@ -29,8 +29,8 @@ from matplotlib.pyplot import savefig, close
 
 def place_cell_summary(
         collection, dpi=150, out_dirname="nc_plots",
-        filter_place_cells=True, filter_low_freq=True, opt_end="",
-        base_dir=None):
+        filter_place_cells=True, filter_low_freq=True,
+        opt_end="", base_dir=None, output_format="png"):
     """
     Quick Png spatial information summary of each cell in collection.
 
@@ -120,13 +120,15 @@ def place_cell_summary(
                 spike_name = os.path.basename(filename)
                 parts = spike_name.split(".")
                 f_dir = os.path.dirname(filename)
-                png_basename = parts[0] + "_" + parts[1] + opt_end + ".png"
+
+                out_basename = (
+                    parts[0] + "_" + parts[1] + opt_end + "." + output_format)
+
                 if base_dir is not None:
                     main_dir = base_dir
-                    png_base = f_dir[len(base_dir + os.sep):]
-                    png_base = ("--").join(png_base.split(os.sep))
-                    # png_base = re.sub(os.sep, "_", png_base)
-                    png_basename = png_base + "--" + png_basename
+                    out_base = f_dir[len(base_dir + os.sep):]
+                    out_base = ("--").join(out_base.split(os.sep))
+                    out_basename = out_base + "--" + out_basename
                 else:
                     main_dir = f_dir
 
@@ -157,11 +159,11 @@ def place_cell_summary(
                         size_multiplier=4, point_size=dpi / 7.0,
                         units=named_units)
                     out_name = os.path.join(
-                        main_dir, out_dirname, png_basename)
+                        main_dir, out_dirname, out_basename)
                     print("Saving place cell figure to {}".format(
                         out_name))
                     make_dir_if_not_exists(out_name)
-                    fig.savefig(out_name, dpi=dpi)
+                    fig.savefig(out_name, dpi=dpi, format=output_format)
                     close("all")
                     gc.collect()
 

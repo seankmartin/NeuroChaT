@@ -1,8 +1,13 @@
 """Burst analysis of cells."""
 import csv
 import os
+import sys
 from copy import copy
 import logging
+import configparser
+import json
+from pprint import pprint
+import argparse
 
 from sklearn.decomposition import PCA
 from sklearn.cluster import AgglomerativeClustering
@@ -368,34 +373,41 @@ def pca_clustering(
         isi_pca, corr_pca, clust, dend, joint_pca)
 
 
-def main(
-        in_dir, tetrode_list, analysis_flags,
-        re_filter=None, test_only=False, opt_end="",
-        s_color=False):
-    """Summarise all tetrodes in in_dir"""
-    # Setup seaborn - note affects all plots!
-    sns.set(palette="colorblind")
-    # Load files from dir in tetrodes x, y, z
+def main(args, config):
+    # Unpack out the cfg file into easier names
+    in_dir = config.get("Setup", "in_dir")
+    regex_filter = config.get("Setup", "regex_filter")
+    regex_filter = None if regex_filter == "None" else regex_filter
+    analysis_flags = json.loads(config.get("Setup", "analysis_flags"))
+    tetrode_list = json.loads(config.get("Setup", "tetrode_list"))
+    seaborn_style = bool(config.get("Plot", "seaborn_style"))
+    plot_order = json.loads(config.get("Plot", "plot_order"))
+    s_color = bool(config.get("Plot", "should_color"))
+    output_format = config.get("Output", "output_format")
+    save_bin_data = bool(config.get("Output", "save_bin_data"))
+    output_spaces = bool(config.get("Output", "output_spaces"))
+    opt_end = config.get("Output", "optional_end")
+    max_units = int(config.get("Setup", "max_units"))
+
+    setup_logging(in_dir)
+
+    if seaborn_style:
+        sns.set(palette="colorblind")
+
+    # Automatic extraction of files from starting dir onwards
     container = NDataContainer(load_on_fly=True)
     out_name = container.add_axona_files_from_dir(
-        in_dir, tetrode_list=tetrode_list,
-        recursive=True, re_filter=re_filter,
-        verbose=False, unit_cutoff=(0, 5))
+        in_dir, tetrode_list=tetrode_list, recursive=True, re_filter=regex_filter, verbose=False, unit_cutoff=(0, max_units))
     container.setup()
-
-    if test_only:
-        exit(0)
 
     # Show summary of place
     if analysis_flags[0]:
-        # place_cell_summary(
-        #     container, dpi=200, out_dirname="nc_place_plots")
         place_cell_summary(
             container, dpi=200, out_dirname="nc_cell_plots", filter_place_cells=False, filter_low_freq=False,
             opt_end=opt_end, base_dir=in_dir)
         plt.close("all")
 
-    # Do numerical analysis
+    # Do numerical analysis of bursting
     should_plot = analysis_flags[2]
     if analysis_flags[1]:
         import re
@@ -477,25 +489,31 @@ def setup_logging(in_dir):
     mpl_logger.setLevel(level=logging.WARNING)
 
 
+def print_config(config, msg=""):
+    if msg is not "":
+        print(msg)
+    """Prints the contents of a config file"""
+    config_dict = [{x: tuple(config.items(x))} for x in config.sections()]
+    pprint(config_dict, width=120)
+
+
 if __name__ == "__main__":
-    in_dir = r'E:\OneDrive\OneDrive - TCDUD.onmicrosoft.com\Bernstein'
-    # in_dir = r"C:\Users\smartin5\Recordings\11092017"
-    setup_logging(in_dir)
-    tetrode_list = [i for i in range(1, 17)]
-    optional_end = "_Can"
+    config = configparser.ConfigParser()
+    here = os.path.dirname(os.path.realpath(__file__))
+    config_path = os.path.join(here, "Configs", "burst_analysis.cfg")
+    config.read(config_path)
 
-    # Use a Regex to filter out certain directories
-    # re_filter = None
-    # re_filter = "^CSR.*|^LSR.*"
-    re_filter = "^Can.*"
+    parser = argparse.ArgumentParser(
+        description='Process modifiable parameters from command line')
+    args, unparsed = parser.parse_known_args()
 
-    # Analysis 0 - summary place cell plot
-    # Analysis 1 - csv file of data to classify cells
-    # Analysis 2 - more graphical output
-    # Analysis 3 - PCA and Dendogram and agglomerative clustering
-    # Analysis 4 - Time resolved analysis
-    analysis_flags = [False, False, False, False, True]
-    main(
-        in_dir, tetrode_list, analysis_flags,
-        re_filter=re_filter, test_only=False,
-        opt_end=optional_end, s_color=True)
+    if len(unparsed) is not 0:
+        print("Unrecognised command line argument passed")
+        print(unparsed)
+        exit(-1)
+
+    print_config(config, "Program started with configuration")
+    if len(sys.argv) > 1:
+        print("Command line arguments", args)
+
+    main(args, config)

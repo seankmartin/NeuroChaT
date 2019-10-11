@@ -718,7 +718,8 @@ class NDataContainer():
         self._count_num_units()
         end_total = len(self)
 
-        print("{} with {} units reduced to {} with {} units".format(
+        print(("{} tetrodes with {} units reduced to "
+               + "{} tetrodes with {} units").format(
             start_size, start_total, end_size, end_total))
 
     def get_data_at(self, data_index, unit_index):
