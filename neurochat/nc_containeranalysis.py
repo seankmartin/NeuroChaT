@@ -166,7 +166,7 @@ def place_cell_summary(
                 if "Theta" in output:
                     thetadata.append(
                         data.theta_index(
-                            bins=isi_bin_length, bound=[-isi_bound, isi_bound]))
+                            bins=2, bound=[-350, 350]))
                 else:
                     thetadata = None
                 if "HighISI" in output:

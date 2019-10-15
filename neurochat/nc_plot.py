@@ -2053,10 +2053,10 @@ def print_place_cells(
         headdata=None, thetadata=None, point_size=10, units=None, 
         output=["Wave", "Path", "Place", "HD", "LowISI", "Theta", "HighISI"],
         fixed_color=None):
-    fig = plt.figure(
-        figsize=(cols * size_multiplier, rows * size_multiplier),
-        tight_layout=False)
-    gs = gridspec.GridSpec(rows, cols, wspace=wspace, hspace=hspace)
+    width, height = cols * size_multiplier, (rows - 0.15) * size_multiplier
+    fig = plt.figure(figsize=(width, height), tight_layout=False)
+    gs = gridspec.GridSpec(
+        rows, cols, figure=fig, wspace=wspace, hspace=hspace)
 
     def get_mapping_idx(name):
         if not name in output:
@@ -2082,12 +2082,14 @@ def print_place_cells(
                     loc_spike(
                         place_data, ax=ax, color=color,
                         point_size=point_size)
+                    ax.set_aspect('auto')
 
                 # Plot the rate map
                 idx = get_mapping_idx("Place")
                 if idx is not None:
                     ax = fig.add_subplot(gs[i, idx])
-                loc_rate(place_data, ax=ax, smooth=True)
+                    loc_rate(place_data, ax=ax, smooth=True)
+                    ax.set_aspect('auto')
 
         if headdata is not None:
             if headdata[i] is not None:

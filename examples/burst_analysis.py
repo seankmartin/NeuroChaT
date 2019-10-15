@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 import scipy.cluster.hierarchy as shc
 import numpy as np
 import matplotlib
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import seaborn as sns
@@ -405,8 +405,15 @@ def main(args, config):
 
     setup_logging(in_dir)
 
+    if output_format == "pdf":
+        matplotlib.use("pdf")
+
     if seaborn_style:
         sns.set(palette="colorblind")
+    else:
+        sns.set_style(
+            "ticks",
+            {'axes.spines.right': False, 'axes.spines.top': False})
 
     # Automatic extraction of files from starting dir onwards
     container = NDataContainer(load_on_fly=True)
@@ -426,7 +433,8 @@ def main(args, config):
             opt_end=opt_end, base_dir=in_dir,
             output_format=output_format, isi_bound=isi_bound,
             isi_bin_length=isi_bin_length, output=plot_order,
-            save_data=save_bin_data, fixed_color=fixed_color)
+            save_data=save_bin_data, fixed_color=fixed_color,
+            point_size=dot_size)
         plt.close("all")
 
     # Do numerical analysis of bursting
