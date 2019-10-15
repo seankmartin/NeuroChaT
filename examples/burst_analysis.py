@@ -80,7 +80,7 @@ def log_isi(ndata, start=0.0005, stop=10, num_bins=60):
 
 def cell_classification_stats(
         in_dir, container, out_name,
-        should_plot=False, opt_end=""):
+        should_plot=False, opt_end="", output_spaces=True):
     """
     Compute a csv of cell stats for each unit in a container
 
@@ -127,7 +127,8 @@ def cell_classification_stats(
             ndata.bandpower_ratio(
                 [5, 11], [1.5, 4], 1.6, relative=True,
                 first_name="Theta", second_name="Delta")
-            result = copy(ndata.get_results())
+            result = copy(ndata.get_results(
+                spaces_to_underscores=not output_spaces))
             _results.append(result)
 
             if should_plot:
@@ -386,17 +387,21 @@ def main(args, config):
     regex_filter = None if regex_filter == "None" else regex_filter
     analysis_flags = json.loads(config.get("Setup", "analysis_flags"))
     tetrode_list = json.loads(config.get("Setup", "tetrode_list"))
-    seaborn_style = bool(config.get("Plot", "seaborn_style"))
+    seaborn_style = config.getboolean("Plot", "seaborn_style")
     plot_order = json.loads(config.get("Plot", "plot_order"))
     fixed_color = config.get("Plot", "path_color")
-    s_color = bool(config.get("Plot", "should_color"))
+    s_color = config.getboolean("Plot", "should_color")
+    plot_outname = config.get("Plot", "output_dirname")
+    dot_size = config.get("Plot", "dot_size")
+    dot_size = None if dot_size == "None" else int(dot_size)
+    summary_dpi = int(config.get("Plot", "summary_dpi"))
     output_format = config.get("Output", "output_format")
-    save_bin_data = bool(config.get("Output", "save_bin_data"))
-    output_spaces = bool(config.get("Output", "output_spaces"))
+    save_bin_data = config.getboolean("Output", "save_bin_data")
+    output_spaces = config.getboolean("Output", "output_spaces")
     opt_end = config.get("Output", "optional_end")
     max_units = int(config.get("Setup", "max_units"))
-    isi_bound = config.get("Params", "isi_bound")
-    isi_bin_length = config.get("Params", "isi_bin_length")
+    isi_bound = int(config.get("Params", "isi_bound"))
+    isi_bin_length = int(config.get("Params", "isi_bin_length"))
 
     setup_logging(in_dir)
 
@@ -408,14 +413,20 @@ def main(args, config):
     out_name = container.add_axona_files_from_dir(
         in_dir, tetrode_list=tetrode_list, recursive=True, re_filter=regex_filter, verbose=False, unit_cutoff=(0, max_units))
     container.setup()
+    if len(container) is 0:
+        print("Unable to find any files matching regex {}".format(
+            regex_filter))
+        exit(-1)
 
     # Show summary of place
     if analysis_flags[0]:
         place_cell_summary(
-            container, dpi=200, out_dirname="nc_cell_plots", filter_place_cells=False, filter_low_freq=False,
+            container, dpi=summary_dpi, out_dirname=plot_outname,
+            filter_place_cells=False, filter_low_freq=False,
             opt_end=opt_end, base_dir=in_dir,
             output_format=output_format, isi_bound=isi_bound,
-            isi_bin_length=isi_bin_length)
+            isi_bin_length=isi_bin_length, output=plot_order,
+            save_data=save_bin_data, fixed_color=fixed_color)
         plt.close("all")
 
     # Do numerical analysis of bursting
@@ -424,15 +435,19 @@ def main(args, config):
         import re
         out_name = remove_extension(out_name) + "csv"
         out_name = re.sub(r"file_list_", r"cell_stats_", out_name)
+        print("Computing cell stats to save to {}".format(out_name))
         cell_classification_stats(
             in_dir, container, out_name,
-            should_plot=should_plot, opt_end=opt_end)
+            should_plot=should_plot, opt_end=opt_end,
+            output_spaces=output_spaces)
 
     # Do PCA based analysis
     if analysis_flags[3]:
+        print("Computing pca clustering")
         pca_clustering(container, in_dir, opt_end=opt_end, s_color=s_color)
 
     if analysis_flags[4]:
+        print("Computing time resolved tests")
         with open(
                 os.path.join(in_dir, "nc_results", "bursttime.csv"), "w") as f:
             from collections import OrderedDict
@@ -511,7 +526,7 @@ def print_config(config, msg=""):
 if __name__ == "__main__":
     config = configparser.ConfigParser()
     here = os.path.dirname(os.path.realpath(__file__))
-    config_path = os.path.join(here, "Configs", "burst_analysis.cfg")
+    config_path = os.path.join(here, "configs", "burst_analysis.cfg")
     config.read(config_path)
 
     parser = argparse.ArgumentParser(

@@ -2065,65 +2065,71 @@ def print_place_cells(
 
     for i in range(rows):
         # Plot the spike position
-        place_data = placedata[i]
-        if place_data is not None:
+        if placedata is not None:
+            place_data = placedata[i]
+            if place_data is not None:
 
-            # Plot the place map
-            idx = get_mapping_idx("Path")
-            if idx is not None:
-                ax = fig.add_subplot(gs[i, idx])
-                if fixed_color:
-                    color = fixed_color
-                elif units == None:
-                    color = get_axona_colours(i)
-                else:
-                    color = get_axona_colours(units[i] - 1)
-                loc_spike(
-                    place_data, ax=ax, color=color,
-                    point_size=point_size)
+                # Plot the place map
+                idx = get_mapping_idx("Path")
+                if idx is not None:
+                    ax = fig.add_subplot(gs[i, idx])
+                    if fixed_color:
+                        color = fixed_color
+                    elif units == None:
+                        color = get_axona_colours(i)
+                    else:
+                        color = get_axona_colours(units[i] - 1)
+                    loc_spike(
+                        place_data, ax=ax, color=color,
+                        point_size=point_size)
 
-            # Plot the rate map
-            idx = get_mapping_idx("Place")
-            if idx is not None:
-                ax = fig.add_subplot(gs[i, idx])
-            loc_rate(place_data, ax=ax, smooth=True)
+                # Plot the rate map
+                idx = get_mapping_idx("Place")
+                if idx is not None:
+                    ax = fig.add_subplot(gs[i, idx])
+                loc_rate(place_data, ax=ax, smooth=True)
 
-        if headdata[i] is not None:
-            idx = get_mapping_idx("HD")
-            if idx is not None:
-                ax = fig.add_subplot(gs[i, idx], projection='polar')
-                hd_rate(headdata[i], ax=ax, title=None)
+        if headdata is not None:
+            if headdata[i] is not None:
+                idx = get_mapping_idx("HD")
+                if idx is not None:
+                    ax = fig.add_subplot(gs[i, idx], projection='polar')
+                    hd_rate(headdata[i], ax=ax, title=None)
 
-        # Plot wave property
-        if wavedata[i] is not None:
-            idx = get_mapping_idx("Wave")
-            if idx is not None:
-                ax = fig.add_subplot(gs[i, idx])
-                largest_waveform(wavedata[i], ax=ax)
+        
+        if wavedata is not None:
+            if wavedata[i] is not None:
+                idx = get_mapping_idx("Wave")
+                if idx is not None:
+                    ax = fig.add_subplot(gs[i, idx])
+                    largest_waveform(wavedata[i], ax=ax)
 
         # Plot -10 to 10 autocorrelation
-        if graphdata[i] is not None:
-            idx = get_mapping_idx("LowAC")
-            if idx is not None:
-                ax = fig.add_subplot(gs[i, idx])
-                isi_corr(
-                    graphdata[i], ax=ax, title=None, xlabel=None, ylabel=None)
+        if graphdata is not None:
+            if graphdata[i] is not None:
+                idx = get_mapping_idx("LowAC")
+                if idx is not None:
+                    ax = fig.add_subplot(gs[i, idx])
+                    isi_corr(
+                        graphdata[i], ax=ax, title=None, xlabel=None, ylabel=None)
 
-        if thetadata[i] is not None:
-            idx = get_mapping_idx("Theta")
-            if idx is not None:
-                ax = fig.add_subplot(gs[i, idx])
-                theta_cell(thetadata[i], ax=ax, title=None,
-                        xlabel=None, ylabel=None)
+        if thetadata is not None:
+            if thetadata[i] is not None:
+                idx = get_mapping_idx("Theta")
+                if idx is not None:
+                    ax = fig.add_subplot(gs[i, idx])
+                    theta_cell(thetadata[i], ax=ax, title=None,
+                            xlabel=None, ylabel=None)
 
-        if isidata[i] is not None:
-            idx = get_mapping_idx("HighISI")
-            if idx is not None:
-                ax = fig.add_subplot(gs[i, idx])
-                temp_fig, (ax1, ax2) = plt.subplots(2)
-                isi(isidata[i], axes=[ax, ax1, ax2],
-                    title1=None, xlabel1=None, ylabel1=None)
-                plt.close(temp_fig)
+        if isidata is not None:
+            if isidata[i] is not None:
+                idx = get_mapping_idx("HighISI")
+                if idx is not None:
+                    ax = fig.add_subplot(gs[i, idx])
+                    temp_fig, (ax1, ax2) = plt.subplots(2)
+                    isi(isidata[i], axes=[ax, ax1, ax2],
+                        title1=None, xlabel1=None, ylabel1=None)
+                    plt.close(temp_fig)
 
         plt.close("all")
         gc.collect()

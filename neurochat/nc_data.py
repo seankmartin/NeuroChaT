@@ -109,7 +109,7 @@ class NData():
 
         """
         if spaces_to_underscores:
-            results = {x.replace(' ', ''): v
+            results = {x.replace(' ', '_'): v
                        for x, v in self._results.items()}
             return results
         return self._results

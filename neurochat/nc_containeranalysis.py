@@ -32,9 +32,9 @@ def place_cell_summary(
         collection, dpi=150, out_dirname="nc_plots",
         filter_place_cells=True, filter_low_freq=True,
         opt_end="", base_dir=None, output_format="png",
-        output=["Wave", "Path", "Place", "HD", "AC", "Theta_AC", "ISI"],
+        output=["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"],
         isi_bound=350, isi_bin_length=2, fixed_color=None,
-        save_data=False):
+        save_data=False, point_size=None):
     """
     Quick Png spatial information summary of each cell in collection.
 
@@ -79,14 +79,21 @@ def place_cell_summary(
             for d_arr in dicts_arr:
                 if d_arr is not None:
                     d = d_arr[-1]
-                    for k, v in d:
+                    for k, v in d.items():
                         out_str = k.replace(" ", "_")
                         if isinstance(v, Iterable):
-                            for x in v:
-                                out_str += "," + str(x)
+                            if isinstance(v, np.ndarray):
+                                v = v.flatten()
+                            else:
+                                v = np.array(v).flatten()
+                                # isinstance(v[0], Iterable):
+                                # for x in v]
+                                # v = np.concatenate(np_arr)
+                            str_arr = [str(x) for x in v]
+                            out_str = out_str + "," + ",".join(str_arr)
                         else:
                             out_str += "," + str(v)
-                    f.write(out_str)
+                        f.write(out_str + "\n")
 
     placedata = []
     graphdata = []
@@ -96,6 +103,8 @@ def place_cell_summary(
     isidata = []
     good_units = []
 
+    if point_size is None:
+        point_size = dpi / 7
     for i, data in enumerate(collection):
         try:
             data_idx, unit_idx = collection._index_to_data_pos(i)
@@ -138,7 +147,6 @@ def place_cell_summary(
                     skaggs['refCoherence'],
                     skaggs['coherence95']))
             if good:
-                ["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"]
                 if "Place" in output:
                     placedata.append(data.place())
                 else:
@@ -169,26 +177,33 @@ def place_cell_summary(
                     isidata = None
 
                 if save_data:
-                    spike_name = os.path.basename(filename)
-                    parts = spike_name.split(".")
-                    f_dir = os.path.dirname(filename)
+                    try:
+                        spike_name = os.path.basename(filename)
+                        parts = spike_name.split(".")
+                        f_dir = os.path.dirname(filename)
 
-                    data_basename = (
-                        parts[0] + "_" + parts[1] + "_" +
-                        str(unit_number) + opt_end + ".csv")
-                    if base_dir is not None:
-                        main_dir = base_dir
-                        out_base = f_dir[len(base_dir + os.sep):]
-                        out_base = ("--").join(out_base.split(os.sep))
-                        data_basename = out_base + "--" + data_basename
-                    else:
-                        main_dir = f_dir
-                    out_name = os.path.join(
-                        main_dir, out_dirname, "data", data_basename)
-                    save_dicts_to_csv(
-                        out_name,
-                        [placedata, graphdata, wavedata,
-                         headdata, thetadata, isidata])
+                        data_basename = (
+                            parts[0] + "_" + parts[1] + "_" +
+                            str(unit_number) + opt_end + ".csv")
+                        if base_dir is not None:
+                            main_dir = base_dir
+                            out_base = f_dir[len(base_dir + os.sep):]
+                            out_base = ("--").join(out_base.split(os.sep))
+                            data_basename = out_base + "--" + data_basename
+                        else:
+                            main_dir = f_dir
+                        out_name = os.path.join(
+                            main_dir, out_dirname, "data", data_basename)
+                        make_dir_if_not_exists(out_name)
+                        save_dicts_to_csv(
+                            out_name,
+                            [placedata, graphdata, wavedata,
+                             headdata, thetadata, isidata])
+                    except Exception as e:
+                        log_exception(
+                            e, "Occured during place cell data saving on" +
+                            " {} unit {} name {} in {}".format(
+                                data_idx, unit_number, spike_name, main_dir))
 
             # Save the accumulated information
             if unit_idx == len(collection.get_units(data_idx)) - 1:
@@ -227,11 +242,11 @@ def place_cell_summary(
                             spike_name, named_units))
 
                     fig = print_place_cells(
-                        len(named_units), len(output),
+                        len(named_units), cols=len(output),
                         placedata=placedata, graphdata=graphdata,
                         wavedata=wavedata, headdata=headdata,
                         thetadata=thetadata, isidata=isidata,
-                        size_multiplier=4, point_size=dpi / 7.0,
+                        size_multiplier=4, point_size=point_size,
                         units=named_units, fixed_color=None,
                         output=output)
                     out_name = os.path.join(
