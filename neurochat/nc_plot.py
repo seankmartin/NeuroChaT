@@ -2050,55 +2050,80 @@ def _make_ax_if_none(ax, **kwargs):
 def print_place_cells(
         rows, cols=7, size_multiplier=4, wspace=0.3, hspace=0.3,
         placedata=None, wavedata=None, graphdata=None, isidata=None,
-        headdata=None, thetadata=None, point_size=10, units=None):
+        headdata=None, thetadata=None, point_size=10, units=None, 
+        output=["Wave", "Path", "Place", "HD", "LowISI", "Theta", "HighISI"],
+        fixed_color=None):
     fig = plt.figure(
         figsize=(cols * size_multiplier, rows * size_multiplier),
         tight_layout=False)
     gs = gridspec.GridSpec(rows, cols, wspace=wspace, hspace=hspace)
 
+    def get_mapping_idx(name):
+        if not name in output:
+            return False
+        return output.index(name)
+
     for i in range(rows):
         # Plot the spike position
         place_data = placedata[i]
         if place_data is not None:
-            ax = fig.add_subplot(gs[i, 0])
-            if units == None:
-                color = get_axona_colours(i)
-            else:
-                color = get_axona_colours(units[i] - 1)
-            loc_spike(
-                place_data, ax=ax, color=color,
-                point_size=point_size)
+
+            # Plot the place map
+            idx = get_mapping_idx("Path")
+            if idx is not None:
+                ax = fig.add_subplot(gs[i, idx])
+                if fixed_color:
+                    color = fixed_color
+                elif units == None:
+                    color = get_axona_colours(i)
+                else:
+                    color = get_axona_colours(units[i] - 1)
+                loc_spike(
+                    place_data, ax=ax, color=color,
+                    point_size=point_size)
 
             # Plot the rate map
-            ax = fig.add_subplot(gs[i, 1])
+            idx = get_mapping_idx("Place")
+            if idx is not None:
+                ax = fig.add_subplot(gs[i, idx])
             loc_rate(place_data, ax=ax, smooth=True)
 
-        head_data = headdata[i]
-        if head_data is not None:
-            ax = fig.add_subplot(gs[i, 2], projection='polar')
-            hd_rate(head_data, ax=ax, title=None)
+        if headdata[i] is not None:
+            idx = get_mapping_idx("HD")
+            if idx is not None:
+                ax = fig.add_subplot(gs[i, idx], projection='polar')
+                hd_rate(headdata[i], ax=ax, title=None)
 
         # Plot wave property
         if wavedata[i] is not None:
-            ax = fig.add_subplot(gs[i, 3])
-            largest_waveform(wavedata[i], ax=ax)
+            idx = get_mapping_idx("Wave")
+            if idx is not None:
+                ax = fig.add_subplot(gs[i, idx])
+                largest_waveform(wavedata[i], ax=ax)
 
         # Plot -10 to 10 autocorrelation
         if graphdata[i] is not None:
-            ax = fig.add_subplot(gs[i, 4])
-            isi_corr(graphdata[i], ax=ax, title=None, xlabel=None, ylabel=None)
+            idx = get_mapping_idx("LowAC")
+            if idx is not None:
+                ax = fig.add_subplot(gs[i, idx])
+                isi_corr(
+                    graphdata[i], ax=ax, title=None, xlabel=None, ylabel=None)
 
         if thetadata[i] is not None:
-            ax = fig.add_subplot(gs[i, 5])
-            theta_cell(thetadata[i], ax=ax, title=None,
-                       xlabel=None, ylabel=None)
+            idx = get_mapping_idx("Theta")
+            if idx is not None:
+                ax = fig.add_subplot(gs[i, idx])
+                theta_cell(thetadata[i], ax=ax, title=None,
+                        xlabel=None, ylabel=None)
 
         if isidata[i] is not None:
-            ax = fig.add_subplot(gs[i, 6])
-            temp_fig, (ax1, ax2) = plt.subplots(2)
-            isi(isidata[i], axes=[ax, ax1, ax2],
-                title1=None, xlabel1=None, ylabel1=None)
-            plt.close(temp_fig)
+            idx = get_mapping_idx("HighISI")
+            if idx is not None:
+                ax = fig.add_subplot(gs[i, idx])
+                temp_fig, (ax1, ax2) = plt.subplots(2)
+                isi(isidata[i], axes=[ax, ax1, ax2],
+                    title1=None, xlabel1=None, ylabel1=None)
+                plt.close(temp_fig)
 
         plt.close("all")
         gc.collect()

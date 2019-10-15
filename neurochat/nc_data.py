@@ -95,7 +95,7 @@ class NData():
         """
         return self.__type
 
-    def get_results(self):
+    def get_results(self, spaces_to_underscores=False):
         """
         Returns the parametric results of the analyses
 
@@ -108,6 +108,10 @@ class NData():
         OrderedDict
 
         """
+        if spaces_to_underscores:
+            results = {x.replace(' ', ''): v
+                       for x, v in self._results.items()}
+            return results
         return self._results
 
     def update_results(self, results):

@@ -29,7 +29,13 @@ import neurochat.nc_plot as nc_plot
 
 def save_results_to_csv(filename, in_dicts):
     """Save a dictionary to a csv"""
-    names = in_dicts[0].keys()
+    # find the dict with the most keys
+    max_key = []
+    for in_dict in in_dicts:
+        names = in_dicts[0].keys()
+        if len(names) > len(max_key):
+            max_key = names
+
     try:
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=names)
@@ -382,12 +388,15 @@ def main(args, config):
     tetrode_list = json.loads(config.get("Setup", "tetrode_list"))
     seaborn_style = bool(config.get("Plot", "seaborn_style"))
     plot_order = json.loads(config.get("Plot", "plot_order"))
+    fixed_color = config.get("Plot", "path_color")
     s_color = bool(config.get("Plot", "should_color"))
     output_format = config.get("Output", "output_format")
     save_bin_data = bool(config.get("Output", "save_bin_data"))
     output_spaces = bool(config.get("Output", "output_spaces"))
     opt_end = config.get("Output", "optional_end")
     max_units = int(config.get("Setup", "max_units"))
+    isi_bound = config.get("Params", "isi_bound")
+    isi_bin_length = config.get("Params", "isi_bin_length")
 
     setup_logging(in_dir)
 
@@ -404,7 +413,9 @@ def main(args, config):
     if analysis_flags[0]:
         place_cell_summary(
             container, dpi=200, out_dirname="nc_cell_plots", filter_place_cells=False, filter_low_freq=False,
-            opt_end=opt_end, base_dir=in_dir)
+            opt_end=opt_end, base_dir=in_dir,
+            output_format=output_format, isi_bound=isi_bound,
+            isi_bin_length=isi_bin_length)
         plt.close("all")
 
     # Do numerical analysis of bursting
