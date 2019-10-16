@@ -390,6 +390,9 @@ def main(args, config):
     seaborn_style = config.getboolean("Plot", "seaborn_style")
     plot_order = json.loads(config.get("Plot", "plot_order"))
     fixed_color = config.get("Plot", "path_color")
+    fixed_color = None if fixed_color == "None" else fixed_color
+    if len(fixed_color) > 1:
+        fixed_color = json.loads(fixed_color)
     s_color = config.getboolean("Plot", "should_color")
     plot_outname = config.get("Plot", "output_dirname")
     dot_size = config.get("Plot", "dot_size")
@@ -434,7 +437,7 @@ def main(args, config):
             output_format=output_format, isi_bound=isi_bound,
             isi_bin_length=isi_bin_length, output=plot_order,
             save_data=save_bin_data, fixed_color=fixed_color,
-            point_size=dot_size)
+            point_size=dot_size, color_isi=s_color, burst_thresh=6)
         plt.close("all")
 
     # Do numerical analysis of bursting

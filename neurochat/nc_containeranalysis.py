@@ -34,7 +34,8 @@ def place_cell_summary(
         opt_end="", base_dir=None, output_format="png",
         output=["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"],
         isi_bound=350, isi_bin_length=2, fixed_color=None,
-        save_data=False, point_size=None):
+        save_data=False, point_size=None, color_isi=True,
+        burst_thresh=5):
     """
     Quick Png spatial information summary of each cell in collection.
 
@@ -67,6 +68,8 @@ def place_cell_summary(
         How long in ms the ISI bins should be
     save_data: bool, default False
         Whether to save out the information used for the plot
+    color_isi: bool, default True
+        Whether the ISI should be black or blue
 
     Returns
     -------
@@ -86,9 +89,6 @@ def place_cell_summary(
                                 v = v.flatten()
                             else:
                                 v = np.array(v).flatten()
-                                # isinstance(v[0], Iterable):
-                                # for x in v]
-                                # v = np.concatenate(np_arr)
                             str_arr = [str(x) for x in v]
                             out_str = out_str + "," + ",".join(str_arr)
                         else:
@@ -247,8 +247,9 @@ def place_cell_summary(
                         wavedata=wavedata, headdata=headdata,
                         thetadata=thetadata, isidata=isidata,
                         size_multiplier=4, point_size=point_size,
-                        units=named_units, fixed_color=None,
-                        output=output)
+                        units=named_units, fixed_color=fixed_color,
+                        output=output, color_isi=color_isi,
+                        burst_ms=burst_thresh)
                     out_name = os.path.join(
                         main_dir, out_dirname, out_basename)
                     print("Saving place cell figure to {}".format(

@@ -169,11 +169,21 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     title = kwargs.get("title1", 'Distribution of inter-spike interval')
     xlabel = kwargs.get("xlabel1", 'ISI (ms)')
     ylabel = kwargs.get("ylabel1", 'Spike count')
+    burst_ms = kwargs.get("burst_ms", 5)
+    s_color = kwargs.get("should_color", True)
+
+    if s_color:
+        color = "darkblue"
+        edgecolor = "darkblue"
+    else:
+        color = "k"
+        edgecolor = "k"
     ax, fig1 = _make_ax_if_none(axes[0])
-    ax.bar(isi_data['isiBins'], isi_data['isiHist'], color='darkblue', \
-           edgecolor='darkblue', rasterized=True)
-    ax.plot([5, 5,], [0, isi_data['maxCount']], linestyle='dashed',\
-            linewidth=2, color='red')
+    ax.bar(isi_data['isiBins'], isi_data['isiHist'], color=color,
+           edgecolor=edgecolor, rasterized=True)
+    ax.plot(
+        [burst_ms, burst_ms], [0, isi_data['maxCount']], 
+        linestyle='dashed', linewidth=2, color='red')
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -186,7 +196,9 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
             linestyle=' ', marker='o', markersize=1, \
             markeredgecolor='k', markerfacecolor=None, rasterized=True)
 #    ax.autoscale(enable= True, axis= 'both', tight= True)
-    ax.plot(ax.get_xlim(), [5, 5], linestyle='dashed', linewidth=2, color='red')
+    ax.plot(
+        ax.get_xlim(), [burst_ms, burst_ms], 
+        linestyle='dashed', linewidth=2, color='red')
     ax.set_aspect(1)
     #    ax.set_xlabel('Interval before (ms)')
     ax.set_ylabel('Interval after (ms)')
@@ -207,7 +219,9 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     c_map.set_under('white')
     ax.pcolormesh(xedges[0:-1], yedges[0:-1], joint_count,\
                   cmap=c_map, vmin=1, rasterized=True)
-    ax.plot(ax.get_xlim(), [5, 5], linestyle='dashed', linewidth=2, color='red')
+    ax.plot(
+        ax.get_xlim(), [burst_ms, burst_ms], 
+        linestyle='dashed', linewidth=2, color='red')
     plt.axis(_extent)
     ax.set_xscale('log')
     ax.set_yscale('log')
@@ -2052,8 +2066,8 @@ def print_place_cells(
         placedata=None, wavedata=None, graphdata=None, isidata=None,
         headdata=None, thetadata=None, point_size=10, units=None, 
         output=["Wave", "Path", "Place", "HD", "LowISI", "Theta", "HighISI"],
-        fixed_color=None):
-    width, height = cols * size_multiplier, (rows - 0.15) * size_multiplier
+        fixed_color=None, burst_ms=5, color_isi=True):
+    width, height = cols * size_multiplier, (rows - 0.20) * size_multiplier
     fig = plt.figure(figsize=(width, height), tight_layout=False)
     gs = gridspec.GridSpec(
         rows, cols, figure=fig, wspace=wspace, hspace=hspace)
@@ -2130,7 +2144,8 @@ def print_place_cells(
                     ax = fig.add_subplot(gs[i, idx])
                     temp_fig, (ax1, ax2) = plt.subplots(2)
                     isi(isidata[i], axes=[ax, ax1, ax2],
-                        title1=None, xlabel1=None, ylabel1=None)
+                        title1=None, xlabel1=None, ylabel1=None,
+                        should_color=color_isi, burst_ms=burst_ms)
                     plt.close(temp_fig)
 
         plt.close("all")
