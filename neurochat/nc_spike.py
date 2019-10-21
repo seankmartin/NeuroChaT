@@ -1642,7 +1642,9 @@ class NSpike(NBase):
                         np.putmask(chan_wave[:, j], chan_wave[:, j] > max_ADC_count, chan_wave[:, j]- max_byte_value)
                     spike_wave['ch'+ str(i+1)] = chan_wave*AD_bit_uvolts[i]
 
+            unit_ID = None
             if os.path.isfile(cut_file):
+                used = cut_file
                 with open(cut_file, 'r') as f_cut:
                     while True:
                         line = f_cut.readline()
@@ -1652,6 +1654,7 @@ class NSpike(NBase):
                             unit_ID = np.fromfile(f_cut, dtype='uint8', sep=' ')
             
             elif os.path.isfile(clu_file):
+                used = clu_file
                 data = np.loadtxt(clu_file)
                 unit_ID = data[1:].flatten() - 1
                     
@@ -1660,6 +1663,13 @@ class NSpike(NBase):
                     "No cluster file found for spike file {} please make one at {} or {}".format(
                         file_name, cut_file, clu_file))
                 return
+            
+            if unit_ID is None:
+                string = "Unable to parse clusters from {}".format(used)
+                print(string)
+                logging.error(string)
+                return
+
             self._set_timestamp(spike_time)
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
