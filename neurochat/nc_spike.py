@@ -661,7 +661,6 @@ class NSpike(NBase):
 
         graph_data['isiHist'], edges = np.histogram(isi, bins=bins, range=bound, density=density)
         graph_data['isiBins'] = edges[:-1]
-        graph_data['isiBinCentres'] = edges[:-1] + np.mean(np.diff(edges))
         graph_data['isi'] = isi
         graph_data['maxCount'] = graph_data['isiHist'].max()
         graph_data['isiBefore'] = isi[:-1]

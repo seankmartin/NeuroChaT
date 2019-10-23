@@ -179,8 +179,10 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
         color = "k"
         edgecolor = "k"
     ax, fig1 = _make_ax_if_none(axes[0])
+    width = np.mean(np.diff(isi_data['isiBins']))
     ax.bar(isi_data['isiBins'], isi_data['isiHist'], color=color,
-           edgecolor=edgecolor, rasterized=True)
+           edgecolor=edgecolor, rasterized=True, align="edge", 
+           width=width, linewidth=0)
     ax.plot(
         [burst_ms, burst_ms], [0, isi_data['maxCount']], 
         linestyle='dashed', linewidth=2, color='red')
@@ -261,8 +263,9 @@ def isi_corr(isi_corr_data, ax=None, **kwargs):
 
     ax, fig = _make_ax_if_none(ax)
 
-    show_edges = False
-    line_width = 1 if show_edges else 0
+    # show_edges = False
+    # line_width = 1 if show_edges else 0
+    line_width = 0
     all_bins = isi_corr_data['isiAllCorrBins']
 
     widths = [
