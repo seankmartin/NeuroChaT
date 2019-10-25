@@ -30,7 +30,7 @@ from matplotlib.pyplot import savefig, close
 
 def place_cell_summary(
         collection, dpi=150, out_dirname="nc_plots",
-        filter_place_cells=True, filter_low_freq=True,
+        filter_place_cells=False, filter_low_freq=False,
         opt_end="", base_dir=None, output_format="png",
         output=["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"],
         isi_bound=350, isi_bin_length=2, fixed_color=None,
@@ -56,10 +56,10 @@ def place_cell_summary(
     opt_end : str, default ""
         A string to append to the file output just before the extension
     base_dir : str, default None
-        An optional directory to save the files to 
+        An optional directory to save the files to
     output_format : str, default png
         What format to save the output image in
-    output : List of str, 
+    output : List of str,
         default ["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"]
         Input should be some subset and/or permutation of these
     isi_bound: int, default 350
@@ -241,6 +241,10 @@ def place_cell_summary(
                             "units {}").format(
                             spike_name, named_units))
 
+                    # Save figures on by one if using pdf or svg
+                    one_by_one = (output_format == "pdf") or (
+                        output_format == "svg")
+
                     fig = print_place_cells(
                         len(named_units), cols=len(output),
                         placedata=placedata, graphdata=graphdata,
@@ -249,13 +253,32 @@ def place_cell_summary(
                         size_multiplier=4, point_size=point_size,
                         units=named_units, fixed_color=fixed_color,
                         output=output, color_isi=color_isi,
-                        burst_ms=burst_thresh)
-                    out_name = os.path.join(
-                        main_dir, out_dirname, out_basename)
-                    print("Saving place cell figure to {}".format(
-                        out_name))
-                    make_dir_if_not_exists(out_name)
-                    fig.savefig(out_name, dpi=dpi, format=output_format)
+                        burst_ms=burst_thresh, one_by_one=one_by_one,
+                        raster=one_by_one)
+
+                    if one_by_one:
+                        for i, f in enumerate(fig):
+                            unit_number = named_units[i]
+                            iname = (
+                                out_basename[:-4] + "_" +
+                                str(unit_number) + out_basename[-4:])
+                            out_name = os.path.join(
+                                main_dir, out_dirname, iname)
+
+                            print("Saving place cell figure to {}".format(
+                                out_name))
+                            make_dir_if_not_exists(out_name)
+                            f.savefig(out_name, dpi=dpi,
+                                      format=output_format)
+
+                    else:
+                        out_name = os.path.join(
+                            main_dir, out_dirname, out_basename)
+                        print("Saving place cell figure to {}".format(
+                            out_name))
+                        make_dir_if_not_exists(out_name)
+                        fig.savefig(out_name, dpi=dpi, format=output_format)
+
                     close("all")
                     gc.collect()
 

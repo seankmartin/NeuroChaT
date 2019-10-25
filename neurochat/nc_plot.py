@@ -171,6 +171,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ylabel = kwargs.get("ylabel1", 'Spike count')
     burst_ms = kwargs.get("burst_ms", 5)
     s_color = kwargs.get("should_color", True)
+    raster = kwargs.get("raster", True)
 
     if s_color:
         color = "darkblue"
@@ -181,7 +182,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax, fig1 = _make_ax_if_none(axes[0])
     width = np.mean(np.diff(isi_data['isiBins']))
     ax.bar(isi_data['isiBins'], isi_data['isiHist'], color=color,
-           edgecolor=edgecolor, rasterized=True, align="edge", 
+           edgecolor=edgecolor, rasterized=raster, align="edge", 
            width=width, linewidth=0)
     ax.plot(
         [burst_ms, burst_ms], [0, isi_data['maxCount']], 
@@ -196,7 +197,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax, fig2 = _make_ax_if_none(axes[1])
     ax.loglog(isi_data['isiBefore'], isi_data['isiAfter'], axes=ax, \
             linestyle=' ', marker='o', markersize=1, \
-            markeredgecolor='k', markerfacecolor=None, rasterized=True)
+            markeredgecolor='k', markerfacecolor=None, rasterized=raster)
 #    ax.autoscale(enable= True, axis= 'both', tight= True)
     ax.plot(
         ax.get_xlim(), [burst_ms, burst_ms], 
@@ -220,7 +221,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     c_map = plt.cm.jet
     c_map.set_under('white')
     ax.pcolormesh(xedges[0:-1], yedges[0:-1], joint_count,\
-                  cmap=c_map, vmin=1, rasterized=True)
+                  cmap=c_map, vmin=1, rasterized=raster)
     ax.plot(
         ax.get_xlim(), [burst_ms, burst_ms], 
         linestyle='dashed', linewidth=2, color='red')
@@ -260,6 +261,7 @@ def isi_corr(isi_corr_data, ax=None, **kwargs):
     xlabel = kwargs.get("xlabel", "Time (ms)")
     ylabel = kwargs.get("ylabel", "Counts")
     plot_theta = kwargs.get("plot_theta", False)
+    raster = kwargs.get("raster", True)
 
     ax, fig = _make_ax_if_none(ax)
 
@@ -267,18 +269,18 @@ def isi_corr(isi_corr_data, ax=None, **kwargs):
     # line_width = 1 if show_edges else 0
     line_width = 0
     all_bins = isi_corr_data['isiAllCorrBins']
-
-    widths = [
-        abs(all_bins[i+1] - all_bins[i]) for i in range(len(all_bins) - 1)]
+    width = np.mean(np.diff(all_bins))
     bin_centres = [
         (all_bins[i+1] + all_bins[i]) / 2 for i in range(len(all_bins) - 1)]
     ax.bar(bin_centres, isi_corr_data['isiCorr'],
-           width=widths, linewidth=line_width, color='darkblue',
-           edgecolor='black', rasterized=True, align='center', antialiased=True)
+           width=width, linewidth=line_width, color='darkblue',
+           edgecolor='black', rasterized=raster, align='center')
     ax.tick_params(width=1.5)
 
     if plot_theta:
-        ax.plot(bin_centres, isi_corr_data['corrFit'], linewidth=2, color='red')
+        ax.plot(
+            bin_centres, isi_corr_data['corrFit'], 
+            linewidth=2, color='red')
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -1088,6 +1090,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     colormap = kwargs.get("colormap", "viridis")
     style = kwargs.get("style", "contour")
     levels = kwargs.get("levels", 5)
+    raster = kwargs.get("raster", True)
     splits = None
 
     if colormap is "default":
@@ -1110,7 +1113,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
         res = ax.pcolormesh(
             place_data['xedges'], place_data['yedges'],
             np.ma.array(fmap, mask=np.isnan(fmap)),
-            cmap=colormap, rasterized=True)
+            cmap=colormap, rasterized=raster)
 
     elif style == "interpolated":
         extent = (
@@ -2069,11 +2072,16 @@ def print_place_cells(
         placedata=None, wavedata=None, graphdata=None, isidata=None,
         headdata=None, thetadata=None, point_size=10, units=None, 
         output=["Wave", "Path", "Place", "HD", "LowISI", "Theta", "HighISI"],
-        fixed_color=None, burst_ms=5, color_isi=True):
-    width, height = cols * size_multiplier, (rows - 0.20) * size_multiplier
-    fig = plt.figure(figsize=(width, height), tight_layout=False)
-    gs = gridspec.GridSpec(
-        rows, cols, figure=fig, wspace=wspace, hspace=hspace)
+        fixed_color=None, burst_ms=5, color_isi=True, one_by_one=False,
+        raster=True):
+    if one_by_one:
+        figs = []
+        width, height = cols * size_multiplier, (1 - 0.20) * size_multiplier
+    else:
+        width, height = cols * size_multiplier, (rows - 0.20) * size_multiplier
+        fig = plt.figure(figsize=(width, height), tight_layout=False)
+        gs = gridspec.GridSpec(
+            rows, cols, figure=fig, wspace=wspace, hspace=hspace)
 
     def get_mapping_idx(name):
         if not name in output:
@@ -2081,6 +2089,15 @@ def print_place_cells(
         return output.index(name)
 
     for i in range(rows):
+        if one_by_one:
+            fig = plt.figure(figsize=(width, height), tight_layout=False)
+            gs = gridspec.GridSpec(
+                1, cols, figure=fig, wspace=wspace, hspace=hspace)
+            j = 0
+        else:
+            j = i
+
+            
         # Plot the spike position
         if placedata is not None:
             place_data = placedata[i]
@@ -2089,7 +2106,7 @@ def print_place_cells(
                 # Plot the place map
                 idx = get_mapping_idx("Path")
                 if idx is not None:
-                    ax = fig.add_subplot(gs[i, idx])
+                    ax = fig.add_subplot(gs[j, idx])
                     if fixed_color:
                         color = fixed_color
                     elif units == None:
@@ -2098,13 +2115,13 @@ def print_place_cells(
                         color = get_axona_colours(units[i] - 1)
                     loc_spike(
                         place_data, ax=ax, color=color,
-                        point_size=point_size)
+                        point_size=point_size, raster=raster)
                     ax.set_aspect('auto')
 
                 # Plot the rate map
                 idx = get_mapping_idx("Place")
                 if idx is not None:
-                    ax = fig.add_subplot(gs[i, idx])
+                    ax = fig.add_subplot(gs[j, idx])
                     loc_rate(place_data, ax=ax, smooth=True)
                     ax.set_aspect('auto')
 
@@ -2112,7 +2129,7 @@ def print_place_cells(
             if headdata[i] is not None:
                 idx = get_mapping_idx("HD")
                 if idx is not None:
-                    ax = fig.add_subplot(gs[i, idx], projection='polar')
+                    ax = fig.add_subplot(gs[j, idx], projection='polar')
                     hd_rate(headdata[i], ax=ax, title=None)
 
         
@@ -2120,7 +2137,7 @@ def print_place_cells(
             if wavedata[i] is not None:
                 idx = get_mapping_idx("Wave")
                 if idx is not None:
-                    ax = fig.add_subplot(gs[i, idx])
+                    ax = fig.add_subplot(gs[j, idx])
                     largest_waveform(wavedata[i], ax=ax)
 
         # Plot -10 to 10 autocorrelation
@@ -2128,29 +2145,34 @@ def print_place_cells(
             if graphdata[i] is not None:
                 idx = get_mapping_idx("LowAC")
                 if idx is not None:
-                    ax = fig.add_subplot(gs[i, idx])
+                    ax = fig.add_subplot(gs[j, idx])
                     isi_corr(
-                        graphdata[i], ax=ax, title=None, xlabel=None, ylabel=None)
+                        graphdata[i], ax=ax, title=None, xlabel=None, ylabel=None, raster=raster)
 
         if thetadata is not None:
             if thetadata[i] is not None:
                 idx = get_mapping_idx("Theta")
                 if idx is not None:
-                    ax = fig.add_subplot(gs[i, idx])
+                    ax = fig.add_subplot(gs[j, idx])
                     theta_cell(thetadata[i], ax=ax, title=None,
-                            xlabel=None, ylabel=None)
+                            xlabel=None, ylabel=None, raster=raster)
 
         if isidata is not None:
             if isidata[i] is not None:
                 idx = get_mapping_idx("HighISI")
                 if idx is not None:
-                    ax = fig.add_subplot(gs[i, idx])
+                    ax = fig.add_subplot(gs[j, idx])
                     temp_fig, (ax1, ax2) = plt.subplots(2)
                     isi(isidata[i], axes=[ax, ax1, ax2],
                         title1=None, xlabel1=None, ylabel1=None,
-                        should_color=color_isi, burst_ms=burst_ms)
+                        should_color=color_isi, burst_ms=burst_ms,
+                        raster=raster)
                     plt.close(temp_fig)
+        
+        if one_by_one:
+            figs.append(fig)
 
-        plt.close("all")
-        gc.collect()
-    return fig
+    if one_by_one:
+        return figs
+    else:
+        return fig
