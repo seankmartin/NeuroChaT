@@ -201,7 +201,7 @@ def place_cell_summary(
                              headdata, thetadata, isidata])
                     except Exception as e:
                         log_exception(
-                            e, "Occured during place cell data saving on" +
+                            e, "Occurred during place cell data saving on" +
                             " {} unit {} name {} in {}".format(
                                 data_idx, unit_number, spike_name, main_dir))
 
@@ -292,7 +292,7 @@ def place_cell_summary(
 
         except Exception as e:
             log_exception(
-                e, "Occured during place cell summary on data" +
+                e, "Occurred during place cell summary on data" +
                    " {} unit {} name {} in {}".format(
                        data_idx, unit_number, spike_name, main_dir))
     return
