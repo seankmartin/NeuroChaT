@@ -188,8 +188,9 @@ def place_cell_summary(
                         if base_dir is not None:
                             main_dir = base_dir
                             out_base = f_dir[len(base_dir + os.sep):]
-                            out_base = ("--").join(out_base.split(os.sep))
-                            data_basename = out_base + "--" + data_basename
+                            if len(out_base) != 0:
+                                out_base = ("--").join(out_base.split(os.sep))
+                                data_basename = out_base + "--" + data_basename
                         else:
                             main_dir = f_dir
                         out_name = os.path.join(
@@ -217,8 +218,9 @@ def place_cell_summary(
                 if base_dir is not None:
                     main_dir = base_dir
                     out_base = f_dir[len(base_dir + os.sep):]
-                    out_base = ("--").join(out_base.split(os.sep))
-                    out_basename = out_base + "--" + out_basename
+                    if len(out_base) != 0:
+                        out_base = ("--").join(out_base.split(os.sep))
+                        out_basename = out_base + "--" + out_basename
                 else:
                     main_dir = f_dir
 
