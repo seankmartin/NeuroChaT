@@ -198,7 +198,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax.loglog(isi_data['isiBefore'], isi_data['isiAfter'], axes=ax, \
             linestyle=' ', marker='o', markersize=1, \
             markeredgecolor='k', markerfacecolor=None, rasterized=raster)
-#    ax.autoscale(enable= True, axis= 'both', tight= True)
+    # ax.autoscale(enable= True, axis= 'both', tight= True)
     ax.plot(
         ax.get_xlim(), [burst_ms, burst_ms], 
         linestyle='dashed', linewidth=2, color='red')
@@ -216,7 +216,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     # Scatter colored
     _extent = [xedges[0], xedges[-2], yedges[0], yedges[-2]]
 
-#        ax = fig2.add_subplot(212, aspect= 'equal')
+    # ax = fig2.add_subplot(212, aspect= 'equal')
     ax, fig3 = _make_ax_if_none(axes[2])
     c_map = plt.cm.jet
     c_map.set_under('white')
@@ -451,7 +451,7 @@ def plv_tr(plv_data):
     offset = plv_data['offset']
     f = plv_data['f']
     fSTA = plv_data['fSTA']
-#        STP= plv_data['STP']
+    # STP= plv_data['STP']
     SFC = plv_data['SFC']
     PLV = plv_data['PLV']
 
@@ -1193,7 +1193,7 @@ def loc_firing(place_data):
     ax = loc_rate(place_data, ax=fig.add_subplot(122))
     ax.set_xlabel('cm')
     #ax.set_ylabel('YLoc')
-#    fig.colorbar(cax)
+    # fig.colorbar(cax)
     fig.set_tight_layout(True)
     return fig
 
@@ -1271,7 +1271,7 @@ def loc_place_field(place_data, ax=None):
     centroid = place_data['centroid']
     ax.plot([centroid[0]], [centroid[1]], 'gX')
     plt.colorbar(pmap, cax=cax, orientation='vertical', use_gridspec=True)
-#        plt.autoscale(enable=True, axis='both', tight=True)
+    # plt.autoscale(enable=True, axis='both', tight=True)
     return ax
 
 # Created by Sean Martin: 13/02/2019
@@ -1836,106 +1836,6 @@ def spike_raster(events, xlim=None, colors=[0, 0, 0], ax=None, **kwargs):
 
     return fig
 
-def replay_summary(replay_data):
-    """
-    Plot a replay data summary.
-
-    Parameters
-    ----------
-    replay_data : dict
-        Dictionary of graph data
-
-    Returns
-    -------
-    fig : matplotlib.pyplot.Figure
-
-    """
-    lfp_times = replay_data["lfp times"]
-    filtered_lfp = replay_data["lfp samples"]
-    mua_hist = replay_data["mua hists"]
-    swr_times = replay_data["swr times"]
-    num_cells = replay_data["num cells"]
-    spike_times = replay_data["spike times"]
-
-    colors = get_axona_colours()[:num_cells]
-    xlim = (lfp_times[0], lfp_times[-1])
-
-    # SWR and filtered LFP
-    fig, axes= plt.subplots(
-        nrows=3, ncols=1, figsize=(12,6), sharex=True)
-    spike_raster(
-        swr_times, ax=axes[0], ylabel=None, xlabel=None,
-        no_y_ticks=True, colors=('b'), linewidths=0.2, linelengths=0.5)
-    axes[0].plot(lfp_times, filtered_lfp, color='k')
-    axes[0].set_title("Filtered LFP and SWR Events")
-
-    # MUA
-    axes[1].plot(mua_hist[1], mua_hist[0], color='k')
-    ticks = [i for i in range(num_cells + 1)]
-    axes[1].set_yticks(ticks)
-    axes[1].set_title("Number of Active Cells")
-
-    # Raw spikes
-    spike_raster(spike_times, linewidths=0.2, ax=axes[2], colors=colors)
-
-    import matplotlib.ticker as ticker
-
-    tick_spacing = 100
-    for ax in axes:
-        ax.set_xlim(xlim[0], xlim[1])
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
-
-    plt.tight_layout()
-    return fig
-
-def plot_replay_sections(replay_data, spike_times, orientation="vertical"):
-    """
-    Plot zoomed in sections of the replay data spikes.
-
-    Parameters
-    ----------
-    replay_data : dict
-        Results from replay_summary
-    spike_times : list
-        A 3 tiered list, most commonly a list of nca.spike_times outputs
-    orientation : str
-        "vertical" or "horizontal" - the direction to plot rasters in
-
-    Returns
-    -------
-    matplotlib.pyplot.Figure :
-        Resulting multi Axes figure
-
-    """
-    num_plots = len(replay_data["overlap swr mua"])
-    row_size = 6
-
-    if num_plots <= row_size:
-        num_cols = num_plots
-        num_rows = 1
-    else:
-        num_cols = row_size
-        num_rows = math.ceil(num_plots / row_size)
-
-    fig, axes = plt.subplots(
-        nrows=num_rows, ncols=num_cols,
-        sharex='col', tight_layout=True, figsize=(num_rows*2, num_cols*2))
-
-    for i, i_range in enumerate(replay_data["overlap swr mua"]):
-        if num_plots == 1:
-            ax = axes
-        else:
-            ax=axes.flatten()[i]
-        # nca.spike_times(sleep_sample, ranges=[i_range])
-        # can be used to get spike times
-        spike_raster(
-            spike_times[i],
-            linewidths=1, ax=ax, orientation=orientation,
-            colors=get_axona_colours()[:replay_data["num cells"]],
-            #xlim=(round(i_range[0], 1), round(i_range[1], 1)),
-            title=None, ylabel=None, xlabel=None)
-    return fig
-
 def plot_angle_between_points(points, xlim, ylim, ax=None):
     """
     Plots the angle between three points
@@ -2183,3 +2083,104 @@ def print_place_cells(
         return figs
     else:
         return fig
+
+
+# def replay_summary(replay_data):
+    # """
+    # Plot a replay data summary.
+
+    # Parameters
+    # ----------
+    # replay_data : dict
+    #     Dictionary of graph data
+
+    # Returns
+    # -------
+    # fig : matplotlib.pyplot.Figure
+
+    # """
+    # lfp_times = replay_data["lfp times"]
+    # filtered_lfp = replay_data["lfp samples"]
+    # mua_hist = replay_data["mua hists"]
+    # swr_times = replay_data["swr times"]
+    # num_cells = replay_data["num cells"]
+    # spike_times = replay_data["spike times"]
+
+    # colors = get_axona_colours()[:num_cells]
+    # xlim = (lfp_times[0], lfp_times[-1])
+
+    # # SWR and filtered LFP
+    # fig, axes= plt.subplots(
+    #     nrows=3, ncols=1, figsize=(12,6), sharex=True)
+    # spike_raster(
+    #     swr_times, ax=axes[0], ylabel=None, xlabel=None,
+    #     no_y_ticks=True, colors=('b'), linewidths=0.2, linelengths=0.5)
+    # axes[0].plot(lfp_times, filtered_lfp, color='k')
+    # axes[0].set_title("Filtered LFP and SWR Events")
+
+    # # MUA
+    # axes[1].plot(mua_hist[1], mua_hist[0], color='k')
+    # ticks = [i for i in range(num_cells + 1)]
+    # axes[1].set_yticks(ticks)
+    # axes[1].set_title("Number of Active Cells")
+
+    # # Raw spikes
+    # spike_raster(spike_times, linewidths=0.2, ax=axes[2], colors=colors)
+
+    # import matplotlib.ticker as ticker
+
+    # tick_spacing = 100
+    # for ax in axes:
+    #     ax.set_xlim(xlim[0], xlim[1])
+    #     ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+
+    # plt.tight_layout()
+    # return fig
+
+# def plot_replay_sections(replay_data, spike_times, orientation="vertical"):
+    # """
+    # Plot zoomed in sections of the replay data spikes.
+
+    # Parameters
+    # ----------
+    # replay_data : dict
+    #     Results from replay_summary
+    # spike_times : list
+    #     A 3 tiered list, most commonly a list of nca.spike_times outputs
+    # orientation : str
+    #     "vertical" or "horizontal" - the direction to plot rasters in
+
+    # Returns
+    # -------
+    # matplotlib.pyplot.Figure :
+    #     Resulting multi Axes figure
+
+    # """
+    # num_plots = len(replay_data["overlap swr mua"])
+    # row_size = 6
+
+    # if num_plots <= row_size:
+    #     num_cols = num_plots
+    #     num_rows = 1
+    # else:
+    #     num_cols = row_size
+    #     num_rows = math.ceil(num_plots / row_size)
+
+    # fig, axes = plt.subplots(
+    #     nrows=num_rows, ncols=num_cols,
+    #     sharex='col', tight_layout=True, figsize=(num_rows*2, num_cols*2))
+
+    # for i, i_range in enumerate(replay_data["overlap swr mua"]):
+    #     if num_plots == 1:
+    #         ax = axes
+    #     else:
+    #         ax=axes.flatten()[i]
+    #     # nca.spike_times(sleep_sample, ranges=[i_range])
+    #     # can be used to get spike times
+    #     spike_raster(
+    #         spike_times[i],
+    #         linewidths=1, ax=ax, orientation=orientation,
+    #         colors=get_axona_colours()[:replay_data["num cells"]],
+    #         #xlim=(round(i_range[0], 1), round(i_range[1], 1)),
+    #         title=None, ylabel=None, xlabel=None)
+    # return fig

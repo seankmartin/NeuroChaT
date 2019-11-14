@@ -1460,6 +1460,7 @@ class NSpike(NBase):
                 g = hdf.f[path]
             else:
                 logging.error('Specified shank datapath does not exist!')
+                return
     
             for key, value in g.attrs.items():
                 _record_info[key] = value
