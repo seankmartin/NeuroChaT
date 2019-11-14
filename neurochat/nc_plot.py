@@ -1200,7 +1200,7 @@ def loc_firing(place_data):
 # Created by Sean Martin: 14/02/2019
 def loc_firing_and_place(place_data, smooth=True):
     """
-    Plots the analysis replay_data of locational correlation to spike-rate
+    Plots the analysis of locational correlation to spike-rate
     with a place map
 
     Parameters
