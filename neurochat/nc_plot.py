@@ -738,7 +738,7 @@ def hd_rate(hd_data, ax=None, **kwargs):
         Graphical data from the unit firing to head-direction correlation
     ax : matplotlib.axes.Axes
         Polar Axes object. If specified, the figure is plotted in this axes.
-    kwargs :
+    kwargs : title - str, default "Head directional firing rate"
 
     Returns
     -------
@@ -757,6 +757,39 @@ def hd_rate(hd_data, ax=None, **kwargs):
 
     ax.set_title(title)
     ax.set_rticks([hd_data['hdRate'].max()])
+
+    return ax
+
+def hd_rate_pred(hd_data, ax=None, **kwargs):
+    """
+    Plot predicted and actual head direction from the positional data.
+
+    Parameters
+    ---------
+    hd_data: dict
+        Graphical data from the unit firing to head-direction correlation
+    ax : matplotlib.axes.Axes
+        Polar Axes object. If specified, the figure is plotted in this axes.
+    kwargs : title - str, default "Head directional firing rate"
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        Axes of the polar plot of actual (blue) and expected (green)
+        head-direction vs spike-rate.
+
+    """
+    if not ax:
+        plt.figure()
+        ax = plt.gca(polar=True)
+
+    hd_rate(hd_data, ax=ax, **kwargs)
+    bins = np.append(hd_data['bins'], hd_data['bins'][0])
+    predRate = np.append(
+        hd_data['hdPred'], hd_data['hdPred'][0])
+    ax.plot(np.radians(bins), predRate, color='green')
+    ax.set_rticks(
+        [hd_data['hdRate'].max(), hd_data['hdPred'].max()])
 
     return ax
 
@@ -791,7 +824,7 @@ def hd_spike(hd_data, ax=None):
 
 def hd_firing(hd_data):
     """
-    Plots the analysis replay_data of head directional correlation to spike-rate
+    Plots the analysis of head directional correlation to spike-rate
 
     Parameters
     ----------
@@ -811,12 +844,7 @@ def hd_firing(hd_data):
     hd_spike(hd_data, ax=plt.gca(polar=True))
 
     fig2 = plt.figure()
-    ax2 = hd_rate(hd_data, ax=plt.gca(polar=True))
-    bins = np.append(hd_data['bins'], hd_data['bins'][0])
-    predRate = np.append(hd_data['hdPred'], hd_data['hdPred'][0])
-    ax2.plot(np.radians(bins), predRate, color='green')
-    ax2.set_rticks([hd_data['hdRate'].max(), hd_data['hdPred'].max()])
-
+    ax2 = hd_rate_pred(hd_data, ax=plt.gca(polar=True))
     return fig1, fig2
 
 def hd_rate_ccw(hd_data):
@@ -1169,7 +1197,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
 
     return ax
 
-def loc_firing(place_data):
+def loc_firing(place_data, **kwargs):
     """
     Plots the analysis replay_data of locational correlation to spike-rate
 
@@ -1186,11 +1214,11 @@ def loc_firing(place_data):
     """
     fig = plt.figure()
 
-    ax = loc_spike(place_data, ax=fig.add_subplot(121))
+    ax = loc_spike(place_data, ax=fig.add_subplot(121), **kwargs)
     ax.set_xlabel('cm')
     ax.set_ylabel('cm')
 
-    ax = loc_rate(place_data, ax=fig.add_subplot(122))
+    ax = loc_rate(place_data, ax=fig.add_subplot(122), **kwargs)
     ax.set_xlabel('cm')
     #ax.set_ylabel('YLoc')
     # fig.colorbar(cax)
@@ -1198,7 +1226,7 @@ def loc_firing(place_data):
     return fig
 
 # Created by Sean Martin: 14/02/2019
-def loc_firing_and_place(place_data, smooth=True):
+def loc_firing_and_place(place_data, smooth=True, **kwargs):
     """
     Plots the analysis of locational correlation to spike-rate
     with a place map
@@ -1216,14 +1244,18 @@ def loc_firing_and_place(place_data, smooth=True):
     """
     fig = plt.figure()
 
-    ax1 = loc_spike(place_data, ax=fig.add_subplot(131))
+    ax1 = loc_spike(
+        place_data, ax=fig.add_subplot(131), **kwargs)
     ax1.set_xlabel('cm')
     ax1.set_ylabel('cm')
 
-    ax2 = loc_rate(place_data, ax=fig.add_subplot(132, sharey=ax1), smooth=smooth)
+    ax2 = loc_rate(
+        place_data, ax=fig.add_subplot(132, sharey=ax1), 
+        smooth=smooth, **kwargs)
     ax2.set_xlabel('cm')
 
-    ax3 = loc_place_field(place_data, ax=fig.add_subplot(133, sharey=ax1))
+    ax3 = loc_place_field(
+        place_data, ax=fig.add_subplot(133, sharey=ax1))
     ax3.set_xlabel('cm')
 
     fig.set_tight_layout(True)
@@ -2031,14 +2063,7 @@ def print_place_cells(
                 if idx is not None:
                     hd_data = headdata[i]
                     ax = fig.add_subplot(gs[j, idx], projection='polar')
-                    hd_rate(hd_data, ax=ax, title=None)
-                    bins = np.append(hd_data['bins'], hd_data['bins'][0])
-                    predRate = np.append(
-                        hd_data['hdPred'], hd_data['hdPred'][0])
-                    ax.plot(np.radians(bins), predRate, color='green')
-                    ax.set_rticks(
-                        [hd_data['hdRate'].max(), hd_data['hdPred'].max()])
-
+                    hd_rate_pred(hd_data, ax=ax, title=None)
         
         if wavedata is not None:
             if wavedata[i] is not None:
