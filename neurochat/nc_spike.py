@@ -1666,7 +1666,6 @@ class NSpike(NBase):
             
             if unit_ID is None:
                 string = "Unable to parse clusters from {}".format(used)
-                print(string)
                 logging.error(string)
                 return
 
