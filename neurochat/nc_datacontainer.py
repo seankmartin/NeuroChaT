@@ -725,7 +725,8 @@ class NDataContainer():
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
             try:
-                if data_index == self._last_data_pt[0]:
+                if (data_index == self._last_data_pt[0] and
+                        (self._last_data_pt[1] is not None)):
                     result = self._last_data_pt[1]
                 else:
                     result = NData()
