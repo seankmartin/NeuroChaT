@@ -687,7 +687,6 @@ class NSpike(NBase):
 
         graph_data[&#39;isiHist&#39;], edges = np.histogram(isi, bins=bins, range=bound, density=density)
         graph_data[&#39;isiBins&#39;] = edges[:-1]
-        graph_data[&#39;isiBinCentres&#39;] = edges[:-1] + np.mean(np.diff(edges))
         graph_data[&#39;isi&#39;] = isi
         graph_data[&#39;maxCount&#39;] = graph_data[&#39;isiHist&#39;].max()
         graph_data[&#39;isiBefore&#39;] = isi[:-1]
@@ -1487,6 +1486,7 @@ class NSpike(NBase):
                 g = hdf.f[path]
             else:
                 logging.error(&#39;Specified shank datapath does not exist!&#39;)
+                return
     
             for key, value in g.attrs.items():
                 _record_info[key] = value
@@ -1668,7 +1668,9 @@ class NSpike(NBase):
                         np.putmask(chan_wave[:, j], chan_wave[:, j] &gt; max_ADC_count, chan_wave[:, j]- max_byte_value)
                     spike_wave[&#39;ch&#39;+ str(i+1)] = chan_wave*AD_bit_uvolts[i]
 
+            unit_ID = None
             if os.path.isfile(cut_file):
+                used = cut_file
                 with open(cut_file, &#39;r&#39;) as f_cut:
                     while True:
                         line = f_cut.readline()
@@ -1678,6 +1680,7 @@ class NSpike(NBase):
                             unit_ID = np.fromfile(f_cut, dtype=&#39;uint8&#39;, sep=&#39; &#39;)
             
             elif os.path.isfile(clu_file):
+                used = clu_file
                 data = np.loadtxt(clu_file)
                 unit_ID = data[1:].flatten() - 1
                     
@@ -1686,6 +1689,12 @@ class NSpike(NBase):
                     &#34;No cluster file found for spike file {} please make one at {} or {}&#34;.format(
                         file_name, cut_file, clu_file))
                 return
+            
+            if unit_ID is None:
+                string = &#34;Unable to parse clusters from {}&#34;.format(used)
+                logging.error(string)
+                return
+
             self._set_timestamp(spike_time)
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
@@ -2503,7 +2512,6 @@ single units in the recording.</p>
 
         graph_data[&#39;isiHist&#39;], edges = np.histogram(isi, bins=bins, range=bound, density=density)
         graph_data[&#39;isiBins&#39;] = edges[:-1]
-        graph_data[&#39;isiBinCentres&#39;] = edges[:-1] + np.mean(np.diff(edges))
         graph_data[&#39;isi&#39;] = isi
         graph_data[&#39;maxCount&#39;] = graph_data[&#39;isiHist&#39;].max()
         graph_data[&#39;isiBefore&#39;] = isi[:-1]
@@ -3303,6 +3311,7 @@ single units in the recording.</p>
                 g = hdf.f[path]
             else:
                 logging.error(&#39;Specified shank datapath does not exist!&#39;)
+                return
     
             for key, value in g.attrs.items():
                 _record_info[key] = value
@@ -3484,7 +3493,9 @@ single units in the recording.</p>
                         np.putmask(chan_wave[:, j], chan_wave[:, j] &gt; max_ADC_count, chan_wave[:, j]- max_byte_value)
                     spike_wave[&#39;ch&#39;+ str(i+1)] = chan_wave*AD_bit_uvolts[i]
 
+            unit_ID = None
             if os.path.isfile(cut_file):
+                used = cut_file
                 with open(cut_file, &#39;r&#39;) as f_cut:
                     while True:
                         line = f_cut.readline()
@@ -3494,6 +3505,7 @@ single units in the recording.</p>
                             unit_ID = np.fromfile(f_cut, dtype=&#39;uint8&#39;, sep=&#39; &#39;)
             
             elif os.path.isfile(clu_file):
+                used = clu_file
                 data = np.loadtxt(clu_file)
                 unit_ID = data[1:].flatten() - 1
                     
@@ -3502,6 +3514,12 @@ single units in the recording.</p>
                     &#34;No cluster file found for spike file {} please make one at {} or {}&#34;.format(
                         file_name, cut_file, clu_file))
                 return
+            
+            if unit_ID is None:
+                string = &#34;Unable to parse clusters from {}&#34;.format(used)
+                logging.error(string)
+                return
+
             self._set_timestamp(spike_time)
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
@@ -4561,7 +4579,6 @@ unit are returned</dd>
 
     graph_data[&#39;isiHist&#39;], edges = np.histogram(isi, bins=bins, range=bound, density=density)
     graph_data[&#39;isiBins&#39;] = edges[:-1]
-    graph_data[&#39;isiBinCentres&#39;] = edges[:-1] + np.mean(np.diff(edges))
     graph_data[&#39;isi&#39;] = isi
     graph_data[&#39;maxCount&#39;] = graph_data[&#39;isiHist&#39;].max()
     graph_data[&#39;isiBefore&#39;] = isi[:-1]
@@ -4929,7 +4946,9 @@ filenames</p>
                     np.putmask(chan_wave[:, j], chan_wave[:, j] &gt; max_ADC_count, chan_wave[:, j]- max_byte_value)
                 spike_wave[&#39;ch&#39;+ str(i+1)] = chan_wave*AD_bit_uvolts[i]
 
+        unit_ID = None
         if os.path.isfile(cut_file):
+            used = cut_file
             with open(cut_file, &#39;r&#39;) as f_cut:
                 while True:
                     line = f_cut.readline()
@@ -4939,6 +4958,7 @@ filenames</p>
                         unit_ID = np.fromfile(f_cut, dtype=&#39;uint8&#39;, sep=&#39; &#39;)
         
         elif os.path.isfile(clu_file):
+            used = clu_file
             data = np.loadtxt(clu_file)
             unit_ID = data[1:].flatten() - 1
                 
@@ -4947,6 +4967,12 @@ filenames</p>
                 &#34;No cluster file found for spike file {} please make one at {} or {}&#34;.format(
                     file_name, cut_file, clu_file))
             return
+        
+        if unit_ID is None:
+            string = &#34;Unable to parse clusters from {}&#34;.format(used)
+            logging.error(string)
+            return
+
         self._set_timestamp(spike_time)
         self._set_waveform(spike_wave)
         self.set_unit_tags(unit_ID)</code></pre>
@@ -4999,6 +5025,7 @@ filenames</p>
             g = hdf.f[path]
         else:
             logging.error(&#39;Specified shank datapath does not exist!&#39;)
+            return
 
         for key, value in g.attrs.items():
             _record_info[key] = value

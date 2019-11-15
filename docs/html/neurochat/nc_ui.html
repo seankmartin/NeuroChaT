@@ -749,6 +749,34 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.lfp_chan_box.clear()
         self.lfp_chan_box.addItems(items)
 
+    def unit_getitems(self):
+        &#34;&#34;&#34;Returns the list of units once spike data is set.&#34;&#34;&#34;
+        try:
+            file_format = self.file_format_box.itemText(
+                self.file_format_box.currentIndex())
+            if file_format == &#34;NWB&#34;:
+                self._control.open_hdf_file()
+                _, path = self._control.get_spike_file().split(&#34;+&#34;)
+                path = path + &#39;/Clustering/cluster_nums&#39;
+                items = self._control.hdf.f[path]
+            else:
+                data = self._control.ndata
+                data.load_spike()
+                items = data.get_unit_list()
+            if len(items) == 0:
+                logging.error(&#34;No units in this file.&#34;)
+                items = [i for i in range(256)]
+            str_items = [str(x) for x in items]
+            self.unit_no_box.clear()
+            self.unit_no_box.addItems(str_items)
+            if file_format == &#34;NWB&#34;:
+                self._control.close_hdf_file()
+        except Exception as e:
+            log_exception(e, &#34;Populating unit list failed&#34;)
+            items = [str(i) for i in range(256)]
+            self.unit_no_box.clear()
+            self.unit_no_box.addItems(items)
+
     def browse(self):
         &#34;&#34;&#34;
         Opens a file dialog asking the user to select spike and spatial data files.
@@ -777,6 +805,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 #                    spike_file = words[-1]
 #                    self._curr_dir = directory
                     self._control.set_spike_file(spike_file)
+                    self._control.ndata.set_spike_file(spike_file)
                     logging.info(&#34;New spike file added: &#34; + \
                                         words[-1])
                     spatial_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -790,6 +819,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                         logging.info(&#34;New spatial file added: &#34; + \
                                         words[-1])
                     self.lfp_chan_getitems()
+                    self.unit_getitems()
 
             elif file_format == &#34;NWB&#34;:
                 nwb_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -808,7 +838,6 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                         path = &#39;/processing/Shank&#39;
                         self._control.open_hdf_file()
                         items= self._control.get_hdf_groups(path=path)
-                        self._control.close_hdf_file()
                         # hdf = Nhdf()
                         # hdf.set_filename(nwb_file)
                         # path = &#39;/processing/Shank&#39;
@@ -817,22 +846,33 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                         # else:
                         #     logging.warning(&#39;No Shank data stored in the path:&#39;+ path)
                         if items:
-                            item, ok = QtWidgets.QInputDialog.getItem(self, &#34;Select electrode group&#34;,
-                                                                      &#34;Electrode groups: &#34;, items, 0, False)
+                            item, ok = QtWidgets.QInputDialog.getItem(
+                                self, &#34;Select electrode group&#34;,
+                                &#34;Electrode groups: &#34;, items, 0, False)
                             if ok:
-                                self._control.set_spike_file(nwb_file+ &#39;+&#39;+ path+ &#39;/&#39; + item)
-                                logging.info(&#39;Spike data set to electrode group: &#39;+ path+ &#39;/&#39;+ item)
+                                self._control.set_spike_file(
+                                    nwb_file+ &#39;+&#39;+ path+ &#39;/&#39; + item)
+                                logging.info(
+                                    &#39;Spike data set to electrode group: &#39;
+                                    + path+ &#39;/&#39;+ item)
 
                                 path = &#39;/processing/Behavioural/Position&#39;
                                 if self._control.exist_hdf_path(path=path):
-                                    self._control.set_spatial_file(nwb_file+ &#39;+&#39;+ path)
-                                    logging.info(&#39;Position data set to group: &#39;+ path)
+                                    self._control.set_spatial_file(
+                                        nwb_file+ &#39;+&#39;+ path)
+                                    logging.info(
+                                        &#39;Position data set to group: &#39;+ path)
                                 else:
-                                    logging.warning(path+ &#39; not found! Spatial data cannot be set!&#39;)
-                    except:
-                        logging.error(&#39;Cannot read the hdf file&#39;)
+                                    logging.warning(
+                                        path+ 
+                                        &#39; not found! Spatial data not set.&#39;)
+                        self._control.close_hdf_file()
+                    except Exception as e:
+                        log_exception(
+                            e, &#34;Cannot read hdf file in nc_ui browse&#34;)
 
                     self.lfp_chan_getitems()
+                    self.unit_getitems()
 
         elif mode_id == 2:
             excel_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -907,9 +947,11 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         Called when the selection in the &#39;Unit No&#39; is changed. Sets the unit number accordingly.
 
         &#34;&#34;&#34;
-
-        self._control.set_unit_no(value)
-        logging.info(&#34;Selected Unit: &#34;+ str(value))
+        if value &lt; 0:
+            return
+        unit_no = int(self.unit_no_box.itemText(value))
+        self._control.set_unit_no(unit_no)
+        logging.info(&#34;Selected Unit: &#34;+ str(unit_no))
 
     def set_lfp_chan(self, value):
         &#34;&#34;&#34;
@@ -949,7 +991,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         pass
     
     def about_nc(self):
-        url = &#34;https://github.com/seankmartin/NeuroChaT/wiki&#34;
+        url = &#34;https://github.com/shanemomara/omaraneurolab/wiki/NeuroChaT&#34;
         webbrowser.open_new(url)
 
     def _set_dictation(self):
@@ -1034,6 +1076,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         getattr(self, self._control.get_graphic_format() + &#39;_button&#39;).setChecked(True)
         self.graphic_format_select()
 
+        self.unit_getitems()
         index = self._control.get_unit_no()
         if index &gt;= 0 &amp; index &lt; 256:
             self.unit_no_box.setCurrentIndex(index)
@@ -2257,20 +2300,36 @@ class UiParameters(QtWidgets.QDialog):
 
         self.loc_field_smooth = add_check_box(obj_name=&#39;loc_field_smooth&#39;)
         self.loc_field_smooth.setChecked(False)
+
+        self.loc_style = add_combo_box(obj_name=&#34;loc_style&#34;)
+        self.loc_style.addItems(
+            [&#34;contour&#34;, &#34;digitized&#34;, &#34;interpolated&#34;])
+
+        self.loc_colormap = add_combo_box(obj_name=&#34;loc_colormap&#34;)
+        self.loc_colormap.addItems(
+            [&#34;viridis&#34;, &#34;default&#34;, &#34;gray&#34;, &#34;plasma&#34;,
+             &#34;inferno&#34;, &#34;magma&#34;, &#34;cividis&#34;])
 #        self.locAngVelCutoff = add_spin_box(min_val=0, 100, &#34;locAngVelCutoff&#34;)
 #        self.locAngVelCutoff.setValue(30)
 #        self.locAngVelCutoff.setSingleStep(5)
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow(&#34;Pixel Size&#34;, self.loc_pixel_size, &#34;cm [range: 1-100]&#34;)
-        box_layout.addRow(&#34;Bound for Chopping Edges&#34;, self.loc_chop_bound, &#34;pixels [range: 3-20]&#34;)
+        box_layout.addRow(
+            &#34;Pixel Size&#34;, self.loc_pixel_size, &#34;cm [range: 1-100]&#34;)
+        box_layout.addRow(
+            &#34;Bound for Chopping Edges&#34;, 
+            self.loc_chop_bound, &#34;pixels [range: 3-20]&#34;)
 #        box_layout.addRow(&#34;Angular Velocity Cutoff&#34;, self.locAngVelCutoff, &#34;deg/sec [range: 0-100, step: 5]&#34;)
-        box_layout.addRow(&#34;Place field threshold&#34;, self.loc_field_thresh, &#34;ratio [range: 0-1, step: 0.01]&#34;)
-        box_layout.addRow(&#34;Smooth firing map before centroid calculation&#34;, self.loc_field_smooth, &#34;True or False&#34;)
+        box_layout.addRow(
+            &#34;Place Field Threshold&#34;, 
+            self.loc_field_thresh, &#34;ratio [range: 0-1, step: 0.01]&#34;)
+        box_layout.addRow(
+            &#34;Whether to Smooth Firing Map Before Centroid Calculation&#34;,
+            self.loc_field_smooth, &#34;True or False&#34;)
 
         self.loc_rate_gb1.setLayout(box_layout)
 
-#        # Box- 2
+        # Box- 2
         self.loc_rate_gb2 = add_group_box(title=&#34;Smoothing Box Kernal&#34;, obj_name=&#34;loc_rate_gb2&#34;)
 
         self.loc_rate_filter = add_combo_box(obj_name=&#34;loc_rate_filter&#34;)
@@ -2282,15 +2341,28 @@ class UiParameters(QtWidgets.QDialog):
         # Change step size to 0.5 if Gaussian is selected
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow(&#34;Smoothing Filter&#34;, self.loc_rate_filter, &#34;&#34;)
-        box_layout.addRow(&#34;Spike Rate Pixels/Sigma&#34;, self.loc_rate_kern_len, \
-        &#34;[range: 1-11]\n\r Box: odds&#34;)
+        box_layout.addRow(
+            &#34;Smoothing Filter&#34;, self.loc_rate_filter, &#34;&#34;)
+        box_layout.addRow(
+            &#34;Spike Rate Pixels/Sigma&#34;, 
+            self.loc_rate_kern_len, &#34;[range: 1-11]\n\r Box: odds&#34;)
 
         self.loc_rate_gb2.setLayout(box_layout)
+
+        # Box 3
+        self.loc_rate_gb3 = add_group_box(
+            title=&#34;Plotting Style&#34;, obj_name=&#34;loc_rate_gb3&#34;)
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            &#34;Firing Rate Map Style&#34;, self.loc_style, &#34;&#34;)
+        box_layout.addRow(
+            &#34;Firing Rate Map Colormap&#34;, self.loc_colormap, &#34;&#34;)
+        self.loc_rate_gb3.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.loc_rate_gb1)
         layout.addWidget(self.loc_rate_gb2)
+        layout.addWidget(self.loc_rate_gb3)
 
         widget.setContents(layout)
 
@@ -3527,6 +3599,34 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         self.lfp_chan_box.clear()
         self.lfp_chan_box.addItems(items)
 
+    def unit_getitems(self):
+        &#34;&#34;&#34;Returns the list of units once spike data is set.&#34;&#34;&#34;
+        try:
+            file_format = self.file_format_box.itemText(
+                self.file_format_box.currentIndex())
+            if file_format == &#34;NWB&#34;:
+                self._control.open_hdf_file()
+                _, path = self._control.get_spike_file().split(&#34;+&#34;)
+                path = path + &#39;/Clustering/cluster_nums&#39;
+                items = self._control.hdf.f[path]
+            else:
+                data = self._control.ndata
+                data.load_spike()
+                items = data.get_unit_list()
+            if len(items) == 0:
+                logging.error(&#34;No units in this file.&#34;)
+                items = [i for i in range(256)]
+            str_items = [str(x) for x in items]
+            self.unit_no_box.clear()
+            self.unit_no_box.addItems(str_items)
+            if file_format == &#34;NWB&#34;:
+                self._control.close_hdf_file()
+        except Exception as e:
+            log_exception(e, &#34;Populating unit list failed&#34;)
+            items = [str(i) for i in range(256)]
+            self.unit_no_box.clear()
+            self.unit_no_box.addItems(items)
+
     def browse(self):
         &#34;&#34;&#34;
         Opens a file dialog asking the user to select spike and spatial data files.
@@ -3555,6 +3655,7 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
 #                    spike_file = words[-1]
 #                    self._curr_dir = directory
                     self._control.set_spike_file(spike_file)
+                    self._control.ndata.set_spike_file(spike_file)
                     logging.info(&#34;New spike file added: &#34; + \
                                         words[-1])
                     spatial_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -3568,6 +3669,7 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
                         logging.info(&#34;New spatial file added: &#34; + \
                                         words[-1])
                     self.lfp_chan_getitems()
+                    self.unit_getitems()
 
             elif file_format == &#34;NWB&#34;:
                 nwb_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -3586,7 +3688,6 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
                         path = &#39;/processing/Shank&#39;
                         self._control.open_hdf_file()
                         items= self._control.get_hdf_groups(path=path)
-                        self._control.close_hdf_file()
                         # hdf = Nhdf()
                         # hdf.set_filename(nwb_file)
                         # path = &#39;/processing/Shank&#39;
@@ -3595,22 +3696,33 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
                         # else:
                         #     logging.warning(&#39;No Shank data stored in the path:&#39;+ path)
                         if items:
-                            item, ok = QtWidgets.QInputDialog.getItem(self, &#34;Select electrode group&#34;,
-                                                                      &#34;Electrode groups: &#34;, items, 0, False)
+                            item, ok = QtWidgets.QInputDialog.getItem(
+                                self, &#34;Select electrode group&#34;,
+                                &#34;Electrode groups: &#34;, items, 0, False)
                             if ok:
-                                self._control.set_spike_file(nwb_file+ &#39;+&#39;+ path+ &#39;/&#39; + item)
-                                logging.info(&#39;Spike data set to electrode group: &#39;+ path+ &#39;/&#39;+ item)
+                                self._control.set_spike_file(
+                                    nwb_file+ &#39;+&#39;+ path+ &#39;/&#39; + item)
+                                logging.info(
+                                    &#39;Spike data set to electrode group: &#39;
+                                    + path+ &#39;/&#39;+ item)
 
                                 path = &#39;/processing/Behavioural/Position&#39;
                                 if self._control.exist_hdf_path(path=path):
-                                    self._control.set_spatial_file(nwb_file+ &#39;+&#39;+ path)
-                                    logging.info(&#39;Position data set to group: &#39;+ path)
+                                    self._control.set_spatial_file(
+                                        nwb_file+ &#39;+&#39;+ path)
+                                    logging.info(
+                                        &#39;Position data set to group: &#39;+ path)
                                 else:
-                                    logging.warning(path+ &#39; not found! Spatial data cannot be set!&#39;)
-                    except:
-                        logging.error(&#39;Cannot read the hdf file&#39;)
+                                    logging.warning(
+                                        path+ 
+                                        &#39; not found! Spatial data not set.&#39;)
+                        self._control.close_hdf_file()
+                    except Exception as e:
+                        log_exception(
+                            e, &#34;Cannot read hdf file in nc_ui browse&#34;)
 
                     self.lfp_chan_getitems()
+                    self.unit_getitems()
 
         elif mode_id == 2:
             excel_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -3685,9 +3797,11 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         Called when the selection in the &#39;Unit No&#39; is changed. Sets the unit number accordingly.
 
         &#34;&#34;&#34;
-
-        self._control.set_unit_no(value)
-        logging.info(&#34;Selected Unit: &#34;+ str(value))
+        if value &lt; 0:
+            return
+        unit_no = int(self.unit_no_box.itemText(value))
+        self._control.set_unit_no(unit_no)
+        logging.info(&#34;Selected Unit: &#34;+ str(unit_no))
 
     def set_lfp_chan(self, value):
         &#34;&#34;&#34;
@@ -3727,7 +3841,7 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         pass
     
     def about_nc(self):
-        url = &#34;https://github.com/seankmartin/NeuroChaT/wiki&#34;
+        url = &#34;https://github.com/shanemomara/omaraneurolab/wiki/NeuroChaT&#34;
         webbrowser.open_new(url)
 
     def _set_dictation(self):
@@ -3812,6 +3926,7 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
         getattr(self, self._control.get_graphic_format() + &#39;_button&#39;).setChecked(True)
         self.graphic_format_select()
 
+        self.unit_getitems()
         index = self._control.get_unit_no()
         if index &gt;= 0 &amp; index &lt; 256:
             self.unit_no_box.setCurrentIndex(index)
@@ -4343,7 +4458,7 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
 <details class="source">
 <summary>Source code</summary>
 <pre><code class="python">def about_nc(self):
-    url = &#34;https://github.com/seankmartin/NeuroChaT/wiki&#34;
+    url = &#34;https://github.com/shanemomara/omaraneurolab/wiki/NeuroChaT&#34;
     webbrowser.open_new(url)</code></pre>
 </details>
 </dd>
@@ -4494,6 +4609,7 @@ Once selected, it also set the LFP channels in the 'LFP Ch No' combo box.</p></s
 #                    spike_file = words[-1]
 #                    self._curr_dir = directory
                     self._control.set_spike_file(spike_file)
+                    self._control.ndata.set_spike_file(spike_file)
                     logging.info(&#34;New spike file added: &#34; + \
                                         words[-1])
                     spatial_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -4507,6 +4623,7 @@ Once selected, it also set the LFP channels in the 'LFP Ch No' combo box.</p></s
                         logging.info(&#34;New spatial file added: &#34; + \
                                         words[-1])
                     self.lfp_chan_getitems()
+                    self.unit_getitems()
 
             elif file_format == &#34;NWB&#34;:
                 nwb_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -4525,7 +4642,6 @@ Once selected, it also set the LFP channels in the 'LFP Ch No' combo box.</p></s
                         path = &#39;/processing/Shank&#39;
                         self._control.open_hdf_file()
                         items= self._control.get_hdf_groups(path=path)
-                        self._control.close_hdf_file()
                         # hdf = Nhdf()
                         # hdf.set_filename(nwb_file)
                         # path = &#39;/processing/Shank&#39;
@@ -4534,22 +4650,33 @@ Once selected, it also set the LFP channels in the 'LFP Ch No' combo box.</p></s
                         # else:
                         #     logging.warning(&#39;No Shank data stored in the path:&#39;+ path)
                         if items:
-                            item, ok = QtWidgets.QInputDialog.getItem(self, &#34;Select electrode group&#34;,
-                                                                      &#34;Electrode groups: &#34;, items, 0, False)
+                            item, ok = QtWidgets.QInputDialog.getItem(
+                                self, &#34;Select electrode group&#34;,
+                                &#34;Electrode groups: &#34;, items, 0, False)
                             if ok:
-                                self._control.set_spike_file(nwb_file+ &#39;+&#39;+ path+ &#39;/&#39; + item)
-                                logging.info(&#39;Spike data set to electrode group: &#39;+ path+ &#39;/&#39;+ item)
+                                self._control.set_spike_file(
+                                    nwb_file+ &#39;+&#39;+ path+ &#39;/&#39; + item)
+                                logging.info(
+                                    &#39;Spike data set to electrode group: &#39;
+                                    + path+ &#39;/&#39;+ item)
 
                                 path = &#39;/processing/Behavioural/Position&#39;
                                 if self._control.exist_hdf_path(path=path):
-                                    self._control.set_spatial_file(nwb_file+ &#39;+&#39;+ path)
-                                    logging.info(&#39;Position data set to group: &#39;+ path)
+                                    self._control.set_spatial_file(
+                                        nwb_file+ &#39;+&#39;+ path)
+                                    logging.info(
+                                        &#39;Position data set to group: &#39;+ path)
                                 else:
-                                    logging.warning(path+ &#39; not found! Spatial data cannot be set!&#39;)
-                    except:
-                        logging.error(&#39;Cannot read the hdf file&#39;)
+                                    logging.warning(
+                                        path+ 
+                                        &#39; not found! Spatial data not set.&#39;)
+                        self._control.close_hdf_file()
+                    except Exception as e:
+                        log_exception(
+                            e, &#34;Cannot read hdf file in nc_ui browse&#34;)
 
                     self.lfp_chan_getitems()
+                    self.unit_getitems()
 
         elif mode_id == 2:
             excel_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self, \
@@ -5265,6 +5392,7 @@ once the spike data is set using the 'Browse' button</p></section>
     getattr(self, self._control.get_graphic_format() + &#39;_button&#39;).setChecked(True)
     self.graphic_format_select()
 
+    self.unit_getitems()
     index = self._control.get_unit_no()
     if index &gt;= 0 &amp; index &lt; 256:
         self.unit_no_box.setCurrentIndex(index)
@@ -5827,9 +5955,11 @@ texts of the log-box are exported</p></section>
     Called when the selection in the &#39;Unit No&#39; is changed. Sets the unit number accordingly.
 
     &#34;&#34;&#34;
-
-    self._control.set_unit_no(value)
-    logging.info(&#34;Selected Unit: &#34;+ str(value))</code></pre>
+    if value &lt; 0:
+        return
+    unit_no = int(self.unit_no_box.itemText(value))
+    self._control.set_unit_no(unit_no)
+    logging.info(&#34;Selected Unit: &#34;+ str(unit_no))</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_ui.NeuroChaT_Ui.setup_ui"><code class="name flex">
@@ -5984,6 +6114,42 @@ in NeuroChaT</p></section>
 <summary>Source code</summary>
 <pre><code class="python">def tutorial(self):
     pass</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_ui.NeuroChaT_Ui.unit_getitems"><code class="name flex">
+<span>def <span class="ident">unit_getitems</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns the list of units once spike data is set.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def unit_getitems(self):
+    &#34;&#34;&#34;Returns the list of units once spike data is set.&#34;&#34;&#34;
+    try:
+        file_format = self.file_format_box.itemText(
+            self.file_format_box.currentIndex())
+        if file_format == &#34;NWB&#34;:
+            self._control.open_hdf_file()
+            _, path = self._control.get_spike_file().split(&#34;+&#34;)
+            path = path + &#39;/Clustering/cluster_nums&#39;
+            items = self._control.hdf.f[path]
+        else:
+            data = self._control.ndata
+            data.load_spike()
+            items = data.get_unit_list()
+        if len(items) == 0:
+            logging.error(&#34;No units in this file.&#34;)
+            items = [i for i in range(256)]
+        str_items = [str(x) for x in items]
+        self.unit_no_box.clear()
+        self.unit_no_box.addItems(str_items)
+        if file_format == &#34;NWB&#34;:
+            self._control.close_hdf_file()
+    except Exception as e:
+        log_exception(e, &#34;Populating unit list failed&#34;)
+        items = [str(i) for i in range(256)]
+        self.unit_no_box.clear()
+        self.unit_no_box.addItems(items)</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_ui.NeuroChaT_Ui.update_log"><code class="name flex">
@@ -6796,20 +6962,36 @@ parameter selection window.</p></section>
 
         self.loc_field_smooth = add_check_box(obj_name=&#39;loc_field_smooth&#39;)
         self.loc_field_smooth.setChecked(False)
+
+        self.loc_style = add_combo_box(obj_name=&#34;loc_style&#34;)
+        self.loc_style.addItems(
+            [&#34;contour&#34;, &#34;digitized&#34;, &#34;interpolated&#34;])
+
+        self.loc_colormap = add_combo_box(obj_name=&#34;loc_colormap&#34;)
+        self.loc_colormap.addItems(
+            [&#34;viridis&#34;, &#34;default&#34;, &#34;gray&#34;, &#34;plasma&#34;,
+             &#34;inferno&#34;, &#34;magma&#34;, &#34;cividis&#34;])
 #        self.locAngVelCutoff = add_spin_box(min_val=0, 100, &#34;locAngVelCutoff&#34;)
 #        self.locAngVelCutoff.setValue(30)
 #        self.locAngVelCutoff.setSingleStep(5)
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow(&#34;Pixel Size&#34;, self.loc_pixel_size, &#34;cm [range: 1-100]&#34;)
-        box_layout.addRow(&#34;Bound for Chopping Edges&#34;, self.loc_chop_bound, &#34;pixels [range: 3-20]&#34;)
+        box_layout.addRow(
+            &#34;Pixel Size&#34;, self.loc_pixel_size, &#34;cm [range: 1-100]&#34;)
+        box_layout.addRow(
+            &#34;Bound for Chopping Edges&#34;, 
+            self.loc_chop_bound, &#34;pixels [range: 3-20]&#34;)
 #        box_layout.addRow(&#34;Angular Velocity Cutoff&#34;, self.locAngVelCutoff, &#34;deg/sec [range: 0-100, step: 5]&#34;)
-        box_layout.addRow(&#34;Place field threshold&#34;, self.loc_field_thresh, &#34;ratio [range: 0-1, step: 0.01]&#34;)
-        box_layout.addRow(&#34;Smooth firing map before centroid calculation&#34;, self.loc_field_smooth, &#34;True or False&#34;)
+        box_layout.addRow(
+            &#34;Place Field Threshold&#34;, 
+            self.loc_field_thresh, &#34;ratio [range: 0-1, step: 0.01]&#34;)
+        box_layout.addRow(
+            &#34;Whether to Smooth Firing Map Before Centroid Calculation&#34;,
+            self.loc_field_smooth, &#34;True or False&#34;)
 
         self.loc_rate_gb1.setLayout(box_layout)
 
-#        # Box- 2
+        # Box- 2
         self.loc_rate_gb2 = add_group_box(title=&#34;Smoothing Box Kernal&#34;, obj_name=&#34;loc_rate_gb2&#34;)
 
         self.loc_rate_filter = add_combo_box(obj_name=&#34;loc_rate_filter&#34;)
@@ -6821,15 +7003,28 @@ parameter selection window.</p></section>
         # Change step size to 0.5 if Gaussian is selected
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow(&#34;Smoothing Filter&#34;, self.loc_rate_filter, &#34;&#34;)
-        box_layout.addRow(&#34;Spike Rate Pixels/Sigma&#34;, self.loc_rate_kern_len, \
-        &#34;[range: 1-11]\n\r Box: odds&#34;)
+        box_layout.addRow(
+            &#34;Smoothing Filter&#34;, self.loc_rate_filter, &#34;&#34;)
+        box_layout.addRow(
+            &#34;Spike Rate Pixels/Sigma&#34;, 
+            self.loc_rate_kern_len, &#34;[range: 1-11]\n\r Box: odds&#34;)
 
         self.loc_rate_gb2.setLayout(box_layout)
+
+        # Box 3
+        self.loc_rate_gb3 = add_group_box(
+            title=&#34;Plotting Style&#34;, obj_name=&#34;loc_rate_gb3&#34;)
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            &#34;Firing Rate Map Style&#34;, self.loc_style, &#34;&#34;)
+        box_layout.addRow(
+            &#34;Firing Rate Map Colormap&#34;, self.loc_colormap, &#34;&#34;)
+        self.loc_rate_gb3.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.loc_rate_gb1)
         layout.addWidget(self.loc_rate_gb2)
+        layout.addWidget(self.loc_rate_gb3)
 
         widget.setContents(layout)
 
@@ -8085,20 +8280,36 @@ parameter selection window.</p></section>
 
         self.loc_field_smooth = add_check_box(obj_name=&#39;loc_field_smooth&#39;)
         self.loc_field_smooth.setChecked(False)
+
+        self.loc_style = add_combo_box(obj_name=&#34;loc_style&#34;)
+        self.loc_style.addItems(
+            [&#34;contour&#34;, &#34;digitized&#34;, &#34;interpolated&#34;])
+
+        self.loc_colormap = add_combo_box(obj_name=&#34;loc_colormap&#34;)
+        self.loc_colormap.addItems(
+            [&#34;viridis&#34;, &#34;default&#34;, &#34;gray&#34;, &#34;plasma&#34;,
+             &#34;inferno&#34;, &#34;magma&#34;, &#34;cividis&#34;])
 #        self.locAngVelCutoff = add_spin_box(min_val=0, 100, &#34;locAngVelCutoff&#34;)
 #        self.locAngVelCutoff.setValue(30)
 #        self.locAngVelCutoff.setSingleStep(5)
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow(&#34;Pixel Size&#34;, self.loc_pixel_size, &#34;cm [range: 1-100]&#34;)
-        box_layout.addRow(&#34;Bound for Chopping Edges&#34;, self.loc_chop_bound, &#34;pixels [range: 3-20]&#34;)
+        box_layout.addRow(
+            &#34;Pixel Size&#34;, self.loc_pixel_size, &#34;cm [range: 1-100]&#34;)
+        box_layout.addRow(
+            &#34;Bound for Chopping Edges&#34;, 
+            self.loc_chop_bound, &#34;pixels [range: 3-20]&#34;)
 #        box_layout.addRow(&#34;Angular Velocity Cutoff&#34;, self.locAngVelCutoff, &#34;deg/sec [range: 0-100, step: 5]&#34;)
-        box_layout.addRow(&#34;Place field threshold&#34;, self.loc_field_thresh, &#34;ratio [range: 0-1, step: 0.01]&#34;)
-        box_layout.addRow(&#34;Smooth firing map before centroid calculation&#34;, self.loc_field_smooth, &#34;True or False&#34;)
+        box_layout.addRow(
+            &#34;Place Field Threshold&#34;, 
+            self.loc_field_thresh, &#34;ratio [range: 0-1, step: 0.01]&#34;)
+        box_layout.addRow(
+            &#34;Whether to Smooth Firing Map Before Centroid Calculation&#34;,
+            self.loc_field_smooth, &#34;True or False&#34;)
 
         self.loc_rate_gb1.setLayout(box_layout)
 
-#        # Box- 2
+        # Box- 2
         self.loc_rate_gb2 = add_group_box(title=&#34;Smoothing Box Kernal&#34;, obj_name=&#34;loc_rate_gb2&#34;)
 
         self.loc_rate_filter = add_combo_box(obj_name=&#34;loc_rate_filter&#34;)
@@ -8110,15 +8321,28 @@ parameter selection window.</p></section>
         # Change step size to 0.5 if Gaussian is selected
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow(&#34;Smoothing Filter&#34;, self.loc_rate_filter, &#34;&#34;)
-        box_layout.addRow(&#34;Spike Rate Pixels/Sigma&#34;, self.loc_rate_kern_len, \
-        &#34;[range: 1-11]\n\r Box: odds&#34;)
+        box_layout.addRow(
+            &#34;Smoothing Filter&#34;, self.loc_rate_filter, &#34;&#34;)
+        box_layout.addRow(
+            &#34;Spike Rate Pixels/Sigma&#34;, 
+            self.loc_rate_kern_len, &#34;[range: 1-11]\n\r Box: odds&#34;)
 
         self.loc_rate_gb2.setLayout(box_layout)
+
+        # Box 3
+        self.loc_rate_gb3 = add_group_box(
+            title=&#34;Plotting Style&#34;, obj_name=&#34;loc_rate_gb3&#34;)
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            &#34;Firing Rate Map Style&#34;, self.loc_style, &#34;&#34;)
+        box_layout.addRow(
+            &#34;Firing Rate Map Colormap&#34;, self.loc_colormap, &#34;&#34;)
+        self.loc_rate_gb3.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.loc_rate_gb1)
         layout.addWidget(self.loc_rate_gb2)
+        layout.addWidget(self.loc_rate_gb3)
 
         widget.setContents(layout)
 
@@ -8991,6 +9215,7 @@ underneath.</p></section>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.setup_ui" href="#neurochat.nc_ui.NeuroChaT_Ui.setup_ui">setup_ui</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.start" href="#neurochat.nc_ui.NeuroChaT_Ui.start">start</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.tutorial" href="#neurochat.nc_ui.NeuroChaT_Ui.tutorial">tutorial</a></code></li>
+<li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.unit_getitems" href="#neurochat.nc_ui.NeuroChaT_Ui.unit_getitems">unit_getitems</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.update_log" href="#neurochat.nc_ui.NeuroChaT_Ui.update_log">update_log</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.verify_units" href="#neurochat.nc_ui.NeuroChaT_Ui.verify_units">verify_units</a></code></li>
 <li><code><a title="neurochat.nc_ui.NeuroChaT_Ui.view_help" href="#neurochat.nc_ui.NeuroChaT_Ui.view_help">view_help</a></code></li>

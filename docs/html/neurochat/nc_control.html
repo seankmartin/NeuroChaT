@@ -341,7 +341,7 @@ class NeuroChaT(QtCore.QThread):
     def mode(self):
         &#34;&#34;&#34;
         Reads the specifications and analyzes data according to the mode that is set
-        in the Configuration file. Thsi is the principle method in NeuroChaT that
+        in the Configuration file. This is the principle method in NeuroChaT that
         sets the input and output data files and calls the execute() method for 
         running the analyses after it sets the data and filenames to NData() object.
         
@@ -689,9 +689,13 @@ class NeuroChaT(QtCore.QThread):
                               fieldThresh=params[&#39;loc_field_thresh&#39;],
                               smoothPlace=params[&#39;loc_field_smooth&#39;],
                               brAdjust=True, update=True)
-                fig1 = nc_plot.loc_firing(place_data)
+                fig1 = nc_plot.loc_firing(
+                    place_data, colormap=params[&#39;loc_colormap&#39;],
+                    style = params[&#39;loc_style&#39;])
                 self.close_fig(fig1)
-                fig2 = nc_plot.loc_firing_and_place(place_data)
+                fig2 = nc_plot.loc_firing_and_place(
+                    place_data, colormap=params[&#39;loc_colormap&#39;],
+                    style = params[&#39;loc_style&#39;])
                 self.close_fig(fig2)
                 self.plot_data_to_hdf(name=name+ &#39;/loc_rate/&#39;, graph_data=place_data)
 
@@ -1059,10 +1063,10 @@ class NeuroChaT(QtCore.QThread):
 
         &#34;&#34;&#34;
         
-        exists= False
-        if path in self.f:
+        exists = False
+        if path in self.hdf.f:
             exists = True
-            return exists
+        return exists
         
     def plot_data_to_hdf(self, name=None, graph_data=None):
         &#34;&#34;&#34;
@@ -1524,7 +1528,7 @@ class NeuroChaT(QtCore.QThread):
 <dl>
 <dt id="neurochat.nc_control.NeuroChaT"><code class="flex name class">
 <span>class <span class="ident">NeuroChaT</span></span>
-<span>(</span><span>config=<neurochat.nc_config.Configuration object at 0x0000000017676988>, data=<neurochat.nc_data.NData object at 0x00000000174F79C8>, parent=None)</span>
+<span>(</span><span>config=<neurochat.nc_config.Configuration object at 0x000002294C8A65C8>, data=<neurochat.nc_data.NData object at 0x000002294D856648>, parent=None)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>The NeuroChaT object is the controller object in NeuroChaT and works as the
@@ -1829,7 +1833,7 @@ It also interafces the GUI to the rest of the NeuroChaT elements.</p>
     def mode(self):
         &#34;&#34;&#34;
         Reads the specifications and analyzes data according to the mode that is set
-        in the Configuration file. Thsi is the principle method in NeuroChaT that
+        in the Configuration file. This is the principle method in NeuroChaT that
         sets the input and output data files and calls the execute() method for 
         running the analyses after it sets the data and filenames to NData() object.
         
@@ -2177,9 +2181,13 @@ It also interafces the GUI to the rest of the NeuroChaT elements.</p>
                               fieldThresh=params[&#39;loc_field_thresh&#39;],
                               smoothPlace=params[&#39;loc_field_smooth&#39;],
                               brAdjust=True, update=True)
-                fig1 = nc_plot.loc_firing(place_data)
+                fig1 = nc_plot.loc_firing(
+                    place_data, colormap=params[&#39;loc_colormap&#39;],
+                    style = params[&#39;loc_style&#39;])
                 self.close_fig(fig1)
-                fig2 = nc_plot.loc_firing_and_place(place_data)
+                fig2 = nc_plot.loc_firing_and_place(
+                    place_data, colormap=params[&#39;loc_colormap&#39;],
+                    style = params[&#39;loc_style&#39;])
                 self.close_fig(fig2)
                 self.plot_data_to_hdf(name=name+ &#39;/loc_rate/&#39;, graph_data=place_data)
 
@@ -2547,10 +2555,10 @@ It also interafces the GUI to the rest of the NeuroChaT elements.</p>
 
         &#34;&#34;&#34;
         
-        exists= False
-        if path in self.f:
+        exists = False
+        if path in self.hdf.f:
             exists = True
-            return exists
+        return exists
         
     def plot_data_to_hdf(self, name=None, graph_data=None):
         &#34;&#34;&#34;
@@ -3721,9 +3729,13 @@ figures to the graphics file that are set in the mode() method.</p>
                           fieldThresh=params[&#39;loc_field_thresh&#39;],
                           smoothPlace=params[&#39;loc_field_smooth&#39;],
                           brAdjust=True, update=True)
-            fig1 = nc_plot.loc_firing(place_data)
+            fig1 = nc_plot.loc_firing(
+                place_data, colormap=params[&#39;loc_colormap&#39;],
+                style = params[&#39;loc_style&#39;])
             self.close_fig(fig1)
-            fig2 = nc_plot.loc_firing_and_place(place_data)
+            fig2 = nc_plot.loc_firing_and_place(
+                place_data, colormap=params[&#39;loc_colormap&#39;],
+                style = params[&#39;loc_style&#39;])
             self.close_fig(fig2)
             self.plot_data_to_hdf(name=name+ &#39;/loc_rate/&#39;, graph_data=place_data)
 
@@ -4056,10 +4068,10 @@ figures to the graphics file that are set in the mode() method.</p>
 
     &#34;&#34;&#34;
     
-    exists= False
-    if path in self.f:
+    exists = False
+    if path in self.hdf.f:
         exists = True
-        return exists</code></pre>
+    return exists</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_control.NeuroChaT.finished"><code class="name flex">
@@ -4267,7 +4279,7 @@ the name of the NWB files</dd>
 </code></dt>
 <dd>
 <section class="desc"><p>Reads the specifications and analyzes data according to the mode that is set
-in the Configuration file. Thsi is the principle method in NeuroChaT that
+in the Configuration file. This is the principle method in NeuroChaT that
 sets the input and output data files and calls the execute() method for
 running the analyses after it sets the data and filenames to NData() object.</p>
 <h2 id="parameters">Parameters</h2>
@@ -4285,7 +4297,7 @@ running the analyses after it sets the data and filenames to NData() object.</p>
 <pre><code class="python">def mode(self):
     &#34;&#34;&#34;
     Reads the specifications and analyzes data according to the mode that is set
-    in the Configuration file. Thsi is the principle method in NeuroChaT that
+    in the Configuration file. This is the principle method in NeuroChaT that
     sets the input and output data files and calls the execute() method for 
     running the analyses after it sets the data and filenames to NData() object.
     
