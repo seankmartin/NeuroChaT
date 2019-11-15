@@ -537,7 +537,7 @@ def print_config(config, msg=""):
 if __name__ == "__main__":
     config = configparser.ConfigParser()
     here = os.path.dirname(os.path.realpath(__file__))
-    config_path = os.path.join(here, "configs", "burst_analysis.cfg")
+    config_path = os.path.join(here, "Configs", "burst_analysis.cfg")
     config.read(config_path)
 
     parser = argparse.ArgumentParser(
