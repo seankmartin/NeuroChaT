@@ -121,7 +121,7 @@ class NData():
         &#34;&#34;&#34;
         return self.__type
 
-    def get_results(self):
+    def get_results(self, spaces_to_underscores=False):
         &#34;&#34;&#34;
         Returns the parametric results of the analyses
 
@@ -134,6 +134,10 @@ class NData():
         OrderedDict
 
         &#34;&#34;&#34;
+        if spaces_to_underscores:
+            results = {x.replace(&#39; &#39;, &#39;_&#39;): v
+                       for x, v in self._results.items()}
+            return results
         return self._results
 
     def update_results(self, results):
@@ -1546,7 +1550,7 @@ analysis and other operations to respective objects.</p>
         &#34;&#34;&#34;
         return self.__type
 
-    def get_results(self):
+    def get_results(self, spaces_to_underscores=False):
         &#34;&#34;&#34;
         Returns the parametric results of the analyses
 
@@ -1559,6 +1563,10 @@ analysis and other operations to respective objects.</p>
         OrderedDict
 
         &#34;&#34;&#34;
+        if spaces_to_underscores:
+            results = {x.replace(&#39; &#39;, &#39;_&#39;): v
+                       for x, v in self._results.items()}
+            return results
         return self._results
 
     def update_results(self, results):
@@ -3164,7 +3172,7 @@ environmental border</p>
 </details>
 </dd>
 <dt id="neurochat.nc_data.NData.get_results"><code class="name flex">
-<span>def <span class="ident">get_results</span></span>(<span>self)</span>
+<span>def <span class="ident">get_results</span></span>(<span>self, spaces_to_underscores=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Returns the parametric results of the analyses</p>
@@ -3180,7 +3188,7 @@ environmental border</p>
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def get_results(self):
+<pre><code class="python">def get_results(self, spaces_to_underscores=False):
     &#34;&#34;&#34;
     Returns the parametric results of the analyses
 
@@ -3193,6 +3201,10 @@ environmental border</p>
     OrderedDict
 
     &#34;&#34;&#34;
+    if spaces_to_underscores:
+        results = {x.replace(&#39; &#39;, &#39;_&#39;): v
+                   for x, v in self._results.items()}
+        return results
     return self._results</code></pre>
 </details>
 </dd>

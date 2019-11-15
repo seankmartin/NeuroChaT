@@ -10,6 +10,7 @@ from math import floor, ceil
 import os
 import gc
 import re
+from collections.abc import Iterable
 
 from neurochat.nc_datacontainer import NDataContainer
 from neurochat.nc_data import NData
@@ -29,8 +30,12 @@ from matplotlib.pyplot import savefig, close
 
 def place_cell_summary(
         collection, dpi=150, out_dirname="nc_plots",
-        filter_place_cells=True, filter_low_freq=True, opt_end="",
-        base_dir=None):
+        filter_place_cells=False, filter_low_freq=False,
+        opt_end="", base_dir=None, output_format="png",
+        output=["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"],
+        isi_bound=350, isi_bin_length=2, fixed_color=None,
+        save_data=False, point_size=None, color_isi=True,
+        burst_thresh=5):
     """
     Quick Png spatial information summary of each cell in collection.
 
@@ -51,12 +56,44 @@ def place_cell_summary(
     opt_end : str, default ""
         A string to append to the file output just before the extension
     base_dir : str, default None
-        An optional directory to save the files to 
+        An optional directory to save the files to
+    output_format : str, default png
+        What format to save the output image in
+    output : List of str,
+        default ["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"]
+        Input should be some subset and/or permutation of these
+    isi_bound: int, default 350
+        How long in ms to plot the ISI to
+    isi_bin_length: int, default 1
+        How long in ms the ISI bins should be
+    save_data: bool, default False
+        Whether to save out the information used for the plot
+    color_isi: bool, default True
+        Whether the ISI should be black or blue
 
     Returns
     -------
     None
     """
+
+    def save_dicts_to_csv(filename, dicts_arr):
+        """Saves the last element of each arr in dicts_arr to file"""
+        with open(filename, "w") as f:
+            for d_arr in dicts_arr:
+                if d_arr is not None:
+                    d = d_arr[-1]
+                    for k, v in d.items():
+                        out_str = k.replace(" ", "_")
+                        if isinstance(v, Iterable):
+                            if isinstance(v, np.ndarray):
+                                v = v.flatten()
+                            else:
+                                v = np.array(v).flatten()
+                            str_arr = [str(x) for x in v]
+                            out_str = out_str + "," + ",".join(str_arr)
+                        else:
+                            out_str += "," + str(v)
+                        f.write(out_str + "\n")
 
     placedata = []
     graphdata = []
@@ -66,6 +103,8 @@ def place_cell_summary(
     isidata = []
     good_units = []
 
+    if point_size is None:
+        point_size = dpi / 7
     for i, data in enumerate(collection):
         try:
             data_idx, unit_idx = collection._index_to_data_pos(i)
@@ -108,25 +147,80 @@ def place_cell_summary(
                     skaggs['refCoherence'],
                     skaggs['coherence95']))
             if good:
-                placedata.append(data.place())
-                graphdata.append(data.isi_corr(bins=1, bound=[-10, 10]))
-                wavedata.append(data.wave_property())
-                headdata.append(data.hd_rate())
-                thetadata.append(data.theta_index(bins=2, bound=[-350, 350]))
-                isidata.append(data.isi(bins=int(350 / 2), bound=[0, 350]))
+                if "Place" in output:
+                    placedata.append(data.place())
+                else:
+                    placedata = None
+                if "LowAC" in output:
+                    graphdata.append(data.isi_corr(bins=1, bound=[-10, 10]))
+                else:
+                    graphdata = None
+                if "Wave" in output:
+                    wavedata.append(data.wave_property())
+                else:
+                    wavedata = None
+                if "HD" in output:
+                    headdata.append(data.hd_rate())
+                else:
+                    headdata = None
+                if "Theta" in output:
+                    thetadata.append(
+                        data.theta_index(
+                            bins=2, bound=[-350, 350]))
+                else:
+                    thetadata = None
+                if "HighISI" in output:
+                    isidata.append(
+                        data.isi(bins=int(isi_bound / isi_bin_length),
+                                 bound=[0, isi_bound]))
+                else:
+                    isidata = None
+
+                if save_data:
+                    try:
+                        spike_name = os.path.basename(filename)
+                        parts = spike_name.split(".")
+                        f_dir = os.path.dirname(filename)
+
+                        data_basename = (
+                            parts[0] + "_" + parts[1] + "_" +
+                            str(unit_number) + opt_end + ".csv")
+                        if base_dir is not None:
+                            main_dir = base_dir
+                            out_base = f_dir[len(base_dir + os.sep):]
+                            if len(out_base) != 0:
+                                out_base = ("--").join(out_base.split(os.sep))
+                                data_basename = out_base + "--" + data_basename
+                        else:
+                            main_dir = f_dir
+                        out_name = os.path.join(
+                            main_dir, out_dirname, "data", data_basename)
+                        make_dir_if_not_exists(out_name)
+                        save_dicts_to_csv(
+                            out_name,
+                            [placedata, graphdata, wavedata,
+                             headdata, thetadata, isidata])
+                    except Exception as e:
+                        log_exception(
+                            e, "Occurred during place cell data saving on" +
+                            " {} unit {} name {} in {}".format(
+                                data_idx, unit_number, spike_name, main_dir))
 
             # Save the accumulated information
             if unit_idx == len(collection.get_units(data_idx)) - 1:
                 spike_name = os.path.basename(filename)
                 parts = spike_name.split(".")
                 f_dir = os.path.dirname(filename)
-                png_basename = parts[0] + "_" + parts[1] + opt_end + ".png"
+
+                out_basename = (
+                    parts[0] + "_" + parts[1] + opt_end + "." + output_format)
+
                 if base_dir is not None:
                     main_dir = base_dir
-                    png_base = f_dir[len(base_dir + os.sep):]
-                    png_base = ("--").join(png_base.split(os.sep))
-                    # png_base = re.sub(os.sep, "_", png_base)
-                    png_basename = png_base + "--" + png_basename
+                    out_base = f_dir[len(base_dir + os.sep):]
+                    if len(out_base) != 0:
+                        out_base = ("--").join(out_base.split(os.sep))
+                        out_basename = out_base + "--" + out_basename
                 else:
                     main_dir = f_dir
 
@@ -149,19 +243,44 @@ def place_cell_summary(
                             "units {}").format(
                             spike_name, named_units))
 
+                    # Save figures on by one if using pdf or svg
+                    one_by_one = (output_format == "pdf") or (
+                        output_format == "svg")
+
                     fig = print_place_cells(
-                        len(named_units),
+                        len(named_units), cols=len(output),
                         placedata=placedata, graphdata=graphdata,
                         wavedata=wavedata, headdata=headdata,
                         thetadata=thetadata, isidata=isidata,
-                        size_multiplier=4, point_size=dpi / 7.0,
-                        units=named_units)
-                    out_name = os.path.join(
-                        main_dir, out_dirname, png_basename)
-                    print("Saving place cell figure to {}".format(
-                        out_name))
-                    make_dir_if_not_exists(out_name)
-                    fig.savefig(out_name, dpi=dpi)
+                        size_multiplier=4, point_size=point_size,
+                        units=named_units, fixed_color=fixed_color,
+                        output=output, color_isi=color_isi,
+                        burst_ms=burst_thresh, one_by_one=one_by_one,
+                        raster=one_by_one)
+
+                    if one_by_one:
+                        for i, f in enumerate(fig):
+                            unit_number = named_units[i]
+                            iname = (
+                                out_basename[:-4] + "_" +
+                                str(unit_number) + out_basename[-4:])
+                            out_name = os.path.join(
+                                main_dir, out_dirname, iname)
+
+                            print("Saving place cell figure to {}".format(
+                                out_name))
+                            make_dir_if_not_exists(out_name)
+                            f.savefig(out_name, dpi=dpi,
+                                      format=output_format)
+
+                    else:
+                        out_name = os.path.join(
+                            main_dir, out_dirname, out_basename)
+                        print("Saving place cell figure to {}".format(
+                            out_name))
+                        make_dir_if_not_exists(out_name)
+                        fig.savefig(out_name, dpi=dpi, format=output_format)
+
                     close("all")
                     gc.collect()
 
@@ -175,7 +294,7 @@ def place_cell_summary(
 
         except Exception as e:
             log_exception(
-                e, "Occured during place cell summary on data" +
+                e, "Occurred during place cell summary on data" +
                    " {} unit {} name {} in {}".format(
                        data_idx, unit_number, spike_name, main_dir))
     return

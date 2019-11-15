@@ -744,13 +744,15 @@ class NDataContainer():
         self._count_num_units()
         end_total = len(self)
 
-        print(&#34;{} with {} units reduced to {} with {} units&#34;.format(
+        print((&#34;{} tetrodes with {} units reduced to &#34;
+               + &#34;{} tetrodes with {} units&#34;).format(
             start_size, start_total, end_size, end_total))
 
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
             try:
-                if data_index == self._last_data_pt[0]:
+                if (data_index == self._last_data_pt[0] and
+                        (self._last_data_pt[1] is not None)):
                     result = self._last_data_pt[1]
                 else:
                     result = NData()
@@ -1658,13 +1660,15 @@ instead load it as needed, on the fly</dd>
         self._count_num_units()
         end_total = len(self)
 
-        print(&#34;{} with {} units reduced to {} with {} units&#34;.format(
+        print((&#34;{} tetrodes with {} units reduced to &#34;
+               + &#34;{} tetrodes with {} units&#34;).format(
             start_size, start_total, end_size, end_total))
 
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
             try:
-                if data_index == self._last_data_pt[0]:
+                if (data_index == self._last_data_pt[0] and
+                        (self._last_data_pt[1] is not None)):
                     result = self._last_data_pt[1]
                 else:
                     result = NData()
@@ -2301,7 +2305,8 @@ directory | position file | spike file | unit numbers | eeg extension</p>
 <pre><code class="python">def get_data_at(self, data_index, unit_index):
     if self._load_on_fly:
         try:
-            if data_index == self._last_data_pt[0]:
+            if (data_index == self._last_data_pt[0] and
+                    (self._last_data_pt[1] is not None)):
                 result = self._last_data_pt[1]
             else:
                 result = NData()
@@ -2583,7 +2588,8 @@ The merged indexes must have the same unit numbers available</p>
     self._count_num_units()
     end_total = len(self)
 
-    print(&#34;{} with {} units reduced to {} with {} units&#34;.format(
+    print((&#34;{} tetrodes with {} units reduced to &#34;
+           + &#34;{} tetrodes with {} units&#34;).format(
         start_size, start_total, end_size, end_total))</code></pre>
 </details>
 </dd>

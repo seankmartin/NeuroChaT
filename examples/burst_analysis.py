@@ -1,8 +1,13 @@
 """Burst analysis of cells."""
 import csv
 import os
+import sys
 from copy import copy
 import logging
+import configparser
+import json
+from pprint import pprint
+import argparse
 
 from sklearn.decomposition import PCA
 from sklearn.cluster import AgglomerativeClustering
@@ -10,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 import scipy.cluster.hierarchy as shc
 import numpy as np
 import matplotlib
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import seaborn as sns
@@ -24,7 +29,13 @@ import neurochat.nc_plot as nc_plot
 
 def save_results_to_csv(filename, in_dicts):
     """Save a dictionary to a csv"""
-    names = in_dicts[0].keys()
+    # find the dict with the most keys
+    max_key = []
+    for in_dict in in_dicts:
+        names = in_dicts[0].keys()
+        if len(names) > len(max_key):
+            max_key = names
+
     try:
         with open(filename, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=names)
@@ -69,7 +80,7 @@ def log_isi(ndata, start=0.0005, stop=10, num_bins=60):
 
 def cell_classification_stats(
         in_dir, container, out_name,
-        should_plot=False, opt_end=""):
+        should_plot=False, opt_end="", output_spaces=True):
     """
     Compute a csv of cell stats for each unit in a container
 
@@ -116,7 +127,8 @@ def cell_classification_stats(
             ndata.bandpower_ratio(
                 [5, 11], [1.5, 4], 1.6, relative=True,
                 first_name="Theta", second_name="Delta")
-            result = copy(ndata.get_results())
+            result = copy(ndata.get_results(
+                spaces_to_underscores=not output_spaces))
             _results.append(result)
 
             if should_plot:
@@ -368,48 +380,85 @@ def pca_clustering(
         isi_pca, corr_pca, clust, dend, joint_pca)
 
 
-def main(
-        in_dir, tetrode_list, analysis_flags,
-        re_filter=None, test_only=False, opt_end="",
-        s_color=False):
-    """Summarise all tetrodes in in_dir"""
-    # Setup seaborn - note affects all plots!
-    sns.set(palette="colorblind")
-    # Load files from dir in tetrodes x, y, z
+def main(args, config):
+    # Unpack out the cfg file into easier names
+    in_dir = config.get("Setup", "in_dir")
+    regex_filter = config.get("Setup", "regex_filter")
+    regex_filter = None if regex_filter == "None" else regex_filter
+    analysis_flags = json.loads(config.get("Setup", "analysis_flags"))
+    tetrode_list = json.loads(config.get("Setup", "tetrode_list"))
+    seaborn_style = config.getboolean("Plot", "seaborn_style")
+    plot_order = json.loads(config.get("Plot", "plot_order"))
+    fixed_color = config.get("Plot", "path_color")
+    fixed_color = None if fixed_color == "None" else fixed_color
+    if len(fixed_color) > 1:
+        fixed_color = json.loads(fixed_color)
+    s_color = config.getboolean("Plot", "should_color")
+    plot_outname = config.get("Plot", "output_dirname")
+    dot_size = config.get("Plot", "dot_size")
+    dot_size = None if dot_size == "None" else int(dot_size)
+    summary_dpi = int(config.get("Plot", "summary_dpi"))
+    output_format = config.get("Output", "output_format")
+    save_bin_data = config.getboolean("Output", "save_bin_data")
+    output_spaces = config.getboolean("Output", "output_spaces")
+    opt_end = config.get("Output", "optional_end")
+    max_units = int(config.get("Setup", "max_units"))
+    isi_bound = int(config.get("Params", "isi_bound"))
+    isi_bin_length = int(config.get("Params", "isi_bin_length"))
+
+    setup_logging(in_dir)
+
+    if output_format == "pdf":
+        matplotlib.use("pdf")
+
+    if seaborn_style:
+        sns.set(palette="colorblind")
+    else:
+        sns.set_style(
+            "ticks",
+            {'axes.spines.right': False, 'axes.spines.top': False})
+
+    # Automatic extraction of files from starting dir onwards
     container = NDataContainer(load_on_fly=True)
     out_name = container.add_axona_files_from_dir(
-        in_dir, tetrode_list=tetrode_list,
-        recursive=True, re_filter=re_filter,
-        verbose=False, unit_cutoff=(0, 5))
+        in_dir, tetrode_list=tetrode_list, recursive=True, re_filter=regex_filter, verbose=False, unit_cutoff=(0, max_units))
     container.setup()
-
-    if test_only:
-        exit(0)
+    if len(container) is 0:
+        print("Unable to find any files matching regex {}".format(
+            regex_filter))
+        exit(-1)
 
     # Show summary of place
     if analysis_flags[0]:
-        # place_cell_summary(
-        #     container, dpi=200, out_dirname="nc_place_plots")
         place_cell_summary(
-            container, dpi=200, out_dirname="nc_cell_plots", filter_place_cells=False, filter_low_freq=False,
-            opt_end=opt_end, base_dir=in_dir)
+            container, dpi=summary_dpi, out_dirname=plot_outname,
+            filter_place_cells=False, filter_low_freq=False,
+            opt_end=opt_end, base_dir=in_dir,
+            output_format=output_format, isi_bound=isi_bound,
+            isi_bin_length=isi_bin_length, output=plot_order,
+            save_data=save_bin_data, fixed_color=fixed_color,
+            point_size=dot_size, color_isi=s_color, burst_thresh=6)
         plt.close("all")
 
-    # Do numerical analysis
+    # Do numerical analysis of bursting
     should_plot = analysis_flags[2]
     if analysis_flags[1]:
         import re
         out_name = remove_extension(out_name) + "csv"
         out_name = re.sub(r"file_list_", r"cell_stats_", out_name)
+        print("Computing cell stats to save to {}".format(out_name))
         cell_classification_stats(
             in_dir, container, out_name,
-            should_plot=should_plot, opt_end=opt_end)
+            should_plot=should_plot, opt_end=opt_end,
+            output_spaces=output_spaces)
 
     # Do PCA based analysis
     if analysis_flags[3]:
+        print("Computing pca clustering")
         pca_clustering(container, in_dir, opt_end=opt_end, s_color=s_color)
 
     if analysis_flags[4]:
+        print("Computing time resolved tests")
         with open(
                 os.path.join(in_dir, "nc_results", "bursttime.csv"), "w") as f:
             from collections import OrderedDict
@@ -477,25 +526,31 @@ def setup_logging(in_dir):
     mpl_logger.setLevel(level=logging.WARNING)
 
 
+def print_config(config, msg=""):
+    if msg is not "":
+        print(msg)
+    """Prints the contents of a config file"""
+    config_dict = [{x: tuple(config.items(x))} for x in config.sections()]
+    pprint(config_dict, width=120)
+
+
 if __name__ == "__main__":
-    in_dir = r'E:\OneDrive\OneDrive - TCDUD.onmicrosoft.com\Bernstein'
-    # in_dir = r"C:\Users\smartin5\Recordings\11092017"
-    setup_logging(in_dir)
-    tetrode_list = [i for i in range(1, 17)]
-    optional_end = "_Can"
+    config = configparser.ConfigParser()
+    here = os.path.dirname(os.path.realpath(__file__))
+    config_path = os.path.join(here, "configs", "burst_analysis.cfg")
+    config.read(config_path)
 
-    # Use a Regex to filter out certain directories
-    # re_filter = None
-    # re_filter = "^CSR.*|^LSR.*"
-    re_filter = "^Can.*"
+    parser = argparse.ArgumentParser(
+        description='Process modifiable parameters from command line')
+    args, unparsed = parser.parse_known_args()
 
-    # Analysis 0 - summary place cell plot
-    # Analysis 1 - csv file of data to classify cells
-    # Analysis 2 - more graphical output
-    # Analysis 3 - PCA and Dendogram and agglomerative clustering
-    # Analysis 4 - Time resolved analysis
-    analysis_flags = [False, False, False, False, True]
-    main(
-        in_dir, tetrode_list, analysis_flags,
-        re_filter=re_filter, test_only=False,
-        opt_end=optional_end, s_color=True)
+    if len(unparsed) is not 0:
+        print("Unrecognised command line argument passed")
+        print(unparsed)
+        exit(-1)
+
+    print_config(config, "Program started with configuration")
+    if len(sys.argv) > 1:
+        print("Command line arguments", args)
+
+    main(args, config)

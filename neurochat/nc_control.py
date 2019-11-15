@@ -315,7 +315,7 @@ class NeuroChaT(QtCore.QThread):
     def mode(self):
         """
         Reads the specifications and analyzes data according to the mode that is set
-        in the Configuration file. Thsi is the principle method in NeuroChaT that
+        in the Configuration file. This is the principle method in NeuroChaT that
         sets the input and output data files and calls the execute() method for 
         running the analyses after it sets the data and filenames to NData() object.
         
@@ -663,9 +663,13 @@ class NeuroChaT(QtCore.QThread):
                               fieldThresh=params['loc_field_thresh'],
                               smoothPlace=params['loc_field_smooth'],
                               brAdjust=True, update=True)
-                fig1 = nc_plot.loc_firing(place_data)
+                fig1 = nc_plot.loc_firing(
+                    place_data, colormap=params['loc_colormap'],
+                    style = params['loc_style'])
                 self.close_fig(fig1)
-                fig2 = nc_plot.loc_firing_and_place(place_data)
+                fig2 = nc_plot.loc_firing_and_place(
+                    place_data, colormap=params['loc_colormap'],
+                    style = params['loc_style'])
                 self.close_fig(fig2)
                 self.plot_data_to_hdf(name=name+ '/loc_rate/', graph_data=place_data)
 
@@ -1033,10 +1037,10 @@ class NeuroChaT(QtCore.QThread):
 
         """
         
-        exists= False
-        if path in self.f:
+        exists = False
+        if path in self.hdf.f:
             exists = True
-            return exists
+        return exists
         
     def plot_data_to_hdf(self, name=None, graph_data=None):
         """
