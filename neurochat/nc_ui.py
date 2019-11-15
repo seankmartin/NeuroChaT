@@ -2237,20 +2237,36 @@ class UiParameters(QtWidgets.QDialog):
 
         self.loc_field_smooth = add_check_box(obj_name='loc_field_smooth')
         self.loc_field_smooth.setChecked(False)
+
+        self.loc_style = add_combo_box(obj_name="loc_style")
+        self.loc_style.addItems(
+            ["contour", "digitized", "interpolated"])
+
+        self.loc_colormap = add_combo_box(obj_name="loc_colormap")
+        self.loc_colormap.addItems(
+            ["viridis", "default", "gray", "plasma",
+             "inferno", "magma", "cividis"])
 #        self.locAngVelCutoff = add_spin_box(min_val=0, 100, "locAngVelCutoff")
 #        self.locAngVelCutoff.setValue(30)
 #        self.locAngVelCutoff.setSingleStep(5)
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow("Pixel Size", self.loc_pixel_size, "cm [range: 1-100]")
-        box_layout.addRow("Bound for Chopping Edges", self.loc_chop_bound, "pixels [range: 3-20]")
+        box_layout.addRow(
+            "Pixel Size", self.loc_pixel_size, "cm [range: 1-100]")
+        box_layout.addRow(
+            "Bound for Chopping Edges", 
+            self.loc_chop_bound, "pixels [range: 3-20]")
 #        box_layout.addRow("Angular Velocity Cutoff", self.locAngVelCutoff, "deg/sec [range: 0-100, step: 5]")
-        box_layout.addRow("Place field threshold", self.loc_field_thresh, "ratio [range: 0-1, step: 0.01]")
-        box_layout.addRow("Smooth firing map before centroid calculation", self.loc_field_smooth, "True or False")
+        box_layout.addRow(
+            "Place Field Threshold", 
+            self.loc_field_thresh, "ratio [range: 0-1, step: 0.01]")
+        box_layout.addRow(
+            "Whether to Smooth Firing Map Before Centroid Calculation",
+            self.loc_field_smooth, "True or False")
 
         self.loc_rate_gb1.setLayout(box_layout)
 
-#        # Box- 2
+        # Box- 2
         self.loc_rate_gb2 = add_group_box(title="Smoothing Box Kernal", obj_name="loc_rate_gb2")
 
         self.loc_rate_filter = add_combo_box(obj_name="loc_rate_filter")
@@ -2262,15 +2278,28 @@ class UiParameters(QtWidgets.QDialog):
         # Change step size to 0.5 if Gaussian is selected
 
         box_layout = ParamBoxLayout()
-        box_layout.addRow("Smoothing Filter", self.loc_rate_filter, "")
-        box_layout.addRow("Spike Rate Pixels/Sigma", self.loc_rate_kern_len, \
-        "[range: 1-11]\n\r Box: odds")
+        box_layout.addRow(
+            "Smoothing Filter", self.loc_rate_filter, "")
+        box_layout.addRow(
+            "Spike Rate Pixels/Sigma", 
+            self.loc_rate_kern_len, "[range: 1-11]\n\r Box: odds")
 
         self.loc_rate_gb2.setLayout(box_layout)
+
+        # Box 3
+        self.loc_rate_gb3 = add_group_box(
+            title="Plotting Style", obj_name="loc_rate_gb3")
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Firing Rate Map Style", self.loc_style, "")
+        box_layout.addRow(
+            "Firing Rate Map Colormap", self.loc_colormap, "")
+        self.loc_rate_gb3.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.loc_rate_gb1)
         layout.addWidget(self.loc_rate_gb2)
+        layout.addWidget(self.loc_rate_gb3)
 
         widget.setContents(layout)
 

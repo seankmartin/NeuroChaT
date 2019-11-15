@@ -663,9 +663,13 @@ class NeuroChaT(QtCore.QThread):
                               fieldThresh=params['loc_field_thresh'],
                               smoothPlace=params['loc_field_smooth'],
                               brAdjust=True, update=True)
-                fig1 = nc_plot.loc_firing(place_data)
+                fig1 = nc_plot.loc_firing(
+                    place_data, colormap=params['loc_colormap'],
+                    style = params['loc_style'])
                 self.close_fig(fig1)
-                fig2 = nc_plot.loc_firing_and_place(place_data)
+                fig2 = nc_plot.loc_firing_and_place(
+                    place_data, colormap=params['loc_colormap'],
+                    style = params['loc_style'])
                 self.close_fig(fig2)
                 self.plot_data_to_hdf(name=name+ '/loc_rate/', graph_data=place_data)
 

@@ -1121,7 +1121,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     raster = kwargs.get("raster", True)
     splits = None
 
-    if colormap is "default":
+    if colormap == "default":
         clist = [(0.0, 0.0, 1.0),\
                 (0.0, 1.0, 0.5),\
                 (0.9, 1.0, 0.0),\
