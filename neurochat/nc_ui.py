@@ -779,7 +779,6 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                         path = '/processing/Shank'
                         self._control.open_hdf_file()
                         items= self._control.get_hdf_groups(path=path)
-                        self._control.close_hdf_file()
                         # hdf = Nhdf()
                         # hdf.set_filename(nwb_file)
                         # path = '/processing/Shank'
@@ -788,20 +787,30 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                         # else:
                         #     logging.warning('No Shank data stored in the path:'+ path)
                         if items:
-                            item, ok = QtWidgets.QInputDialog.getItem(self, "Select electrode group",
-                                                                      "Electrode groups: ", items, 0, False)
+                            item, ok = QtWidgets.QInputDialog.getItem(
+                                self, "Select electrode group",
+                                "Electrode groups: ", items, 0, False)
                             if ok:
-                                self._control.set_spike_file(nwb_file+ '+'+ path+ '/' + item)
-                                logging.info('Spike data set to electrode group: '+ path+ '/'+ item)
+                                self._control.set_spike_file(
+                                    nwb_file+ '+'+ path+ '/' + item)
+                                logging.info(
+                                    'Spike data set to electrode group: '
+                                    + path+ '/'+ item)
 
                                 path = '/processing/Behavioural/Position'
                                 if self._control.exist_hdf_path(path=path):
-                                    self._control.set_spatial_file(nwb_file+ '+'+ path)
-                                    logging.info('Position data set to group: '+ path)
+                                    self._control.set_spatial_file(
+                                        nwb_file+ '+'+ path)
+                                    logging.info(
+                                        'Position data set to group: '+ path)
                                 else:
-                                    logging.warning(path+ ' not found! Spatial data cannot be set!')
-                    except:
-                        logging.error('Cannot read the hdf file')
+                                    logging.warning(
+                                        path+ 
+                                        ' not found! Spatial data not set.')
+                        self._control.close_hdf_file()
+                    except Exception as e:
+                        log_exception(
+                            e, "Cannot read hdf file in nc_ui browse")
 
                     self.lfp_chan_getitems()
 
