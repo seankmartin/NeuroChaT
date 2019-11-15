@@ -751,7 +751,8 @@ class NDataContainer():
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
             try:
-                if data_index == self._last_data_pt[0]:
+                if (data_index == self._last_data_pt[0] and
+                        (self._last_data_pt[1] is not None)):
                     result = self._last_data_pt[1]
                 else:
                     result = NData()
@@ -1666,7 +1667,8 @@ instead load it as needed, on the fly</dd>
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
             try:
-                if data_index == self._last_data_pt[0]:
+                if (data_index == self._last_data_pt[0] and
+                        (self._last_data_pt[1] is not None)):
                     result = self._last_data_pt[1]
                 else:
                     result = NData()
@@ -2303,7 +2305,8 @@ directory | position file | spike file | unit numbers | eeg extension</p>
 <pre><code class="python">def get_data_at(self, data_index, unit_index):
     if self._load_on_fly:
         try:
-            if data_index == self._last_data_pt[0]:
+            if (data_index == self._last_data_pt[0] and
+                    (self._last_data_pt[1] is not None)):
                 result = self._last_data_pt[1]
             else:
                 result = NData()
