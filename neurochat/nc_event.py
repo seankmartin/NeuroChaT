@@ -13,8 +13,9 @@ This module implements NEvent Class for NeuroChaT software
 """
 
 import logging
-
+import os
 from collections import OrderedDict as oDict
+import re
 
 import numpy as np
 
@@ -40,6 +41,9 @@ class NEvent(NBase):
         self._timestamp = np.array([], dtype='f')
         self._event_train = np.array([], dtype=int)
         self._type = 'event'
+        self._timebase = None
+        self._total_samples = None
+        self._bytes_per_timestamp = None
 
     def get_event_name(self, event_tag=None):
         """
@@ -131,6 +135,33 @@ class NEvent(NBase):
 
         self.set_curr_tag(name)
 
+    def set_timebase(self, timebase):
+        """
+        Sets timebase 
+
+        Parameters
+        ----------
+        timebase : int
+            Timebase
+
+        Returns
+        -------
+        None
+
+        """
+        self._timebase = timebase
+
+    def get_timebase(self):
+        """
+        Gets timebase 
+
+        Returns
+        -------
+        float
+
+        """
+        return self._timebase
+
     def get_event_stamp(self, event=None):
         """
         Returns timestamps for a particular event
@@ -208,6 +239,14 @@ class NEvent(NBase):
 
         return self._event_train
 
+    def get_total_samples(self):
+
+        return self._total_samples
+
+    def get_bytes_per_timestamp(self):
+
+        return self._bytes_per_timestamp
+
     def _set_event_train(self, event_train):
         """
         Sets tags for all events
@@ -224,6 +263,27 @@ class NEvent(NBase):
         """
 
         self._event_train = event_train
+
+    def _set_total_samples(self, nsamples):
+        """
+        Sets tags for all events
+
+        Parameters
+        ----------
+        event_train : ndarray
+            Train of events as train of tags
+
+        Returns
+        -------
+        None
+
+        """
+
+        self._total_samples = nsamples
+
+    def _set_bytes_per_timestamp(self, bytes_per_timestamp):
+
+        self._bytes_per_timestamp = bytes_per_timestamp
 
     def load(self, filename=None, system=None):
         """
@@ -242,11 +302,83 @@ class NEvent(NBase):
         None
 
         """
-
         if system is None:
             system = self._system
         if filename is None:
             filename = self._filename
+        if os.path.isfile(filename):
+            with open(filename, 'rb') as f:
+                while True:
+                    line = f.readline()
+                    try:
+                        line = line.decode('latin-1')
+                    except:
+                        break
+
+                    if line == '':
+                        break
+                    if line.startswith('trial_date'):
+                        self._set_date(
+                            ' '.join(line.replace(',', ' ').split()[1:]))
+                    if line.startswith('trial_time'):
+                        self._set_time(line.split()[1])
+                    if line.startswith('experimenter'):
+                        self._set_experiemnter(' '.join(line.split()[1:]))
+                    if line.startswith('comments'):
+                        self._set_comments(' '.join(line.split()[1:]))
+                    if line.startswith('duration'):
+                        self._set_duration(float(''.join(line.split()[1:])))
+                    if line.startswith('sw_version'):
+                        self._set_file_version(line.split()[1])
+                    if line.startswith('timebase'):
+                        self.set_timebase(
+                            int(''.join(re.findall(r'\d+.\d+|\d+', line))))
+                    if line.startswith('bytes_per_timestamp'):
+                        self._set_bytes_per_timestamp(
+                            int(''.join(re.findall(r'\d+', line))))
+                    if line.startswith('num_' + 'stm' + '_samples'):
+                        self._set_total_samples(
+                            int(''.join(re.findall(r'\d+', line))))
+                    if line.startswith("data_start"):
+                        break
+
+                num_stm_samples = self.get_total_samples()
+                bytes_per_timestamp = self.get_bytes_per_timestamp()
+                timebase = self.get_timebase()
+
+                f.seek(0, 0)
+                header_offset = []
+                while True:
+                    try:
+                        buff = f.read(10).decode('UTF-8')
+                    except:
+                        break
+                    if buff == 'data_start':
+                        header_offset = f.tell()
+                        break
+                    else:
+                        f.seek(-9, 1)
+
+                if not header_offset:
+                    print('Error: data_start marker not found!')
+                else:
+                    f.seek(header_offset, 0)
+                    byte_buffer = np.fromfile(f, dtype='uint8')
+                    stim_time = np.zeros([num_stm_samples, ], dtype='f')
+                    for i in range(num_stm_samples):
+                        start_idx = bytes_per_timestamp * i
+                        end_idx = start_idx + bytes_per_timestamp
+                        chunk = byte_buffer[start_idx:end_idx]
+                        time_val = (
+                            16777216 * chunk[0] +
+                            65536 * chunk[1] +
+                            256 * chunk[2] +
+                            chunk[3]) / timebase
+                        stim_time[i] = time_val
+                self._set_timestamp(stim_time)
+        else:
+            logging.error(
+                "No events file found for file {}".format(filename))
 
     def _create_tag(self, name_train):
         """
