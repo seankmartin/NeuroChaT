@@ -39,7 +39,7 @@ class NEvent(NBase):
         self._curr_tag = []
         self._curr_name = []
         self._timestamp = np.array([], dtype='f')
-        self._event_train = np.array([], dtype=int)
+        self._event_train = []
         self._type = 'event'
         self._timebase = None
         self._total_samples = None
@@ -375,6 +375,11 @@ class NEvent(NBase):
                             256 * chunk[2] +
                             chunk[3]) / timebase
                         stim_time[i] = time_val
+                # tags = [1 for i in range(num_stm_samples)]
+                # self._event_train = tags
+                # names = ["Stimulation" for i in range(num_stm_samples)]
+                # self._event_names = names
+                # self.set_curr_tag("Stimulation")
                 self._set_timestamp(stim_time)
         else:
             logging.error(
