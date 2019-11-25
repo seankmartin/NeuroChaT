@@ -34,12 +34,12 @@ class NEvent(NBase):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._event_names = []
         self._event_trig_averages = []
         self._curr_tag = []
         self._curr_name = []
+        self._event_names = np.array([], dtype='f')
         self._timestamp = np.array([], dtype='f')
-        self._event_train = []
+        self._event_train = np.array([], dtype='f')
         self._type = 'event'
         self._timebase = None
         self._total_samples = None
@@ -63,7 +63,8 @@ class NEvent(NBase):
         if event_tag is None:
             event_name = self._event_names
         elif event_tag in self._event_train:
-            event_name = self._event_names[self._event_train.index(event_tag)]
+            event_name = self._event_names[
+                np.nonzero(self._event_train == event_tag)[0]]
         else:
             event_name = None
         return event_name
@@ -88,7 +89,8 @@ class NEvent(NBase):
         elif event_name == 'all':
             event_tag = self._event_trig_averages
         elif event_name in self._event_names:
-            event_tag = self._event_train[self._event_names.index(event_name)]
+            event_tag = self._event_train[
+                np.nonzero(self._event_names == event_name)[0]]
         else:
             event_tag = None
 
@@ -179,12 +181,13 @@ class NEvent(NBase):
         """
 
         if event is None:
-            event = self._curr_tag
+            tag = self._curr_tag
         if event in self._event_names:
             tag = self.get_tag(event)
-        elif event in self._event_trig_averages:
+        elif event in self._event_train:
             tag = event
-        timestamp = self._timestamp[self._event_train == tag]
+        where = np.nonzero(self._event_train == tag)
+        timestamp = self._timestamp[where]
 
         return timestamp
 
@@ -304,6 +307,9 @@ class NEvent(NBase):
         """
         if system is None:
             system = self._system
+        if not system == "Axona":
+            logging.error("Only implemented event reading in Axona currently")
+            return
         if filename is None:
             filename = self._filename
         if os.path.isfile(filename):
@@ -375,11 +381,12 @@ class NEvent(NBase):
                             256 * chunk[2] +
                             chunk[3]) / timebase
                         stim_time[i] = time_val
-                # tags = [1 for i in range(num_stm_samples)]
-                # self._event_train = tags
-                # names = ["Stimulation" for i in range(num_stm_samples)]
-                # self._event_names = names
-                # self.set_curr_tag("Stimulation")
+                tags = np.array([1 for i in range(num_stm_samples)])
+                self._event_train = tags
+                names = np.array(
+                    ["Stimulation" for i in range(num_stm_samples)])
+                self._event_names = names
+                self.set_curr_tag(1)
                 self._set_timestamp(stim_time)
         else:
             logging.error(
@@ -446,9 +453,6 @@ class NEvent(NBase):
                 spike.load()
         else:
             logging.error("Spikes by name has yet to be implemented")
-            # for name in names:
-            #     spike = self.get_spikes_by_name(name)
-            #     spike.load()
 
     def add_lfp(self, lfp=None, **kwargs):
         """
@@ -493,9 +497,6 @@ class NEvent(NBase):
                 lfp.load()
         else:
             logging.error("Lfp by name has yet to be implemented")
-            # for name in names:
-            # lfp = self.get_lfp_by_name(name)
-            # lfp.load()
 
     def psth(self, event=None, spike=None, **kwargs):
         """
