@@ -297,18 +297,25 @@ def place_cell_summary(
                             iname = (
                                 out_basename[:-4] + "_" +
                                 str(unit_number) + out_basename[-4:])
-                            out_name = os.path.join(
-                                main_dir, out_dirname, "good", iname)
+                            if filter_low_freq or filter_place_cells:
+                                out_name = os.path.join(
+                                    main_dir, out_dirname, "good", iname)
+                            else:
+                                out_name = os.path.join(
+                                    main_dir, out_dirname, iname)
 
                             print("Saving place cell figure to {}".format(
                                 out_name))
                             make_dir_if_not_exists(out_name)
-                            f.savefig(out_name, dpi=dpi,
-                                      format=output_format)
+                            f.savefig(out_name, dpi=dpi, format=output_format)
 
                     else:
-                        out_name = os.path.join(
-                            main_dir, out_dirname, "good", out_basename)
+                        if filter_low_freq or filter_place_cells:
+                            out_name = os.path.join(
+                                main_dir, out_dirname, "good", out_basename)
+                        else:
+                            out_name = os.path.join(
+                                main_dir, out_dirname, out_basename)
                         print("Saving place cell figure to {}".format(
                             out_name))
                         make_dir_if_not_exists(out_name)
