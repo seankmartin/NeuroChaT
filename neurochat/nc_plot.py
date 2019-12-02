@@ -666,6 +666,8 @@ def speed(speed_data):
     ax.set_title('Speed vs Spiking Rate')
     ax.set_xlabel('Speed (cm/sec)')
     ax.set_ylabel('Spikes/sec')
+    ax.set_xlim(speed_data['bins'][0] - 1, speed_data['bins'][-1] + 1)
+    ax.set_ylim(0, speed_data['rate'].max() + 1)
 
     return fig1
 
@@ -2005,7 +2007,7 @@ def print_place_cells(
         headdata=None, thetadata=None, point_size=10, units=None, 
         output=["Wave", "Path", "Place", "HD", "LowISI", "Theta", "HighISI"],
         fixed_color=None, burst_ms=5, color_isi=True, one_by_one=False,
-        raster=True):
+        raster=True, hd_predict=True):
     if one_by_one:
         figs = []
         width, height = cols * size_multiplier, (1 - 0.20) * size_multiplier
@@ -2063,7 +2065,10 @@ def print_place_cells(
                 if idx is not None:
                     hd_data = headdata[i]
                     ax = fig.add_subplot(gs[j, idx], projection='polar')
-                    hd_rate_pred(hd_data, ax=ax, title=None)
+                    if hd_predict:
+                        hd_rate_pred(hd_data, ax=ax, title=None)
+                    else:
+                        hd_rate(hd_data, ax=ax, title=None)
         
         if wavedata is not None:
             if wavedata[i] is not None:
