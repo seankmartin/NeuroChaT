@@ -500,7 +500,7 @@ class NDataContainer():
             friendly_re = ""
             if re_filter:
                 friendly_re = "_" + \
-                    " ".join(re.findall("[a-zA-Z]+", re_filter))
+                    "-".join(re.findall("[a-zA-Z0-9_]+", re_filter))
             name = (
                 "file_list_" + os.path.basename(directory) +
                 friendly_re + ".txt")

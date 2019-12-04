@@ -264,6 +264,10 @@ def place_cell_summary(
                     named_units = collection.get_units(data_idx)
                     bad_named_units = []
 
+                # Save figures on by one if using pdf or svg
+                one_by_one = (output_format == "pdf") or (
+                    output_format == "svg")
+
                 if len(named_units) > 0:
                     if filter_place_cells:
                         print((
@@ -275,10 +279,6 @@ def place_cell_summary(
                             "Plotting summary for {} " +
                             "units {}").format(
                             spike_name, named_units))
-
-                    # Save figures on by one if using pdf or svg
-                    one_by_one = (output_format == "pdf") or (
-                        output_format == "svg")
 
                     fig = print_place_cells(
                         len(named_units), cols=len(output),
@@ -324,63 +324,63 @@ def place_cell_summary(
                     close("all")
                     gc.collect()
 
-                    if len(bad_named_units) > 0:
-                        print((
-                            "Plotting bad summary for {} " +
-                            "non-spatial units {}").format(
-                            spike_name, bad_named_units))
-                        fig = print_place_cells(
-                            len(bad_named_units), cols=len(output),
-                            placedata=bad_placedata, graphdata=bad_graphdata,
-                            wavedata=bad_wavedata, headdata=bad_headdata,
-                            thetadata=bad_thetadata, isidata=bad_isidata,
-                            size_multiplier=4, point_size=point_size,
-                            units=bad_named_units, fixed_color=fixed_color,
-                            output=output, color_isi=color_isi,
-                            burst_ms=burst_thresh, one_by_one=one_by_one,
-                            raster=one_by_one, hd_predict=hd_predict)
+                if len(bad_named_units) > 0:
+                    print((
+                        "Plotting bad summary for {} " +
+                        "non-spatial units {}").format(
+                        spike_name, bad_named_units))
+                    fig = print_place_cells(
+                        len(bad_named_units), cols=len(output),
+                        placedata=bad_placedata, graphdata=bad_graphdata,
+                        wavedata=bad_wavedata, headdata=bad_headdata,
+                        thetadata=bad_thetadata, isidata=bad_isidata,
+                        size_multiplier=4, point_size=point_size,
+                        units=bad_named_units, fixed_color=fixed_color,
+                        output=output, color_isi=color_isi,
+                        burst_ms=burst_thresh, one_by_one=one_by_one,
+                        raster=one_by_one, hd_predict=hd_predict)
 
-                        if one_by_one:
-                            for i, f in enumerate(fig):
-                                unit_number = bad_named_units[i]
-                                iname = (
-                                    out_basename[:-4] + "_" +
-                                    str(unit_number) + out_basename[-4:])
-                                out_name = os.path.join(
-                                    main_dir, out_dirname, "bad", iname)
-
-                                print("Saving place cell figure to {}".format(
-                                    out_name))
-                                make_dir_if_not_exists(out_name)
-                                f.savefig(out_name, dpi=dpi,
-                                          format=output_format)
-
-                        else:
+                    if one_by_one:
+                        for i, f in enumerate(fig):
+                            unit_number = bad_named_units[i]
+                            iname = (
+                                out_basename[:-4] + "_" +
+                                str(unit_number) + out_basename[-4:])
                             out_name = os.path.join(
-                                main_dir, out_dirname, "bad", out_basename)
+                                main_dir, out_dirname, "bad", iname)
+
                             print("Saving place cell figure to {}".format(
                                 out_name))
                             make_dir_if_not_exists(out_name)
-                            fig.savefig(out_name, dpi=dpi,
-                                        format=output_format)
+                            f.savefig(out_name, dpi=dpi,
+                                      format=output_format)
 
-                        close("all")
-                        gc.collect()
+                    else:
+                        out_name = os.path.join(
+                            main_dir, out_dirname, "bad", out_basename)
+                        print("Saving place cell figure to {}".format(
+                            out_name))
+                        make_dir_if_not_exists(out_name)
+                        fig.savefig(out_name, dpi=dpi,
+                                    format=output_format)
 
-                    good_placedata = []
-                    good_graphdata = []
-                    good_wavedata = []
-                    good_headdata = []
-                    good_thetadata = []
-                    good_isidata = []
-                    good_units = []
-                    bad_placedata = []
-                    bad_graphdata = []
-                    bad_wavedata = []
-                    bad_headdata = []
-                    bad_thetadata = []
-                    bad_isidata = []
-                    bad_units = []
+                    close("all")
+                    gc.collect()
+
+                good_placedata = []
+                good_graphdata = []
+                good_wavedata = []
+                good_headdata = []
+                good_thetadata = []
+                good_isidata = []
+                good_units = []
+                bad_placedata = []
+                bad_graphdata = []
+                bad_wavedata = []
+                bad_headdata = []
+                bad_thetadata = []
+                bad_isidata = []
+                bad_units = []
 
         except Exception as e:
             log_exception(
