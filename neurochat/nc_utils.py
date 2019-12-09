@@ -1039,7 +1039,8 @@ def get_axona_colours(index=None):
             return
         return get_axona_colours.colorcells[index]
 
-def has_ext(filename, ext):
+
+def has_ext(filename, ext, case_sensitive_ext=False):
     """
     Check if the filename ends in the extension
     
@@ -1049,6 +1050,8 @@ def has_ext(filename, ext):
         The name of the file
     ext : str
         The extension, may have leading dot (e.g txt == .txt)
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
     
     Returns
     -------
@@ -1059,12 +1062,16 @@ def has_ext(filename, ext):
         return True
     if ext[0] != ".":
         ext = "." + ext
-    return filename[-len(ext):].lower() == ext.lower()
+    if case_sensitive_ext:
+        return filename[-len(ext):] == ext
+    else:
+        return filename[-len(ext):].lower() == ext.lower()
 
 
 def get_all_files_in_dir(
         in_dir, ext=None, return_absolute=True, 
-        recursive=False, verbose=False, re_filter=None):
+        recursive=False, verbose=False, re_filter=None, 
+        case_sensitive_ext=False):
     """
     Get all files in the directory with the given extension.
     
@@ -1080,6 +1087,10 @@ def get_all_files_in_dir(
         Whether to recurse through directories.
     verbose: bool, optional. Defaults to False.
         Whether to print the files found.
+    re_filter: str, optional. Defaults to None
+        a regular expression used to filter the results
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
 
     Returns
     -------
@@ -1096,7 +1107,9 @@ def get_all_files_in_dir(
         return search_res is not None
 
     def ok_file(root_dir, f):
-        return has_ext(f, ext) and isfile(join(root_dir, f)) and match_filter(f)
+        return (
+            has_ext(f, ext, case_sensitive_ext=case_sensitive_ext) and 
+            isfile(join(root_dir, f)) and match_filter(f))
 
     def convert_to_path(root_dir, f): 
         return join(root_dir, f) if return_absolute else f
