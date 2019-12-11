@@ -1469,7 +1469,7 @@ class NSpatial(NAbstract):
              maxes[0] / p_shape[1],
              maxes[1] / p_shape[0])
         co_ords = np.array(np.where(pfield == largest_group))
-        boundary = [None, None]
+        boundary = [[None, None], [None, None]]
         for i in range(2):
             j = (i + 1) % 2
             boundary[i] = (
