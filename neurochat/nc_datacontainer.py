@@ -743,6 +743,30 @@ class NDataContainer():
             result.set_unit_no(self.get_units(data_index)[unit_index])
         return result
 
+    def get_name_at_idx(
+            self, idx, ext, opt_end="", base_dir=None, out_dirname="nc_plots"):
+        data_idx, unit_idx = self._index_to_data_pos(idx)
+        filename = self.get_file_dict()["Spike"][data_idx][0]
+        unit_number = self.get_units(data_idx)[unit_idx]
+        spike_name = os.path.basename(filename)
+        parts = spike_name.split(".")
+        f_dir = os.path.dirname(filename)
+        data_basename = (
+            parts[0] + "_" + parts[1] + "_" +
+            str(unit_number) + opt_end + "." + ext)
+        if base_dir is not None:
+            main_dir = base_dir
+            out_base = f_dir[len(base_dir + os.sep):]
+            if len(out_base) != 0:
+                out_base = ("--").join(out_base.split(os.sep))
+                data_basename = out_base + "--" + data_basename
+        else:
+            main_dir = f_dir
+        out_name = os.path.join(
+            main_dir, out_dirname, data_basename)
+        make_dir_if_not_exists(out_name)
+        return out_name
+
     # Methods from here on should be for private class use
     def _pretty_string(self):
         """Alternative string representation should be prettier."""
