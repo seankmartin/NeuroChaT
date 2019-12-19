@@ -109,134 +109,173 @@ def place_cell_summary(
     bad_thetadata = []
     bad_isidata = []
     bad_units = []
+    skipped = 0
 
     if point_size is None:
         point_size = dpi / 7
     for i, data in enumerate(collection):
         try:
             data_idx, unit_idx = collection._index_to_data_pos(i)
+            print("Working on {}, {}".format(unit_idx, len(
+                collection.get_units(data_idx)) - 1))
             filename = collection.get_file_dict()["Spike"][data_idx][0]
             unit_number = collection.get_units(data_idx)[unit_idx]
             print("Working on {} unit {}".format(
                 filename, unit_number))
 
             count = data.spike.get_unit_spikes_count()
-            duration = data.spike.get_duration()
-            good = True
-
-            if filter_low_freq:
-                if (count / duration) < 0.1 or (count / duration) > 7:
-                    print("Reject spike frequency {}".format(count / duration))
-                    good = False
-                    bad_units.append(unit_idx)
-
-            if good and filter_place_cells:
-                skaggs = data.loc_shuffle(nshuff=num_shuffles)
-                bad_skaggs = skaggs['refSkaggs'] <= skaggs['skaggs95']
-                bad_sparsity = skaggs['refSparsity'] >= skaggs['sparsity05']
-                bad_cohere = skaggs['refCoherence'] <= skaggs['coherence95']
-                first_str_part = "Accept "
-
-                if bad_skaggs or bad_sparsity or bad_cohere:
-                    good = False
-                    first_str_part = "Reject "
-                    bad_units.append(unit_idx)
-
-                print((
-                    first_str_part +
-                    "Skaggs {:2f} | {:2f}, " +
-                    "Sparsity {:2f} | {:2f}, " +
-                    "Coherence {:2f} | {:2f}").format(
-                    skaggs['refSkaggs'],
-                    skaggs['skaggs95'],
-                    skaggs['refSparsity'],
-                    skaggs['sparsity05'],
-                    skaggs['refCoherence'],
-                    skaggs['coherence95']))
-
-            if good:
-                good_units.append(unit_idx)
-                placedata = good_placedata
-                graphdata = good_graphdata
-                wavedata = good_wavedata
-                headdata = good_headdata
-                thetadata = good_thetadata
-                isidata = good_isidata
+            # Skip very low count cells
+            if count < 5:
+                skipped += 1
+                print("Skipping as only {} spikes".format(count))
             else:
-                placedata = bad_placedata
-                graphdata = bad_graphdata
-                wavedata = bad_wavedata
-                headdata = bad_headdata
-                thetadata = bad_thetadata
-                isidata = bad_isidata
+                duration = data.spike.get_duration()
+                good = True
 
-            if "Place" in output:
-                placedata.append(data.place())
-            else:
-                bad_placedata = None
-                good_placedata = None
-            if "LowAC" in output:
-                graphdata.append(data.isi_corr(bins=1, bound=[-10, 10]))
-            else:
-                bad_graphdata = None
-                good_graphdata = None
-            if "Wave" in output:
-                wavedata.append(data.wave_property())
-            else:
-                bad_wavedata = None
-                good_wavedata = None
-            if "HD" in output:
-                headdata.append(data.hd_rate())
-            else:
-                bad_headdata = None
-                good_headdata = None
-            if "Theta" in output:
-                thetadata.append(
-                    data.theta_index(
-                        bins=2, bound=[-350, 350]))
-            else:
-                bad_thetadata = None
-                good_thetadata = None
-            if "HighISI" in output:
-                isidata.append(
-                    data.isi(bins=int(isi_bound / isi_bin_length),
-                             bound=[0, isi_bound]))
-            else:
-                bad_isidata = None
-                good_isidata = None
+                # Place cell filtering is based on
+                # https://www.nature.com/articles/ncomms11824
+                # Activity-plasticity of hippocampus place maps
+                # Schoenenberger et al, 2016
+                if filter_low_freq:
+                    if (count / duration) < 0.25 or (count / duration) > 7:
+                        print("Reject spike frequency {}".format(
+                            count / duration))
+                        good = False
+                        bad_units.append(unit_idx)
 
-            if save_data:
-                try:
-                    spike_name = os.path.basename(filename)
-                    parts = spike_name.split(".")
-                    f_dir = os.path.dirname(filename)
+                if good and filter_place_cells:
+                    skaggs = data.loc_shuffle(nshuff=1)
+                    bad_sparsity = skaggs['refSparsity'] >= 0.3
+                    bad_cohere = skaggs['refCoherence'] <= 0.55
+                    first_str_part = "Accept "
 
-                    data_basename = (
-                        parts[0] + "_" + parts[1] + "_" +
-                        str(unit_number) + opt_end + ".csv")
-                    if base_dir is not None:
-                        main_dir = base_dir
-                        out_base = f_dir[len(base_dir + os.sep):]
-                        if len(out_base) != 0:
-                            out_base = ("--").join(out_base.split(os.sep))
-                            data_basename = out_base + "--" + data_basename
-                    else:
-                        main_dir = f_dir
-                    out_name = os.path.join(
-                        main_dir, out_dirname, "data", data_basename)
-                    make_dir_if_not_exists(out_name)
-                    save_dicts_to_csv(
-                        out_name,
-                        [placedata, graphdata, wavedata,
-                            headdata, thetadata, isidata])
-                except Exception as e:
-                    log_exception(
-                        e, "Occurred during place cell data saving on" +
-                        " {} unit {} name {} in {}".format(
-                            data_idx, unit_number, spike_name, main_dir))
+                    if bad_sparsity or bad_cohere:
+                        good = False
+                        first_str_part = "Reject "
+                        bad_units.append(unit_idx)
+
+                    print((
+                        first_str_part +
+                        "Skaggs {:2f}, " +
+                        "Sparsity {:2f}, " +
+                        "Coherence {:2f}").format(
+                        skaggs['refSkaggs'], skaggs['refSparsity'],
+                        skaggs['refCoherence']))
+
+                if good:
+                    good_units.append(unit_idx)
+                    placedata = good_placedata
+                    graphdata = good_graphdata
+                    wavedata = good_wavedata
+                    headdata = good_headdata
+                    thetadata = good_thetadata
+                    isidata = good_isidata
+                else:
+                    placedata = bad_placedata
+                    graphdata = bad_graphdata
+                    wavedata = bad_wavedata
+                    headdata = bad_headdata
+                    thetadata = bad_thetadata
+                    isidata = bad_isidata
+
+                if (
+                    (len(bad_units) + len(good_units)) >
+                        len(collection.get_units(data_idx))):
+                    save_bad = bad_units
+                    save_good = good_units
+                    good_placedata = []
+                    good_graphdata = []
+                    good_wavedata = []
+                    good_headdata = []
+                    good_thetadata = []
+                    good_isidata = []
+                    good_units = []
+                    bad_placedata = []
+                    bad_graphdata = []
+                    bad_wavedata = []
+                    bad_headdata = []
+                    bad_thetadata = []
+                    bad_isidata = []
+                    bad_units = []
+                    skipped = 0
+                    print("ERROR: Found too many units in the collection")
+                    raise Exception(
+                        "Accumlated more units than possible " +
+                        "bad {} good {} total {}".format(
+                            save_bad, save_good, collection.get_units(data_idx)))
+
+                if "Place" in output:
+                    placedata.append(data.place())
+                else:
+                    bad_placedata = None
+                    good_placedata = None
+                if "LowAC" in output:
+                    graphdata.append(data.isi_corr(bins=1, bound=[-10, 10]))
+                else:
+                    bad_graphdata = None
+                    good_graphdata = None
+                if "Wave" in output:
+                    wavedata.append(data.wave_property())
+                else:
+                    bad_wavedata = None
+                    good_wavedata = None
+                if "HD" in output:
+                    headdata.append(data.hd_rate())
+                else:
+                    bad_headdata = None
+                    good_headdata = None
+                if "Theta" in output:
+                    thetadata.append(
+                        data.theta_index(
+                            bins=2, bound=[-350, 350]))
+                else:
+                    bad_thetadata = None
+                    good_thetadata = None
+                if "HighISI" in output:
+                    isidata.append(
+                        data.isi(bins=int(isi_bound / isi_bin_length),
+                                 bound=[0, isi_bound]))
+                else:
+                    bad_isidata = None
+                    good_isidata = None
+
+                if save_data:
+                    try:
+                        spike_name = os.path.basename(filename)
+                        parts = spike_name.split(".")
+                        f_dir = os.path.dirname(filename)
+
+                        data_basename = (
+                            parts[0] + "_" + parts[1] + "_" +
+                            str(unit_number) + opt_end + ".csv")
+                        if base_dir is not None:
+                            main_dir = base_dir
+                            out_base = f_dir[len(base_dir + os.sep):]
+                            if len(out_base) != 0:
+                                out_base = ("--").join(out_base.split(os.sep))
+                                data_basename = out_base + "--" + data_basename
+                        else:
+                            main_dir = f_dir
+                        out_name = os.path.join(
+                            main_dir, out_dirname, "data", data_basename)
+                        make_dir_if_not_exists(out_name)
+                        save_dicts_to_csv(
+                            out_name,
+                            [placedata, graphdata, wavedata,
+                                headdata, thetadata, isidata])
+                    except Exception as e:
+                        log_exception(
+                            e, "Occurred during place cell data saving on" +
+                            " {} unit {} name {} in {}".format(
+                                data_idx, unit_number, spike_name, main_dir))
 
             # Save the accumulated information
             if unit_idx == len(collection.get_units(data_idx)) - 1:
+                if ((len(bad_units) + len(good_units)) !=
+                        len(collection.get_units(data_idx)) - skipped):
+                    print("ERROR: Did not cover all units in the collection")
+                    print("Good {}, Bad {}, Total {}".format(
+                        bad_units, good_units, collection.get_units(data_idx)))
                 spike_name = os.path.basename(filename)
                 parts = spike_name.split(".")
                 f_dir = os.path.dirname(filename)
@@ -292,8 +331,8 @@ def place_cell_summary(
                         raster=one_by_one, hd_predict=hd_predict)
 
                     if one_by_one:
-                        for i, f in enumerate(fig):
-                            unit_number = named_units[i]
+                        for k, f in enumerate(fig):
+                            unit_number = named_units[k]
                             iname = (
                                 out_basename[:-4] + "_" +
                                 str(unit_number) + out_basename[-4:])
@@ -341,8 +380,8 @@ def place_cell_summary(
                         raster=one_by_one, hd_predict=hd_predict)
 
                     if one_by_one:
-                        for i, f in enumerate(fig):
-                            unit_number = bad_named_units[i]
+                        for k, f in enumerate(fig):
+                            unit_number = bad_named_units[k]
                             iname = (
                                 out_basename[:-4] + "_" +
                                 str(unit_number) + out_basename[-4:])
@@ -381,6 +420,7 @@ def place_cell_summary(
                 bad_thetadata = []
                 bad_isidata = []
                 bad_units = []
+                skipped = 0
 
         except Exception as e:
             log_exception(
