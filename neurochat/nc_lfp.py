@@ -1183,11 +1183,13 @@ class NLfp(NBase):
         low, high = band
         method = kwargs.get("method", "welch")
         window_sec = kwargs.get("window_sec", 2 / (low + 0.000001))
+        unit = kwargs.get("unit", "milli")
+        scale = 1000 if unit == "micro" else 1
         sf = self.get_sampling_rate()
-        lfp_samples = self.get_samples()
+        lfp_samples = self.get_samples() * scale
 
         band_total = kwargs.get('band_total', False)
-        _filter = kwargs.get('total_band', [1.5, 40])
+        _filter = kwargs.get('total_band', [1.5, 90])
 
         # if prefilt:
         #     lfp_samples = butter_filter(lfp_samples, sf, *_filter)
