@@ -579,6 +579,7 @@ class NLfp(NBase):
         slc = kwargs.get('slice', None)
         if slc:
             lfp = self.get_samples()[slc]
+            print("Slice!!", slc) 
         else:
             lfp = self.get_samples()
 
@@ -613,7 +614,7 @@ class NLfp(NBase):
                     window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
                     detrend='constant', return_onesided=True, scaling=ptype)
 
-            graph_data['t'] = t
+            graph_data['t'] = t + self.get_timestamp()[0]
             graph_data['f'] = f[find(f <= fmax)]
 
             if db:
@@ -1592,3 +1593,14 @@ class NLfp(NBase):
             self._set_total_samples(lfp_wave.size)
             self._set_timestamp(time)
             self._set_sampling_rate(resamp_freq)
+
+    def noise_locator(self, sd = 2):
+        samples = self.get_samples()
+        std_samples = np.std(samples)
+        mean_samples = np.mean(samples)
+        from neurochat.nc_utils import find_peaks
+        peak_vals, peak_locs = find_peaks(samples, thresh=mean_samples + sd*std_samples)
+        neg_peak_vals, neg_peak_locs = find_peaks(
+            -samples, thresh=mean_samples + sd*std_samples)
+        # for times self.get_timestamps()[thing below]
+        return np.sort(np.concatenate([peak_locs, neg_peak_locs]))
