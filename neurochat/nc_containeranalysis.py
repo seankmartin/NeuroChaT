@@ -141,7 +141,6 @@ def place_cell_summary(
                         print("Reject spike frequency {}".format(
                             count / duration))
                         good = False
-                        bad_units.append(unit_idx)
 
                 if good and filter_place_cells:
                     skaggs = data.loc_shuffle(nshuff=1)
@@ -152,7 +151,6 @@ def place_cell_summary(
                     if bad_sparsity or bad_cohere:
                         good = False
                         first_str_part = "Reject "
-                        bad_units.append(unit_idx)
 
                     print((
                         first_str_part +
@@ -171,6 +169,7 @@ def place_cell_summary(
                     thetadata = good_thetadata
                     isidata = good_isidata
                 else:
+                    bad_units.append(unit_idx)
                     placedata = bad_placedata
                     graphdata = bad_graphdata
                     wavedata = bad_wavedata
@@ -303,7 +302,7 @@ def place_cell_summary(
                     named_units = collection.get_units(data_idx)
                     bad_named_units = []
 
-                # Save figures on by one if using pdf or svg
+                # Save figures one by one if using pdf or svg
                 one_by_one = (output_format == "pdf") or (
                     output_format == "svg")
 
