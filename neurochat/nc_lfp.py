@@ -18,7 +18,7 @@ from math import floor, ceil
 from neurochat.nc_utils import window_rms
 from neurochat.nc_utils import butter_filter
 from neurochat.nc_utils import find_peaks
-
+from neurochat.nc_utils import find_true_ranges
 from neurochat.nc_utils import butter_filter, fft_psd, find
 
 from neurochat.nc_circular import CircStat
@@ -1594,13 +1594,45 @@ class NLfp(NBase):
             self._set_timestamp(time)
             self._set_sampling_rate(resamp_freq)
 
-    def noise_locator(self, sd = 2):
+    def peak_noise(self, sd_thresh=3):
         samples = self.get_samples()
-        std_samples = np.std(samples)
-        mean_samples = np.mean(samples)
-        from neurochat.nc_utils import find_peaks
-        peak_vals, peak_locs = find_peaks(samples, thresh=mean_samples + sd*std_samples)
-        neg_peak_vals, neg_peak_locs = find_peaks(
-            -samples, thresh=mean_samples + sd*std_samples)
-        # for times self.get_timestamps()[thing below]
-        return np.sort(np.concatenate([peak_locs, neg_peak_locs]))
+        sd = np.std(samples)
+        mean = np.mean(samples)
+        _, peak_locs = find_peaks(
+            samples, thresh=mean + sd_thresh*sd)
+        _, neg_peak_locs = find_peaks(
+            -1 * samples, thresh=mean + sd_thresh*sd)
+        thr_locs = np.sort(np.concatenate([peak_locs, neg_peak_locs]))
+        thr_vals = self.get_samples()[thr_locs]
+        thr_time = self.get_timestamp()[thr_locs]
+        return mean, sd, thr_locs, thr_vals, thr_time
+
+    def find_noise(self, sd_thresh=3):
+        samples = self.get_samples()
+        std = np.std(samples)
+        mean = np.mean(samples)
+        over_thresh = np.logical_or(
+            samples >= mean + sd_thresh*std,
+            samples <= mean - sd_thresh*std)
+        # use np.where on the logical or if not using find_true_ranges        
+        _, thr_locs = find_true_ranges(
+            [i for i in range(len(samples))], over_thresh, 
+            min_range=1, return_idxs=True)
+        final_thr_locs = []
+        for i in range(len(thr_locs)-1):
+            if thr_locs[i+1] - thr_locs[i] <= 8:
+                for j in range(thr_locs[i], thr_locs[i+1]):
+                    final_thr_locs.append(j)
+            else:
+                final_thr_locs.append(thr_locs[i])
+        final_thr_locs.append(thr_locs[-1])
+
+        print('original: ', len(thr_locs))
+        thr_locs = np.array(final_thr_locs)
+        print("changed: ", len(thr_locs))
+        thr_vals = self.get_samples()[thr_locs]
+        thr_time = self.get_timestamp()[thr_locs]
+        # print(len(thr_locs), len(thr_time))
+        return mean, std, thr_locs, thr_vals, thr_time
+
+
