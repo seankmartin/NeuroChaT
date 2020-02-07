@@ -309,7 +309,8 @@ def theta_cell(plot_data, ax=None, **kwargs):
     """
     return isi_corr(plot_data, ax=ax, plot_theta=True, **kwargs)
 
-def lfp_spectrum(plot_data):
+
+def lfp_spectrum(plot_data, ax=None, color=None):
     """
     Plots LFP spectrum analysis data
 
@@ -325,10 +326,10 @@ def lfp_spectrum(plot_data):
 
     """
 
+    ax, fig1 = _make_ax_if_none(ax)
 
-    fig1 = plt.figure()
-    ax = plt.gca()
-    ax.plot(plot_data['f'], plot_data['Pxx'], linewidth=2)
+    ax.plot(plot_data['f'], plot_data['Pxx'],
+            linewidth=2, linestyle='dashed', color=color)
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('PSD')
     _extent = [0, plot_data['f'].max(), 0, plot_data['Pxx'].max()]
@@ -336,7 +337,8 @@ def lfp_spectrum(plot_data):
 
     return fig1
 
-def lfp_spectrum_tr(plot_data):
+
+def lfp_spectrum_tr(plot_data, ax=None):
     """
     Plots time-resolved LFP spectrum analysis data
 
@@ -352,17 +354,23 @@ def lfp_spectrum_tr(plot_data):
 
     """
 
-    fig1 = plt.figure()
-    ax = plt.gca()
+    ax, fig1 = _make_ax_if_none(ax)
+
     c_map = plt.cm.jet
-    pcm = ax.pcolormesh(plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map)
-    _extent = [0, plot_data['t'].max(), 0, plot_data['f'].max()]
+    pcm = ax.pcolormesh(
+        plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map)
+    _extent = [
+        plot_data['t'].min(), plot_data['t'].max(), 0, plot_data['f'].max()]
     plt.axis(_extent)
     ax.set_xlabel('Time (sec)')
     ax.set_ylabel('Frequency (Hz)')
+    if fig1 is not None:
     fig1.colorbar(pcm)
+    else:
+        plt.colorbar(pcm, ax=ax, use_gridspec=True)
 
     return fig1
+
 
 def plv(plv_data):
     """
