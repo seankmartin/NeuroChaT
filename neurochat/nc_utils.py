@@ -1115,9 +1115,10 @@ def get_all_files_in_dir(
         return search_res is not None
 
     def ok_file(root_dir, f):
-        return (
-            has_ext(f, ext, case_sensitive_ext=case_sensitive_ext) and 
-            isfile(join(root_dir, f)) and match_filter(f))
+        good_ext = has_ext(f, ext, case_sensitive_ext=case_sensitive_ext)
+        good_file = isfile(join(root_dir, f))
+        good_filter = match_filter(f)
+        return good_ext and good_file and good_filter
 
     def convert_to_path(root_dir, f): 
         return join(root_dir, f) if return_absolute else f
