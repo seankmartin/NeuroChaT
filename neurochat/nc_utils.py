@@ -860,7 +860,7 @@ def smooth_2d(x, filttype='b', filtsize=5):
 
     return smoothX
 
-def find_true_ranges(arr, truth_arr, min_range):
+def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     """
     Returns a list of ranges where truth values occur and the corresponding
     values from arr, arr is assumed to be a sorted list
@@ -882,16 +882,24 @@ def find_true_ranges(arr, truth_arr, min_range):
 
     in_range = False
     ranges = []
+    range_idxs = []
     for idx, b in enumerate(truth_arr):
         if b and not in_range:
             in_range = True
             range_start = arr[idx]
+            range_start_idx = idx
         if not b and in_range:
             in_range = False
             range_end = arr[idx - 1]
-            if range_end - range_start > min_range:
+            range_end_idx = idx
+            if range_end - range_start >= min_range:
                 ranges.append((range_start, range_end))
-    return ranges
+                for i in range(range_start_idx, range_end_idx):
+                    range_idxs.append(i)
+    if not return_idxs:
+        return ranges
+    else:
+        return ranges, range_idxs
 
 def find_peaks(data, **kwargs):
     """
