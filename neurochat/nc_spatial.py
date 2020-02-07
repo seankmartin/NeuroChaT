@@ -1390,14 +1390,17 @@ class NSpatial(NAbstract):
         thresh = kwargs.get('fieldThresh', 0.2)
         required_neighbours = kwargs.get('minPlaceFieldNeighbours', 9)
         smooth_place = kwargs.get('smoothPlace', False)
+        # Can pass another NData object to estimate the border from
+        # Can be useful in some cases, such as when the animal
+        # only explores a subset of the arena.
         separate_border_data = kwargs.get(
-            "separateBorderData", False)
+            "separateBorderData", None)
 
         # xedges = np.arange(0, np.ceil(np.max(self._pos_x)), pixel)
         # yedges = np.arange(0, np.ceil(np.max(self._pos_y)), pixel)
 
         # Update the border to match the requested pixel size
-        if separate_border_data:
+        if separate_border_data is not None:
             self.set_border(
                 separate_border_data.calc_border(**kwargs))
             times = self._time
