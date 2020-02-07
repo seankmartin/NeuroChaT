@@ -1607,20 +1607,34 @@ class NLfp(NBase):
         thr_time = self.get_timestamp()[thr_locs]
         return mean, sd, thr_locs, thr_vals, thr_time
 
-    def find_noise(self, sd_thresh=3):
+    def find_noise(self, sd_thresh=3, min_noise_freq=8):
+        """
+        Obtains locations of signal above threshold in windows
+
+        Parameters
+        ----------
+        sd_thresh: float
+            threshold to exclude noise
+        min_noise_freq: float
+            minimum noise freq - Used to locate noise blocks
+            eg. 250 Hz sampling rate, 40Hz min_noise_freq: locates noise within 9 samples of each other
+
+        """
         samples = self.get_samples()
+        Fs = self.get_sampling_rate()
         std = np.std(samples)
         mean = np.mean(samples)
         over_thresh = np.logical_or(
             samples >= mean + sd_thresh*std,
             samples <= mean - sd_thresh*std)
-        # use np.where on the logical or if not using find_true_ranges        
+        # use np.where on the logical or if not using find_true_ranges    
         _, thr_locs = find_true_ranges(
             [i for i in range(len(samples))], over_thresh, 
             min_range=1, return_idxs=True)
         final_thr_locs = []
         for i in range(len(thr_locs)-1):
-            if thr_locs[i+1] - thr_locs[i] <= 8:
+            # Set based on sampling freq/max freq of interest.
+            if thr_locs[i+1] - thr_locs[i] <= ceil(Fs/min_noise_freq):
                 for j in range(thr_locs[i], thr_locs[i+1]):
                     final_thr_locs.append(j)
             else:
@@ -1629,7 +1643,7 @@ class NLfp(NBase):
 
         print('original: ', len(thr_locs))
         thr_locs = np.array(final_thr_locs)
-        print("changed: ", len(thr_locs))
+        print('changed: ', len(thr_locs))
         thr_vals = self.get_samples()[thr_locs]
         thr_time = self.get_timestamp()[thr_locs]
         # print(len(thr_locs), len(thr_time))
