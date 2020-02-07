@@ -440,14 +440,20 @@ class NDataContainer():
         save_result = kwargs.get("save_result", True)
         unit_cutoff = kwargs.get("unit_cutoff", None)
 
+        if verbose:
+            print("Finding set files:")
         files = get_all_files_in_dir(
             directory, data_extension,
             recursive=recursive, verbose=verbose,
             re_filter=re_filter, return_absolute=True)
+        if verbose:
+            print("Finding txt files:")
         txt_files = get_all_files_in_dir(
             directory, pos_extension,
             recursive=recursive, verbose=verbose,
             re_filter=re_filter, return_absolute=True)
+        if verbose:
+            print("Finding stm files:")
         stm_files = get_all_files_in_dir(
             directory, stm_extension,
             recursive=recursive, verbose=verbose,
@@ -491,6 +497,9 @@ class NDataContainer():
                 self.add_files(NDataContainer.EFileType.Position, [pos_name])
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
                 self.add_files(NDataContainer.EFileType.STM, [stm_name])
+        if len(self) == 0:
+            print("Did not find any Axona files to add")
+            return
         self.set_units()
 
         if unit_cutoff:
@@ -901,7 +910,6 @@ class NDataContainer():
         """Return the number of units in the collection."""
         counts = self._unit_count
         if len(counts) == 0:
-            print("Recounting units")
             self._unit_count = self._count_num_units()
             counts = self._unit_count
         return sum(counts)
