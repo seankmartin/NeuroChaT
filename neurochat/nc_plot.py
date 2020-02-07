@@ -365,7 +365,7 @@ def lfp_spectrum_tr(plot_data, ax=None):
     ax.set_xlabel('Time (sec)')
     ax.set_ylabel('Frequency (Hz)')
     if fig1 is not None:
-    fig1.colorbar(pcm)
+        fig1.colorbar(pcm)
     else:
         plt.colorbar(pcm, ax=ax, use_gridspec=True)
 
