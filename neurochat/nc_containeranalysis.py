@@ -35,7 +35,7 @@ def place_cell_summary(
         output=["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"],
         isi_bound=350, isi_bin_length=2, fixed_color=None,
         save_data=False, point_size=None, color_isi=True,
-        burst_thresh=5, num_shuffles=300, hd_predict=False):
+        burst_thresh=5, hd_predict=False):
     """
     Quick Png spatial information summary of each cell in collection.
 
@@ -70,6 +70,10 @@ def place_cell_summary(
         Whether to save out the information used for the plot
     color_isi: bool, default True
         Whether the ISI should be black or blue
+    burst_thresh: int, default 5
+        How long in ms to consider the window for burst to be
+    hd_predict: bool, default False
+        Whether the head directional graph should be plotted with predicted HD.
 
     Returns
     -------
