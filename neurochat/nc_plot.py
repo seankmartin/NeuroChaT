@@ -336,7 +336,7 @@ def lfp_spectrum(plot_data, ax=None, color=None):
     ax, fig1 = _make_ax_if_none(ax)
 
     ax.plot(plot_data['f'], plot_data['Pxx'],
-            linewidth=2, linestyle='dashed', color=color)
+            linewidth=5, linestyle='dashed', color=color)
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('PSD')
     _extent = [0, plot_data['f'].max(), 0, plot_data['Pxx'].max()]
