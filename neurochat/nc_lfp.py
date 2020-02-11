@@ -1593,22 +1593,11 @@ class NLfp(NBase):
             self._set_timestamp(time)
             self._set_sampling_rate(resamp_freq)
 
-    def peak_artf(self, sd_thresh=3):
-        samples = self.get_samples()
-        sd = np.std(samples)
-        mean = np.mean(samples)
-        _, peak_locs = find_peaks(
-            samples, thresh=mean + sd_thresh*sd)
-        _, neg_peak_locs = find_peaks(
-            -1 * samples, thresh=mean + sd_thresh*sd)
-        thr_locs = np.sort(np.concatenate([peak_locs, neg_peak_locs]))
-        thr_vals = self.get_samples()[thr_locs]
-        thr_time = self.get_timestamp()[thr_locs]
-        return mean, sd, thr_locs, thr_vals, thr_time
-
     def find_artf(self, sd_thresh=3, min_artf_freq=8):
         """
-        Obtains locations of signal above threshold in windows
+        Obtains locations of signal above threshold in windows.
+        
+        NOTE this function is still a work in progress and may see future changes.
 
         Parameters
         ----------
