@@ -369,7 +369,9 @@ def lfp_spectrum_tr(plot_data, ax=None):
     _extent = [
         plot_data['t'].min(), plot_data['t'].max(), 0, plot_data['f'].max()]
     plt.axis(_extent)
-    if ax is None:
+    ax.set_xlabel('Time (sec)')
+    ax.set_ylabel('Frequency (Hz)')
+    if fig1 is not None:
         fig1.colorbar(pcm)
     else:
         plt.colorbar(pcm, ax=ax, use_gridspec=True)
