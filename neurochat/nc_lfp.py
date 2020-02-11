@@ -579,7 +579,6 @@ class NLfp(NBase):
         slc = kwargs.get('slice', None)
         if slc:
             lfp = self.get_samples()[slc]
-            print("Slice!!", slc) 
         else:
             lfp = self.get_samples()
 
