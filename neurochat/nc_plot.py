@@ -344,7 +344,7 @@ def lfp_spectrum(plot_data, ax=None, color=None, style="Solid"):
 
     ax, fig1 = _make_ax_if_none(ax)
 
-    if style == "Default":
+    if style == "Solid":
         linewidth = 2
         linestyle = "solid"
     elif style == "Dashed":
