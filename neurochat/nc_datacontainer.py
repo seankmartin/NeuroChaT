@@ -360,7 +360,7 @@ class NDataContainer():
                         unit_list = int(unit_info)
                     else:
                         unit_list = [
-                            int(x) for x in unit_info.split(" ") if x is not ""]
+                            int(x) for x in unit_info.split(" ") if x != ""]
 
                     # Load the lfp
                     lfp_ext = row[4]
@@ -459,6 +459,7 @@ class NDataContainer():
             recursive=recursive, verbose=verbose,
             re_filter=re_filter, return_absolute=True)
 
+        num_found = 0
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
@@ -493,11 +494,17 @@ class NDataContainer():
                         stm_name = fname
                         break
 
+                logging.info(
+                    "Adding tetrode {} with clusters {}, positions {}".format(
+                        tetrode, os.path.basename(spike_name),
+                        os.path.basename(pos_name))
+                )
+                num_found += 1
                 self.add_files(NDataContainer.EFileType.Spike, [spike_name])
                 self.add_files(NDataContainer.EFileType.Position, [pos_name])
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
                 self.add_files(NDataContainer.EFileType.STM, [stm_name])
-        if len(self) == 0:
+        if num_found == 0:
             print("Did not find any Axona files to add")
             return
         self.set_units()
@@ -697,7 +704,7 @@ class NDataContainer():
         for key in ["Spike", "LFP", "Position", "STM"]:
             name = self.get_file_dict(key)[idx][0]
             str_info[key] = (os.path.basename(name))
-            if name is not "":
+            if name != "":
                 dirnames.append(os.path.dirname(name))
 
         if absolute:
@@ -735,7 +742,7 @@ class NDataContainer():
             if (unit_count > unit_ub) or (unit_count < unit_lb):
                 for key in ("Spike", "LFP", "Position"):
                     name = self._file_names_dict[key].pop(i)
-                    if (key is "Spike") and verbose:
+                    if (key == "Spike") and verbose:
                         print("Removed {} with {} units".format(
                             os.path.basename(name[0]), unit_count))
                 if self._unit_count.pop(i) != unit_count:
@@ -748,9 +755,13 @@ class NDataContainer():
         self._count_num_units()
         end_total = len(self)
 
-        print(("{} tetrodes with {} units reduced to "
-               + "{} tetrodes with {} units").format(
-            start_size, start_total, end_size, end_total))
+        if end_total != start_total:
+            print(("{} tetrodes with {} units reduced to "
+                   + "{} tetrodes with {} units").format(
+                start_size, start_total, end_size, end_total))
+        else:
+            print("{} tetrodes with {} units".format(
+                start_size, start_total))
 
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
