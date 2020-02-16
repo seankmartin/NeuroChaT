@@ -120,12 +120,11 @@ def place_cell_summary(
     for i, data in enumerate(collection):
         try:
             data_idx, unit_idx = collection._index_to_data_pos(i)
-            print("Working on {}, {}".format(unit_idx, len(
-                collection.get_units(data_idx)) - 1))
             filename = collection.get_file_dict()["Spike"][data_idx][0]
             unit_number = collection.get_units(data_idx)[unit_idx]
-            print("Working on {} unit {}".format(
-                filename, unit_number))
+            print("Working on {} unit {} out of {}".format(
+                filename, unit_number, len(
+                    collection.get_units(data_idx)) - 1))
 
             count = data.spike.get_unit_spikes_count()
             # Skip very low count cells
