@@ -317,7 +317,7 @@ def theta_cell(plot_data, ax=None, **kwargs):
     return isi_corr(plot_data, ax=ax, plot_theta=True, **kwargs)
 
 
-def lfp_spectrum(plot_data, ax=None, color=None):
+def lfp_spectrum(plot_data, ax=None, color=None, style="Solid"):
     """
     Plots LFP spectrum analysis data
 
@@ -325,6 +325,15 @@ def lfp_spectrum(plot_data, ax=None, color=None):
     ----------
     plot_data : dict
         Graphical data from the ISI correlation
+    ax : matplotlib Axes
+        Optional axes to plot into.
+        Makes a new figure if this is None
+    color : matplotlib supported color
+        Default is None, the color of the plot line
+    style : str
+        options are:
+            Solid - A thin flat line
+            Dashed - A thicker dashed line
 
     Returns
     -------
@@ -335,8 +344,20 @@ def lfp_spectrum(plot_data, ax=None, color=None):
 
     ax, fig1 = _make_ax_if_none(ax)
 
+    if style == "Default":
+        linewidth = 2
+        linestyle = "solid"
+    elif style == "Dashed":
+        linewidth = 5
+        linestyle = "dashed"
+    else:
+        print("Unknown style {} in lfp_spectrum, using Solid".format(
+            style))
+        linewidth = 2
+        linestyle = "solid"
+
     ax.plot(plot_data['f'], plot_data['Pxx'],
-            linewidth=5, linestyle='dashed', color=color)
+            linewidth=linewidth, linestyle=linestyle, color=color)
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('PSD')
     _extent = [0, plot_data['f'].max(), 0, plot_data['Pxx'].max()]
