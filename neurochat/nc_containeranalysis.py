@@ -124,7 +124,7 @@ def place_cell_summary(
             unit_number = collection.get_units(data_idx)[unit_idx]
             print("Working on {} unit {} out of {}".format(
                 filename, unit_number, len(
-                    collection.get_units(data_idx)) - 1))
+                    collection.get_units(data_idx))))
 
             count = data.spike.get_unit_spikes_count()
             # Skip very low count cells
