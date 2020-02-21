@@ -40,6 +40,7 @@ import re
 
 import pandas as pd
 import numpy as np
+import pprint
 
 from neurochat.nc_data import NData
 from neurochat.nc_utils import get_all_files_in_dir, make_dir_if_not_exists
@@ -65,7 +66,8 @@ class NDataContainer():
     Additionally the ndata objects themselves can be stored.
     &#34;&#34;&#34;
 
-    def __init__(self, share_positions=False, load_on_fly=False):
+    def __init__(
+            self, share_positions=False, load_on_fly=False, share_stms=False):
         &#34;&#34;&#34;
         Initialise the class.
 
@@ -94,6 +96,7 @@ class NDataContainer():
         self._container = []
         self._unit_count = []
         self._share_positions = share_positions
+        self._share_stms = share_stms
         self._load_on_fly = load_on_fly
         self._last_data_pt = (1, None)
         self._smoothed_speed = False
@@ -104,6 +107,7 @@ class NDataContainer():
         Spike = 1
         Position = 2
         LFP = 3
+        STM = 4
 
     def get_num_data(self):
         &#34;&#34;&#34;Return the number of Ndata objects in the container.&#34;&#34;&#34;
@@ -220,6 +224,10 @@ class NDataContainer():
             return
 
         if f_type.name == &#34;Position&#34; and self._share_positions and len(filenames) == 1:
+            for _ in range(len(self.get_file_dict()[&#34;Spike&#34;]) - 1):
+                filenames.append(filenames[0])
+
+        if f_type.name == &#34;STM&#34; and self._share_stms and len(filenames) == 1:
             for _ in range(len(self.get_file_dict()[&#34;Spike&#34;]) - 1):
                 filenames.append(filenames[0])
 
@@ -378,7 +386,7 @@ class NDataContainer():
                         unit_list = int(unit_info)
                     else:
                         unit_list = [
-                            int(x) for x in unit_info.split(&#34; &#34;) if x is not &#34;&#34;]
+                            int(x) for x in unit_info.split(&#34; &#34;) if x != &#34;&#34;]
 
                     # Load the lfp
                     lfp_ext = row[4]
@@ -453,19 +461,31 @@ class NDataContainer():
         clu_extension = kwargs.get(&#34;clu_extension&#34;, &#34;.clu.X&#34;)
         pos_extension = kwargs.get(&#34;pos_extension&#34;, &#34;.txt&#34;)
         lfp_extension = kwargs.get(&#34;lfp_extension&#34;, &#34;.eeg&#34;)
+        stm_extension = kwargs.get(&#34;stm_extension&#34;, &#34;.stm&#34;)
         re_filter = kwargs.get(&#34;re_filter&#34;, None)
         save_result = kwargs.get(&#34;save_result&#34;, True)
         unit_cutoff = kwargs.get(&#34;unit_cutoff&#34;, None)
 
+        if verbose:
+            print(&#34;Finding set files:&#34;)
         files = get_all_files_in_dir(
             directory, data_extension,
             recursive=recursive, verbose=verbose,
             re_filter=re_filter, return_absolute=True)
+        if verbose:
+            print(&#34;Finding txt files:&#34;)
         txt_files = get_all_files_in_dir(
             directory, pos_extension,
             recursive=recursive, verbose=verbose,
             re_filter=re_filter, return_absolute=True)
+        if verbose:
+            print(&#34;Finding stm files:&#34;)
+        stm_files = get_all_files_in_dir(
+            directory, stm_extension,
+            recursive=recursive, verbose=verbose,
+            re_filter=re_filter, return_absolute=True)
 
+        num_found = 0
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
@@ -473,6 +493,7 @@ class NDataContainer():
                 cut_name = filename + &#39;_&#39; + str(tetrode) + cluster_extension
                 clu_name = filename + clu_extension[:-1] + str(tetrode)
                 lfp_name = filename + lfp_extension
+                stm_name = &#34;&#34;
 
                 if not os.path.isfile(os.path.join(directory, spike_name)):
                     continue
@@ -485,7 +506,7 @@ class NDataContainer():
                     continue
 
                 for fname in txt_files:
-                    if fname[:len(filename)] == filename:
+                    if fname[:(len(filename) + 1)] == filename + &#34;_&#34;:
                         pos_name = fname
                         break
 
@@ -494,9 +515,24 @@ class NDataContainer():
                         &#34;Skipping tetrode {} - no position file for {}&#34;.format(tetrode, filename))
                     continue
 
+                for fname in stm_files:
+                    if fname[:len(filename)] == filename:
+                        stm_name = fname
+                        break
+
+                logging.info(
+                    &#34;Adding tetrode {} with clusters {}, positions {}&#34;.format(
+                        tetrode, os.path.basename(spike_name),
+                        os.path.basename(pos_name))
+                )
+                num_found += 1
                 self.add_files(NDataContainer.EFileType.Spike, [spike_name])
                 self.add_files(NDataContainer.EFileType.Position, [pos_name])
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
+                self.add_files(NDataContainer.EFileType.STM, [stm_name])
+        if num_found == 0:
+            print(&#34;Did not find any Axona files to add&#34;)
+            return
         self.set_units()
 
         if unit_cutoff:
@@ -506,7 +542,7 @@ class NDataContainer():
             friendly_re = &#34;&#34;
             if re_filter:
                 friendly_re = &#34;_&#34; + \
-                    &#34; &#34;.join(re.findall(&#34;[a-zA-Z]+&#34;, re_filter))
+                    &#34;-&#34;.join(re.findall(&#34;[a-zA-Z0-9_]+&#34;, re_filter))
             name = (
                 &#34;file_list_&#34; + os.path.basename(directory) +
                 friendly_re + &#34;.txt&#34;)
@@ -691,10 +727,11 @@ class NDataContainer():
         if absolute:
             idx, u_idx = self._index_to_data_pos(idx)
 
-        for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;]:
+        for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;, &#34;STM&#34;]:
             name = self.get_file_dict(key)[idx][0]
             str_info[key] = (os.path.basename(name))
-            dirnames.append(os.path.dirname(name))
+            if name != &#34;&#34;:
+                dirnames.append(os.path.dirname(name))
 
         if absolute:
             str_info[&#34;Units&#34;] = (self.get_units(idx)[u_idx])
@@ -705,7 +742,7 @@ class NDataContainer():
             str_info[&#34;Root&#34;] = dirnames[0]
         else:
             print(&#34;Not all files are in the same directory {} {}&#34;.format(
-                &#34;:Spike, LFP, Position: &#34;, dirnames))
+                &#34;:Spike, LFP, Position, STM: &#34;, dirnames))
             str_info[&#34;Root&#34;] = dirnames
         return str_info
 
@@ -731,7 +768,7 @@ class NDataContainer():
             if (unit_count &gt; unit_ub) or (unit_count &lt; unit_lb):
                 for key in (&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;):
                     name = self._file_names_dict[key].pop(i)
-                    if (key is &#34;Spike&#34;) and verbose:
+                    if (key == &#34;Spike&#34;) and verbose:
                         print(&#34;Removed {} with {} units&#34;.format(
                             os.path.basename(name[0]), unit_count))
                 if self._unit_count.pop(i) != unit_count:
@@ -744,9 +781,13 @@ class NDataContainer():
         self._count_num_units()
         end_total = len(self)
 
-        print((&#34;{} tetrodes with {} units reduced to &#34;
-               + &#34;{} tetrodes with {} units&#34;).format(
-            start_size, start_total, end_size, end_total))
+        if end_total != start_total:
+            print((&#34;{} tetrodes with {} units reduced to &#34;
+                   + &#34;{} tetrodes with {} units&#34;).format(
+                start_size, start_total, end_size, end_total))
+        else:
+            print(&#34;{} tetrodes with {} units&#34;.format(
+                start_size, start_total))
 
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
@@ -757,6 +798,8 @@ class NDataContainer():
                 else:
                     result = NData()
                     for key, vals in self.get_file_dict().items():
+                        if key == &#34;STM&#34;:
+                            continue
                         descriptor = vals[data_index]
                         self._load(key, descriptor,
                                    idx=data_index, ndata=result)
@@ -769,16 +812,41 @@ class NDataContainer():
             result.set_unit_no(self.get_units(data_index)[unit_index])
         return result
 
+    def get_name_at_idx(
+            self, idx, ext, opt_end=&#34;&#34;, base_dir=None, out_dirname=&#34;nc_plots&#34;):
+        data_idx, unit_idx = self._index_to_data_pos(idx)
+        filename = self.get_file_dict()[&#34;Spike&#34;][data_idx][0]
+        unit_number = self.get_units(data_idx)[unit_idx]
+        spike_name = os.path.basename(filename)
+        parts = spike_name.split(&#34;.&#34;)
+        f_dir = os.path.dirname(filename)
+        data_basename = (
+            parts[0] + &#34;_&#34; + parts[1] + &#34;_&#34; +
+            str(unit_number) + opt_end + &#34;.&#34; + ext)
+        if base_dir is not None:
+            main_dir = base_dir
+            out_base = f_dir[len(base_dir + os.sep):]
+            if len(out_base) != 0:
+                out_base = (&#34;--&#34;).join(out_base.split(os.sep))
+                data_basename = out_base + &#34;--&#34; + data_basename
+        else:
+            main_dir = f_dir
+        out_name = os.path.join(
+            main_dir, out_dirname, data_basename)
+        make_dir_if_not_exists(out_name)
+        return out_name
+
     # Methods from here on should be for private class use
     def _pretty_string(self):
         &#34;&#34;&#34;Alternative string representation should be prettier.&#34;&#34;&#34;
         all_str_info = []
         for i in range(self.get_num_data()):
             str_info = self.get_index_info(i)
-            b_str = &#34;{}: \n\tSpk {}\n\tUnt {}: {}\n\tLfp {}\n\tPos {}\n\tDir {}&#34;.format(
+            b_str = &#34;{}: \n\tSpk {}\n\tUnt {}: {}\n\tLfp {}\n\tPos {}\n\tSTM {}\n\tDir {}&#34;.format(
                 i, str_info[&#34;Spike&#34;], len(str_info[&#34;Units&#34;]),
                 str_info[&#34;Units&#34;], str_info[&#34;LFP&#34;],
-                str_info[&#34;Position&#34;], str_info[&#34;Root&#34;])
+                str_info[&#34;Position&#34;], str_info[&#34;STM&#34;],
+                str_info[&#34;Root&#34;])
             all_str_info.append(b_str)
         return &#34;\n&#34;.join(all_str_info)
 
@@ -879,7 +947,6 @@ class NDataContainer():
         &#34;&#34;&#34;Return the number of units in the collection.&#34;&#34;&#34;
         counts = self._unit_count
         if len(counts) == 0:
-            print(&#34;Recounting units&#34;)
             self._unit_count = self._count_num_units()
             counts = self._unit_count
         return sum(counts)
@@ -939,7 +1006,7 @@ class NDataContainer():
 <dl>
 <dt id="neurochat.nc_datacontainer.NDataContainer"><code class="flex name class">
 <span>class <span class="ident">NDataContainer</span></span>
-<span>(</span><span>share_positions=False, load_on_fly=False)</span>
+<span>(</span><span>share_positions=False, load_on_fly=False, share_stms=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Class for storing multiple file locations for ndata objects.</p>
@@ -981,7 +1048,8 @@ instead load it as needed, on the fly</dd>
     Additionally the ndata objects themselves can be stored.
     &#34;&#34;&#34;
 
-    def __init__(self, share_positions=False, load_on_fly=False):
+    def __init__(
+            self, share_positions=False, load_on_fly=False, share_stms=False):
         &#34;&#34;&#34;
         Initialise the class.
 
@@ -1010,6 +1078,7 @@ instead load it as needed, on the fly</dd>
         self._container = []
         self._unit_count = []
         self._share_positions = share_positions
+        self._share_stms = share_stms
         self._load_on_fly = load_on_fly
         self._last_data_pt = (1, None)
         self._smoothed_speed = False
@@ -1020,6 +1089,7 @@ instead load it as needed, on the fly</dd>
         Spike = 1
         Position = 2
         LFP = 3
+        STM = 4
 
     def get_num_data(self):
         &#34;&#34;&#34;Return the number of Ndata objects in the container.&#34;&#34;&#34;
@@ -1136,6 +1206,10 @@ instead load it as needed, on the fly</dd>
             return
 
         if f_type.name == &#34;Position&#34; and self._share_positions and len(filenames) == 1:
+            for _ in range(len(self.get_file_dict()[&#34;Spike&#34;]) - 1):
+                filenames.append(filenames[0])
+
+        if f_type.name == &#34;STM&#34; and self._share_stms and len(filenames) == 1:
             for _ in range(len(self.get_file_dict()[&#34;Spike&#34;]) - 1):
                 filenames.append(filenames[0])
 
@@ -1294,7 +1368,7 @@ instead load it as needed, on the fly</dd>
                         unit_list = int(unit_info)
                     else:
                         unit_list = [
-                            int(x) for x in unit_info.split(&#34; &#34;) if x is not &#34;&#34;]
+                            int(x) for x in unit_info.split(&#34; &#34;) if x != &#34;&#34;]
 
                     # Load the lfp
                     lfp_ext = row[4]
@@ -1369,19 +1443,31 @@ instead load it as needed, on the fly</dd>
         clu_extension = kwargs.get(&#34;clu_extension&#34;, &#34;.clu.X&#34;)
         pos_extension = kwargs.get(&#34;pos_extension&#34;, &#34;.txt&#34;)
         lfp_extension = kwargs.get(&#34;lfp_extension&#34;, &#34;.eeg&#34;)
+        stm_extension = kwargs.get(&#34;stm_extension&#34;, &#34;.stm&#34;)
         re_filter = kwargs.get(&#34;re_filter&#34;, None)
         save_result = kwargs.get(&#34;save_result&#34;, True)
         unit_cutoff = kwargs.get(&#34;unit_cutoff&#34;, None)
 
+        if verbose:
+            print(&#34;Finding set files:&#34;)
         files = get_all_files_in_dir(
             directory, data_extension,
             recursive=recursive, verbose=verbose,
             re_filter=re_filter, return_absolute=True)
+        if verbose:
+            print(&#34;Finding txt files:&#34;)
         txt_files = get_all_files_in_dir(
             directory, pos_extension,
             recursive=recursive, verbose=verbose,
             re_filter=re_filter, return_absolute=True)
+        if verbose:
+            print(&#34;Finding stm files:&#34;)
+        stm_files = get_all_files_in_dir(
+            directory, stm_extension,
+            recursive=recursive, verbose=verbose,
+            re_filter=re_filter, return_absolute=True)
 
+        num_found = 0
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
@@ -1389,6 +1475,7 @@ instead load it as needed, on the fly</dd>
                 cut_name = filename + &#39;_&#39; + str(tetrode) + cluster_extension
                 clu_name = filename + clu_extension[:-1] + str(tetrode)
                 lfp_name = filename + lfp_extension
+                stm_name = &#34;&#34;
 
                 if not os.path.isfile(os.path.join(directory, spike_name)):
                     continue
@@ -1401,7 +1488,7 @@ instead load it as needed, on the fly</dd>
                     continue
 
                 for fname in txt_files:
-                    if fname[:len(filename)] == filename:
+                    if fname[:(len(filename) + 1)] == filename + &#34;_&#34;:
                         pos_name = fname
                         break
 
@@ -1410,9 +1497,24 @@ instead load it as needed, on the fly</dd>
                         &#34;Skipping tetrode {} - no position file for {}&#34;.format(tetrode, filename))
                     continue
 
+                for fname in stm_files:
+                    if fname[:len(filename)] == filename:
+                        stm_name = fname
+                        break
+
+                logging.info(
+                    &#34;Adding tetrode {} with clusters {}, positions {}&#34;.format(
+                        tetrode, os.path.basename(spike_name),
+                        os.path.basename(pos_name))
+                )
+                num_found += 1
                 self.add_files(NDataContainer.EFileType.Spike, [spike_name])
                 self.add_files(NDataContainer.EFileType.Position, [pos_name])
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
+                self.add_files(NDataContainer.EFileType.STM, [stm_name])
+        if num_found == 0:
+            print(&#34;Did not find any Axona files to add&#34;)
+            return
         self.set_units()
 
         if unit_cutoff:
@@ -1422,7 +1524,7 @@ instead load it as needed, on the fly</dd>
             friendly_re = &#34;&#34;
             if re_filter:
                 friendly_re = &#34;_&#34; + \
-                    &#34; &#34;.join(re.findall(&#34;[a-zA-Z]+&#34;, re_filter))
+                    &#34;-&#34;.join(re.findall(&#34;[a-zA-Z0-9_]+&#34;, re_filter))
             name = (
                 &#34;file_list_&#34; + os.path.basename(directory) +
                 friendly_re + &#34;.txt&#34;)
@@ -1607,10 +1709,11 @@ instead load it as needed, on the fly</dd>
         if absolute:
             idx, u_idx = self._index_to_data_pos(idx)
 
-        for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;]:
+        for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;, &#34;STM&#34;]:
             name = self.get_file_dict(key)[idx][0]
             str_info[key] = (os.path.basename(name))
-            dirnames.append(os.path.dirname(name))
+            if name != &#34;&#34;:
+                dirnames.append(os.path.dirname(name))
 
         if absolute:
             str_info[&#34;Units&#34;] = (self.get_units(idx)[u_idx])
@@ -1621,7 +1724,7 @@ instead load it as needed, on the fly</dd>
             str_info[&#34;Root&#34;] = dirnames[0]
         else:
             print(&#34;Not all files are in the same directory {} {}&#34;.format(
-                &#34;:Spike, LFP, Position: &#34;, dirnames))
+                &#34;:Spike, LFP, Position, STM: &#34;, dirnames))
             str_info[&#34;Root&#34;] = dirnames
         return str_info
 
@@ -1647,7 +1750,7 @@ instead load it as needed, on the fly</dd>
             if (unit_count &gt; unit_ub) or (unit_count &lt; unit_lb):
                 for key in (&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;):
                     name = self._file_names_dict[key].pop(i)
-                    if (key is &#34;Spike&#34;) and verbose:
+                    if (key == &#34;Spike&#34;) and verbose:
                         print(&#34;Removed {} with {} units&#34;.format(
                             os.path.basename(name[0]), unit_count))
                 if self._unit_count.pop(i) != unit_count:
@@ -1660,9 +1763,13 @@ instead load it as needed, on the fly</dd>
         self._count_num_units()
         end_total = len(self)
 
-        print((&#34;{} tetrodes with {} units reduced to &#34;
-               + &#34;{} tetrodes with {} units&#34;).format(
-            start_size, start_total, end_size, end_total))
+        if end_total != start_total:
+            print((&#34;{} tetrodes with {} units reduced to &#34;
+                   + &#34;{} tetrodes with {} units&#34;).format(
+                start_size, start_total, end_size, end_total))
+        else:
+            print(&#34;{} tetrodes with {} units&#34;.format(
+                start_size, start_total))
 
     def get_data_at(self, data_index, unit_index):
         if self._load_on_fly:
@@ -1673,6 +1780,8 @@ instead load it as needed, on the fly</dd>
                 else:
                     result = NData()
                     for key, vals in self.get_file_dict().items():
+                        if key == &#34;STM&#34;:
+                            continue
                         descriptor = vals[data_index]
                         self._load(key, descriptor,
                                    idx=data_index, ndata=result)
@@ -1685,16 +1794,41 @@ instead load it as needed, on the fly</dd>
             result.set_unit_no(self.get_units(data_index)[unit_index])
         return result
 
+    def get_name_at_idx(
+            self, idx, ext, opt_end=&#34;&#34;, base_dir=None, out_dirname=&#34;nc_plots&#34;):
+        data_idx, unit_idx = self._index_to_data_pos(idx)
+        filename = self.get_file_dict()[&#34;Spike&#34;][data_idx][0]
+        unit_number = self.get_units(data_idx)[unit_idx]
+        spike_name = os.path.basename(filename)
+        parts = spike_name.split(&#34;.&#34;)
+        f_dir = os.path.dirname(filename)
+        data_basename = (
+            parts[0] + &#34;_&#34; + parts[1] + &#34;_&#34; +
+            str(unit_number) + opt_end + &#34;.&#34; + ext)
+        if base_dir is not None:
+            main_dir = base_dir
+            out_base = f_dir[len(base_dir + os.sep):]
+            if len(out_base) != 0:
+                out_base = (&#34;--&#34;).join(out_base.split(os.sep))
+                data_basename = out_base + &#34;--&#34; + data_basename
+        else:
+            main_dir = f_dir
+        out_name = os.path.join(
+            main_dir, out_dirname, data_basename)
+        make_dir_if_not_exists(out_name)
+        return out_name
+
     # Methods from here on should be for private class use
     def _pretty_string(self):
         &#34;&#34;&#34;Alternative string representation should be prettier.&#34;&#34;&#34;
         all_str_info = []
         for i in range(self.get_num_data()):
             str_info = self.get_index_info(i)
-            b_str = &#34;{}: \n\tSpk {}\n\tUnt {}: {}\n\tLfp {}\n\tPos {}\n\tDir {}&#34;.format(
+            b_str = &#34;{}: \n\tSpk {}\n\tUnt {}: {}\n\tLfp {}\n\tPos {}\n\tSTM {}\n\tDir {}&#34;.format(
                 i, str_info[&#34;Spike&#34;], len(str_info[&#34;Units&#34;]),
                 str_info[&#34;Units&#34;], str_info[&#34;LFP&#34;],
-                str_info[&#34;Position&#34;], str_info[&#34;Root&#34;])
+                str_info[&#34;Position&#34;], str_info[&#34;STM&#34;],
+                str_info[&#34;Root&#34;])
             all_str_info.append(b_str)
         return &#34;\n&#34;.join(all_str_info)
 
@@ -1795,7 +1929,6 @@ instead load it as needed, on the fly</dd>
         &#34;&#34;&#34;Return the number of units in the collection.&#34;&#34;&#34;
         counts = self._unit_count
         if len(counts) == 0:
-            print(&#34;Recounting units&#34;)
             self._unit_count = self._count_num_units()
             counts = self._unit_count
         return sum(counts)
@@ -1973,19 +2106,31 @@ don't consider any recordings with units outside this range</dd>
     clu_extension = kwargs.get(&#34;clu_extension&#34;, &#34;.clu.X&#34;)
     pos_extension = kwargs.get(&#34;pos_extension&#34;, &#34;.txt&#34;)
     lfp_extension = kwargs.get(&#34;lfp_extension&#34;, &#34;.eeg&#34;)
+    stm_extension = kwargs.get(&#34;stm_extension&#34;, &#34;.stm&#34;)
     re_filter = kwargs.get(&#34;re_filter&#34;, None)
     save_result = kwargs.get(&#34;save_result&#34;, True)
     unit_cutoff = kwargs.get(&#34;unit_cutoff&#34;, None)
 
+    if verbose:
+        print(&#34;Finding set files:&#34;)
     files = get_all_files_in_dir(
         directory, data_extension,
         recursive=recursive, verbose=verbose,
         re_filter=re_filter, return_absolute=True)
+    if verbose:
+        print(&#34;Finding txt files:&#34;)
     txt_files = get_all_files_in_dir(
         directory, pos_extension,
         recursive=recursive, verbose=verbose,
         re_filter=re_filter, return_absolute=True)
+    if verbose:
+        print(&#34;Finding stm files:&#34;)
+    stm_files = get_all_files_in_dir(
+        directory, stm_extension,
+        recursive=recursive, verbose=verbose,
+        re_filter=re_filter, return_absolute=True)
 
+    num_found = 0
     for filename in files:
         filename = filename[:-len(data_extension)]
         for tetrode in tetrode_list:
@@ -1993,6 +2138,7 @@ don't consider any recordings with units outside this range</dd>
             cut_name = filename + &#39;_&#39; + str(tetrode) + cluster_extension
             clu_name = filename + clu_extension[:-1] + str(tetrode)
             lfp_name = filename + lfp_extension
+            stm_name = &#34;&#34;
 
             if not os.path.isfile(os.path.join(directory, spike_name)):
                 continue
@@ -2005,7 +2151,7 @@ don't consider any recordings with units outside this range</dd>
                 continue
 
             for fname in txt_files:
-                if fname[:len(filename)] == filename:
+                if fname[:(len(filename) + 1)] == filename + &#34;_&#34;:
                     pos_name = fname
                     break
 
@@ -2014,9 +2160,24 @@ don't consider any recordings with units outside this range</dd>
                     &#34;Skipping tetrode {} - no position file for {}&#34;.format(tetrode, filename))
                 continue
 
+            for fname in stm_files:
+                if fname[:len(filename)] == filename:
+                    stm_name = fname
+                    break
+
+            logging.info(
+                &#34;Adding tetrode {} with clusters {}, positions {}&#34;.format(
+                    tetrode, os.path.basename(spike_name),
+                    os.path.basename(pos_name))
+            )
+            num_found += 1
             self.add_files(NDataContainer.EFileType.Spike, [spike_name])
             self.add_files(NDataContainer.EFileType.Position, [pos_name])
             self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
+            self.add_files(NDataContainer.EFileType.STM, [stm_name])
+    if num_found == 0:
+        print(&#34;Did not find any Axona files to add&#34;)
+        return
     self.set_units()
 
     if unit_cutoff:
@@ -2026,7 +2187,7 @@ don't consider any recordings with units outside this range</dd>
         friendly_re = &#34;&#34;
         if re_filter:
             friendly_re = &#34;_&#34; + \
-                &#34; &#34;.join(re.findall(&#34;[a-zA-Z]+&#34;, re_filter))
+                &#34;-&#34;.join(re.findall(&#34;[a-zA-Z0-9_]+&#34;, re_filter))
         name = (
             &#34;file_list_&#34; + os.path.basename(directory) +
             friendly_re + &#34;.txt&#34;)
@@ -2102,6 +2263,10 @@ don't consider any recordings with units outside this range</dd>
         return
 
     if f_type.name == &#34;Position&#34; and self._share_positions and len(filenames) == 1:
+        for _ in range(len(self.get_file_dict()[&#34;Spike&#34;]) - 1):
+            filenames.append(filenames[0])
+
+    if f_type.name == &#34;STM&#34; and self._share_stms and len(filenames) == 1:
         for _ in range(len(self.get_file_dict()[&#34;Spike&#34;]) - 1):
             filenames.append(filenames[0])
 
@@ -2211,7 +2376,7 @@ directory | position file | spike file | unit numbers | eeg extension</p>
                     unit_list = int(unit_info)
                 else:
                     unit_list = [
-                        int(x) for x in unit_info.split(&#34; &#34;) if x is not &#34;&#34;]
+                        int(x) for x in unit_info.split(&#34; &#34;) if x != &#34;&#34;]
 
                 # Load the lfp
                 lfp_ext = row[4]
@@ -2311,6 +2476,8 @@ directory | position file | spike file | unit numbers | eeg extension</p>
             else:
                 result = NData()
                 for key, vals in self.get_file_dict().items():
+                    if key == &#34;STM&#34;:
+                        continue
                     descriptor = vals[data_index]
                     self._load(key, descriptor,
                                idx=data_index, ndata=result)
@@ -2352,10 +2519,11 @@ directory | position file | spike file | unit numbers | eeg extension</p>
     if absolute:
         idx, u_idx = self._index_to_data_pos(idx)
 
-    for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;]:
+    for key in [&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;, &#34;STM&#34;]:
         name = self.get_file_dict(key)[idx][0]
         str_info[key] = (os.path.basename(name))
-        dirnames.append(os.path.dirname(name))
+        if name != &#34;&#34;:
+            dirnames.append(os.path.dirname(name))
 
     if absolute:
         str_info[&#34;Units&#34;] = (self.get_units(idx)[u_idx])
@@ -2366,9 +2534,41 @@ directory | position file | spike file | unit numbers | eeg extension</p>
         str_info[&#34;Root&#34;] = dirnames[0]
     else:
         print(&#34;Not all files are in the same directory {} {}&#34;.format(
-            &#34;:Spike, LFP, Position: &#34;, dirnames))
+            &#34;:Spike, LFP, Position, STM: &#34;, dirnames))
         str_info[&#34;Root&#34;] = dirnames
     return str_info</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_datacontainer.NDataContainer.get_name_at_idx"><code class="name flex">
+<span>def <span class="ident">get_name_at_idx</span></span>(<span>self, idx, ext, opt_end='', base_dir=None, out_dirname='nc_plots')</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_name_at_idx(
+        self, idx, ext, opt_end=&#34;&#34;, base_dir=None, out_dirname=&#34;nc_plots&#34;):
+    data_idx, unit_idx = self._index_to_data_pos(idx)
+    filename = self.get_file_dict()[&#34;Spike&#34;][data_idx][0]
+    unit_number = self.get_units(data_idx)[unit_idx]
+    spike_name = os.path.basename(filename)
+    parts = spike_name.split(&#34;.&#34;)
+    f_dir = os.path.dirname(filename)
+    data_basename = (
+        parts[0] + &#34;_&#34; + parts[1] + &#34;_&#34; +
+        str(unit_number) + opt_end + &#34;.&#34; + ext)
+    if base_dir is not None:
+        main_dir = base_dir
+        out_base = f_dir[len(base_dir + os.sep):]
+        if len(out_base) != 0:
+            out_base = (&#34;--&#34;).join(out_base.split(os.sep))
+            data_basename = out_base + &#34;--&#34; + data_basename
+    else:
+        main_dir = f_dir
+    out_name = os.path.join(
+        main_dir, out_dirname, data_basename)
+    make_dir_if_not_exists(out_name)
+    return out_name</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.get_num_data"><code class="name flex">
@@ -2575,7 +2775,7 @@ The merged indexes must have the same unit numbers available</p>
         if (unit_count &gt; unit_ub) or (unit_count &lt; unit_lb):
             for key in (&#34;Spike&#34;, &#34;LFP&#34;, &#34;Position&#34;):
                 name = self._file_names_dict[key].pop(i)
-                if (key is &#34;Spike&#34;) and verbose:
+                if (key == &#34;Spike&#34;) and verbose:
                     print(&#34;Removed {} with {} units&#34;.format(
                         os.path.basename(name[0]), unit_count))
             if self._unit_count.pop(i) != unit_count:
@@ -2588,9 +2788,13 @@ The merged indexes must have the same unit numbers available</p>
     self._count_num_units()
     end_total = len(self)
 
-    print((&#34;{} tetrodes with {} units reduced to &#34;
-           + &#34;{} tetrodes with {} units&#34;).format(
-        start_size, start_total, end_size, end_total))</code></pre>
+    if end_total != start_total:
+        print((&#34;{} tetrodes with {} units reduced to &#34;
+               + &#34;{} tetrodes with {} units&#34;).format(
+            start_size, start_total, end_size, end_total))
+    else:
+        print(&#34;{} tetrodes with {} units&#34;.format(
+            start_size, start_total))</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.set_units"><code class="name flex">
@@ -2853,6 +3057,7 @@ Parameters</p>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_data_at" href="#neurochat.nc_datacontainer.NDataContainer.get_data_at">get_data_at</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_file_dict" href="#neurochat.nc_datacontainer.NDataContainer.get_file_dict">get_file_dict</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_index_info" href="#neurochat.nc_datacontainer.NDataContainer.get_index_info">get_index_info</a></code></li>
+<li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_name_at_idx" href="#neurochat.nc_datacontainer.NDataContainer.get_name_at_idx">get_name_at_idx</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_num_data" href="#neurochat.nc_datacontainer.NDataContainer.get_num_data">get_num_data</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.get_units" href="#neurochat.nc_datacontainer.NDataContainer.get_units">get_units</a></code></li>
 <li><code><a title="neurochat.nc_datacontainer.NDataContainer.list_all_units" href="#neurochat.nc_datacontainer.NDataContainer.list_all_units">list_all_units</a></code></li>

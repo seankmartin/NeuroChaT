@@ -44,7 +44,7 @@ from math import floor, ceil
 from neurochat.nc_utils import window_rms
 from neurochat.nc_utils import butter_filter
 from neurochat.nc_utils import find_peaks
-
+from neurochat.nc_utils import find_true_ranges
 from neurochat.nc_utils import butter_filter, fft_psd, find
 
 from neurochat.nc_circular import CircStat
@@ -639,7 +639,7 @@ class NLfp(NBase):
                     window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
                     detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
-            graph_data[&#39;t&#39;] = t
+            graph_data[&#39;t&#39;] = t + self.get_timestamp()[0]
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
@@ -1209,11 +1209,13 @@ class NLfp(NBase):
         low, high = band
         method = kwargs.get(&#34;method&#34;, &#34;welch&#34;)
         window_sec = kwargs.get(&#34;window_sec&#34;, 2 / (low + 0.000001))
+        unit = kwargs.get(&#34;unit&#34;, &#34;milli&#34;)
+        scale = 1000 if unit == &#34;micro&#34; else 1
         sf = self.get_sampling_rate()
-        lfp_samples = self.get_samples()
+        lfp_samples = self.get_samples() * scale
 
         band_total = kwargs.get(&#39;band_total&#39;, False)
-        _filter = kwargs.get(&#39;total_band&#39;, [1.5, 40])
+        _filter = kwargs.get(&#39;total_band&#39;, [1.5, 90])
 
         # if prefilt:
         #     lfp_samples = butter_filter(lfp_samples, sf, *_filter)
@@ -1615,7 +1617,57 @@ class NLfp(NBase):
             self._set_samples(lfp_wave)
             self._set_total_samples(lfp_wave.size)
             self._set_timestamp(time)
-            self._set_sampling_rate(resamp_freq)</code></pre>
+            self._set_sampling_rate(resamp_freq)
+
+    def find_artf(self, sd_thresh=3, min_artf_freq=8):
+        &#34;&#34;&#34;
+        Obtains locations of signal above threshold in windows.
+        
+        NOTE this function is still a work in progress and may see future changes.
+
+        Parameters
+        ----------
+        sd_thresh: float
+            threshold to exclude artf
+        min_artf_freq: float
+            minimum artf freq - Used to locate artf blocks
+            eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of each other
+
+        &#34;&#34;&#34;
+        samples = self.get_samples()
+        Fs = self.get_sampling_rate()
+        std = np.std(samples)
+        mean = np.mean(samples)
+        over_thresh = np.logical_or(
+            samples &gt;= mean + sd_thresh*std,
+            samples &lt;= mean - sd_thresh*std)
+        # use np.where on the logical or if not using find_true_ranges    
+        _, thr_locs = find_true_ranges(
+            [i for i in range(len(samples))], over_thresh, 
+            min_range=1, return_idxs=True)
+        final_thr_locs = []
+        if len(thr_locs) == 0:
+            print(&#34;No artefacts found.&#34;)
+            thr_vals = []
+            thr_time = []
+        else:
+            for i in range(len(thr_locs)-1):
+                # Set based on sampling freq/max freq of interest.
+                if thr_locs[i+1] - thr_locs[i] &lt;= ceil(Fs/min_artf_freq):
+                    for j in range(thr_locs[i], thr_locs[i+1]):
+                        final_thr_locs.append(j)
+                else:
+                    final_thr_locs.append(thr_locs[i])
+            final_thr_locs.append(thr_locs[-1])
+
+            # print(&#39;original: &#39;, len(thr_locs))
+            thr_locs = np.array(final_thr_locs)
+            # print(&#39;changed: &#39;, len(thr_locs))
+            thr_vals = self.get_samples()[thr_locs]
+            thr_time = self.get_timestamp()[thr_locs]
+        per_removed = len(thr_locs)/len(samples)*100
+        # print(len(thr_locs), len(thr_time))
+        return mean, std, thr_locs, thr_vals, thr_time, per_removed</code></pre>
 </details>
 </section>
 <section>
@@ -2224,7 +2276,7 @@ LFP signal in the recording.</p>
                     window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
                     detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
-            graph_data[&#39;t&#39;] = t
+            graph_data[&#39;t&#39;] = t + self.get_timestamp()[0]
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
@@ -2794,11 +2846,13 @@ LFP signal in the recording.</p>
         low, high = band
         method = kwargs.get(&#34;method&#34;, &#34;welch&#34;)
         window_sec = kwargs.get(&#34;window_sec&#34;, 2 / (low + 0.000001))
+        unit = kwargs.get(&#34;unit&#34;, &#34;milli&#34;)
+        scale = 1000 if unit == &#34;micro&#34; else 1
         sf = self.get_sampling_rate()
-        lfp_samples = self.get_samples()
+        lfp_samples = self.get_samples() * scale
 
         band_total = kwargs.get(&#39;band_total&#39;, False)
-        _filter = kwargs.get(&#39;total_band&#39;, [1.5, 40])
+        _filter = kwargs.get(&#39;total_band&#39;, [1.5, 90])
 
         # if prefilt:
         #     lfp_samples = butter_filter(lfp_samples, sf, *_filter)
@@ -3200,7 +3254,57 @@ LFP signal in the recording.</p>
             self._set_samples(lfp_wave)
             self._set_total_samples(lfp_wave.size)
             self._set_timestamp(time)
-            self._set_sampling_rate(resamp_freq)</code></pre>
+            self._set_sampling_rate(resamp_freq)
+
+    def find_artf(self, sd_thresh=3, min_artf_freq=8):
+        &#34;&#34;&#34;
+        Obtains locations of signal above threshold in windows.
+        
+        NOTE this function is still a work in progress and may see future changes.
+
+        Parameters
+        ----------
+        sd_thresh: float
+            threshold to exclude artf
+        min_artf_freq: float
+            minimum artf freq - Used to locate artf blocks
+            eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of each other
+
+        &#34;&#34;&#34;
+        samples = self.get_samples()
+        Fs = self.get_sampling_rate()
+        std = np.std(samples)
+        mean = np.mean(samples)
+        over_thresh = np.logical_or(
+            samples &gt;= mean + sd_thresh*std,
+            samples &lt;= mean - sd_thresh*std)
+        # use np.where on the logical or if not using find_true_ranges    
+        _, thr_locs = find_true_ranges(
+            [i for i in range(len(samples))], over_thresh, 
+            min_range=1, return_idxs=True)
+        final_thr_locs = []
+        if len(thr_locs) == 0:
+            print(&#34;No artefacts found.&#34;)
+            thr_vals = []
+            thr_time = []
+        else:
+            for i in range(len(thr_locs)-1):
+                # Set based on sampling freq/max freq of interest.
+                if thr_locs[i+1] - thr_locs[i] &lt;= ceil(Fs/min_artf_freq):
+                    for j in range(thr_locs[i], thr_locs[i+1]):
+                        final_thr_locs.append(j)
+                else:
+                    final_thr_locs.append(thr_locs[i])
+            final_thr_locs.append(thr_locs[-1])
+
+            # print(&#39;original: &#39;, len(thr_locs))
+            thr_locs = np.array(final_thr_locs)
+            # print(&#39;changed: &#39;, len(thr_locs))
+            thr_vals = self.get_samples()[thr_locs]
+            thr_time = self.get_timestamp()[thr_locs]
+        per_removed = len(thr_locs)/len(samples)*100
+        # print(len(thr_locs), len(thr_time))
+        return mean, std, thr_locs, thr_vals, thr_time, per_removed</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -3359,11 +3463,13 @@ Default [1.5, 40]</p>
     low, high = band
     method = kwargs.get(&#34;method&#34;, &#34;welch&#34;)
     window_sec = kwargs.get(&#34;window_sec&#34;, 2 / (low + 0.000001))
+    unit = kwargs.get(&#34;unit&#34;, &#34;milli&#34;)
+    scale = 1000 if unit == &#34;micro&#34; else 1
     sf = self.get_sampling_rate()
-    lfp_samples = self.get_samples()
+    lfp_samples = self.get_samples() * scale
 
     band_total = kwargs.get(&#39;band_total&#39;, False)
-    _filter = kwargs.get(&#39;total_band&#39;, [1.5, 40])
+    _filter = kwargs.get(&#39;total_band&#39;, [1.5, 90])
 
     # if prefilt:
     #     lfp_samples = butter_filter(lfp_samples, sf, *_filter)
@@ -3559,6 +3665,73 @@ event triggered average of the LFP signal</dd>
         graph_data[&#39;center&#39;] = center
 
     return graph_data</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_lfp.NLfp.find_artf"><code class="name flex">
+<span>def <span class="ident">find_artf</span></span>(<span>self, sd_thresh=3, min_artf_freq=8)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Obtains locations of signal above threshold in windows.</p>
+<p>NOTE this function is still a work in progress and may see future changes.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>sd_thresh</code></strong> :&ensp;<code>float</code></dt>
+<dd>threshold to exclude artf</dd>
+<dt><strong><code>min_artf_freq</code></strong> :&ensp;<code>float</code></dt>
+<dd>minimum artf freq - Used to locate artf blocks
+eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of each other</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def find_artf(self, sd_thresh=3, min_artf_freq=8):
+    &#34;&#34;&#34;
+    Obtains locations of signal above threshold in windows.
+    
+    NOTE this function is still a work in progress and may see future changes.
+
+    Parameters
+    ----------
+    sd_thresh: float
+        threshold to exclude artf
+    min_artf_freq: float
+        minimum artf freq - Used to locate artf blocks
+        eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of each other
+
+    &#34;&#34;&#34;
+    samples = self.get_samples()
+    Fs = self.get_sampling_rate()
+    std = np.std(samples)
+    mean = np.mean(samples)
+    over_thresh = np.logical_or(
+        samples &gt;= mean + sd_thresh*std,
+        samples &lt;= mean - sd_thresh*std)
+    # use np.where on the logical or if not using find_true_ranges    
+    _, thr_locs = find_true_ranges(
+        [i for i in range(len(samples))], over_thresh, 
+        min_range=1, return_idxs=True)
+    final_thr_locs = []
+    if len(thr_locs) == 0:
+        print(&#34;No artefacts found.&#34;)
+        thr_vals = []
+        thr_time = []
+    else:
+        for i in range(len(thr_locs)-1):
+            # Set based on sampling freq/max freq of interest.
+            if thr_locs[i+1] - thr_locs[i] &lt;= ceil(Fs/min_artf_freq):
+                for j in range(thr_locs[i], thr_locs[i+1]):
+                    final_thr_locs.append(j)
+            else:
+                final_thr_locs.append(thr_locs[i])
+        final_thr_locs.append(thr_locs[-1])
+
+        # print(&#39;original: &#39;, len(thr_locs))
+        thr_locs = np.array(final_thr_locs)
+        # print(&#39;changed: &#39;, len(thr_locs))
+        thr_vals = self.get_samples()[thr_locs]
+        thr_time = self.get_timestamp()[thr_locs]
+    per_removed = len(thr_locs)/len(samples)*100
+    # print(len(thr_locs), len(thr_time))
+    return mean, std, thr_locs, thr_vals, thr_time, per_removed</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_lfp.NLfp.get_bytes_per_sample"><code class="name flex">
@@ -5132,7 +5305,7 @@ have file tags like 'eeg' or 'eeg8' etc.</p>
                     window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
                     detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
-            graph_data[&#39;t&#39;] = t
+            graph_data[&#39;t&#39;] = t + self.get_timestamp()[0]
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
@@ -5328,6 +5501,7 @@ implemented yet.</dd>
 <li><code><a title="neurochat.nc_lfp.NLfp.bandpower" href="#neurochat.nc_lfp.NLfp.bandpower">bandpower</a></code></li>
 <li><code><a title="neurochat.nc_lfp.NLfp.bandpower_ratio" href="#neurochat.nc_lfp.NLfp.bandpower_ratio">bandpower_ratio</a></code></li>
 <li><code><a title="neurochat.nc_lfp.NLfp.event_trig_average" href="#neurochat.nc_lfp.NLfp.event_trig_average">event_trig_average</a></code></li>
+<li><code><a title="neurochat.nc_lfp.NLfp.find_artf" href="#neurochat.nc_lfp.NLfp.find_artf">find_artf</a></code></li>
 <li><code><a title="neurochat.nc_lfp.NLfp.get_bytes_per_sample" href="#neurochat.nc_lfp.NLfp.get_bytes_per_sample">get_bytes_per_sample</a></code></li>
 <li><code><a title="neurochat.nc_lfp.NLfp.get_channel_id" href="#neurochat.nc_lfp.NLfp.get_channel_id">get_channel_id</a></code></li>
 <li><code><a title="neurochat.nc_lfp.NLfp.get_file_tag" href="#neurochat.nc_lfp.NLfp.get_file_tag">get_file_tag</a></code></li>
