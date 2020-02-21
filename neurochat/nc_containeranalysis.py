@@ -633,7 +633,6 @@ def spike_times(collection, filter_speed=False, **kwargs):
         or a 2d list containing a list of times for each collection item
 
     """
-    should_smooth = kwargs.get("should_smooth", False)
     ranges = kwargs.get("ranges", None)
 
     if isinstance(collection, NData):
@@ -646,10 +645,6 @@ def spike_times(collection, filter_speed=False, **kwargs):
             times = collection.get_unit_stamp()
 
     else:
-        if should_smooth:
-            smooth_speeds(collection)
-            kwargs["should_smooth"] = False
-
         times = []
         for data in collection:
             if ranges is not None:
