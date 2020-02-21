@@ -480,7 +480,7 @@ class NDataContainer():
                     continue
 
                 for fname in txt_files:
-                    if fname[:len(filename)] == filename:
+                    if fname[:(len(filename) + 1)] == filename + "_":
                         pos_name = fname
                         break
 
