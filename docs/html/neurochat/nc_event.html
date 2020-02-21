@@ -39,8 +39,9 @@ This module implements NEvent Class for NeuroChaT software
 &#34;&#34;&#34;
 
 import logging
-
+import os
 from collections import OrderedDict as oDict
+import re
 
 import numpy as np
 
@@ -59,13 +60,16 @@ class NEvent(NBase):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._event_names = []
         self._event_trig_averages = []
         self._curr_tag = []
         self._curr_name = []
+        self._event_names = np.array([], dtype=&#39;f&#39;)
         self._timestamp = np.array([], dtype=&#39;f&#39;)
-        self._event_train = np.array([], dtype=int)
+        self._event_train = np.array([], dtype=&#39;f&#39;)
         self._type = &#39;event&#39;
+        self._timebase = None
+        self._total_samples = None
+        self._bytes_per_timestamp = None
 
     def get_event_name(self, event_tag=None):
         &#34;&#34;&#34;
@@ -85,7 +89,8 @@ class NEvent(NBase):
         if event_tag is None:
             event_name = self._event_names
         elif event_tag in self._event_train:
-            event_name = self._event_names[self._event_train.index(event_tag)]
+            event_name = self._event_names[
+                np.nonzero(self._event_train == event_tag)[0]]
         else:
             event_name = None
         return event_name
@@ -110,7 +115,8 @@ class NEvent(NBase):
         elif event_name == &#39;all&#39;:
             event_tag = self._event_trig_averages
         elif event_name in self._event_names:
-            event_tag = self._event_train[self._event_names.index(event_name)]
+            event_tag = self._event_train[
+                np.nonzero(self._event_names == event_name)[0]]
         else:
             event_tag = None
 
@@ -157,6 +163,33 @@ class NEvent(NBase):
 
         self.set_curr_tag(name)
 
+    def set_timebase(self, timebase):
+        &#34;&#34;&#34;
+        Sets timebase 
+
+        Parameters
+        ----------
+        timebase : int
+            Timebase
+
+        Returns
+        -------
+        None
+
+        &#34;&#34;&#34;
+        self._timebase = timebase
+
+    def get_timebase(self):
+        &#34;&#34;&#34;
+        Gets timebase 
+
+        Returns
+        -------
+        float
+
+        &#34;&#34;&#34;
+        return self._timebase
+
     def get_event_stamp(self, event=None):
         &#34;&#34;&#34;
         Returns timestamps for a particular event
@@ -174,12 +207,13 @@ class NEvent(NBase):
         &#34;&#34;&#34;
 
         if event is None:
-            event = self._curr_tag
+            tag = self._curr_tag
         if event in self._event_names:
             tag = self.get_tag(event)
-        elif event in self._event_trig_averages:
+        elif event in self._event_train:
             tag = event
-        timestamp = self._timestamp[self._event_train == tag]
+        where = np.nonzero(self._event_train == tag)
+        timestamp = self._timestamp[where]
 
         return timestamp
 
@@ -234,6 +268,14 @@ class NEvent(NBase):
 
         return self._event_train
 
+    def get_total_samples(self):
+
+        return self._total_samples
+
+    def get_bytes_per_timestamp(self):
+
+        return self._bytes_per_timestamp
+
     def _set_event_train(self, event_train):
         &#34;&#34;&#34;
         Sets tags for all events
@@ -250,6 +292,27 @@ class NEvent(NBase):
         &#34;&#34;&#34;
 
         self._event_train = event_train
+
+    def _set_total_samples(self, nsamples):
+        &#34;&#34;&#34;
+        Sets tags for all events
+
+        Parameters
+        ----------
+        event_train : ndarray
+            Train of events as train of tags
+
+        Returns
+        -------
+        None
+
+        &#34;&#34;&#34;
+
+        self._total_samples = nsamples
+
+    def _set_bytes_per_timestamp(self, bytes_per_timestamp):
+
+        self._bytes_per_timestamp = bytes_per_timestamp
 
     def load(self, filename=None, system=None):
         &#34;&#34;&#34;
@@ -268,11 +331,92 @@ class NEvent(NBase):
         None
 
         &#34;&#34;&#34;
-
         if system is None:
             system = self._system
+        if not system == &#34;Axona&#34;:
+            logging.error(&#34;Only implemented event reading in Axona currently&#34;)
+            return
         if filename is None:
             filename = self._filename
+        if os.path.isfile(filename):
+            with open(filename, &#39;rb&#39;) as f:
+                while True:
+                    line = f.readline()
+                    try:
+                        line = line.decode(&#39;latin-1&#39;)
+                    except:
+                        break
+
+                    if line == &#39;&#39;:
+                        break
+                    if line.startswith(&#39;trial_date&#39;):
+                        self._set_date(
+                            &#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
+                    if line.startswith(&#39;trial_time&#39;):
+                        self._set_time(line.split()[1])
+                    if line.startswith(&#39;experimenter&#39;):
+                        self._set_experiemnter(&#39; &#39;.join(line.split()[1:]))
+                    if line.startswith(&#39;comments&#39;):
+                        self._set_comments(&#39; &#39;.join(line.split()[1:]))
+                    if line.startswith(&#39;duration&#39;):
+                        self._set_duration(float(&#39;&#39;.join(line.split()[1:])))
+                    if line.startswith(&#39;sw_version&#39;):
+                        self._set_file_version(line.split()[1])
+                    if line.startswith(&#39;timebase&#39;):
+                        self.set_timebase(
+                            int(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
+                    if line.startswith(&#39;bytes_per_timestamp&#39;):
+                        self._set_bytes_per_timestamp(
+                            int(&#39;&#39;.join(re.findall(r&#39;\d+&#39;, line))))
+                    if line.startswith(&#39;num_&#39; + &#39;stm&#39; + &#39;_samples&#39;):
+                        self._set_total_samples(
+                            int(&#39;&#39;.join(re.findall(r&#39;\d+&#39;, line))))
+                    if line.startswith(&#34;data_start&#34;):
+                        break
+
+                num_stm_samples = self.get_total_samples()
+                bytes_per_timestamp = self.get_bytes_per_timestamp()
+                timebase = self.get_timebase()
+
+                f.seek(0, 0)
+                header_offset = []
+                while True:
+                    try:
+                        buff = f.read(10).decode(&#39;UTF-8&#39;)
+                    except:
+                        break
+                    if buff == &#39;data_start&#39;:
+                        header_offset = f.tell()
+                        break
+                    else:
+                        f.seek(-9, 1)
+
+                if not header_offset:
+                    print(&#39;Error: data_start marker not found!&#39;)
+                else:
+                    f.seek(header_offset, 0)
+                    byte_buffer = np.fromfile(f, dtype=&#39;uint8&#39;)
+                    stim_time = np.zeros([num_stm_samples, ], dtype=&#39;f&#39;)
+                    for i in range(num_stm_samples):
+                        start_idx = bytes_per_timestamp * i
+                        end_idx = start_idx + bytes_per_timestamp
+                        chunk = byte_buffer[start_idx:end_idx]
+                        time_val = (
+                            16777216 * chunk[0] +
+                            65536 * chunk[1] +
+                            256 * chunk[2] +
+                            chunk[3]) / timebase
+                        stim_time[i] = time_val
+                tags = np.array([1 for i in range(num_stm_samples)])
+                self._event_train = tags
+                names = np.array(
+                    [&#34;Stimulation&#34; for i in range(num_stm_samples)])
+                self._event_names = names
+                self.set_curr_tag(1)
+                self._set_timestamp(stim_time)
+        else:
+            logging.error(
+                &#34;No events file found for file {}&#34;.format(filename))
 
     def _create_tag(self, name_train):
         &#34;&#34;&#34;
@@ -335,9 +479,6 @@ class NEvent(NBase):
                 spike.load()
         else:
             logging.error(&#34;Spikes by name has yet to be implemented&#34;)
-            # for name in names:
-            #     spike = self.get_spikes_by_name(name)
-            #     spike.load()
 
     def add_lfp(self, lfp=None, **kwargs):
         &#34;&#34;&#34;
@@ -382,9 +523,6 @@ class NEvent(NBase):
                 lfp.load()
         else:
             logging.error(&#34;Lfp by name has yet to be implemented&#34;)
-            # for name in names:
-            # lfp = self.get_lfp_by_name(name)
-            # lfp.load()
 
     def psth(self, event=None, spike=None, **kwargs):
         &#34;&#34;&#34;
@@ -531,13 +669,16 @@ Events are stored as names and tags. Each tag is a number representing particula
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._event_names = []
         self._event_trig_averages = []
         self._curr_tag = []
         self._curr_name = []
+        self._event_names = np.array([], dtype=&#39;f&#39;)
         self._timestamp = np.array([], dtype=&#39;f&#39;)
-        self._event_train = np.array([], dtype=int)
+        self._event_train = np.array([], dtype=&#39;f&#39;)
         self._type = &#39;event&#39;
+        self._timebase = None
+        self._total_samples = None
+        self._bytes_per_timestamp = None
 
     def get_event_name(self, event_tag=None):
         &#34;&#34;&#34;
@@ -557,7 +698,8 @@ Events are stored as names and tags. Each tag is a number representing particula
         if event_tag is None:
             event_name = self._event_names
         elif event_tag in self._event_train:
-            event_name = self._event_names[self._event_train.index(event_tag)]
+            event_name = self._event_names[
+                np.nonzero(self._event_train == event_tag)[0]]
         else:
             event_name = None
         return event_name
@@ -582,7 +724,8 @@ Events are stored as names and tags. Each tag is a number representing particula
         elif event_name == &#39;all&#39;:
             event_tag = self._event_trig_averages
         elif event_name in self._event_names:
-            event_tag = self._event_train[self._event_names.index(event_name)]
+            event_tag = self._event_train[
+                np.nonzero(self._event_names == event_name)[0]]
         else:
             event_tag = None
 
@@ -629,6 +772,33 @@ Events are stored as names and tags. Each tag is a number representing particula
 
         self.set_curr_tag(name)
 
+    def set_timebase(self, timebase):
+        &#34;&#34;&#34;
+        Sets timebase 
+
+        Parameters
+        ----------
+        timebase : int
+            Timebase
+
+        Returns
+        -------
+        None
+
+        &#34;&#34;&#34;
+        self._timebase = timebase
+
+    def get_timebase(self):
+        &#34;&#34;&#34;
+        Gets timebase 
+
+        Returns
+        -------
+        float
+
+        &#34;&#34;&#34;
+        return self._timebase
+
     def get_event_stamp(self, event=None):
         &#34;&#34;&#34;
         Returns timestamps for a particular event
@@ -646,12 +816,13 @@ Events are stored as names and tags. Each tag is a number representing particula
         &#34;&#34;&#34;
 
         if event is None:
-            event = self._curr_tag
+            tag = self._curr_tag
         if event in self._event_names:
             tag = self.get_tag(event)
-        elif event in self._event_trig_averages:
+        elif event in self._event_train:
             tag = event
-        timestamp = self._timestamp[self._event_train == tag]
+        where = np.nonzero(self._event_train == tag)
+        timestamp = self._timestamp[where]
 
         return timestamp
 
@@ -706,6 +877,14 @@ Events are stored as names and tags. Each tag is a number representing particula
 
         return self._event_train
 
+    def get_total_samples(self):
+
+        return self._total_samples
+
+    def get_bytes_per_timestamp(self):
+
+        return self._bytes_per_timestamp
+
     def _set_event_train(self, event_train):
         &#34;&#34;&#34;
         Sets tags for all events
@@ -722,6 +901,27 @@ Events are stored as names and tags. Each tag is a number representing particula
         &#34;&#34;&#34;
 
         self._event_train = event_train
+
+    def _set_total_samples(self, nsamples):
+        &#34;&#34;&#34;
+        Sets tags for all events
+
+        Parameters
+        ----------
+        event_train : ndarray
+            Train of events as train of tags
+
+        Returns
+        -------
+        None
+
+        &#34;&#34;&#34;
+
+        self._total_samples = nsamples
+
+    def _set_bytes_per_timestamp(self, bytes_per_timestamp):
+
+        self._bytes_per_timestamp = bytes_per_timestamp
 
     def load(self, filename=None, system=None):
         &#34;&#34;&#34;
@@ -740,11 +940,92 @@ Events are stored as names and tags. Each tag is a number representing particula
         None
 
         &#34;&#34;&#34;
-
         if system is None:
             system = self._system
+        if not system == &#34;Axona&#34;:
+            logging.error(&#34;Only implemented event reading in Axona currently&#34;)
+            return
         if filename is None:
             filename = self._filename
+        if os.path.isfile(filename):
+            with open(filename, &#39;rb&#39;) as f:
+                while True:
+                    line = f.readline()
+                    try:
+                        line = line.decode(&#39;latin-1&#39;)
+                    except:
+                        break
+
+                    if line == &#39;&#39;:
+                        break
+                    if line.startswith(&#39;trial_date&#39;):
+                        self._set_date(
+                            &#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
+                    if line.startswith(&#39;trial_time&#39;):
+                        self._set_time(line.split()[1])
+                    if line.startswith(&#39;experimenter&#39;):
+                        self._set_experiemnter(&#39; &#39;.join(line.split()[1:]))
+                    if line.startswith(&#39;comments&#39;):
+                        self._set_comments(&#39; &#39;.join(line.split()[1:]))
+                    if line.startswith(&#39;duration&#39;):
+                        self._set_duration(float(&#39;&#39;.join(line.split()[1:])))
+                    if line.startswith(&#39;sw_version&#39;):
+                        self._set_file_version(line.split()[1])
+                    if line.startswith(&#39;timebase&#39;):
+                        self.set_timebase(
+                            int(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
+                    if line.startswith(&#39;bytes_per_timestamp&#39;):
+                        self._set_bytes_per_timestamp(
+                            int(&#39;&#39;.join(re.findall(r&#39;\d+&#39;, line))))
+                    if line.startswith(&#39;num_&#39; + &#39;stm&#39; + &#39;_samples&#39;):
+                        self._set_total_samples(
+                            int(&#39;&#39;.join(re.findall(r&#39;\d+&#39;, line))))
+                    if line.startswith(&#34;data_start&#34;):
+                        break
+
+                num_stm_samples = self.get_total_samples()
+                bytes_per_timestamp = self.get_bytes_per_timestamp()
+                timebase = self.get_timebase()
+
+                f.seek(0, 0)
+                header_offset = []
+                while True:
+                    try:
+                        buff = f.read(10).decode(&#39;UTF-8&#39;)
+                    except:
+                        break
+                    if buff == &#39;data_start&#39;:
+                        header_offset = f.tell()
+                        break
+                    else:
+                        f.seek(-9, 1)
+
+                if not header_offset:
+                    print(&#39;Error: data_start marker not found!&#39;)
+                else:
+                    f.seek(header_offset, 0)
+                    byte_buffer = np.fromfile(f, dtype=&#39;uint8&#39;)
+                    stim_time = np.zeros([num_stm_samples, ], dtype=&#39;f&#39;)
+                    for i in range(num_stm_samples):
+                        start_idx = bytes_per_timestamp * i
+                        end_idx = start_idx + bytes_per_timestamp
+                        chunk = byte_buffer[start_idx:end_idx]
+                        time_val = (
+                            16777216 * chunk[0] +
+                            65536 * chunk[1] +
+                            256 * chunk[2] +
+                            chunk[3]) / timebase
+                        stim_time[i] = time_val
+                tags = np.array([1 for i in range(num_stm_samples)])
+                self._event_train = tags
+                names = np.array(
+                    [&#34;Stimulation&#34; for i in range(num_stm_samples)])
+                self._event_names = names
+                self.set_curr_tag(1)
+                self._set_timestamp(stim_time)
+        else:
+            logging.error(
+                &#34;No events file found for file {}&#34;.format(filename))
 
     def _create_tag(self, name_train):
         &#34;&#34;&#34;
@@ -807,9 +1088,6 @@ Events are stored as names and tags. Each tag is a number representing particula
                 spike.load()
         else:
             logging.error(&#34;Spikes by name has yet to be implemented&#34;)
-            # for name in names:
-            #     spike = self.get_spikes_by_name(name)
-            #     spike.load()
 
     def add_lfp(self, lfp=None, **kwargs):
         &#34;&#34;&#34;
@@ -854,9 +1132,6 @@ Events are stored as names and tags. Each tag is a number representing particula
                 lfp.load()
         else:
             logging.error(&#34;Lfp by name has yet to be implemented&#34;)
-            # for name in names:
-            # lfp = self.get_lfp_by_name(name)
-            # lfp.load()
 
     def psth(self, event=None, spike=None, **kwargs):
         &#34;&#34;&#34;
@@ -1037,6 +1312,18 @@ A new NSpike() object</p></section>
     return new_spike</code></pre>
 </details>
 </dd>
+<dt id="neurochat.nc_event.NEvent.get_bytes_per_timestamp"><code class="name flex">
+<span>def <span class="ident">get_bytes_per_timestamp</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_bytes_per_timestamp(self):
+
+    return self._bytes_per_timestamp</code></pre>
+</details>
+</dd>
 <dt id="neurochat.nc_event.NEvent.get_event_name"><code class="name flex">
 <span>def <span class="ident">get_event_name</span></span>(<span>self, event_tag=None)</span>
 </code></dt>
@@ -1072,7 +1359,8 @@ A new NSpike() object</p></section>
     if event_tag is None:
         event_name = self._event_names
     elif event_tag in self._event_train:
-        event_name = self._event_names[self._event_train.index(event_tag)]
+        event_name = self._event_names[
+            np.nonzero(self._event_train == event_tag)[0]]
     else:
         event_name = None
     return event_name</code></pre>
@@ -1112,12 +1400,13 @@ A new NSpike() object</p></section>
     &#34;&#34;&#34;
 
     if event is None:
-        event = self._curr_tag
+        tag = self._curr_tag
     if event in self._event_names:
         tag = self.get_tag(event)
-    elif event in self._event_trig_averages:
+    elif event in self._event_train:
         tag = event
-    timestamp = self._timestamp[self._event_train == tag]
+    where = np.nonzero(self._event_train == tag)
+    timestamp = self._timestamp[where]
 
     return timestamp</code></pre>
 </details>
@@ -1194,11 +1483,36 @@ A new NSpike() object</p></section>
     elif event_name == &#39;all&#39;:
         event_tag = self._event_trig_averages
     elif event_name in self._event_names:
-        event_tag = self._event_train[self._event_names.index(event_name)]
+        event_tag = self._event_train[
+            np.nonzero(self._event_names == event_name)[0]]
     else:
         event_tag = None
 
     return event_tag</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_event.NEvent.get_timebase"><code class="name flex">
+<span>def <span class="ident">get_timebase</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Gets timebase </p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>&nbsp;</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_timebase(self):
+    &#34;&#34;&#34;
+    Gets timebase 
+
+    Returns
+    -------
+    float
+
+    &#34;&#34;&#34;
+    return self._timebase</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_event.NEvent.get_timestamp"><code class="name flex">
@@ -1234,6 +1548,18 @@ A new NSpike() object</p></section>
     &#34;&#34;&#34;
 
     return self._timestamp</code></pre>
+</details>
+</dd>
+<dt id="neurochat.nc_event.NEvent.get_total_samples"><code class="name flex">
+<span>def <span class="ident">get_total_samples</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_total_samples(self):
+
+    return self._total_samples</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_event.NEvent.load"><code class="name flex">
@@ -1273,11 +1599,92 @@ A new NSpike() object</p></section>
     None
 
     &#34;&#34;&#34;
-
     if system is None:
         system = self._system
+    if not system == &#34;Axona&#34;:
+        logging.error(&#34;Only implemented event reading in Axona currently&#34;)
+        return
     if filename is None:
-        filename = self._filename</code></pre>
+        filename = self._filename
+    if os.path.isfile(filename):
+        with open(filename, &#39;rb&#39;) as f:
+            while True:
+                line = f.readline()
+                try:
+                    line = line.decode(&#39;latin-1&#39;)
+                except:
+                    break
+
+                if line == &#39;&#39;:
+                    break
+                if line.startswith(&#39;trial_date&#39;):
+                    self._set_date(
+                        &#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
+                if line.startswith(&#39;trial_time&#39;):
+                    self._set_time(line.split()[1])
+                if line.startswith(&#39;experimenter&#39;):
+                    self._set_experiemnter(&#39; &#39;.join(line.split()[1:]))
+                if line.startswith(&#39;comments&#39;):
+                    self._set_comments(&#39; &#39;.join(line.split()[1:]))
+                if line.startswith(&#39;duration&#39;):
+                    self._set_duration(float(&#39;&#39;.join(line.split()[1:])))
+                if line.startswith(&#39;sw_version&#39;):
+                    self._set_file_version(line.split()[1])
+                if line.startswith(&#39;timebase&#39;):
+                    self.set_timebase(
+                        int(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
+                if line.startswith(&#39;bytes_per_timestamp&#39;):
+                    self._set_bytes_per_timestamp(
+                        int(&#39;&#39;.join(re.findall(r&#39;\d+&#39;, line))))
+                if line.startswith(&#39;num_&#39; + &#39;stm&#39; + &#39;_samples&#39;):
+                    self._set_total_samples(
+                        int(&#39;&#39;.join(re.findall(r&#39;\d+&#39;, line))))
+                if line.startswith(&#34;data_start&#34;):
+                    break
+
+            num_stm_samples = self.get_total_samples()
+            bytes_per_timestamp = self.get_bytes_per_timestamp()
+            timebase = self.get_timebase()
+
+            f.seek(0, 0)
+            header_offset = []
+            while True:
+                try:
+                    buff = f.read(10).decode(&#39;UTF-8&#39;)
+                except:
+                    break
+                if buff == &#39;data_start&#39;:
+                    header_offset = f.tell()
+                    break
+                else:
+                    f.seek(-9, 1)
+
+            if not header_offset:
+                print(&#39;Error: data_start marker not found!&#39;)
+            else:
+                f.seek(header_offset, 0)
+                byte_buffer = np.fromfile(f, dtype=&#39;uint8&#39;)
+                stim_time = np.zeros([num_stm_samples, ], dtype=&#39;f&#39;)
+                for i in range(num_stm_samples):
+                    start_idx = bytes_per_timestamp * i
+                    end_idx = start_idx + bytes_per_timestamp
+                    chunk = byte_buffer[start_idx:end_idx]
+                    time_val = (
+                        16777216 * chunk[0] +
+                        65536 * chunk[1] +
+                        256 * chunk[2] +
+                        chunk[3]) / timebase
+                    stim_time[i] = time_val
+            tags = np.array([1 for i in range(num_stm_samples)])
+            self._event_train = tags
+            names = np.array(
+                [&#34;Stimulation&#34; for i in range(num_stm_samples)])
+            self._event_names = names
+            self.set_curr_tag(1)
+            self._set_timestamp(stim_time)
+    else:
+        logging.error(
+            &#34;No events file found for file {}&#34;.format(filename))</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_event.NEvent.load_lfp"><code class="name flex">
@@ -1608,6 +2015,40 @@ filenames</p>
         self._curr_name = event</code></pre>
 </details>
 </dd>
+<dt id="neurochat.nc_event.NEvent.set_timebase"><code class="name flex">
+<span>def <span class="ident">set_timebase</span></span>(<span>self, timebase)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Sets timebase </p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>timebase</code></strong> :&ensp;<code>int</code></dt>
+<dd>Timebase</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def set_timebase(self, timebase):
+    &#34;&#34;&#34;
+    Sets timebase 
+
+    Parameters
+    ----------
+    timebase : int
+        Timebase
+
+    Returns
+    -------
+    None
+
+    &#34;&#34;&#34;
+    self._timebase = timebase</code></pre>
+</details>
+</dd>
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
@@ -1674,14 +2115,17 @@ filenames</p>
 <ul>
 <li>
 <h4><code><a title="neurochat.nc_event.NEvent" href="#neurochat.nc_event.NEvent">NEvent</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="neurochat.nc_event.NEvent.add_lfp" href="#neurochat.nc_event.NEvent.add_lfp">add_lfp</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.add_spike" href="#neurochat.nc_event.NEvent.add_spike">add_spike</a></code></li>
+<li><code><a title="neurochat.nc_event.NEvent.get_bytes_per_timestamp" href="#neurochat.nc_event.NEvent.get_bytes_per_timestamp">get_bytes_per_timestamp</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.get_event_name" href="#neurochat.nc_event.NEvent.get_event_name">get_event_name</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.get_event_stamp" href="#neurochat.nc_event.NEvent.get_event_stamp">get_event_stamp</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.get_event_train" href="#neurochat.nc_event.NEvent.get_event_train">get_event_train</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.get_tag" href="#neurochat.nc_event.NEvent.get_tag">get_tag</a></code></li>
+<li><code><a title="neurochat.nc_event.NEvent.get_timebase" href="#neurochat.nc_event.NEvent.get_timebase">get_timebase</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.get_timestamp" href="#neurochat.nc_event.NEvent.get_timestamp">get_timestamp</a></code></li>
+<li><code><a title="neurochat.nc_event.NEvent.get_total_samples" href="#neurochat.nc_event.NEvent.get_total_samples">get_total_samples</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.load" href="#neurochat.nc_event.NEvent.load">load</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.load_lfp" href="#neurochat.nc_event.NEvent.load_lfp">load_lfp</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.load_spike" href="#neurochat.nc_event.NEvent.load_spike">load_spike</a></code></li>
@@ -1690,6 +2134,7 @@ filenames</p>
 <li><code><a title="neurochat.nc_event.NEvent.psth" href="#neurochat.nc_event.NEvent.psth">psth</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.set_curr_name" href="#neurochat.nc_event.NEvent.set_curr_name">set_curr_name</a></code></li>
 <li><code><a title="neurochat.nc_event.NEvent.set_curr_tag" href="#neurochat.nc_event.NEvent.set_curr_tag">set_curr_tag</a></code></li>
+<li><code><a title="neurochat.nc_event.NEvent.set_timebase" href="#neurochat.nc_event.NEvent.set_timebase">set_timebase</a></code></li>
 </ul>
 </li>
 </ul>

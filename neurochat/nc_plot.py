@@ -24,6 +24,7 @@ from neurochat.nc_utils import find, angle_between_points, get_axona_colours
 BLUE = '#1f77b4'
 RED = '#d62728'
 
+
 def scatterplot_matrix(_data, names=[], **kwargs):
     """Plots a scatterplot matrix of subplots.  Each row of "_data" is plotted
     against other rows, resulting in a nrows by nrows grid of subplots with the
@@ -57,13 +58,14 @@ def scatterplot_matrix(_data, names=[], **kwargs):
     # Label the diagonal subplots...
     if len(names) == numvars:
         for i, label in enumerate(names):
-            axs[i, i].annotate(label, (0.5, 0.5), xycoords='axes fraction',\
-               ha='center', va='center')
+            axs[i, i].annotate(label, (0.5, 0.5), xycoords='axes fraction',
+                               ha='center', va='center')
 
     # Turn on the proper x or y axes ticks.
     for i, j in zip(range(numvars), itertools.cycle((-1, 0))):
         axs[j, i].xaxis.set_visible(True)
         axs[i, j].yaxis.set_visible(True)
+
 
 def set_backend(backend):
     """
@@ -86,6 +88,7 @@ def set_backend(backend):
 
     if backend:
         plt.switch_backend(backend)
+
 
 def wave_property(wave_data, plots=[2, 2]):
     """
@@ -111,12 +114,13 @@ def wave_property(wave_data, plots=[2, 2]):
     # Plot waves
     for i in np.arange(len(ax)):
         ax[i].plot(wave_data['Mean wave'][:, i], color='black', linewidth=2.0)
-        ax[i].plot(wave_data['Mean wave'][:, i]+wave_data['Std wave'][:, i],\
-          color='green', linestyle='dashed')
-        ax[i].plot(wave_data['Mean wave'][:, i]-wave_data['Std wave'][:, i],\
-          color='green', linestyle='dashed')
+        ax[i].plot(wave_data['Mean wave'][:, i] + wave_data['Std wave'][:, i],
+                   color='green', linestyle='dashed')
+        ax[i].plot(wave_data['Mean wave'][:, i] - wave_data['Std wave'][:, i],
+                   color='green', linestyle='dashed')
 
     return fig1
+
 
 def largest_waveform(wave_data, ax=None):
     """
@@ -138,10 +142,11 @@ def largest_waveform(wave_data, ax=None):
     mean_wave = wave_data['Mean wave'][:, wave_data["Max channel"]]
     std_wave = wave_data['Std wave'][:, wave_data["Max channel"]]
     ax.plot(mean_wave, color='black', linewidth=2.0)
-    ax.plot(mean_wave+std_wave, color='green', linestyle='dashed')
-    ax.plot(mean_wave-std_wave, color='green', linestyle='dashed')
+    ax.plot(mean_wave + std_wave, color='green', linestyle='dashed')
+    ax.plot(mean_wave - std_wave, color='green', linestyle='dashed')
 
     return fig
+
 
 def isi(isi_data, axes=[None, None, None], **kwargs):
     """
@@ -182,10 +187,10 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax, fig1 = _make_ax_if_none(axes[0])
     width = np.mean(np.diff(isi_data['isiBins']))
     ax.bar(isi_data['isiBins'], isi_data['isiHist'], color=color,
-           edgecolor=edgecolor, rasterized=raster, align="edge", 
+           edgecolor=edgecolor, rasterized=raster, align="edge",
            width=width, linewidth=0)
     ax.plot(
-        [burst_ms, burst_ms], [0, isi_data['maxCount']], 
+        [burst_ms, burst_ms], [0, isi_data['maxCount']],
         linestyle='dashed', linewidth=2, color='red')
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -193,14 +198,14 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     max_axis = isi_data['isiBins'].max()
     max_axisLog = np.ceil(np.log10(max_axis))
 
-    ## ISI scatterplot
+    # ISI scatterplot
     ax, fig2 = _make_ax_if_none(axes[1])
-    ax.loglog(isi_data['isiBefore'], isi_data['isiAfter'], axes=ax, \
-            linestyle=' ', marker='o', markersize=1, \
-            markeredgecolor='k', markerfacecolor=None, rasterized=raster)
+    ax.loglog(isi_data['isiBefore'], isi_data['isiAfter'], axes=ax,
+              linestyle=' ', marker='o', markersize=1,
+              markeredgecolor='k', markerfacecolor=None, rasterized=raster)
     # ax.autoscale(enable= True, axis= 'both', tight= True)
     ax.plot(
-        ax.get_xlim(), [burst_ms, burst_ms], 
+        ax.get_xlim(), [burst_ms, burst_ms],
         linestyle='dashed', linewidth=2, color='red')
     ax.set_aspect(1)
     #    ax.set_xlabel('Interval before (ms)')
@@ -209,9 +214,9 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax.set_title('Distribution of ISI \n (before and after spike)')
 
     #
-    logBins = np.logspace(0, max_axisLog, max_axisLog*70)
-    joint_count, xedges, yedges = np.histogram2d(isi_data['isiBefore'],\
-                                isi_data['isiAfter'], bins=logBins)
+    logBins = np.logspace(0, max_axisLog, max_axisLog * 70)
+    joint_count, xedges, yedges = np.histogram2d(
+        isi_data['isiBefore'], isi_data['isiAfter'], bins=logBins)
 
     # Scatter colored
     _extent = [xedges[0], xedges[-2], yedges[0], yedges[-2]]
@@ -220,10 +225,10 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax, fig3 = _make_ax_if_none(axes[2])
     c_map = plt.cm.jet
     c_map.set_under('white')
-    ax.pcolormesh(xedges[0:-1], yedges[0:-1], joint_count,\
+    ax.pcolormesh(xedges[0:-1], yedges[0:-1], joint_count,
                   cmap=c_map, vmin=1, rasterized=raster)
     ax.plot(
-        ax.get_xlim(), [burst_ms, burst_ms], 
+        ax.get_xlim(), [burst_ms, burst_ms],
         linestyle='dashed', linewidth=2, color='red')
     plt.axis(_extent)
     ax.set_xscale('log')
@@ -234,6 +239,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax.set_title('Distribution of ISI \n (before and after spike)')
 
     return fig1, fig2, fig3
+
 
 def isi_corr(isi_corr_data, ax=None, **kwargs):
     """
@@ -271,7 +277,7 @@ def isi_corr(isi_corr_data, ax=None, **kwargs):
     all_bins = isi_corr_data['isiAllCorrBins']
     width = np.mean(np.diff(all_bins))
     bin_centres = [
-        (all_bins[i+1] + all_bins[i]) / 2 for i in range(len(all_bins) - 1)]
+        (all_bins[i + 1] + all_bins[i]) / 2 for i in range(len(all_bins) - 1)]
     ax.bar(bin_centres, isi_corr_data['isiCorr'],
            width=width, linewidth=line_width, color='darkblue',
            edgecolor='black', rasterized=raster, align='center')
@@ -279,7 +285,7 @@ def isi_corr(isi_corr_data, ax=None, **kwargs):
 
     if plot_theta:
         ax.plot(
-            bin_centres, isi_corr_data['corrFit'], 
+            bin_centres, isi_corr_data['corrFit'],
             linewidth=2, color='red')
 
     ax.set_title(title)
@@ -287,6 +293,7 @@ def isi_corr(isi_corr_data, ax=None, **kwargs):
     ax.set_ylabel(ylabel)
 
     return fig
+
 
 def theta_cell(plot_data, ax=None, **kwargs):
     """
@@ -309,7 +316,8 @@ def theta_cell(plot_data, ax=None, **kwargs):
     """
     return isi_corr(plot_data, ax=ax, plot_theta=True, **kwargs)
 
-def lfp_spectrum(plot_data):
+
+def lfp_spectrum(plot_data, ax=None, color=None, style="Solid"):
     """
     Plots LFP spectrum analysis data
 
@@ -317,6 +325,15 @@ def lfp_spectrum(plot_data):
     ----------
     plot_data : dict
         Graphical data from the ISI correlation
+    ax : matplotlib Axes
+        Optional axes to plot into.
+        Makes a new figure if this is None
+    color : matplotlib supported color
+        Default is None, the color of the plot line
+    style : str
+        options are:
+            Solid - A thin flat line
+            Dashed - A thicker dashed line
 
     Returns
     -------
@@ -325,10 +342,22 @@ def lfp_spectrum(plot_data):
 
     """
 
+    ax, fig1 = _make_ax_if_none(ax)
 
-    fig1 = plt.figure()
-    ax = plt.gca()
-    ax.plot(plot_data['f'], plot_data['Pxx'], linewidth=2)
+    if style == "Solid":
+        linewidth = 2
+        linestyle = "solid"
+    elif style == "Dashed":
+        linewidth = 5
+        linestyle = "dashed"
+    else:
+        print("Unknown style {} in lfp_spectrum, using Solid".format(
+            style))
+        linewidth = 2
+        linestyle = "solid"
+
+    ax.plot(plot_data['f'], plot_data['Pxx'],
+            linewidth=linewidth, linestyle=linestyle, color=color)
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('PSD')
     _extent = [0, plot_data['f'].max(), 0, plot_data['Pxx'].max()]
@@ -336,7 +365,8 @@ def lfp_spectrum(plot_data):
 
     return fig1
 
-def lfp_spectrum_tr(plot_data):
+
+def lfp_spectrum_tr(plot_data, ax=None):
     """
     Plots time-resolved LFP spectrum analysis data
 
@@ -352,17 +382,23 @@ def lfp_spectrum_tr(plot_data):
 
     """
 
-    fig1 = plt.figure()
-    ax = plt.gca()
+    ax, fig1 = _make_ax_if_none(ax)
+
     c_map = plt.cm.jet
-    pcm = ax.pcolormesh(plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map)
-    _extent = [0, plot_data['t'].max(), 0, plot_data['f'].max()]
+    pcm = ax.pcolormesh(
+        plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map)
+    _extent = [
+        plot_data['t'].min(), plot_data['t'].max(), 0, plot_data['f'].max()]
     plt.axis(_extent)
     ax.set_xlabel('Time (sec)')
     ax.set_ylabel('Frequency (Hz)')
-    fig1.colorbar(pcm)
+    if fig1 is not None:
+        fig1.colorbar(pcm)
+    else:
+        plt.colorbar(pcm, ax=ax, use_gridspec=True)
 
     return fig1
+
 
 def plv(plv_data):
     """
@@ -428,6 +464,7 @@ def plv(plv_data):
     plt.subplots_adjust(wspace=0.3, hspace=0.35)
     return fig1, fig2
 
+
 def plv_tr(plv_data):
     """
     Plots the analysis replay_data of time-resolved Phase-locking value (PLV)
@@ -484,6 +521,7 @@ def plv_tr(plv_data):
 
     return fig1, fig2, fig3
 
+
 def plv_bs(plv_data):
     """
     Plots the analysis replay_data of bootstrapped Phase-locking value (PLV)
@@ -519,11 +557,11 @@ def plv_bs(plv_data):
 
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.plot(t, STAm, linewidth=2, color='darkblue', marker='o', \
-                 markerfacecolor='darkblue', markeredgecolor='none')
-    ax.fill_between(t, STAm- STAe, STAm+ STAe, \
-                 facecolor='cornflowerblue', alpha=0.5,\
-                 edgecolor='none', rasterized=True)
+    ax.plot(t, STAm, linewidth=2, color='darkblue', marker='o',
+            markerfacecolor='darkblue', markeredgecolor='none')
+    ax.fill_between(t, STAm - STAe, STAm + STAe,
+                    facecolor='cornflowerblue', alpha=0.5,
+                    edgecolor='none', rasterized=True)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_title('Spike-triggered average (STA)')
     ax.set_xlabel('Time (sec)')
@@ -531,43 +569,49 @@ def plv_bs(plv_data):
 
     fig2 = plt.figure()
     ax = fig2.add_subplot(221)
-    ax.plot(f, fSTAm, linewidth=2, color='darkblue', marker='.', rasterized=True)
-    ax.fill_between(f, fSTAm- fSTAe, fSTAm+ fSTAe, \
-                 facecolor='cornflowerblue', alpha=0.5,\
-                 edgecolor='none', rasterized=True)
+    ax.plot(f, fSTAm, linewidth=2, color='darkblue',
+            marker='.', rasterized=True)
+    ax.fill_between(f, fSTAm - fSTAe, fSTAm + fSTAe,
+                    facecolor='cornflowerblue', alpha=0.5,
+                    edgecolor='none', rasterized=True)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_ylabel('fft of STA')
 
     ax = fig2.add_subplot(222)
-    ax.plot(f, STPm, linewidth=2, color='darkblue', marker='.', rasterized=True)
-    ax.fill_between(f, STPm- STPe, STPm+ STPe, \
-                 facecolor='cornflowerblue', alpha=0.5,\
-                 edgecolor='none', rasterized=True)
+    ax.plot(f, STPm, linewidth=2, color='darkblue',
+            marker='.', rasterized=True)
+    ax.fill_between(f, STPm - STPe, STPm + STPe,
+                    facecolor='cornflowerblue', alpha=0.5,
+                    edgecolor='none', rasterized=True)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_ylabel('STP')
 
     ax = fig2.add_subplot(223)
-    ax.plot(f, SFCm, linewidth=2, color='darkblue', marker='.', rasterized=True)
-    ax.fill_between(f, SFCm- SFCe, SFCm+ SFCe, \
-                 facecolor='cornflowerblue', alpha=0.5,\
-                 edgecolor='none', rasterized=True)
+    ax.plot(f, SFCm, linewidth=2, color='darkblue',
+            marker='.', rasterized=True)
+    ax.fill_between(f, SFCm - SFCe, SFCm + SFCe,
+                    facecolor='cornflowerblue', alpha=0.5,
+                    edgecolor='none', rasterized=True)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_ylabel('SFC')
 
     ax = fig2.add_subplot(224)
-    ax.plot(f, PLVm, linewidth=2, color='darkblue', marker='.', rasterized=True)
-    ax.fill_between(f, PLVm- PLVe, PLVm+ PLVe, \
-                 facecolor='cornflowerblue', alpha=0.5,\
-                 edgecolor='none', rasterized=True)
+    ax.plot(f, PLVm, linewidth=2, color='darkblue',
+            marker='.', rasterized=True)
+    ax.fill_between(f, PLVm - PLVe, PLVm + PLVe,
+                    facecolor='cornflowerblue', alpha=0.5,
+                    edgecolor='none', rasterized=True)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_ylabel('PLV')
 
     for ax in fig2.axes:
         ax.set_xlabel('Frequency (Hz)')
 
-    fig2.suptitle('Frequency analysis of spike-triggered lfp metrics (bootstrap)')
+    fig2.suptitle(
+        'Frequency analysis of spike-triggered lfp metrics (bootstrap)')
     plt.subplots_adjust(wspace=0.3, hspace=0.35)
     return fig1, fig2
+
 
 def spike_phase(phase_data):
     """
@@ -593,10 +637,10 @@ def spike_phase(phase_data):
 
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.bar(np.append(phBins, phBins+ 360), np.append(phCount, phCount), \
-           color='slateblue', width=np.diff(phBins).mean(),\
+    ax.bar(np.append(phBins, phBins + 360), np.append(phCount, phCount),
+           color='slateblue', width=np.diff(phBins).mean(),
            alpha=0.6, align='center', rasterized=True)
-    ax.plot(np.append(phBins, phBins+ 360), 0.5*np.max(phCount)*(np.cos(np.append(phBins, phBins+ 360)*np.pi/180)+ 1), \
+    ax.plot(np.append(phBins, phBins + 360), 0.5 * np.max(phCount) * (np.cos(np.append(phBins, phBins + 360) * np.pi / 180) + 1),
             color='red', linewidth=2)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_title('LFP phase distribution (red= reference cosine line)')
@@ -605,27 +649,27 @@ def spike_phase(phase_data):
 
     fig2 = plt.figure()
     ax = plt.gca(polar=True)
-    ax.bar(phBins*np.pi/180, phCount, width=3*np.pi/180, color='blue',\
-           alpha=0.6, bottom=np.max(phase_data['phCount'])/2, rasterized=True)
-    ax.plot([0, phase_data['meanTheta']], [0, 1.5*np.max(phCount)], \
+    ax.bar(phBins * np.pi / 180, phCount, width=3 * np.pi / 180, color='blue',
+           alpha=0.6, bottom=np.max(phase_data['phCount']) / 2, rasterized=True)
+    ax.plot([0, phase_data['meanTheta']], [0, 1.5 * np.max(phCount)],
             linewidth=3, color='red', marker='.')
     plt.title('LFP phase distribution (red= mean direction)')
 
     fig3 = plt.figure()
     ax = fig3.add_subplot(211)
-    #cdict= {'blue': (0, 0, 1),
+    # cdict= {'blue': (0, 0, 1),
     #       'white': (0, 0, 0)}
     #c_map = mcol.LinearSegmentedColormap('my_colormap', cdict, 256)
-    ax.pcolormesh(phase_data['rasterbins'], np.arange(0, phase_data['raster'].shape[0]), \
+    ax.pcolormesh(phase_data['rasterbins'], np.arange(0, phase_data['raster'].shape[0]),
                   phase_data['raster'], cmap=plt.cm.binary, rasterized=True)
-    
-    # Alternative idea for plotting, not currently working. 
+
+    # Alternative idea for plotting, not currently working.
     # rasters = phase_data['raster']
     # bin_length = np.mean(np.diff(phase_data['raster'], 0))
 
     # for idx, row in enumerate(rasters):
     #      rasters[idx] = [
-    #          j_idx*(bin_length) +0.5*bin_length if j == 1 else 0 for 
+    #          j_idx*(bin_length) +0.5*bin_length if j == 1 else 0 for
     #             j_idx, j in enumerate(row)]
     # ax.eventplot(rasters)
     plt.autoscale(enable=True, axis='both', tight=True)
@@ -633,13 +677,14 @@ def spike_phase(phase_data):
     ax.set_ylabel('Time')
 
     ax = fig3.add_subplot(212)
-    ax.bar(phBins, phCount, color='slateblue', \
+    ax.bar(phBins, phCount, color='slateblue',
            width=np.diff(phBins).mean(), alpha=0.6, align='center', rasterized=True)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_xlabel('Phase(deg)')
     ax.set_ylabel('Spike count')
 
     return fig1, fig2, fig3
+
 
 def speed(speed_data):
     """
@@ -657,17 +702,21 @@ def speed(speed_data):
 
     """
 
-    ## Speed analysis
+    # Speed analysis
     fig1 = plt.figure()
     ax = plt.gca()
     ax.scatter(speed_data['bins'], speed_data['rate'], c=BLUE, zorder=1)
-    ax.plot(speed_data['bins'], speed_data['fitRate'], color=RED, linewidth=1.5, zorder=2)
+    ax.plot(speed_data['bins'], speed_data['fitRate'],
+            color=RED, linewidth=1.5, zorder=2)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_title('Speed vs Spiking Rate')
     ax.set_xlabel('Speed (cm/sec)')
     ax.set_ylabel('Spikes/sec')
+    ax.set_xlim(speed_data['bins'][0] - 1, speed_data['bins'][-1] + 1)
+    ax.set_ylim(0, speed_data['rate'].max() + 1)
 
     return fig1
+
 
 def angular_velocity(angVel_data):
     """
@@ -685,19 +734,24 @@ def angular_velocity(angVel_data):
 
     """
 
-    ## Angular velocity analysis
+    # Angular velocity analysis
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.scatter(angVel_data['leftBins'], angVel_data['leftRate'], c=BLUE, zorder=1)
-    ax.plot(angVel_data['leftBins'], angVel_data['leftFitRate'], color=RED, linewidth=1.5, zorder=2)
-    ax.scatter(angVel_data['rightBins'], angVel_data['rightRate'], c=BLUE, zorder=1)
-    ax.plot(angVel_data['rightBins'], angVel_data['rightFitRate'], color=RED, linewidth=1.5, zorder=2)
+    ax.scatter(angVel_data['leftBins'],
+               angVel_data['leftRate'], c=BLUE, zorder=1)
+    ax.plot(angVel_data['leftBins'], angVel_data['leftFitRate'],
+            color=RED, linewidth=1.5, zorder=2)
+    ax.scatter(angVel_data['rightBins'],
+               angVel_data['rightRate'], c=BLUE, zorder=1)
+    ax.plot(angVel_data['rightBins'], angVel_data['rightFitRate'],
+            color=RED, linewidth=1.5, zorder=2)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_title('Angular Velocity vs Spiking Rate')
     ax.set_xlabel('Angular velocity (deg/sec)')
     ax.set_ylabel('Spikes/sec')
 
     return fig1
+
 
 def multiple_regression(mra_data):
     """
@@ -718,8 +772,9 @@ def multiple_regression(mra_data):
     varOrder = ['Total', 'Loc', 'HD', 'Speed', 'Ang Vel', 'Dist Border']
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.bar(np.arange(6), mra_data['meanRsq'], color='royalblue', align='center')
-    ax.errorbar(np.arange(6), mra_data['meanRsq'], fmt='ro',\
+    ax.bar(np.arange(6), mra_data['meanRsq'],
+           color='royalblue', align='center')
+    ax.errorbar(np.arange(6), mra_data['meanRsq'], fmt='ro',
                 yerr=mra_data['stdRsq'], ecolor='k', elinewidth=3)
     ax.set_title('Multiple regression scores')
     ax.set_ylabel('$R^2$')
@@ -727,6 +782,7 @@ def multiple_regression(mra_data):
     plt.autoscale(enable=True, axis='both', tight=True)
 
     return fig1
+
 
 def hd_rate(hd_data, ax=None, **kwargs):
     """
@@ -759,6 +815,7 @@ def hd_rate(hd_data, ax=None, **kwargs):
     ax.set_rticks([hd_data['hdRate'].max()])
 
     return ax
+
 
 def hd_rate_pred(hd_data, ax=None, **kwargs):
     """
@@ -793,6 +850,7 @@ def hd_rate_pred(hd_data, ax=None, **kwargs):
 
     return ax
 
+
 def hd_spike(hd_data, ax=None):
     """
     Plots the head-direction of the animal at the time of spiking-events in polar scatter plot.
@@ -815,12 +873,13 @@ def hd_spike(hd_data, ax=None):
         plt.figure()
         ax = plt.gca(polar=True)
 
-    ax.scatter(np.radians(hd_data['scatter_bins']), hd_data['scatter_radius'], \
-             s=1, c=RED, alpha=0.75, edgecolors='none', rasterized=True)
+    ax.scatter(np.radians(hd_data['scatter_bins']), hd_data['scatter_radius'],
+               s=1, c=RED, alpha=0.75, edgecolors='none', rasterized=True)
     ax.set_rticks([])
     ax.spines['polar'].set_visible(False)
 
     return ax
+
 
 def hd_firing(hd_data):
     """
@@ -846,6 +905,7 @@ def hd_firing(hd_data):
     fig2 = plt.figure()
     ax2 = hd_rate_pred(hd_data, ax=plt.gca(polar=True))
     return fig1, fig2
+
 
 def hd_rate_ccw(hd_data):
     """
@@ -874,6 +934,7 @@ def hd_rate_ccw(hd_data):
 
     return fig1
 
+
 def hd_shuffle(hd_shuffle_data):
     """
     Plots the analysis outcome of head directional shuffling analysis
@@ -894,29 +955,32 @@ def hd_shuffle(hd_shuffle_data):
 
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.bar(hd_shuffle_data['raylZEdges'], hd_shuffle_data['raylZCount'],\
-           color='slateblue', alpha=0.6,\
+    ax.bar(hd_shuffle_data['raylZEdges'], hd_shuffle_data['raylZCount'],
+           color='slateblue', alpha=0.6,
            width=np.diff(hd_shuffle_data['raylZEdges']).mean(), rasterized=True)
-    ax.plot([hd_shuffle_data['raylZPer95'], hd_shuffle_data['raylZPer95']], \
+    ax.plot([hd_shuffle_data['raylZPer95'], hd_shuffle_data['raylZPer95']],
             [0, hd_shuffle_data['raylZCount'].max()], color='red', linewidth=2)
     plt.autoscale(enable=True, axis='both', tight=True)
-    ax.set_title('Rayleigh Z distribution for shuffled spikes (red= 95th percentile)')
+    ax.set_title(
+        'Rayleigh Z distribution for shuffled spikes (red= 95th percentile)')
     ax.set_xlabel('Rayleigh Z score')
     ax.set_ylabel('Count')
 
     fig2 = plt.figure()
     ax = plt.gca()
-    ax.bar(hd_shuffle_data['vonMisesKEdges'], hd_shuffle_data['vonMisesKCount'],\
-           color='slateblue', alpha=0.6, \
+    ax.bar(hd_shuffle_data['vonMisesKEdges'], hd_shuffle_data['vonMisesKCount'],
+           color='slateblue', alpha=0.6,
            width=np.diff(hd_shuffle_data['vonMisesKEdges']).mean(), rasterized=True)
-    ax.plot([hd_shuffle_data['vonMisesKPer95'], hd_shuffle_data['vonMisesKPer95']], \
+    ax.plot([hd_shuffle_data['vonMisesKPer95'], hd_shuffle_data['vonMisesKPer95']],
             [0, hd_shuffle_data['vonMisesKCount'].max()], color='red', linewidth=2)
     plt.autoscale(enable=True, axis='both', tight=True)
-    ax.set_title('von Mises kappa distribution for shuffled spikes \n (red= 95th percentile)')
+    ax.set_title(
+        'von Mises kappa distribution for shuffled spikes \n (red= 95th percentile)')
     ax.set_xlabel('von Mises kappa')
     ax.set_ylabel('Count')
 
     return fig1, fig2
+
 
 def hd_spike_time_lapse(hd_data):
     """
@@ -934,19 +998,18 @@ def hd_spike_time_lapse(hd_data):
 
     """
 
-
     keys = [key[1] for key in list(enumerate(hd_data.keys()))]
     fig = []
     axs = []
     keys = list(hd_data.keys())
     nkey = len(keys)
-    nfig = int(np.ceil(nkey/4))
+    nfig = int(np.ceil(nkey / 4))
     for _ in range(nfig):
         f, ax = plt.subplots(2, 2, subplot_kw=dict(projection='polar'))
         plt.subplots_adjust(top=0.9, hspace=0.55)
         fig.append(f)
         axs.extend(list(ax.flatten()))
-        
+
     for i, ax in enumerate(axs):
         if i < len(keys):
             key = keys[i]
@@ -956,6 +1019,7 @@ def hd_spike_time_lapse(hd_data):
         else:
             ax.set_visible(False)
     return fig
+
 
 def hd_rate_time_lapse(hd_data):
     """
@@ -978,13 +1042,13 @@ def hd_rate_time_lapse(hd_data):
     axs = []
     keys = list(hd_data.keys())
     nkey = len(keys)
-    nfig = int(np.ceil(nkey/4))
+    nfig = int(np.ceil(nkey / 4))
     for _ in range(nfig):
         f, ax = plt.subplots(2, 2, subplot_kw=dict(projection='polar'))
         plt.subplots_adjust(top=0.9, hspace=0.55)
         fig.append(f)
         axs.extend(list(ax.flatten()))
-        
+
     for i, ax in enumerate(axs):
         if i < len(keys):
             key = keys[i]
@@ -995,12 +1059,14 @@ def hd_rate_time_lapse(hd_data):
             ax.set_visible(False)
     return fig
 
+
 def _nice_lapse_key(key):
     parts = key.split("To")
     end = parts[1][-3:] if parts[1][-3:].lower() == "end" else (
         parts[1][0] + " " + parts[1][-3:])
     nice_key = parts[0] + " to " + end
     return nice_key
+
 
 def hd_time_shift(hd_shift_data):
     """
@@ -1023,7 +1089,7 @@ def hd_time_shift(hd_shift_data):
 
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.plot(hd_shift_data['shiftTime'], hd_shift_data['skaggs'],\
+    ax.plot(hd_shift_data['shiftTime'], hd_shift_data['skaggs'],
             marker='o', markerfacecolor=RED, linewidth=2)
     ax.set_xlabel('Shift time (ms)')
     ax.set_ylabel('Skaggs IC')
@@ -1031,7 +1097,7 @@ def hd_time_shift(hd_shift_data):
 
     fig2 = plt.figure()
     ax = plt.gca()
-    ax.plot(hd_shift_data['shiftTime'], hd_shift_data['peakRate'],\
+    ax.plot(hd_shift_data['shiftTime'], hd_shift_data['peakRate'],
             marker='o', markerfacecolor=RED, linewidth=2)
     ax.set_xlabel('Shift time (ms)')
     ax.set_ylabel('Peak firing rate (spikes/sec)')
@@ -1039,14 +1105,18 @@ def hd_time_shift(hd_shift_data):
 
     fig3 = plt.figure()
     ax = plt.gca()
-    ax.scatter(hd_shift_data['shiftTime'], hd_shift_data['delta'], c=RED, zorder=3)
-    ax.plot(hd_shift_data['shiftTime'], hd_shift_data['deltaFit'], color=BLUE, linewidth=1.5, zorder=1)
-    ax.plot(hd_shift_data['shiftTime'], np.zeros(hd_shift_data['shiftTime'].size), color='k', linestyle='--', linewidth=1.5, zorder=2)
+    ax.scatter(hd_shift_data['shiftTime'],
+               hd_shift_data['delta'], c=RED, zorder=3)
+    ax.plot(hd_shift_data['shiftTime'], hd_shift_data['deltaFit'],
+            color=BLUE, linewidth=1.5, zorder=1)
+    ax.plot(hd_shift_data['shiftTime'], np.zeros(
+        hd_shift_data['shiftTime'].size), color='k', linestyle='--', linewidth=1.5, zorder=2)
     ax.set_xlabel('Shift time (ms)')
     ax.set_ylabel('Delta (degree)')
     ax.set_title('Delta of hd firing in shifted time of spiking events')
 
     return fig1, fig2, fig3
+
 
 def loc_spike(place_data, ax=None, **kwargs):
     """
@@ -1079,15 +1149,16 @@ def loc_spike(place_data, ax=None, **kwargs):
         ax = plt.gca()
 
     ax.plot(place_data['posX'], place_data['posY'], color='black', zorder=1)
-    ax.scatter(place_data['spikeLoc'][0], place_data['spikeLoc'][1], \
+    ax.scatter(place_data['spikeLoc'][0], place_data['spikeLoc'][1],
                s=point_size, marker='o', color=color, zorder=2)
     ax.set_ylim([0, place_data['yedges'].max()])
     ax.set_xlim([0, place_data['xedges'].max()])
     #asp = np.diff(ax.get_xlim())[0] / np.diff(ax.get_ylim())[0]
-    #ax.set_aspect(asp)
+    # ax.set_aspect(asp)
     ax.set_aspect('equal')
     ax.invert_yaxis()
     return ax
+
 
 def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     """
@@ -1122,11 +1193,11 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     splits = None
 
     if colormap == "default":
-        clist = [(0.0, 0.0, 1.0),\
-                (0.0, 1.0, 0.5),\
-                (0.9, 1.0, 0.0),\
-                (1.0, 0.75, 0.0),\
-                (0.9, 0.0, 0.0)]
+        clist = [(0.0, 0.0, 1.0),
+                 (0.0, 1.0, 0.5),
+                 (0.9, 1.0, 0.0),
+                 (1.0, 0.75, 0.0),
+                 (0.9, 0.0, 0.0)]
         colormap = mcol.ListedColormap(clist)
 
     ax, fig = _make_ax_if_none(ax)
@@ -1159,15 +1230,15 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
         pad_map = np.pad(fmap[:-1, :-1], ((1, 1), (1, 1)), "edge")
         vmin, vmax = np.nanmin(pad_map), np.nanmax(pad_map)
         if vmin != vmax:
-            splits = np.linspace(vmin, vmax, levels+1)
+            splits = np.linspace(vmin, vmax, levels + 1)
         else:
-            splits = np.array([vmin, vmin*2])
+            splits = np.array([vmin, vmin * 2])
         x_edges = np.append(
-            place_data["xedges"] - dx/2,
-            place_data["xedges"][-1] + dx/2)
+            place_data["xedges"] - dx / 2,
+            place_data["xedges"][-1] + dx / 2)
         y_edges = np.append(
-            place_data["yedges"] - dy/2,
-            place_data["yedges"][-1] + dy/2)
+            place_data["yedges"] - dy / 2,
+            place_data["yedges"][-1] + dy / 2)
         res = ax.contourf(
             x_edges, y_edges,
             np.ma.array(pad_map, mask=np.isnan(pad_map)),
@@ -1188,7 +1259,8 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     ax.set_xlim([0, place_data['xedges'].max()])
     ax.set_aspect('equal')
     ax.invert_yaxis()
-    cbar = plt.colorbar(res, cax=cax, orientation='vertical', use_gridspec=True)
+    cbar = plt.colorbar(
+        res, cax=cax, orientation='vertical', use_gridspec=True)
     # cbar.ax.set_ticks(levels)
     # cbar.ax.set_yticklabels(np.around(levels, decimals=1))
     if splits is not None:
@@ -1196,6 +1268,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
         cbar.ax.set_yticklabels(split_text)
 
     return ax
+
 
 def loc_firing(place_data, **kwargs):
     """
@@ -1220,12 +1293,14 @@ def loc_firing(place_data, **kwargs):
 
     ax = loc_rate(place_data, ax=fig.add_subplot(122), **kwargs)
     ax.set_xlabel('cm')
-    #ax.set_ylabel('YLoc')
+    # ax.set_ylabel('YLoc')
     # fig.colorbar(cax)
     fig.set_tight_layout(True)
     return fig
 
 # Created by Sean Martin: 14/02/2019
+
+
 def loc_firing_and_place(place_data, smooth=True, **kwargs):
     """
     Plots the analysis of locational correlation to spike-rate
@@ -1250,7 +1325,7 @@ def loc_firing_and_place(place_data, smooth=True, **kwargs):
     ax1.set_ylabel('cm')
 
     ax2 = loc_rate(
-        place_data, ax=fig.add_subplot(132, sharey=ax1), 
+        place_data, ax=fig.add_subplot(132, sharey=ax1),
         smooth=smooth, **kwargs)
     ax2.set_xlabel('cm')
 
@@ -1263,6 +1338,8 @@ def loc_firing_and_place(place_data, smooth=True, **kwargs):
     return fig
 
 # Created by Sean Martin: 13/02/2019
+
+
 def loc_place_field(place_data, ax=None):
     """
     Plots the location of the place field(s) of the unit.
@@ -1283,19 +1360,19 @@ def loc_place_field(place_data, ax=None):
 
     # spatial place field
     ax, _ = _make_ax_if_none(ax)
-    clist = [(0.0, 0.0, 1.0),\
-            (0.0, 1.0, 0.5),\
-            (0.9, 1.0, 0.0),\
-            (1.0, 0.75, 0.0),\
-            (0.9, 0.0, 0.0)]
+    clist = [(0.0, 0.0, 1.0),
+             (0.0, 1.0, 0.5),
+             (0.9, 1.0, 0.0),
+             (1.0, 0.75, 0.0),
+             (0.9, 0.0, 0.0)]
     c_map = mcol.ListedColormap(clist)
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='3%', pad=0.05)
     mask = (place_data['placeField'] == 0)
-    pmap= ax.pcolormesh(place_data['xedges'], place_data['yedges'],
-                        np.ma.array(place_data['placeField'], mask=mask),
-                        cmap=c_map, rasterized=True)
+    pmap = ax.pcolormesh(place_data['xedges'], place_data['yedges'],
+                         np.ma.array(place_data['placeField'], mask=mask),
+                         cmap=c_map, rasterized=True)
     ax.set_ylim([0, place_data['yedges'].max()])
     ax.set_xlim([0, place_data['xedges'].max()])
     ax.set_aspect('equal')
@@ -1307,6 +1384,8 @@ def loc_place_field(place_data, ax=None):
     return ax
 
 # Created by Sean Martin: 13/02/2019
+
+
 def loc_place_centroid(place_data, centroid):
     """
     Plots the analysis replay_data of locational correlation to spike-rate
@@ -1339,6 +1418,7 @@ def loc_place_centroid(place_data, centroid):
     plt.tight_layout()
     return fig
 
+
 def loc_spike_time_lapse(place_data):
     """
     Plots the analysis outcome of locational time-lapse analysis
@@ -1360,7 +1440,7 @@ def loc_spike_time_lapse(place_data):
     axs = []
     keys = list(place_data.keys())
     nkey = len(keys)
-    nfig = int(np.ceil(nkey/4))
+    nfig = int(np.ceil(nkey / 4))
     for _ in range(nfig):
         f, ax = plt.subplots(2, 2, sharex='col', sharey='row')
         fig.append(f)
@@ -1376,6 +1456,7 @@ def loc_spike_time_lapse(place_data):
             ax.set_visible(False)
 
     return fig
+
 
 def loc_rate_time_lapse(place_data):
     """
@@ -1399,7 +1480,7 @@ def loc_rate_time_lapse(place_data):
     axs = []
     keys = list(place_data.keys())
     nkey = len(keys)
-    nfig = int(np.ceil(nkey/4))
+    nfig = int(np.ceil(nkey / 4))
     for _ in range(nfig):
         f, ax = plt.subplots(2, 2, sharex='col', sharey='row')
         fig.append(f)
@@ -1415,6 +1496,7 @@ def loc_rate_time_lapse(place_data):
             ax.set_visible(False)
 
     return fig
+
 
 def loc_shuffle(loc_shuffle_data):
     """
@@ -1436,9 +1518,9 @@ def loc_shuffle(loc_shuffle_data):
     fig1 = plt.figure()
 #    ax= plt.gca()
     ax = fig1.add_subplot(221)
-    ax.bar(loc_shuffle_data['skaggsEdges'][:-1], loc_shuffle_data['skaggsCount'], color='slateblue', alpha=0.6, \
+    ax.bar(loc_shuffle_data['skaggsEdges'][:-1], loc_shuffle_data['skaggsCount'], color='slateblue', alpha=0.6,
            width=np.diff(loc_shuffle_data['skaggsEdges']).mean(), rasterized=True)
-    ax.plot([loc_shuffle_data['skaggs95'], loc_shuffle_data['skaggs95']], \
+    ax.plot([loc_shuffle_data['skaggs95'], loc_shuffle_data['skaggs95']],
             [0, loc_shuffle_data['skaggsCount'].max()], color='red', linewidth=2)
 #        ax.plot([loc_shuffle_data['refSkaggs'], loc_shuffle_data['refSkaggs']], \
 #                [0, loc_shuffle_data['skaggsCount'].max()], color='green', linewidth=2)
@@ -1447,9 +1529,9 @@ def loc_shuffle(loc_shuffle_data):
 #    ax.set_ylabel('Count', fontsize=12)
 
     ax = fig1.add_subplot(222)
-    ax.bar(loc_shuffle_data['sparsityEdges'][:-1], loc_shuffle_data['sparsityCount'], color='slateblue', alpha=0.6, \
-                    width=np.diff(loc_shuffle_data['sparsityEdges']).mean(), rasterized=True)
-    ax.plot([loc_shuffle_data['sparsity05'], loc_shuffle_data['sparsity05']], \
+    ax.bar(loc_shuffle_data['sparsityEdges'][:-1], loc_shuffle_data['sparsityCount'], color='slateblue', alpha=0.6,
+           width=np.diff(loc_shuffle_data['sparsityEdges']).mean(), rasterized=True)
+    ax.plot([loc_shuffle_data['sparsity05'], loc_shuffle_data['sparsity05']],
             [0, loc_shuffle_data['sparsityCount'].max()], color='red', linewidth=2)
 #        ax.plot([loc_shuffle_data['refSparsity'], loc_shuffle_data['refSparsity']], \
 #                [0, loc_shuffle_data['sparsityCount'].max()], color='green', linewidth=2)
@@ -1457,9 +1539,9 @@ def loc_shuffle(loc_shuffle_data):
     ax.set_xlabel('Sparsity')
 
     ax = fig1.add_subplot(223)
-    ax.bar(loc_shuffle_data['coherenceEdges'][:-1], loc_shuffle_data['coherenceCount'], color='slateblue', alpha=0.6, \
-                    width=np.diff(loc_shuffle_data['coherenceEdges']).mean(), rasterized=True)
-    ax.plot([loc_shuffle_data['coherence95'], loc_shuffle_data['coherence95']], \
+    ax.bar(loc_shuffle_data['coherenceEdges'][:-1], loc_shuffle_data['coherenceCount'], color='slateblue', alpha=0.6,
+           width=np.diff(loc_shuffle_data['coherenceEdges']).mean(), rasterized=True)
+    ax.plot([loc_shuffle_data['coherence95'], loc_shuffle_data['coherence95']],
             [0, loc_shuffle_data['coherenceCount'].max()], color='red', linewidth=2)
 #        ax.plot([loc_shuffle_data['refCoherence'], loc_shuffle_data['refCoherence']], \
 #                [0, loc_shuffle_data['coherenceCount'].max()], color='green', linewidth=2)
@@ -1475,6 +1557,7 @@ def loc_shuffle(loc_shuffle_data):
     plt.subplots_adjust(hspace=0.35, wspace=0.23)
 
     return fig1
+
 
 def loc_time_shift(loc_shift_data):
     """
@@ -1496,12 +1579,14 @@ def loc_time_shift(loc_shift_data):
 
     """
 
-    ## Locational time shift analysis
+    # Locational time shift analysis
 
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.plot(loc_shift_data['shiftTime'], loc_shift_data['skaggs'], linewidth=2, zorder=1)
-    ax.scatter(loc_shift_data['shiftTime'], loc_shift_data['skaggs'], marker='o', color=RED, zorder=2)
+    ax.plot(loc_shift_data['shiftTime'],
+            loc_shift_data['skaggs'], linewidth=2, zorder=1)
+    ax.scatter(loc_shift_data['shiftTime'],
+               loc_shift_data['skaggs'], marker='o', color=RED, zorder=2)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_ylabel('Skaggs IC')
     ax.set_xlabel('Shift time (ms)')
@@ -1509,8 +1594,10 @@ def loc_time_shift(loc_shift_data):
 
     fig2 = plt.figure()
     ax = plt.gca()
-    ax.plot(loc_shift_data['shiftTime'], loc_shift_data['sparsity'], linewidth=2, zorder=1)
-    ax.scatter(loc_shift_data['shiftTime'], loc_shift_data['sparsity'], marker='o', color=RED, zorder=2)
+    ax.plot(loc_shift_data['shiftTime'],
+            loc_shift_data['sparsity'], linewidth=2, zorder=1)
+    ax.scatter(loc_shift_data['shiftTime'],
+               loc_shift_data['sparsity'], marker='o', color=RED, zorder=2)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_ylabel('Sparsity')
     ax.set_xlabel('Shift time (ms)')
@@ -1518,8 +1605,10 @@ def loc_time_shift(loc_shift_data):
 
     fig3 = plt.figure()
     ax = plt.gca()
-    ax.plot(loc_shift_data['shiftTime'], loc_shift_data['coherence'], linewidth=2, zorder=1)
-    ax.scatter(loc_shift_data['shiftTime'], loc_shift_data['coherence'], marker='o', color=RED, zorder=2)
+    ax.plot(loc_shift_data['shiftTime'],
+            loc_shift_data['coherence'], linewidth=2, zorder=1)
+    ax.scatter(loc_shift_data['shiftTime'],
+               loc_shift_data['coherence'], marker='o', color=RED, zorder=2)
     plt.autoscale(enable=True, axis='both', tight=True)
     ax.set_ylabel('Coherence')
     ax.set_xlabel('Shift time (ms)')
@@ -1530,6 +1619,7 @@ def loc_time_shift(loc_shift_data):
     #        fig1.suptitle('Specifity indices in time shift')
 
     return fig1, fig2, fig3
+
 
 def loc_auto_corr(locAuto_data):
     """
@@ -1547,24 +1637,24 @@ def loc_auto_corr(locAuto_data):
 
     """
     # Locational firing map autocorrelation
-    clist = [(1.0, 1.0, 1.0),\
-            (0.0, 0.0, 0.5),\
-            (0.0, 0.0, 1.0),\
-            (0.0, 0.5, 1.0),\
-            (0.0, 0.75, 1.0),\
-            (0.5, 1.0, 0.0),\
-            (0.9, 1.0, 0.0),\
-            (1.0, 0.75, 0.0),\
-            (1.0, 0.4, 0.0),\
-            (1.0, 0.0, 0.0),\
-            (0.5, 0.0, 0.0)]
+    clist = [(1.0, 1.0, 1.0),
+             (0.0, 0.0, 0.5),
+             (0.0, 0.0, 1.0),
+             (0.0, 0.5, 1.0),
+             (0.0, 0.75, 1.0),
+             (0.5, 1.0, 0.0),
+             (0.9, 1.0, 0.0),
+             (1.0, 0.75, 0.0),
+             (1.0, 0.4, 0.0),
+             (1.0, 0.0, 0.0),
+             (0.5, 0.0, 0.0)]
 
     c_map = mcol.ListedColormap(clist)
 
     fig1 = plt.figure()
     ax = fig1.gca()
-    pc = ax.pcolormesh(locAuto_data['xshift'], locAuto_data['yshift'], np.ma.array(locAuto_data['corrMap'], \
-                    mask=np.isnan(locAuto_data['corrMap'])), cmap=c_map, rasterized=True)
+    pc = ax.pcolormesh(locAuto_data['xshift'], locAuto_data['yshift'], np.ma.array(locAuto_data['corrMap'],
+                                                                                   mask=np.isnan(locAuto_data['corrMap'])), cmap=c_map, rasterized=True)
     ax.set_title('Spatial correlation of firing intensity map)')
     ax.set_xlabel('X-lag')
     ax.set_ylabel('Y-lag')
@@ -1574,6 +1664,7 @@ def loc_auto_corr(locAuto_data):
     plt.colorbar(pc)
 
     return fig1
+
 
 def rot_corr(plot_data):
     """
@@ -1604,6 +1695,7 @@ def rot_corr(plot_data):
 
     return fig1
 
+
 def dist_rate(dist_data):
     """
     Plots the firing rate vs distance from border
@@ -1622,9 +1714,11 @@ def dist_rate(dist_data):
 
     fig1 = plt.figure()
     ax = plt.gca()
-    ax.plot(dist_data['distBins'], dist_data['smoothRate'], marker='o', markerfacecolor=RED, linewidth=2, label='Firing rate')
+    ax.plot(dist_data['distBins'], dist_data['smoothRate'], marker='o',
+            markerfacecolor=RED, linewidth=2, label='Firing rate')
     if 'rateFit' in dist_data.keys():
-        ax.plot(dist_data['distBins'], dist_data['rateFit'], 'go-', markerfacecolor='brown', linewidth=2, label='Fitted rate')
+        ax.plot(dist_data['distBins'], dist_data['rateFit'], 'go-',
+                markerfacecolor='brown', linewidth=2, label='Fitted rate')
     ax.set_title('Distance from border vs spike rate')
     ax.set_xlabel('Distance (cm)')
     ax.set_ylabel('Rate (spikes/sec)')
@@ -1632,6 +1726,7 @@ def dist_rate(dist_data):
     plt.legend(loc='lower right')
 
     return fig1
+
 
 def stair_plot(dist_data):
     """
@@ -1656,13 +1751,16 @@ def stair_plot(dist_data):
     fig1 = plt.figure()
     ax = plt.gca()
     for i, step in enumerate(perSteps):
-        ax.plot([step, step+ stepsize], [perDist[i], perDist[i]], color='b', linestyle='--', marker='o', markerfacecolor=RED, linewidth=2)
-        if i > 0: #perSteps.shape[0]:
-            ax.plot([step, step], [perDist[i-1], perDist[i]], color='b', linestyle='--', linewidth=2)
+        ax.plot([step, step + stepsize], [perDist[i], perDist[i]], color='b',
+                linestyle='--', marker='o', markerfacecolor=RED, linewidth=2)
+        if i > 0:  # perSteps.shape[0]:
+            ax.plot([step, step], [perDist[i - 1], perDist[i]],
+                    color='b', linestyle='--', linewidth=2)
     ax.set_xlabel('% firing rate (spikes/sec)')
     ax.set_ylabel('Mean distance (cm)')
 
     return fig1
+
 
 def border(border_data):
     """
@@ -1688,15 +1786,15 @@ def border(border_data):
 
     fig1 = plt.figure()
     ax = fig1.add_subplot(211)
-    ax.bar(border_data['distBins'], border_data['distCount'], color='slateblue', alpha=0.6, \
-                    width=0.5*np.diff(border_data['distBins']).mean())
+    ax.bar(border_data['distBins'], border_data['distCount'], color='slateblue', alpha=0.6,
+           width=0.5 * np.diff(border_data['distBins']).mean())
     ax.set_title('Histogram of taxicab distance of active pixels')
     ax.set_xlabel('Taxicab distance(cm)')
     ax.set_ylabel('Active pixel count')
 
     ax = fig1.add_subplot(212)
-    ax.bar(border_data['circBins'], border_data['angDistCount'], color='slateblue', alpha=0.6, \
-                    width=0.5*np.diff(border_data['circBins']).mean())
+    ax.bar(border_data['circBins'], border_data['angDistCount'], color='slateblue', alpha=0.6,
+           width=0.5 * np.diff(border_data['circBins']).mean())
     ax.set_title('Angular distance vs Active pixel count')
     ax.set_xlabel('Angular distance')
     ax.set_ylabel('Active pixel count')
@@ -1704,11 +1802,12 @@ def border(border_data):
     plt.subplots_adjust(hspace=0.5)
     fig2 = plt.figure()
     ax = plt.gca()
-    pcm = ax.pcolormesh(border_data['cBinsInterp'], border_data['dBinsInterp'], \
-                       border_data['circLinMap'], cmap='seismic', rasterized=True)
+    pcm = ax.pcolormesh(border_data['cBinsInterp'], border_data['dBinsInterp'],
+                        border_data['circLinMap'], cmap='seismic', rasterized=True)
     ax.invert_yaxis()
     plt.autoscale(enable=True, axis='both', tight=True)
-    ax.set_title('Histogram for angle vs distance from border of active pixels')
+    ax.set_title(
+        'Histogram for angle vs distance from border of active pixels')
     ax.set_xlabel('Angular distance (Deg)')
     ax.set_ylabel('Taxicab distance (cm)')
     fig2.colorbar(pcm)
@@ -1717,6 +1816,7 @@ def border(border_data):
     fig4 = stair_plot(border_data)
 
     return fig1, fig2, fig3, fig4
+
 
 def gradient(gradient_data):
     """
@@ -1742,7 +1842,8 @@ def gradient(gradient_data):
 
     fig2 = plt.figure()
     ax = plt.gca()
-    ax.plot(gradient_data['distBins'], gradient_data['diffRate'], color=BLUE, marker='o', markerfacecolor=RED, linewidth=2)
+    ax.plot(gradient_data['distBins'], gradient_data['diffRate'],
+            color=BLUE, marker='o', markerfacecolor=RED, linewidth=2)
     ax.set_title('Differential firing rate (fitted)')
     ax.set_xlabel('Distance (cm)')
     ax.set_ylabel('Differential rate (spikes/sec)')
@@ -1751,6 +1852,7 @@ def gradient(gradient_data):
     fig3 = stair_plot(gradient_data)
 
     return fig1, fig2, fig3
+
 
 def grid(grid_data):
     """
@@ -1779,12 +1881,15 @@ def grid(grid_data):
 
     ax.scatter(xmax, ymax, c='black', marker='s', zorder=2)
     for i in range(xmax.size):
-        if i < xmax.size-1:
-            ax.plot([xmax[i], xmax[i+1]], [ymax[i], ymax[i+1]], 'k', linewidth=2)
+        if i < xmax.size - 1:
+            ax.plot([xmax[i], xmax[i + 1]],
+                    [ymax[i], ymax[i + 1]], 'k', linewidth=2)
         else:
             ax.plot([xmax[i], xmax[0]], [ymax[i], ymax[0]], 'k', linewidth=2)
-    ax.plot(xshift[xshift >= 0], np.zeros(find(xshift >= 0).size), 'k--', linewidth=2)
-    ax.plot(xshift[xshift >= 0], xshift[xshift >= 0]*ymax[0]/ xmax[0], 'k--', linewidth=2)
+    ax.plot(xshift[xshift >= 0], np.zeros(
+        find(xshift >= 0).size), 'k--', linewidth=2)
+    ax.plot(xshift[xshift >= 0], xshift[xshift >= 0]
+            * ymax[0] / xmax[0], 'k--', linewidth=2)
     ax.set_title('Grid cell analysis')
     ax.set_xlim([grid_data['xshift'].min(), grid_data['xshift'].max()])
     ax.set_ylim([grid_data['yshift'].min(), grid_data['yshift'].max()])
@@ -1808,6 +1913,7 @@ def grid(grid_data):
         return fig1, fig2
     else:
         return fig1
+
 
 def spike_raster(events, xlim=None, colors=[0, 0, 0], ax=None, **kwargs):
     """
@@ -1868,6 +1974,7 @@ def spike_raster(events, xlim=None, colors=[0, 0, 0], ax=None, **kwargs):
 
     return fig
 
+
 def plot_angle_between_points(points, xlim, ylim, ax=None):
     """
     Plots the angle between three points
@@ -1895,18 +2002,19 @@ def plot_angle_between_points(points, xlim, ylim, ax=None):
     ydata = arr[:, 1]
 
     line_1 = Line2D(
-        xdata[:2], ydata[:2], linewidth=1, linestyle = "-", color="green",
+        xdata[:2], ydata[:2], linewidth=1, linestyle="-", color="green",
         marker=".", markersize=10, markeredgecolor='k', markerfacecolor='k'
     )
     line_2 = Line2D(
-        xdata[1:], ydata[1:], linewidth=1, linestyle = "-", color="red",
+        xdata[1:], ydata[1:], linewidth=1, linestyle="-", color="red",
         marker=".", markersize=10, markeredgecolor='k', markerfacecolor='k')
 
     ax.add_line(line_1)
     ax.add_line(line_2)
 
-    angle_plot = _get_angle_plot(line_1, line_2, 0.2, 'b', [xdata[1], ydata[1]], xlim, ylim)
-    ax.add_patch(angle_plot) # To display the angle arc
+    angle_plot = _get_angle_plot(line_1, line_2, 0.2, 'b', [
+                                 xdata[1], ydata[1]], xlim, ylim)
+    ax.add_patch(angle_plot)  # To display the angle arc
 
     ax.set_ylim([0, ylim])
     ax.set_xlim([0, xlim])
@@ -1921,9 +2029,10 @@ def plot_angle_between_points(points, xlim, ylim, ax=None):
     plt.legend()
     return fig
 
+
 def _get_angle_plot(
-    line1, line2, offset = 1, color = None,
-    origin = [0,0], len_x_axis = 1, len_y_axis = 1):
+        line1, line2, offset=1, color=None,
+        origin=[0, 0], len_x_axis=1, len_y_axis=1):
     """
     Internal helper function to get an arc between two lines
     Can be displayed as a patch
@@ -1958,7 +2067,6 @@ def _get_angle_plot(
     if l1xy[0][1] < l1xy[1][1]:
         angle1 = 360 - angle1
 
-
     l2xy = line2.get_xydata()
     further2 = l2xy[0] + [1, 0]
     # Angle between line1 and x-axis
@@ -1972,9 +2080,11 @@ def _get_angle_plot(
     angle = theta2 - theta1
 
     if color is None:
-        color = line1.get_color() # Uses the color of line 1 if color parameter is not passed.
+        # Uses the color of line 1 if color parameter is not passed.
+        color = line1.get_color()
 
-    return Arc(origin, len_x_axis*offset, len_y_axis*offset, 0, theta1, theta2, color=color, label = "%0.2f"%float(angle)+u"\u00b0")
+    return Arc(origin, len_x_axis * offset, len_y_axis * offset, 0, theta1, theta2, color=color, label="%0.2f" % float(angle) + u"\u00b0")
+
 
 def _make_ax_if_none(ax, **kwargs):
     """
@@ -2002,10 +2112,10 @@ def _make_ax_if_none(ax, **kwargs):
 def print_place_cells(
         rows, cols=7, size_multiplier=4, wspace=0.3, hspace=0.3,
         placedata=None, wavedata=None, graphdata=None, isidata=None,
-        headdata=None, thetadata=None, point_size=10, units=None, 
+        headdata=None, thetadata=None, point_size=10, units=None,
         output=["Wave", "Path", "Place", "HD", "LowISI", "Theta", "HighISI"],
         fixed_color=None, burst_ms=5, color_isi=True, one_by_one=False,
-        raster=True):
+        raster=True, hd_predict=True):
     if one_by_one:
         figs = []
         width, height = cols * size_multiplier, (1 - 0.20) * size_multiplier
@@ -2029,7 +2139,6 @@ def print_place_cells(
         else:
             j = i
 
-            
         # Plot the spike position
         if placedata is not None:
             place_data = placedata[i]
@@ -2063,8 +2172,11 @@ def print_place_cells(
                 if idx is not None:
                     hd_data = headdata[i]
                     ax = fig.add_subplot(gs[j, idx], projection='polar')
-                    hd_rate_pred(hd_data, ax=ax, title=None)
-        
+                    if hd_predict:
+                        hd_rate_pred(hd_data, ax=ax, title=None)
+                    else:
+                        hd_rate(hd_data, ax=ax, title=None)
+
         if wavedata is not None:
             if wavedata[i] is not None:
                 idx = get_mapping_idx("Wave")
@@ -2087,7 +2199,7 @@ def print_place_cells(
                 if idx is not None:
                     ax = fig.add_subplot(gs[j, idx])
                     theta_cell(thetadata[i], ax=ax, title=None,
-                            xlabel=None, ylabel=None, raster=raster)
+                               xlabel=None, ylabel=None, raster=raster)
 
         if isidata is not None:
             if isidata[i] is not None:
@@ -2100,7 +2212,7 @@ def print_place_cells(
                         should_color=color_isi, burst_ms=burst_ms,
                         raster=raster)
                     plt.close(temp_fig)
-        
+
         if one_by_one:
             figs.append(fig)
 

@@ -860,7 +860,7 @@ def smooth_2d(x, filttype='b', filtsize=5):
 
     return smoothX
 
-def find_true_ranges(arr, truth_arr, min_range):
+def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     """
     Returns a list of ranges where truth values occur and the corresponding
     values from arr, arr is assumed to be a sorted list
@@ -882,16 +882,24 @@ def find_true_ranges(arr, truth_arr, min_range):
 
     in_range = False
     ranges = []
+    range_idxs = []
     for idx, b in enumerate(truth_arr):
         if b and not in_range:
             in_range = True
             range_start = arr[idx]
+            range_start_idx = idx
         if not b and in_range:
             in_range = False
             range_end = arr[idx - 1]
-            if range_end - range_start > min_range:
+            range_end_idx = idx
+            if range_end - range_start >= min_range:
                 ranges.append((range_start, range_end))
-    return ranges
+                for i in range(range_start_idx, range_end_idx):
+                    range_idxs.append(i)
+    if not return_idxs:
+        return ranges
+    else:
+        return ranges, range_idxs
 
 def find_peaks(data, **kwargs):
     """
@@ -1039,7 +1047,8 @@ def get_axona_colours(index=None):
             return
         return get_axona_colours.colorcells[index]
 
-def has_ext(filename, ext):
+
+def has_ext(filename, ext, case_sensitive_ext=False):
     """
     Check if the filename ends in the extension
     
@@ -1049,6 +1058,8 @@ def has_ext(filename, ext):
         The name of the file
     ext : str
         The extension, may have leading dot (e.g txt == .txt)
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
     
     Returns
     -------
@@ -1059,12 +1070,16 @@ def has_ext(filename, ext):
         return True
     if ext[0] != ".":
         ext = "." + ext
-    return filename[-len(ext):].lower() == ext.lower()
+    if case_sensitive_ext:
+        return filename[-len(ext):] == ext
+    else:
+        return filename[-len(ext):].lower() == ext.lower()
 
 
 def get_all_files_in_dir(
         in_dir, ext=None, return_absolute=True, 
-        recursive=False, verbose=False, re_filter=None):
+        recursive=False, verbose=False, re_filter=None, 
+        case_sensitive_ext=False):
     """
     Get all files in the directory with the given extension.
     
@@ -1072,7 +1087,7 @@ def get_all_files_in_dir(
     ----------
     in_dir : str
         The absolute path to the directory
-    ext : str, optional. Defaults to True.
+    ext : str, optional. Defaults to None.
         The extension of files to get.
     return_absolute : bool, optional. Defaults to True.
         Whether to return the absolute filename or not.
@@ -1080,6 +1095,10 @@ def get_all_files_in_dir(
         Whether to recurse through directories.
     verbose: bool, optional. Defaults to False.
         Whether to print the files found.
+    re_filter: str, optional. Defaults to None
+        a regular expression used to filter the results
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
 
     Returns
     -------
@@ -1096,7 +1115,10 @@ def get_all_files_in_dir(
         return search_res is not None
 
     def ok_file(root_dir, f):
-        return has_ext(f, ext) and isfile(join(root_dir, f)) and match_filter(f)
+        good_ext = has_ext(f, ext, case_sensitive_ext=case_sensitive_ext)
+        good_file = isfile(join(root_dir, f))
+        good_filter = match_filter(f)
+        return good_ext and good_file and good_filter
 
     def convert_to_path(root_dir, f): 
         return join(root_dir, f) if return_absolute else f

@@ -886,7 +886,7 @@ def smooth_2d(x, filttype=&#39;b&#39;, filtsize=5):
 
     return smoothX
 
-def find_true_ranges(arr, truth_arr, min_range):
+def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     &#34;&#34;&#34;
     Returns a list of ranges where truth values occur and the corresponding
     values from arr, arr is assumed to be a sorted list
@@ -908,16 +908,24 @@ def find_true_ranges(arr, truth_arr, min_range):
 
     in_range = False
     ranges = []
+    range_idxs = []
     for idx, b in enumerate(truth_arr):
         if b and not in_range:
             in_range = True
             range_start = arr[idx]
+            range_start_idx = idx
         if not b and in_range:
             in_range = False
             range_end = arr[idx - 1]
-            if range_end - range_start &gt; min_range:
+            range_end_idx = idx
+            if range_end - range_start &gt;= min_range:
                 ranges.append((range_start, range_end))
-    return ranges
+                for i in range(range_start_idx, range_end_idx):
+                    range_idxs.append(i)
+    if not return_idxs:
+        return ranges
+    else:
+        return ranges, range_idxs
 
 def find_peaks(data, **kwargs):
     &#34;&#34;&#34;
@@ -1065,7 +1073,8 @@ def get_axona_colours(index=None):
             return
         return get_axona_colours.colorcells[index]
 
-def has_ext(filename, ext):
+
+def has_ext(filename, ext, case_sensitive_ext=False):
     &#34;&#34;&#34;
     Check if the filename ends in the extension
     
@@ -1075,6 +1084,8 @@ def has_ext(filename, ext):
         The name of the file
     ext : str
         The extension, may have leading dot (e.g txt == .txt)
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
     
     Returns
     -------
@@ -1085,12 +1096,16 @@ def has_ext(filename, ext):
         return True
     if ext[0] != &#34;.&#34;:
         ext = &#34;.&#34; + ext
-    return filename[-len(ext):].lower() == ext.lower()
+    if case_sensitive_ext:
+        return filename[-len(ext):] == ext
+    else:
+        return filename[-len(ext):].lower() == ext.lower()
 
 
 def get_all_files_in_dir(
         in_dir, ext=None, return_absolute=True, 
-        recursive=False, verbose=False, re_filter=None):
+        recursive=False, verbose=False, re_filter=None, 
+        case_sensitive_ext=False):
     &#34;&#34;&#34;
     Get all files in the directory with the given extension.
     
@@ -1098,7 +1113,7 @@ def get_all_files_in_dir(
     ----------
     in_dir : str
         The absolute path to the directory
-    ext : str, optional. Defaults to True.
+    ext : str, optional. Defaults to None.
         The extension of files to get.
     return_absolute : bool, optional. Defaults to True.
         Whether to return the absolute filename or not.
@@ -1106,6 +1121,10 @@ def get_all_files_in_dir(
         Whether to recurse through directories.
     verbose: bool, optional. Defaults to False.
         Whether to print the files found.
+    re_filter: str, optional. Defaults to None
+        a regular expression used to filter the results
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
 
     Returns
     -------
@@ -1122,7 +1141,10 @@ def get_all_files_in_dir(
         return search_res is not None
 
     def ok_file(root_dir, f):
-        return has_ext(f, ext) and isfile(join(root_dir, f)) and match_filter(f)
+        good_ext = has_ext(f, ext, case_sensitive_ext=case_sensitive_ext)
+        good_file = isfile(join(root_dir, f))
+        good_filter = match_filter(f)
+        return good_ext and good_file and good_filter
 
     def convert_to_path(root_dir, f): 
         return join(root_dir, f) if return_absolute else f
@@ -1983,7 +2005,7 @@ Don't consider any peaks with a value below this, default 0</dd>
 </details>
 </dd>
 <dt id="neurochat.nc_utils.find_true_ranges"><code class="name flex">
-<span>def <span class="ident">find_true_ranges</span></span>(<span>arr, truth_arr, min_range)</span>
+<span>def <span class="ident">find_true_ranges</span></span>(<span>arr, truth_arr, min_range, return_idxs=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Returns a list of ranges where truth values occur and the corresponding
@@ -2004,7 +2026,7 @@ values from arr, arr is assumed to be a sorted list</p>
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def find_true_ranges(arr, truth_arr, min_range):
+<pre><code class="python">def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     &#34;&#34;&#34;
     Returns a list of ranges where truth values occur and the corresponding
     values from arr, arr is assumed to be a sorted list
@@ -2026,20 +2048,28 @@ values from arr, arr is assumed to be a sorted list</p>
 
     in_range = False
     ranges = []
+    range_idxs = []
     for idx, b in enumerate(truth_arr):
         if b and not in_range:
             in_range = True
             range_start = arr[idx]
+            range_start_idx = idx
         if not b and in_range:
             in_range = False
             range_end = arr[idx - 1]
-            if range_end - range_start &gt; min_range:
+            range_end_idx = idx
+            if range_end - range_start &gt;= min_range:
                 ranges.append((range_start, range_end))
-    return ranges</code></pre>
+                for i in range(range_start_idx, range_end_idx):
+                    range_idxs.append(i)
+    if not return_idxs:
+        return ranges
+    else:
+        return ranges, range_idxs</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_utils.get_all_files_in_dir"><code class="name flex">
-<span>def <span class="ident">get_all_files_in_dir</span></span>(<span>in_dir, ext=None, return_absolute=True, recursive=False, verbose=False, re_filter=None)</span>
+<span>def <span class="ident">get_all_files_in_dir</span></span>(<span>in_dir, ext=None, return_absolute=True, recursive=False, verbose=False, re_filter=None, case_sensitive_ext=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Get all files in the directory with the given extension.</p>
@@ -2047,15 +2077,19 @@ values from arr, arr is assumed to be a sorted list</p>
 <dl>
 <dt><strong><code>in_dir</code></strong> :&ensp;<code>str</code></dt>
 <dd>The absolute path to the directory</dd>
+<dt>ext : str, optional. Defaults to None.</dt>
+<dt>The extension of files to get.</dt>
+<dt>return_absolute : bool, optional. Defaults to True.</dt>
+<dt>Whether to return the absolute filename or not.</dt>
+<dt>recursive: bool, optional. Defaults to False.</dt>
+<dt>Whether to recurse through directories.</dt>
+<dt>verbose: bool, optional. Defaults to False.</dt>
+<dt>Whether to print the files found.</dt>
+<dt><strong><code>re_filter</code></strong> :&ensp;<code>str</code>, <code>optional.</code> <code>Defaults</code> <code>to</code> <code>None</code></dt>
+<dd>a regular expression used to filter the results</dd>
+<dt><strong><code>case_sensitive_ext</code></strong> :&ensp;<code>bool</code>, <code>optional.</code> <code>Defaults</code> <code>to</code> <code>False</code>,</dt>
+<dd>Whether to match the case of the file extension</dd>
 </dl>
-<p>ext : str, optional. Defaults to True.
-The extension of files to get.
-return_absolute : bool, optional. Defaults to True.
-Whether to return the absolute filename or not.
-recursive: bool, optional. Defaults to False.
-Whether to recurse through directories.
-verbose: bool, optional. Defaults to False.
-Whether to print the files found.</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>List</code></strong> :&ensp;<code>A</code> <code>list</code> of <code>filenames</code></dt>
@@ -2065,7 +2099,8 @@ Whether to print the files found.</p>
 <summary>Source code</summary>
 <pre><code class="python">def get_all_files_in_dir(
         in_dir, ext=None, return_absolute=True, 
-        recursive=False, verbose=False, re_filter=None):
+        recursive=False, verbose=False, re_filter=None, 
+        case_sensitive_ext=False):
     &#34;&#34;&#34;
     Get all files in the directory with the given extension.
     
@@ -2073,7 +2108,7 @@ Whether to print the files found.</p>
     ----------
     in_dir : str
         The absolute path to the directory
-    ext : str, optional. Defaults to True.
+    ext : str, optional. Defaults to None.
         The extension of files to get.
     return_absolute : bool, optional. Defaults to True.
         Whether to return the absolute filename or not.
@@ -2081,6 +2116,10 @@ Whether to print the files found.</p>
         Whether to recurse through directories.
     verbose: bool, optional. Defaults to False.
         Whether to print the files found.
+    re_filter: str, optional. Defaults to None
+        a regular expression used to filter the results
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
 
     Returns
     -------
@@ -2097,7 +2136,10 @@ Whether to print the files found.</p>
         return search_res is not None
 
     def ok_file(root_dir, f):
-        return has_ext(f, ext) and isfile(join(root_dir, f)) and match_filter(f)
+        good_ext = has_ext(f, ext, case_sensitive_ext=case_sensitive_ext)
+        good_file = isfile(join(root_dir, f))
+        good_filter = match_filter(f)
+        return good_ext and good_file and good_filter
 
     def convert_to_path(root_dir, f): 
         return join(root_dir, f) if return_absolute else f
@@ -2211,7 +2253,7 @@ def get_axona_colours(index=None):
 </details>
 </dd>
 <dt id="neurochat.nc_utils.has_ext"><code class="name flex">
-<span>def <span class="ident">has_ext</span></span>(<span>filename, ext)</span>
+<span>def <span class="ident">has_ext</span></span>(<span>filename, ext, case_sensitive_ext=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Check if the filename ends in the extension</p>
@@ -2221,6 +2263,8 @@ def get_axona_colours(index=None):
 <dd>The name of the file</dd>
 <dt><strong><code>ext</code></strong> :&ensp;<code>str</code></dt>
 <dd>The extension, may have leading dot (e.g txt == .txt)</dd>
+<dt><strong><code>case_sensitive_ext</code></strong> :&ensp;<code>bool</code>, <code>optional.</code> <code>Defaults</code> <code>to</code> <code>False</code>,</dt>
+<dd>Whether to match the case of the file extension</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -2229,7 +2273,7 @@ def get_axona_colours(index=None):
 </dl></section>
 <details class="source">
 <summary>Source code</summary>
-<pre><code class="python">def has_ext(filename, ext):
+<pre><code class="python">def has_ext(filename, ext, case_sensitive_ext=False):
     &#34;&#34;&#34;
     Check if the filename ends in the extension
     
@@ -2239,6 +2283,8 @@ def get_axona_colours(index=None):
         The name of the file
     ext : str
         The extension, may have leading dot (e.g txt == .txt)
+    case_sensitive_ext: bool, optional. Defaults to False,
+        Whether to match the case of the file extension
     
     Returns
     -------
@@ -2249,7 +2295,10 @@ def get_axona_colours(index=None):
         return True
     if ext[0] != &#34;.&#34;:
         ext = &#34;.&#34; + ext
-    return filename[-len(ext):].lower() == ext.lower()</code></pre>
+    if case_sensitive_ext:
+        return filename[-len(ext):] == ext
+    else:
+        return filename[-len(ext):].lower() == ext.lower()</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_utils.hellinger"><code class="name flex">
