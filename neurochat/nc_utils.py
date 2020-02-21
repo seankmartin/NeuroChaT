@@ -1087,7 +1087,7 @@ def get_all_files_in_dir(
     ----------
     in_dir : str
         The absolute path to the directory
-    ext : str, optional. Defaults to True.
+    ext : str, optional. Defaults to None.
         The extension of files to get.
     return_absolute : bool, optional. Defaults to True.
         Whether to return the absolute filename or not.
