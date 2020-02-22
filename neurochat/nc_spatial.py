@@ -1726,7 +1726,13 @@ class NSpatial(NAbstract):
 
         hd_rate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting='unsafe')
 
-        smoothRate = smooth_1d(hd_rate, filttype, filtsize)
+        extra_for_smooth = int(np.floor(filtsize / 2))
+        to_smooth_hd = np.concatenate([
+            hd_rate[len(hd_rate) - extra_for_smooth:],
+            hd_rate, 
+            hd_rate[:extra_for_smooth]])
+        smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+        smoothRate = smoothRate[2:len(smoothRate)-2]
 
         if update:
             _results['HD Skaggs'] = self.skaggs_info(hd_rate, tcount)
