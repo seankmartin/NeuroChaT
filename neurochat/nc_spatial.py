@@ -794,37 +794,138 @@ class NSpatial(NAbstract):
     def load_spatial_Axona(self, file_name):
         """
         Loads Axona format spatial data to the NSpatial() object
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
-        """
+        None
 
+        """
         try:
-            f = open(file_name, 'rt')
             self._set_data_source(file_name)
             self._set_source_format('Axona')
-            while True:
-                line = f.readline()
-                if line == '':
-                    break
-                elif line.startswith('time'):
-                    spatial_data = np.loadtxt(f, dtype='float', usecols=range(5))
-            self._set_time(spatial_data[:, 0])
-            self._set_pos_x(spatial_data[:, 1]- np.min(spatial_data[:, 1]))
-            self._set_pos_y(spatial_data[:, 2]- np.min(spatial_data[:, 2]))
-            self._set_direction(spatial_data[:, 3])
-            self._set_speed(spatial_data[:, 4])
-            f.seek(0, 0)
-            pixel_size = list(map(float, re.findall(r"\d+.\d+|\d+", f.readline())))
-            self.set_pixel_size(pixel_size)
-            self.smooth_direction()
-        except:
+            if file_name.endswith(".txt"):
+                f = open(file_name, 'rt')
+                while True:
+                    line = f.readline()
+                    if line == '':
+                        break
+                    elif line.startswith('time'):
+                        spatial_data = np.loadtxt(
+                            f, dtype='float', usecols=range(5))
+                self._set_time(spatial_data[:, 0])
+                self._set_pos_x(
+                    spatial_data[:, 1] - np.min(spatial_data[:, 1]))
+                self._set_pos_y(
+                    spatial_data[:, 2] - np.min(spatial_data[:, 2]))
+                self._set_direction(spatial_data[:, 3])
+                self._set_speed(spatial_data[:, 4])
+                f.seek(0, 0)
+                pixel_size = list(
+                    map(float, re.findall(r"\d+.\d+|\d+", f.readline())))
+                self.set_pixel_size(pixel_size)
+                self.smooth_direction()
+
+            elif file_name.endswith(".pos"):
+                f = open(file_name, 'rb')
+                total_pos_samples = 0
+                while True:
+                    line = f.readline()
+                    try:
+                        line = line.decode('latin-1')
+                    except:
+                        break
+                    if line == '':
+                        break
+                    elif line.startswith("pos_format"):
+                        info = line.split(" ")[-1]
+                        if info[:-2] != "t,x1,y1,x2,y2,numpix1,numpix2":
+                            logging.error(
+                                ".pos reading only supports 2-spot mode currently")
+                            print(info[:-2])
+                            print("t,x1,y1,x2,y2,numpix1,numpix2")
+                            return
+                    elif line.startswith("num_pos_samples"):
+                        total_pos_samples = int(line.strip().split(" ")[-1])
+                    elif line.startswith("data_start"):
+                        break
+
+                f.seek(0, 0)
+                header_offset = []
+                while True:
+                    try:
+                        buff = f.read(10).decode('UTF-8')
+                    except:
+                        break
+                    if buff == 'data_start':
+                        header_offset = f.tell()
+                        break
+                    else:
+                        f.seek(-9, 1)
+                f.seek(header_offset, 0)
+                print("Starting pos decode")
+                big_pos = np.zeros(
+                    shape=(total_pos_samples, 2), dtype=np.int16)
+                small_pos = np.zeros(
+                    shape=(total_pos_samples, 2), dtype=np.int16)
+                spatial_data = np.zeros(
+                    shape=(total_pos_samples, 5), dtype=float)
+                counter = 0
+                print(total_pos_samples)
+                with open("spatial.txt", "w") as wf:
+                    while counter < total_pos_samples:
+                        chunk = f.read(20)
+                        frame_count = (
+                            16777216 * chunk[0] +
+                            65536 * chunk[1] +
+                            256 * chunk[2] +
+                            chunk[3])
+                        words = np.zeros(shape=(7, ), dtype=np.uint16)
+                        for i in range(4, 18, 2):
+                            s_idx = (i - 4) // 2
+                            words[s_idx] = (256 * chunk[i]) + chunk[i+1]
+
+                        # Words are:
+                        # big_spotx, big_spoty, little_spotx, 
+                        # little_spoty, number_of_pixels_in_big_spot,
+                        # number_of_pixels_in_little_spot, total_tracked_pixels
+                        out_str = "{}: {}\n".format(frame_count, words)
+                        wf.write(out_str)
+                        # print(frame_count, words)
+                        # TODO do this for big and small positions
+                        # TODO do this after addding
+                        big_pos[counter] = np.array(words[0:2])
+                        small_pos[counter] = np.array(words[2:4])
+                        # if (words[0] == words[1]) and (words[1] == 1023):
+                        #     print("Untracked position!")
+                        # else:
+                            # TODO do actual spatial decoding
+                            # # TODO check actual sample rate
+                            # spatial_data[counter][0] = counter * 0.02
+                            # spatial_data[counter][1] = words[1]
+                            # spatial_data[counter][2] = words[2]
+                            # pos_vec = big_pos[counter] - small_pos[counter]
+                            # from neurochat.nc_utils import angle_between_points
+                            # angle = angle_between_points(
+                            #     small_pos[counter] + np.array([1, 0]), 
+                            #     small_pos[counter], big_pos[counter])
+                            # if words[2] < words[4]:
+                            #     angle = 360 - angle
+                            # spatial_data[counter][3] = angle
+                            # speed = (np.abs(pos_vec) / 0.02)
+                            # spatial_data[counter][4] = speed
+                            # print(spatial_data[counter])
+                        counter = counter + 1
+
+            else:
+                logging.error("Position data only supports .pos or .txt")
+                return
+
+        except Exception as e:
+            print(e)
             logging.error('File does not exist or is open in another process!')
 
     def load_spatial_NWB(self, file_name):
