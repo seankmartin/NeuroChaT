@@ -594,7 +594,7 @@ class NSpike(NBase):
             if (wave.shape[0] == 1):
                 slope = np.array([(np.gradient(wave[0]))])
             else:
-                slope = np.gradient(wave)[1][:, :-1]
+                slope = np.gradient(wave, axis=1)
             meanWave[:, i] = np.mean(wave, 0)
             stdWave[:, i] = np.std(wave, 0)
             max_val = wave.max(1)
