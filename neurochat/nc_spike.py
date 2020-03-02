@@ -591,9 +591,12 @@ class NSpike(NBase):
         amp = np.empty([num_spikes, tot_chans])
         height = np.empty([num_spikes, tot_chans])
         for i, (chan, wave) in enumerate(_waves.items()):
+            if (wave.shape[0] == 1):
+                slope = np.array([(np.gradient(wave[0]))])
+            else:
+                slope = np.gradient(wave)[1][:, :-1]
             meanWave[:, i] = np.mean(wave, 0)
             stdWave[:, i] = np.std(wave, 0)
-            slope = np.gradient(wave)[1][:, :-1]
             max_val = wave.max(1)
 
             peak_val, trough1_val = 0, 0
