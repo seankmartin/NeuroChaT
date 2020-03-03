@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>neurochat.nc_spike API documentation</title>
 <meta name="description" content="This module implements NSpike Class for NeuroChaT software …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
@@ -23,7 +23,9 @@
 <p>This module implements NSpike Class for NeuroChaT software</p>
 <p>@author: Md Nurul Islam; islammn at tcd dot ie</p>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
 This module implements NSpike Class for NeuroChaT software
@@ -617,9 +619,12 @@ class NSpike(NBase):
         amp = np.empty([num_spikes, tot_chans])
         height = np.empty([num_spikes, tot_chans])
         for i, (chan, wave) in enumerate(_waves.items()):
+            if (wave.shape[0] == 1):
+                slope = np.array([(np.gradient(wave[0]))])
+            else:
+                slope = np.gradient(wave, axis=1)
             meanWave[:, i] = np.mean(wave, 0)
             stdWave[:, i] = np.std(wave, 0)
-            slope = np.gradient(wave)[1][:, :-1]
             max_val = wave.max(1)
 
             peak_val, trough1_val = 0, 0
@@ -1547,13 +1552,14 @@ class NSpike(NBase):
         None
         
         &#34;&#34;&#34;
-        words = file_name.split(sep=os.sep)
-        file_directory = os.sep.join(words[0:-1])
-        file_tag = words[-1].split(sep=&#39;.&#39;)[0]
-        tet_no = words[-1].split(sep=&#39;.&#39;)[1]
-        set_file = file_directory + os.sep + file_tag + &#39;.set&#39;
-        cut_file = file_directory + os.sep + file_tag + &#39;_&#39; + tet_no + &#39;.cut&#39;
-        clu_file = file_directory + os.sep + file_tag + &#39;.clu.&#39; + tet_no
+        file_directory, file_basename = os.path.split(file_name)
+        file_tag, tet_no = os.path.splitext(file_basename)
+        tet_no = tet_no[1:]
+        set_file = os.path.join(file_directory, file_tag + &#39;.set&#39;)
+        cut_file = os.path.join(
+            file_directory, file_tag + &#39;_&#39; + tet_no + &#39;.cut&#39;)
+        clu_file = os.path.join(
+            file_directory, file_tag + &#39;.clu.&#39; + tet_no)
 
         self._set_data_source(file_name)
         self._set_source_format(&#39;Axona&#39;)
@@ -1877,7 +1883,9 @@ single units in the recording.</p>
 <dd>Keyword arguments</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">class NSpike(NBase):
     &#34;&#34;&#34;
     This data class is the placeholder for the dataset that contains information
@@ -2442,9 +2450,12 @@ single units in the recording.</p>
         amp = np.empty([num_spikes, tot_chans])
         height = np.empty([num_spikes, tot_chans])
         for i, (chan, wave) in enumerate(_waves.items()):
+            if (wave.shape[0] == 1):
+                slope = np.array([(np.gradient(wave[0]))])
+            else:
+                slope = np.gradient(wave, axis=1)
             meanWave[:, i] = np.mean(wave, 0)
             stdWave[:, i] = np.std(wave, 0)
-            slope = np.gradient(wave)[1][:, :-1]
             max_val = wave.max(1)
 
             peak_val, trough1_val = 0, 0
@@ -3372,13 +3383,14 @@ single units in the recording.</p>
         None
         
         &#34;&#34;&#34;
-        words = file_name.split(sep=os.sep)
-        file_directory = os.sep.join(words[0:-1])
-        file_tag = words[-1].split(sep=&#39;.&#39;)[0]
-        tet_no = words[-1].split(sep=&#39;.&#39;)[1]
-        set_file = file_directory + os.sep + file_tag + &#39;.set&#39;
-        cut_file = file_directory + os.sep + file_tag + &#39;_&#39; + tet_no + &#39;.cut&#39;
-        clu_file = file_directory + os.sep + file_tag + &#39;.clu.&#39; + tet_no
+        file_directory, file_basename = os.path.split(file_name)
+        file_tag, tet_no = os.path.splitext(file_basename)
+        tet_no = tet_no[1:]
+        set_file = os.path.join(file_directory, file_tag + &#39;.set&#39;)
+        cut_file = os.path.join(
+            file_directory, file_tag + &#39;_&#39; + tet_no + &#39;.cut&#39;)
+        clu_file = os.path.join(
+            file_directory, file_tag + &#39;.clu.&#39; + tet_no)
 
         self._set_data_source(file_name)
         self._set_source_format(&#39;Axona&#39;)
@@ -3666,7 +3678,9 @@ single units in the recording.</p>
 <p><code>:obj:Nlfp</code>
 A new NLfp() object</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def add_lfp(self, lfp=None, **kwargs):
     &#34;&#34;&#34;
     Adds new LFP node to current NSpike() object
@@ -3712,7 +3726,9 @@ A new NLfp() object</p></section>
 <p><code>:obj:NSpike</code>
 A new NSpike() object</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def add_spike(self, spike=None, **kwargs):
     &#34;&#34;&#34;
     Adds new spike node to current NSpike() object
@@ -3751,7 +3767,9 @@ A new NSpike() object</p></section>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def burst(self, burst_thresh=5, ibi_thresh=50):
     &#34;&#34;&#34;
     Analysis of bursting properties of the spiking train
@@ -3849,7 +3867,9 @@ A new NSpike() object</p></section>
 <dd>Number of bytes to represent each sample of the spike waveforms</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_bytes_per_sample(self):
     &#34;&#34;&#34;
     Returns the number of bytes to represent each spike waveform sample
@@ -3884,7 +3904,9 @@ A new NSpike() object</p></section>
 <dd>Identities of individual channels</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_channel_ids(self):
     &#34;&#34;&#34;
     Returns the identities of individual channels
@@ -3919,7 +3941,9 @@ A new NSpike() object</p></section>
 <dd>Fullscale ADC value in mV</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_fullscale_mv(self):
     &#34;&#34;&#34;
     Returns the fullscale value of the ADC in mV
@@ -3954,7 +3978,9 @@ A new NSpike() object</p></section>
 <dd>Number of bytes to represent timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_samples_per_spike(self):
     &#34;&#34;&#34;
     Returns the number of bytes to represent each timestamp in the binary file
@@ -3989,7 +4015,9 @@ A new NSpike() object</p></section>
 <dd>Sampling rate for spike waveforms</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_sampling_rate(self):
     &#34;&#34;&#34;
     Returns the sampling rate of spike waveforms
@@ -4023,7 +4051,9 @@ A new NSpike() object</p></section>
 <dd>Timebase for spike event timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_timebase(self):
     &#34;&#34;&#34;
     Returns the timebase for spike event timestamps
@@ -4058,7 +4088,9 @@ A new NSpike() object</p></section>
 <dd>Timestamps of the spiking waveforms</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_timestamp(self, unit_no=None):
     &#34;&#34;&#34;
     Returns the timestamps of the spike-waveforms of spefied unit
@@ -4098,7 +4130,9 @@ A new NSpike() object</p></section>
 <dd>Number of bytes to represent timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_timestamp_bytes(self):
     &#34;&#34;&#34;
     Returns the number of bytes to represent each timestamp in the binary file
@@ -4132,7 +4166,9 @@ A new NSpike() object</p></section>
 <dd>Total number of electrode channels</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_total_channels(self):
     &#34;&#34;&#34;
     Returns total number of electrode channels in the spike data file
@@ -4167,7 +4203,9 @@ A new NSpike() object</p></section>
 <dd>Total number of spikes</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_total_spikes(self):
     &#34;&#34;&#34;
     Returns total number of spikes in the recording
@@ -4202,7 +4240,9 @@ A new NSpike() object</p></section>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_type(self):
     &#34;&#34;&#34;
     Returns the type of object. For NSpike, this is always `spike` type
@@ -4236,7 +4276,9 @@ A new NSpike() object</p></section>
 <dd>List of the unique tags of spiking-waveforms from clustering</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_list(self):
     &#34;&#34;&#34;
     Gets the list of the units
@@ -4271,7 +4313,9 @@ A new NSpike() object</p></section>
 <dd>Unit or cell number set to analyse</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_no(self, spike_name=None):
     &#34;&#34;&#34;
     Gets currently set unit number of the spike dataset to analyse
@@ -4312,7 +4356,9 @@ A new NSpike() object</p></section>
 <dd>Number of units spikes of a unit in a recording session</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_spikes_count(self, unit_no=None):
     &#34;&#34;&#34;
     Returns the number of spikes in a unit
@@ -4351,7 +4397,9 @@ A new NSpike() object</p></section>
 <dd>Timestamps for currently set unit</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_stamp(self):
     &#34;&#34;&#34;
     Gets the timestamps for currently set unit to analyse
@@ -4386,7 +4434,9 @@ A new NSpike() object</p></section>
 <dd>The timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_stamps_in_ranges(self, ranges):
     &#34;&#34;&#34;
     Return the unit timestamps in a list of ranges.
@@ -4425,7 +4475,9 @@ A new NSpike() object</p></section>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_tags(self):
     
     &#34;&#34;&#34;
@@ -4461,7 +4513,9 @@ A new NSpike() object</p></section>
 unit are returned</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_waves(self, unit_no=None):
     &#34;&#34;&#34;
     Returns spike waveform of a specified unit
@@ -4504,7 +4558,9 @@ unit are returned</dd>
 <dd>Dictionary of spiking waveforms where keys represent the channel number</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_waveform(self):
     &#34;&#34;&#34;
     Returns spike-waveforms
@@ -4545,7 +4601,9 @@ unit are returned</dd>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def isi(self, bins=&#39;auto&#39;, bound=None, density=False, 
         refractory_threshold=2):
     &#34;&#34;&#34;
@@ -4611,7 +4669,9 @@ unit are returned</dd>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def isi_corr(self, spike=None, **kwargs):
     &#34;&#34;&#34;
     Calculates the correlation of ISI histogram.
@@ -4676,7 +4736,9 @@ unit are returned</dd>
 <h2 id="see-also">See also</h2>
 <p><code>load_spike_axona()</code>, <code>load_spike_NLX()</code>, <code>load_spike_NWB()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load(self, filename=None, system=None):
     &#34;&#34;&#34;
     Loads spike datasets
@@ -4727,7 +4789,9 @@ filenames</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_lfp(self, names=&#39;all&#39;):
     &#34;&#34;&#34;
     Loads datasets of the LFP nodes. Name of each node is used for obtaining the
@@ -4768,7 +4832,9 @@ filenames</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spike(self, names=None):
     &#34;&#34;&#34;
     Loads datasets of the spike nodes. Name of each node is used for obtaining the
@@ -4810,7 +4876,9 @@ filenames</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spike_Axona(self, file_name):
     &#34;&#34;&#34;
     Decodes spike data from Axona file format
@@ -4825,13 +4893,14 @@ filenames</p>
     None
     
     &#34;&#34;&#34;
-    words = file_name.split(sep=os.sep)
-    file_directory = os.sep.join(words[0:-1])
-    file_tag = words[-1].split(sep=&#39;.&#39;)[0]
-    tet_no = words[-1].split(sep=&#39;.&#39;)[1]
-    set_file = file_directory + os.sep + file_tag + &#39;.set&#39;
-    cut_file = file_directory + os.sep + file_tag + &#39;_&#39; + tet_no + &#39;.cut&#39;
-    clu_file = file_directory + os.sep + file_tag + &#39;.clu.&#39; + tet_no
+    file_directory, file_basename = os.path.split(file_name)
+    file_tag, tet_no = os.path.splitext(file_basename)
+    tet_no = tet_no[1:]
+    set_file = os.path.join(file_directory, file_tag + &#39;.set&#39;)
+    cut_file = os.path.join(
+        file_directory, file_tag + &#39;_&#39; + tet_no + &#39;.cut&#39;)
+    clu_file = os.path.join(
+        file_directory, file_tag + &#39;.clu.&#39; + tet_no)
 
     self._set_data_source(file_name)
     self._set_source_format(&#39;Axona&#39;)
@@ -4994,7 +5063,9 @@ filenames</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spike_NWB(self, file_name):
     &#34;&#34;&#34;
     Decodes spike data from NWB (HDF5) file format
@@ -5089,7 +5160,9 @@ filenames</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spike_Neuralynx(self, file_name):
     &#34;&#34;&#34;
     Decodes spike data from Neuralynx file format
@@ -5233,7 +5306,9 @@ filenames</p>
 <h2 id="see-also">See also</h2>
 <p><code>nc_lfp.NLfp().phase_dist()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def phase_dist(self, lfp = None, **kwargs):
     &#34;&#34;&#34;
     Analysis of spike to LFP phase distribution
@@ -5288,7 +5363,9 @@ filenames</p>
 <h2 id="see-also">See also</h2>
 <p><code>nc_lfp.NLfp().plv()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def plv(self, lfp=None, **kwargs):
     &#34;&#34;&#34;
     Calculates phase-locking value of spike train to underlying LFP signal.
@@ -5340,7 +5417,9 @@ filenames</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def psth(self, event_stamp, **kwargs):
     &#34;&#34;&#34;
     Calculates peri-stimulus time histogram (PSTH)
@@ -5403,7 +5482,9 @@ filenames</p>
 <h2 id="also-see">Also see</h2>
 <p>nc_hdf.Nhdf().save_spike()</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def save_to_hdf5(self, file_name=None, system=None):
     &#34;&#34;&#34;
     Stores NSpike() object to HDF5 file
@@ -5453,7 +5534,9 @@ filenames</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_unit_no(self, unit_no=None, spike_name=None):
     &#34;&#34;&#34;
     Sets the unit number of the spike dataset to analyse
@@ -5501,7 +5584,9 @@ filenames</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_unit_tags(self, new_tags):
     
     &#34;&#34;&#34;
@@ -5544,7 +5629,9 @@ filenames</p>
 <h2 id="see-also">See also</h2>
 <p><code>nc_lfp.NLfp().spike_lfp_causality()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def spike_lfp_causality(self, lfp=None, **kwargs):
     &#34;&#34;&#34;
     Analyses spike to underlying LFP causality
@@ -5592,7 +5679,9 @@ filenames</p>
 <dd>subsampled version of initial spike object</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def subsample(self, sample_range=None):
     &#34;&#34;&#34;
     Extract a time range from the spikes.
@@ -5642,7 +5731,9 @@ filenames</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def theta_index(self, **kwargs):
     &#34;&#34;&#34;
     Analysis of theta-modulation of a unit
@@ -5745,7 +5836,9 @@ filenames</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def theta_skip_index(self, **kwargs):
     &#34;&#34;&#34;
     Analysis of theta-skipping of a unit
@@ -5844,7 +5937,9 @@ filenames</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def wave_property(self):
     &#34;&#34;&#34;
     Claulates different waveform properties for currently set unit
@@ -5902,9 +5997,12 @@ filenames</p>
     amp = np.empty([num_spikes, tot_chans])
     height = np.empty([num_spikes, tot_chans])
     for i, (chan, wave) in enumerate(_waves.items()):
+        if (wave.shape[0] == 1):
+            slope = np.array([(np.gradient(wave[0]))])
+        else:
+            slope = np.gradient(wave, axis=1)
         meanWave[:, i] = np.mean(wave, 0)
         stdWave[:, i] = np.std(wave, 0)
-        slope = np.gradient(wave)[1][:, :-1]
         max_val = wave.max(1)
 
         peak_val, trough1_val = 0, 0
@@ -6054,7 +6152,7 @@ filenames</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

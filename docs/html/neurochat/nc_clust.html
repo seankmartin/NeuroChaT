@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>neurochat.nc_clust API documentation</title>
 <meta name="description" content="This module implements NClust Class for NeuroChaT software …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
@@ -23,7 +23,9 @@
 <p>This module implements NClust Class for NeuroChaT software</p>
 <p>@author: Md Nurul Islam; islammn at tcd dot ie</p>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
 This module implements NClust Class for NeuroChaT software
@@ -48,17 +50,18 @@ class NClust(NBase):
     This class facilitates clustering-related operations. Although no clustering
     algorithm is implemented in this class, it can be subclassed to create such
     algorithms.
-    
+
     &#34;&#34;&#34;
+
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Attributes
         ----------
         spike : NSpike
             An object of NSpike() class or its subclass
-            
+
         &#34;&#34;&#34;
-        
+
         spike = kwargs.get(&#39;spike&#39;, None)
         self.wavetime = []
         self.UPSAMPLED = False
@@ -74,115 +77,115 @@ class NClust(NBase):
     def get_unit_tags(self):
         &#34;&#34;&#34;
         Returns tags of the spiking waveforms from clustering
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         return self.spike.get_unit_tags()
 
     def set_unit_tags(self, new_tags=None):
         &#34;&#34;&#34;
         Returns tags of the spiking waveforms from clustering
-        
+
         Parameters
         ----------
         new_tags : ndarray
             Array that contains the tags for spike-waveforms based on the cluster number
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.spike.set_unit_tags(new_tags)
 
     def get_unit_list(self):
         &#34;&#34;&#34;
         Returns the list of units in a spike dataset
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             List of units
-        
+
         &#34;&#34;&#34;
-        
+
         return self.spike.get_unit_list()
 
     def _set_unit_list(self):
         &#34;&#34;&#34;
         Sets the unit list
-        
-        Delegetaes to NSpike._set_unit_list()
-        
+
+        Delegates to NSpike._set_unit_list()
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         See also
         --------
         nc_spike.NSPike()._set_unit_list
-        
+
         &#34;&#34;&#34;
-        
+
         self.spike._set_unit_list()
 
-    def get_timestamp(self, unit_no=None):    
+    def get_timestamp(self, unit_no=None):
         &#34;&#34;&#34;
         Returns the timestamps of the spike-waveforms of specified unit
-        
+
         Parameters
         ----------
         unit_no : int
             Unit whose timestamps are to be returned
-        
+
         Returns
         -------
         ndarray
             Timestamps of the spiking waveforms
-            
+
         &#34;&#34;&#34;
-        
+
         self.spike.get_timestamp(unit_no=unit_no)
 
     def get_unit_spikes_count(self, unit_no=None):
         &#34;&#34;&#34;
         Returns the total number of spikes in a specified unit
-        
+
         Parameters
         ----------
         unit_no : int
             Unit whose count is returned
-        
+
         Returns
         -------
         int
             Total number of spikes in the unit
-        
+
         &#34;&#34;&#34;
-            
+
         return self.spike.get_unit_spikes_count(unit_no=unit_no)
 
     def get_waveform(self):
         &#34;&#34;&#34;
         Returns the waveforms in the spike dataset
-        
+
         Parameters
         ----------
         None        
@@ -192,90 +195,91 @@ class NClust(NBase):
         dict
             Each key represents one channel of the electrode group, each value
             represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
-        
-        &#34;&#34;&#34; 
+
+        &#34;&#34;&#34;
         return self.spike.get_waveform()
 
     def _set_waveform(self, spike_waves=[]):
         &#34;&#34;&#34;
         Sets the waveforms of the spike dataset
-        
+
         Parameters
         ----------
         spike_waves : dict
             Spike waveforms
-        
+
         Returns
         -------
         None        
-        
+
         &#34;&#34;&#34;
         self.spike._set_waveform(spike_waves=spike_waves)
 
     def get_unit_waves(self, unit_no=None):
         &#34;&#34;&#34;
         Returns spike waveforms of a specific unit
-        
+
         Parameters
         ----------
         unit_no : int
             Unit whose waveforms are returned
-        
+
         Returns
         -------
         dict
             Spike wavefoorms in each channel of the electrode group 
-        
+
         &#34;&#34;&#34;
         return self.spike.get_unit_waves(unit_no=unit_no)
 
-    # For multi-unit analysis, {&#39;SpikeName&#39;: cell_no} pairs should be used as function input
+    # For multi-unit analysis,
+    # {&#39;SpikeName&#39;: cell_no} pairs should be used as function input
 
     def load(self, filename=None, system=None):
         &#34;&#34;&#34;
         Loads spike dataset from the file
-        
+
         Parameters
         ----------
         filename: str
             Name of the spike file
-        
+
         Returns
         -------
         system
             Data format or recording system
-        
+
         &#34;&#34;&#34;
         self.spike.load(filename=filename, system=system)
 
     def add_spike(self, spike=None, **kwargs):
         &#34;&#34;&#34;
         Adds new spike node to current NSpike() object
-        
+
         Parameters
         ----------
         spike : NSpike
             NSPike object. If None, new object is created
-        
+
         Returns
         -------
         `:obj:NSpike`
             A new NSpike() object
 
         &#34;&#34;&#34;
-        
+
         return self.spike.add_spike(spike=spike, **kwargs)
 
     def load_spike(self, names=None):
         &#34;&#34;&#34;
         Loads datasets of the spike nodes. Name of each node is used for obtaining the
         filenames.
-        
+
         Parameters
         ----------
         names : list of str
             Names of the nodes to load. If None, current NSpike() object is loaded
-        
+
         Returns
         -------
         None
@@ -285,226 +289,226 @@ class NClust(NBase):
 
     def wave_property(self):
         &#34;&#34;&#34;
-        Claulates different waveform properties for currently set unit
-        
+        Calculates different waveform properties for currently set unit
+
         Delegates to NSpike().wave_property()
-        
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-        
+
         See also
         --------
         NSpike().wave_property()
 
         &#34;&#34;&#34;
-        
+
         return self.spike.wave_property()
 
     def isi(self, bins=&#39;auto&#39;, bound=None, density=False):
         &#34;&#34;&#34;
-        Calulates the ISI histogram of the spike train
-        
+        Calculates the ISI histogram of the spike train
+
         Delegates to NSpike().isi()
-        
+
         Parameters
         ----------
         bins : str or int
             Number of ISI histogram bins. If &#39;auto&#39;, NumPy default is used
-            
+
         bound : int
             Length of the ISI histogram in msec
         density : bool
-            If true, normalized historagm is calcultaed
- 
+            If true, normalized histogram is calculated
+
         Returns
         -------
         dict
             Graphical data of the analysis
-        
+
         See also
         --------
         NSpike().isi()
-    
+
         &#34;&#34;&#34;
-        
+
         return self.spike.isi(bins=bins, bound=bound, density=density)
 
     def isi_corr(self, **kwargs):
         &#34;&#34;&#34;
-        Analysis of ISI autocrrelation histogram
-        
+        Analysis of ISI autocorrelation histogram
+
         Delegates to NSpike().isi_auto_corr()
-        
+
         Parameters
         ----------            
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         See also
         --------
         nc_spike.NSpike().isi_corr
 
         &#34;&#34;&#34;
-        
+
         return self.spike.isi_corr(**kwargs)
 
     def psth(self, event_stamp, **kwargs):
         &#34;&#34;&#34;
         Calculates peri-stimulus time histogram (PSTH)
-        
+
         Delegates to NSpike().psth()
-        
+
         Parameters
         ----------
         event_stamp : ndarray
             Event timestamps
-            
+
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-            
+
         See also
         --------
         NSpike().psth()
-    
+
         &#34;&#34;&#34;
-        
+
         return self.spike.psth(event_stamp, **kwargs)
 
     def burst(self, burst_thresh=5, ibi_thresh=50):
         &#34;&#34;&#34;
         Burst analysis of spik-train
-        
+
         Delegates to NSpike().burst()
-        
+
         Parameters
         ----------
         burst_thresh : int
             Minimum ISI between consecutive spikes in a burst
-            
+
         ibi_thresh : int
             Minimum inter-burst interval between two bursting groups of spikes
- 
+
         Returns
         -------
         None
-    
+
         See also
         --------
         nc_spike.NSpike().burst
 
         &#34;&#34;&#34;
-        
+
         self.spike.burst(burst_thresh=burst_thresh, ibi_thresh=ibi_thresh)
 
     def get_total_spikes(self):
         &#34;&#34;&#34;
         Returns total number of spikes in the recording
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Total number of spikes
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_total_spikes()
 
     def get_total_channels(self):
         &#34;&#34;&#34;
         Returns total number of electrode channels in the spike data file
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Total number of electrode channels
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_total_channels()
 
     def get_channel_ids(self):
         &#34;&#34;&#34;
         Returns the identities of individual channels
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         list
             Identities of individual channels 
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_channel_ids()
 
     def get_timebase(self):
         &#34;&#34;&#34;
         Returns the timebase for spike event timestamps
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Timebase for spike event timestamps
 
         &#34;&#34;&#34;
-        
-        return  self.spike.get_timebase()
+
+        return self.spike.get_timebase()
 
     def get_sampling_rate(self):
         &#34;&#34;&#34;
         Returns the sampling rate of spike waveforms
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Sampling rate for spike waveforms
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_sampling_rate()
 
     def get_samples_per_spike(self):
         &#34;&#34;&#34;
         Returns the number of bytes to represent each timestamp in the binary file
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -516,102 +520,103 @@ class NClust(NBase):
     def get_wave_timestamp(self):
         &#34;&#34;&#34;
         Returns the temporal resolution to  represent samples of spike-waves.
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Number of bytes to represent timestamps
 
         &#34;&#34;&#34;
-        
+
         # resturn as microsecond
-        fs = self.spike.get_sampling_rate()/10**6 # fs downsampled so that the time is given in microsecond
-        return 1/fs
+        # fs downsampled so that the time is given in microsecond
+        fs = self.spike.get_sampling_rate() / 10**6
+        return 1 / fs
 
     def save_to_hdf5(self):
         &#34;&#34;&#34;
         Stores NSpike() object to HDF5 file
-        
+
         Delegates to NSPike().save_to_hdf5()
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         Also see
         --------
         nc_hdf.Nhdf().save_spike()
-        
+
         &#34;&#34;&#34;
-        
+
         self.spike.save_to_hdf5()
 
-    def get_feat(self, npc = 2):
+    def get_feat(self, npc=2):
         &#34;&#34;&#34;
         Returns the spike-waveform features.
-        
+
         Parameters
         ----------
         nc : int
             Number of principle components in each channel.
-        
+
         Returns
         -------
         feat : ndarray
             Matrix of size (number_spike X number_features)
-        
+
         &#34;&#34;&#34;
-        
+
         if not self.NULL_CHAN_REMOVED:
             self.remove_null_chan()
         if not self.ALLIGNED:
             self.align_wave_peak()
 
-        trough, trough_loc = self.get_min_wave_chan() # trough only in max_channel
+        trough, trough_loc = self.get_min_wave_chan()  # trough only in max_channel
         peak, peak_chan, peak_loc = self.get_max_wave_chan()
 #        amp = np.abs(peak-trough)
         pc = self.get_wave_pc(npc=npc)
         shape = (self.get_total_spikes(), 1)
-        feat = np.concatenate((peak.reshape(shape), trough.reshape(shape), pc), axis=1)
+        feat = np.concatenate(
+            (peak.reshape(shape), trough.reshape(shape), pc), axis=1)
 
         return feat
 
         # for all units
-    def get_feat_by_unit(self, unit_no = None):
+    def get_feat_by_unit(self, unit_no=None):
         &#34;&#34;&#34;
         Returns the spike-waveform features for a paricular unit.
-        
+
         Parameters
         ----------
         unit_no : int
             Unit of interest
-        
+
         Returns
         -------
         feat : ndarray
             Matrix of size (number_spike X number_features)
-        
+
         &#34;&#34;&#34;
-        
-        
+
         if unit_no in self.get_unit_list():
             feat = self.get_feat()
             return feat[self.get_unit_tags() == unit_no, :]
         else:
             logging.error(&#39;Specified unit does not exist in the spike dataset&#39;)
-            
+
     def get_wave_peaks(self):
         &#34;&#34;&#34;
         Returns the peaks of the spike-waveforms.
-        
+
         Parameters
         ----------
         None        
@@ -623,10 +628,11 @@ class NClust(NBase):
         peak_loc : ndarray
             Index of peak locations
         &#34;&#34;&#34;
-        
+
         wave = self.get_waveform()
         peak = np.zeros((self.get_total_spikes(), len(wave.keys())))
-        peak_loc = np.zeros((self.get_total_spikes(), len(wave.keys())), dtype=int)
+        peak_loc = np.zeros(
+            (self.get_total_spikes(), len(wave.keys())), dtype=int)
         for i, key in enumerate(wave.keys()):
             peak[:, i] = np.amax(wave[key], axis=1)
             peak_loc[:, i] = np.argmax(wave[key], axis=1)
@@ -636,11 +642,11 @@ class NClust(NBase):
     def get_max_wave_chan(self):
         &#34;&#34;&#34;
         Returns the maximum of waveform peaks among the electrode groups.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         max_wave_val : ndarray
@@ -649,9 +655,9 @@ class NClust(NBase):
             Channel of the electrode group where a spike waveform is strongest
         peak_loc : ndarray
             Peak location in the channel with strongest waveform
-        
+
         &#34;&#34;&#34;
-        
+
         # Peak value at the highest channel, the highest channel, and the index of the peak
         peak, peak_loc = self.get_wave_peaks()
         max_wave_chan = np.argmax(peak, axis=1)
@@ -661,29 +667,32 @@ class NClust(NBase):
     def align_wave_peak(self, reach=300, factor=2):
         &#34;&#34;&#34;
         Align the waves by their peaks.
-        
+
         Parameters
         ----------
         reach : int
             Maximum allowed time-shift in microsecond
         factors : int
             Resampling factor
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         if not self.UPSAMPLED:
             self.resample_wave(factor=factor)
         if not self.ALLIGNED:
-            shift = round(reach/self.get_wave_timestamp()) # maximum 300microsecond allowed for shift
-            wave = self.get_waveform() # NC waves are stroed in waves[&#39;ch1&#39;], waves[&#39;ch2&#39;] etc. ways
+            # maximum 300microsecond allowed for shift
+            shift = round(reach / self.get_wave_timestamp())
+            # NC waves are stroed in waves[&#39;ch1&#39;], waves[&#39;ch2&#39;] etc. ways
+            wave = self.get_waveform()
             maxInd = shift + self.get_max_wave_chan()[2]
             shift_ind = int(np.median(maxInd)) - maxInd
             shift_ind[np.abs(shift_ind) &gt; shift] = 0
-            stacked_chan = np.empty((self.get_total_spikes(), self.get_samples_per_spike(), self.get_total_channels()))
+            stacked_chan = np.empty((self.get_total_spikes(
+            ), self.get_samples_per_spike(), self.get_total_channels()))
             keys = []
             i = 0
             for key, val in wave.items():
@@ -691,9 +700,12 @@ class NClust(NBase):
                 keys.append(key)
                 i += 1
 
-            stacked_chan = np.lib.pad(stacked_chan, [(0, 0), (shift, shift), (0, 0)], &#39;edge&#39;) # Shows error in Jupyter, check again
+            # Shows error in Jupyter, check again
+            stacked_chan = np.lib.pad(
+                stacked_chan, [(0, 0), (shift, shift), (0, 0)], &#39;edge&#39;)
 
-            stacked_chan = np.array([np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[shift: shift+ self.get_samples_per_spike()] for i in np.arange(shift_ind.size)])
+            stacked_chan = np.array([np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[
+                                    shift: shift + self.get_samples_per_spike()] for i in np.arange(shift_ind.size)])
 
             for i, key in enumerate(keys):
                 wave[key] = stacked_chan[:, :, i]
@@ -705,7 +717,7 @@ class NClust(NBase):
     def get_wave_min(self):
         &#34;&#34;&#34;
         Returns the minimum values of the spike-waveforms.
-        
+
         Parameters
         ----------
         None
@@ -716,9 +728,9 @@ class NClust(NBase):
             Minimum value of the  wavefforms
         min_loc : ndarray
             Index of minimum value
-            
+
         &#34;&#34;&#34;
-        
+
         wave = self.get_waveform()
         min_w = np.zeros((self.get_total_spikes(), len(wave.keys())))
         min_loc = np.zeros((self.get_total_spikes(), len(wave.keys())))
@@ -731,35 +743,35 @@ class NClust(NBase):
     def get_min_wave_chan(self):
         &#34;&#34;&#34;
         Returns the maximum of waveform peaks among the electrode groups.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         ndarray
             Minimum value of the waveform at channels with maximum peak value
         ndarray
             Index of minimum values
-        
+
         &#34;&#34;&#34;
         # Peak value at the highest channel, the highest channel, and the index of the peak
         max_wave_chan = self.get_max_wave_chan()[1]
         trough, trough_loc = self.get_wave_min()
         return trough[np.arange(len(max_wave_chan)), max_wave_chan], \
-                trough_loc[np.arange(len(max_wave_chan)), max_wave_chan]
+            trough_loc[np.arange(len(max_wave_chan)), max_wave_chan]
         # use get_max_channel to determine
 
     def get_wave_pc(self, npc=2):
         &#34;&#34;&#34;
         Returns the Principle Components of the waveforms
-        
+
         Parameters
         ----------
         npc : int
             Number of principle components from waveforms of each channel
-        
+
         Returns
         -------
         pc : ndarray
@@ -775,7 +787,8 @@ class NClust(NBase):
             if npc and npc &lt; w_new.shape[1]:
                 w_new = w_new[:, :npc]
             else:
-                w_new = w_new[:, 0:(find(np.cumsum(pc_var) &gt;= 0.95, 1, &#39;first&#39;)[0]+1)]
+                w_new = w_new[:, 0:(
+                    find(np.cumsum(pc_var) &gt;= 0.95, 1, &#39;first&#39;)[0] + 1)]
             if not len(pc):
                 pc = w_new
             else:
@@ -785,59 +798,59 @@ class NClust(NBase):
     def get_wavetime(self):
         &#34;&#34;&#34;
         Returns the timestamps of the waveforms, not the spiking-event timestamp
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
             Timestamps of the spike-waveforms
-            
+
         &#34;&#34;&#34;
-        
+
         # calculate the wavetime from the sampling rate and number of sample, returns in microsecond
         nsamp = self.spike.get_samples_per_spike()
         timestamp = self.get_wave_timestamp()
-        return np.arange(0, (nsamp)*timestamp, timestamp)
+        return np.arange(0, (nsamp) * timestamp, timestamp)
 
     def resample_wavetime(self, factor=2):
         &#34;&#34;&#34;
         Resamples the timestamps of spike-waveforms
-        
+
         Parameters
         ----------
         factor : int
             Resampling factor
-        
+
         Returns
         -------
             Resampled timestamps
-            
+
         &#34;&#34;&#34;
-        
+
         wavetime = self.get_wavetime()
         timestamp = self.get_wave_timestamp()
-        
-        return np.arange(0, wavetime[-1], timestamp/factor)
+
+        return np.arange(0, wavetime[-1], timestamp / factor)
         # return resampled time
 
     def resample_wave(self, factor=2):
         &#34;&#34;&#34;
         Resamples spike waveforms
-        
+
         Parameters
         ----------
         factor : int
             Resampling factor
-        
+
         Returns
         -------
         wave : dict
             Upsampled waveforms
         uptime  ndarray
             Upsampled wave timestamps
-            
+
         &#34;&#34;&#34;
         # resample wave using spline interpolation using the resampled_time,return wave
         if not self.UPSAMPLED:
@@ -845,26 +858,28 @@ class NClust(NBase):
             uptime = self.resample_wavetime(factor=factor)
             wave = self.get_waveform()
             for key, w in wave.items():
-                f = sc.interpolate.interp1d(wavetime, w, axis=1, kind=&#39;quadratic&#39;)
+                f = sc.interpolate.interp1d(
+                    wavetime, w, axis=1, kind=&#39;quadratic&#39;)
                 wave[key] = f(uptime)
 
-            self.spike._set_sampling_rate(self.get_sampling_rate()*factor)
+            self.spike._set_sampling_rate(self.get_sampling_rate() * factor)
             self.spike._set_samples_per_spike(uptime.size)
             self.UPSAMPLED = True
-            
+
             return wave, uptime
-        
+
         else:
-            logging.warning(&#39;You can upsample only once. Please reload data from source file for changing sampling factor!&#39;)
+            logging.warning(
+                &#39;You can upsample only once. Please reload data from source file for changing sampling factor!&#39;)
 
     def get_wave_energy(self):
         &#34;&#34;&#34;
         Energy of the spike waveforms, measured as the summation of the square of samples
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         energy : ndarray
@@ -873,41 +888,42 @@ class NClust(NBase):
         wave = self.get_waveform()
         energy = np.zeros((self.get_total_spikes(), len(wave.keys())))
         for i, key in enumerate(wave.keys()):
-            energy[:, i] = np.sum(np.square(wave[key]), 1)/10**6 # taken the enrgy in mV2
+            energy[:, i] = np.sum(np.square(wave[key]), 1) / \
+                10**6  # taken the enrgy in mV2
         return energy
 
     def get_max_energy_chan(self):
         &#34;&#34;&#34;
         Returns the maximum energy of the spike waveforms
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         ndarray
             Maximum energy of the spikes
         &#34;&#34;&#34;
-        
+
         energy = self.get_wave_energy()
         return np.argmax(energy, axis=1)
 
     def remove_null_chan(self):
         &#34;&#34;&#34;
         Removes the channel from the electrode group that has no spike in it
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         off_chan : int
             Channel number that has been removed
-            
+
         &#34;&#34;&#34;
-        
+
         wave = self.get_waveform()
         off_chan = []
         for key, w in wave.items():
@@ -918,28 +934,28 @@ class NClust(NBase):
                 del wave[key]
             self._set_waveform(wave)
             self.NULL_CHAN_REMOVED = True
-        
+
         return off_chan
         # simply detect in which channel everything is zero, which means it&#39;s a reference channel or nothing is recorded here
 
     def cluster_separation(self, unit_no=0):
         &#34;&#34;&#34;
         Quantitatively measures the separation of a specific unit from other clusters
-        
+
         Parameters
         ----------
         unit_no : int
             Unit of interest. If &#39;0&#39;, pairwise comparison of all units are returned
-        
+
         Returns
         -------
         bc : ndarray
             Bhattacharyya coefficient
         dh : ndarray
             Hellinger distance
-            
+
         &#34;&#34;&#34;
-        
+
         # if unit_no==0 all units, matrix output for pairwise comparison,
         # else maximum BC for the specified unit
         feat = self.get_feat()
@@ -976,7 +992,7 @@ class NClust(NBase):
         &#34;&#34;&#34;
         Quantitatively measures the similarity or distance of cluster of one unit
         in a spike dataset to cluster of another unit in another dataset
-        
+
         Parameters
         ----------
         nclust : Nclust
@@ -985,17 +1001,17 @@ class NClust(NBase):
             Unit of current Nclust object
         unit_2 : int
             Unit of another NClust object  under comparison
-        
+
         Returns
         -------
-        
+
         bc : ndarray
             Bhattacharyya coefficient
         dh : ndarray
             Hellinger distance
-            
+
         &#34;&#34;&#34;
-        
+
         if isinstance(nclust, NClust):
             if unit_1 in self.get_unit_list() and unit_2 in nclust.get_unit_list():
                 X1 = self.get_feat_by_unit(unit_no=unit_1)
@@ -1028,23 +1044,26 @@ algorithms.</p>
 <dd>An object of NSpike() class or its subclass</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">class NClust(NBase):
     &#34;&#34;&#34;
     This class facilitates clustering-related operations. Although no clustering
     algorithm is implemented in this class, it can be subclassed to create such
     algorithms.
-    
+
     &#34;&#34;&#34;
+
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Attributes
         ----------
         spike : NSpike
             An object of NSpike() class or its subclass
-            
+
         &#34;&#34;&#34;
-        
+
         spike = kwargs.get(&#39;spike&#39;, None)
         self.wavetime = []
         self.UPSAMPLED = False
@@ -1060,115 +1079,115 @@ algorithms.</p>
     def get_unit_tags(self):
         &#34;&#34;&#34;
         Returns tags of the spiking waveforms from clustering
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         return self.spike.get_unit_tags()
 
     def set_unit_tags(self, new_tags=None):
         &#34;&#34;&#34;
         Returns tags of the spiking waveforms from clustering
-        
+
         Parameters
         ----------
         new_tags : ndarray
             Array that contains the tags for spike-waveforms based on the cluster number
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.spike.set_unit_tags(new_tags)
 
     def get_unit_list(self):
         &#34;&#34;&#34;
         Returns the list of units in a spike dataset
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             List of units
-        
+
         &#34;&#34;&#34;
-        
+
         return self.spike.get_unit_list()
 
     def _set_unit_list(self):
         &#34;&#34;&#34;
         Sets the unit list
-        
-        Delegetaes to NSpike._set_unit_list()
-        
+
+        Delegates to NSpike._set_unit_list()
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         See also
         --------
         nc_spike.NSPike()._set_unit_list
-        
+
         &#34;&#34;&#34;
-        
+
         self.spike._set_unit_list()
 
-    def get_timestamp(self, unit_no=None):    
+    def get_timestamp(self, unit_no=None):
         &#34;&#34;&#34;
         Returns the timestamps of the spike-waveforms of specified unit
-        
+
         Parameters
         ----------
         unit_no : int
             Unit whose timestamps are to be returned
-        
+
         Returns
         -------
         ndarray
             Timestamps of the spiking waveforms
-            
+
         &#34;&#34;&#34;
-        
+
         self.spike.get_timestamp(unit_no=unit_no)
 
     def get_unit_spikes_count(self, unit_no=None):
         &#34;&#34;&#34;
         Returns the total number of spikes in a specified unit
-        
+
         Parameters
         ----------
         unit_no : int
             Unit whose count is returned
-        
+
         Returns
         -------
         int
             Total number of spikes in the unit
-        
+
         &#34;&#34;&#34;
-            
+
         return self.spike.get_unit_spikes_count(unit_no=unit_no)
 
     def get_waveform(self):
         &#34;&#34;&#34;
         Returns the waveforms in the spike dataset
-        
+
         Parameters
         ----------
         None        
@@ -1178,90 +1197,91 @@ algorithms.</p>
         dict
             Each key represents one channel of the electrode group, each value
             represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
-        
-        &#34;&#34;&#34; 
+
+        &#34;&#34;&#34;
         return self.spike.get_waveform()
 
     def _set_waveform(self, spike_waves=[]):
         &#34;&#34;&#34;
         Sets the waveforms of the spike dataset
-        
+
         Parameters
         ----------
         spike_waves : dict
             Spike waveforms
-        
+
         Returns
         -------
         None        
-        
+
         &#34;&#34;&#34;
         self.spike._set_waveform(spike_waves=spike_waves)
 
     def get_unit_waves(self, unit_no=None):
         &#34;&#34;&#34;
         Returns spike waveforms of a specific unit
-        
+
         Parameters
         ----------
         unit_no : int
             Unit whose waveforms are returned
-        
+
         Returns
         -------
         dict
             Spike wavefoorms in each channel of the electrode group 
-        
+
         &#34;&#34;&#34;
         return self.spike.get_unit_waves(unit_no=unit_no)
 
-    # For multi-unit analysis, {&#39;SpikeName&#39;: cell_no} pairs should be used as function input
+    # For multi-unit analysis,
+    # {&#39;SpikeName&#39;: cell_no} pairs should be used as function input
 
     def load(self, filename=None, system=None):
         &#34;&#34;&#34;
         Loads spike dataset from the file
-        
+
         Parameters
         ----------
         filename: str
             Name of the spike file
-        
+
         Returns
         -------
         system
             Data format or recording system
-        
+
         &#34;&#34;&#34;
         self.spike.load(filename=filename, system=system)
 
     def add_spike(self, spike=None, **kwargs):
         &#34;&#34;&#34;
         Adds new spike node to current NSpike() object
-        
+
         Parameters
         ----------
         spike : NSpike
             NSPike object. If None, new object is created
-        
+
         Returns
         -------
         `:obj:NSpike`
             A new NSpike() object
 
         &#34;&#34;&#34;
-        
+
         return self.spike.add_spike(spike=spike, **kwargs)
 
     def load_spike(self, names=None):
         &#34;&#34;&#34;
         Loads datasets of the spike nodes. Name of each node is used for obtaining the
         filenames.
-        
+
         Parameters
         ----------
         names : list of str
             Names of the nodes to load. If None, current NSpike() object is loaded
-        
+
         Returns
         -------
         None
@@ -1271,226 +1291,226 @@ algorithms.</p>
 
     def wave_property(self):
         &#34;&#34;&#34;
-        Claulates different waveform properties for currently set unit
-        
+        Calculates different waveform properties for currently set unit
+
         Delegates to NSpike().wave_property()
-        
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-        
+
         See also
         --------
         NSpike().wave_property()
 
         &#34;&#34;&#34;
-        
+
         return self.spike.wave_property()
 
     def isi(self, bins=&#39;auto&#39;, bound=None, density=False):
         &#34;&#34;&#34;
-        Calulates the ISI histogram of the spike train
-        
+        Calculates the ISI histogram of the spike train
+
         Delegates to NSpike().isi()
-        
+
         Parameters
         ----------
         bins : str or int
             Number of ISI histogram bins. If &#39;auto&#39;, NumPy default is used
-            
+
         bound : int
             Length of the ISI histogram in msec
         density : bool
-            If true, normalized historagm is calcultaed
- 
+            If true, normalized histogram is calculated
+
         Returns
         -------
         dict
             Graphical data of the analysis
-        
+
         See also
         --------
         NSpike().isi()
-    
+
         &#34;&#34;&#34;
-        
+
         return self.spike.isi(bins=bins, bound=bound, density=density)
 
     def isi_corr(self, **kwargs):
         &#34;&#34;&#34;
-        Analysis of ISI autocrrelation histogram
-        
+        Analysis of ISI autocorrelation histogram
+
         Delegates to NSpike().isi_auto_corr()
-        
+
         Parameters
         ----------            
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         See also
         --------
         nc_spike.NSpike().isi_corr
 
         &#34;&#34;&#34;
-        
+
         return self.spike.isi_corr(**kwargs)
 
     def psth(self, event_stamp, **kwargs):
         &#34;&#34;&#34;
         Calculates peri-stimulus time histogram (PSTH)
-        
+
         Delegates to NSpike().psth()
-        
+
         Parameters
         ----------
         event_stamp : ndarray
             Event timestamps
-            
+
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-            
+
         See also
         --------
         NSpike().psth()
-    
+
         &#34;&#34;&#34;
-        
+
         return self.spike.psth(event_stamp, **kwargs)
 
     def burst(self, burst_thresh=5, ibi_thresh=50):
         &#34;&#34;&#34;
         Burst analysis of spik-train
-        
+
         Delegates to NSpike().burst()
-        
+
         Parameters
         ----------
         burst_thresh : int
             Minimum ISI between consecutive spikes in a burst
-            
+
         ibi_thresh : int
             Minimum inter-burst interval between two bursting groups of spikes
- 
+
         Returns
         -------
         None
-    
+
         See also
         --------
         nc_spike.NSpike().burst
 
         &#34;&#34;&#34;
-        
+
         self.spike.burst(burst_thresh=burst_thresh, ibi_thresh=ibi_thresh)
 
     def get_total_spikes(self):
         &#34;&#34;&#34;
         Returns total number of spikes in the recording
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Total number of spikes
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_total_spikes()
 
     def get_total_channels(self):
         &#34;&#34;&#34;
         Returns total number of electrode channels in the spike data file
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Total number of electrode channels
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_total_channels()
 
     def get_channel_ids(self):
         &#34;&#34;&#34;
         Returns the identities of individual channels
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         list
             Identities of individual channels 
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_channel_ids()
 
     def get_timebase(self):
         &#34;&#34;&#34;
         Returns the timebase for spike event timestamps
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Timebase for spike event timestamps
 
         &#34;&#34;&#34;
-        
-        return  self.spike.get_timebase()
+
+        return self.spike.get_timebase()
 
     def get_sampling_rate(self):
         &#34;&#34;&#34;
         Returns the sampling rate of spike waveforms
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Sampling rate for spike waveforms
 
         &#34;&#34;&#34;
-        
+
         return self.spike.get_sampling_rate()
 
     def get_samples_per_spike(self):
         &#34;&#34;&#34;
         Returns the number of bytes to represent each timestamp in the binary file
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1502,102 +1522,103 @@ algorithms.</p>
     def get_wave_timestamp(self):
         &#34;&#34;&#34;
         Returns the temporal resolution to  represent samples of spike-waves.
-                
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
             Number of bytes to represent timestamps
 
         &#34;&#34;&#34;
-        
+
         # resturn as microsecond
-        fs = self.spike.get_sampling_rate()/10**6 # fs downsampled so that the time is given in microsecond
-        return 1/fs
+        # fs downsampled so that the time is given in microsecond
+        fs = self.spike.get_sampling_rate() / 10**6
+        return 1 / fs
 
     def save_to_hdf5(self):
         &#34;&#34;&#34;
         Stores NSpike() object to HDF5 file
-        
+
         Delegates to NSPike().save_to_hdf5()
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         Also see
         --------
         nc_hdf.Nhdf().save_spike()
-        
+
         &#34;&#34;&#34;
-        
+
         self.spike.save_to_hdf5()
 
-    def get_feat(self, npc = 2):
+    def get_feat(self, npc=2):
         &#34;&#34;&#34;
         Returns the spike-waveform features.
-        
+
         Parameters
         ----------
         nc : int
             Number of principle components in each channel.
-        
+
         Returns
         -------
         feat : ndarray
             Matrix of size (number_spike X number_features)
-        
+
         &#34;&#34;&#34;
-        
+
         if not self.NULL_CHAN_REMOVED:
             self.remove_null_chan()
         if not self.ALLIGNED:
             self.align_wave_peak()
 
-        trough, trough_loc = self.get_min_wave_chan() # trough only in max_channel
+        trough, trough_loc = self.get_min_wave_chan()  # trough only in max_channel
         peak, peak_chan, peak_loc = self.get_max_wave_chan()
 #        amp = np.abs(peak-trough)
         pc = self.get_wave_pc(npc=npc)
         shape = (self.get_total_spikes(), 1)
-        feat = np.concatenate((peak.reshape(shape), trough.reshape(shape), pc), axis=1)
+        feat = np.concatenate(
+            (peak.reshape(shape), trough.reshape(shape), pc), axis=1)
 
         return feat
 
         # for all units
-    def get_feat_by_unit(self, unit_no = None):
+    def get_feat_by_unit(self, unit_no=None):
         &#34;&#34;&#34;
         Returns the spike-waveform features for a paricular unit.
-        
+
         Parameters
         ----------
         unit_no : int
             Unit of interest
-        
+
         Returns
         -------
         feat : ndarray
             Matrix of size (number_spike X number_features)
-        
+
         &#34;&#34;&#34;
-        
-        
+
         if unit_no in self.get_unit_list():
             feat = self.get_feat()
             return feat[self.get_unit_tags() == unit_no, :]
         else:
             logging.error(&#39;Specified unit does not exist in the spike dataset&#39;)
-            
+
     def get_wave_peaks(self):
         &#34;&#34;&#34;
         Returns the peaks of the spike-waveforms.
-        
+
         Parameters
         ----------
         None        
@@ -1609,10 +1630,11 @@ algorithms.</p>
         peak_loc : ndarray
             Index of peak locations
         &#34;&#34;&#34;
-        
+
         wave = self.get_waveform()
         peak = np.zeros((self.get_total_spikes(), len(wave.keys())))
-        peak_loc = np.zeros((self.get_total_spikes(), len(wave.keys())), dtype=int)
+        peak_loc = np.zeros(
+            (self.get_total_spikes(), len(wave.keys())), dtype=int)
         for i, key in enumerate(wave.keys()):
             peak[:, i] = np.amax(wave[key], axis=1)
             peak_loc[:, i] = np.argmax(wave[key], axis=1)
@@ -1622,11 +1644,11 @@ algorithms.</p>
     def get_max_wave_chan(self):
         &#34;&#34;&#34;
         Returns the maximum of waveform peaks among the electrode groups.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         max_wave_val : ndarray
@@ -1635,9 +1657,9 @@ algorithms.</p>
             Channel of the electrode group where a spike waveform is strongest
         peak_loc : ndarray
             Peak location in the channel with strongest waveform
-        
+
         &#34;&#34;&#34;
-        
+
         # Peak value at the highest channel, the highest channel, and the index of the peak
         peak, peak_loc = self.get_wave_peaks()
         max_wave_chan = np.argmax(peak, axis=1)
@@ -1647,29 +1669,32 @@ algorithms.</p>
     def align_wave_peak(self, reach=300, factor=2):
         &#34;&#34;&#34;
         Align the waves by their peaks.
-        
+
         Parameters
         ----------
         reach : int
             Maximum allowed time-shift in microsecond
         factors : int
             Resampling factor
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         if not self.UPSAMPLED:
             self.resample_wave(factor=factor)
         if not self.ALLIGNED:
-            shift = round(reach/self.get_wave_timestamp()) # maximum 300microsecond allowed for shift
-            wave = self.get_waveform() # NC waves are stroed in waves[&#39;ch1&#39;], waves[&#39;ch2&#39;] etc. ways
+            # maximum 300microsecond allowed for shift
+            shift = round(reach / self.get_wave_timestamp())
+            # NC waves are stroed in waves[&#39;ch1&#39;], waves[&#39;ch2&#39;] etc. ways
+            wave = self.get_waveform()
             maxInd = shift + self.get_max_wave_chan()[2]
             shift_ind = int(np.median(maxInd)) - maxInd
             shift_ind[np.abs(shift_ind) &gt; shift] = 0
-            stacked_chan = np.empty((self.get_total_spikes(), self.get_samples_per_spike(), self.get_total_channels()))
+            stacked_chan = np.empty((self.get_total_spikes(
+            ), self.get_samples_per_spike(), self.get_total_channels()))
             keys = []
             i = 0
             for key, val in wave.items():
@@ -1677,9 +1702,12 @@ algorithms.</p>
                 keys.append(key)
                 i += 1
 
-            stacked_chan = np.lib.pad(stacked_chan, [(0, 0), (shift, shift), (0, 0)], &#39;edge&#39;) # Shows error in Jupyter, check again
+            # Shows error in Jupyter, check again
+            stacked_chan = np.lib.pad(
+                stacked_chan, [(0, 0), (shift, shift), (0, 0)], &#39;edge&#39;)
 
-            stacked_chan = np.array([np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[shift: shift+ self.get_samples_per_spike()] for i in np.arange(shift_ind.size)])
+            stacked_chan = np.array([np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[
+                                    shift: shift + self.get_samples_per_spike()] for i in np.arange(shift_ind.size)])
 
             for i, key in enumerate(keys):
                 wave[key] = stacked_chan[:, :, i]
@@ -1691,7 +1719,7 @@ algorithms.</p>
     def get_wave_min(self):
         &#34;&#34;&#34;
         Returns the minimum values of the spike-waveforms.
-        
+
         Parameters
         ----------
         None
@@ -1702,9 +1730,9 @@ algorithms.</p>
             Minimum value of the  wavefforms
         min_loc : ndarray
             Index of minimum value
-            
+
         &#34;&#34;&#34;
-        
+
         wave = self.get_waveform()
         min_w = np.zeros((self.get_total_spikes(), len(wave.keys())))
         min_loc = np.zeros((self.get_total_spikes(), len(wave.keys())))
@@ -1717,35 +1745,35 @@ algorithms.</p>
     def get_min_wave_chan(self):
         &#34;&#34;&#34;
         Returns the maximum of waveform peaks among the electrode groups.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         ndarray
             Minimum value of the waveform at channels with maximum peak value
         ndarray
             Index of minimum values
-        
+
         &#34;&#34;&#34;
         # Peak value at the highest channel, the highest channel, and the index of the peak
         max_wave_chan = self.get_max_wave_chan()[1]
         trough, trough_loc = self.get_wave_min()
         return trough[np.arange(len(max_wave_chan)), max_wave_chan], \
-                trough_loc[np.arange(len(max_wave_chan)), max_wave_chan]
+            trough_loc[np.arange(len(max_wave_chan)), max_wave_chan]
         # use get_max_channel to determine
 
     def get_wave_pc(self, npc=2):
         &#34;&#34;&#34;
         Returns the Principle Components of the waveforms
-        
+
         Parameters
         ----------
         npc : int
             Number of principle components from waveforms of each channel
-        
+
         Returns
         -------
         pc : ndarray
@@ -1761,7 +1789,8 @@ algorithms.</p>
             if npc and npc &lt; w_new.shape[1]:
                 w_new = w_new[:, :npc]
             else:
-                w_new = w_new[:, 0:(find(np.cumsum(pc_var) &gt;= 0.95, 1, &#39;first&#39;)[0]+1)]
+                w_new = w_new[:, 0:(
+                    find(np.cumsum(pc_var) &gt;= 0.95, 1, &#39;first&#39;)[0] + 1)]
             if not len(pc):
                 pc = w_new
             else:
@@ -1771,59 +1800,59 @@ algorithms.</p>
     def get_wavetime(self):
         &#34;&#34;&#34;
         Returns the timestamps of the waveforms, not the spiking-event timestamp
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
             Timestamps of the spike-waveforms
-            
+
         &#34;&#34;&#34;
-        
+
         # calculate the wavetime from the sampling rate and number of sample, returns in microsecond
         nsamp = self.spike.get_samples_per_spike()
         timestamp = self.get_wave_timestamp()
-        return np.arange(0, (nsamp)*timestamp, timestamp)
+        return np.arange(0, (nsamp) * timestamp, timestamp)
 
     def resample_wavetime(self, factor=2):
         &#34;&#34;&#34;
         Resamples the timestamps of spike-waveforms
-        
+
         Parameters
         ----------
         factor : int
             Resampling factor
-        
+
         Returns
         -------
             Resampled timestamps
-            
+
         &#34;&#34;&#34;
-        
+
         wavetime = self.get_wavetime()
         timestamp = self.get_wave_timestamp()
-        
-        return np.arange(0, wavetime[-1], timestamp/factor)
+
+        return np.arange(0, wavetime[-1], timestamp / factor)
         # return resampled time
 
     def resample_wave(self, factor=2):
         &#34;&#34;&#34;
         Resamples spike waveforms
-        
+
         Parameters
         ----------
         factor : int
             Resampling factor
-        
+
         Returns
         -------
         wave : dict
             Upsampled waveforms
         uptime  ndarray
             Upsampled wave timestamps
-            
+
         &#34;&#34;&#34;
         # resample wave using spline interpolation using the resampled_time,return wave
         if not self.UPSAMPLED:
@@ -1831,26 +1860,28 @@ algorithms.</p>
             uptime = self.resample_wavetime(factor=factor)
             wave = self.get_waveform()
             for key, w in wave.items():
-                f = sc.interpolate.interp1d(wavetime, w, axis=1, kind=&#39;quadratic&#39;)
+                f = sc.interpolate.interp1d(
+                    wavetime, w, axis=1, kind=&#39;quadratic&#39;)
                 wave[key] = f(uptime)
 
-            self.spike._set_sampling_rate(self.get_sampling_rate()*factor)
+            self.spike._set_sampling_rate(self.get_sampling_rate() * factor)
             self.spike._set_samples_per_spike(uptime.size)
             self.UPSAMPLED = True
-            
+
             return wave, uptime
-        
+
         else:
-            logging.warning(&#39;You can upsample only once. Please reload data from source file for changing sampling factor!&#39;)
+            logging.warning(
+                &#39;You can upsample only once. Please reload data from source file for changing sampling factor!&#39;)
 
     def get_wave_energy(self):
         &#34;&#34;&#34;
         Energy of the spike waveforms, measured as the summation of the square of samples
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         energy : ndarray
@@ -1859,41 +1890,42 @@ algorithms.</p>
         wave = self.get_waveform()
         energy = np.zeros((self.get_total_spikes(), len(wave.keys())))
         for i, key in enumerate(wave.keys()):
-            energy[:, i] = np.sum(np.square(wave[key]), 1)/10**6 # taken the enrgy in mV2
+            energy[:, i] = np.sum(np.square(wave[key]), 1) / \
+                10**6  # taken the enrgy in mV2
         return energy
 
     def get_max_energy_chan(self):
         &#34;&#34;&#34;
         Returns the maximum energy of the spike waveforms
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         ndarray
             Maximum energy of the spikes
         &#34;&#34;&#34;
-        
+
         energy = self.get_wave_energy()
         return np.argmax(energy, axis=1)
 
     def remove_null_chan(self):
         &#34;&#34;&#34;
         Removes the channel from the electrode group that has no spike in it
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         off_chan : int
             Channel number that has been removed
-            
+
         &#34;&#34;&#34;
-        
+
         wave = self.get_waveform()
         off_chan = []
         for key, w in wave.items():
@@ -1904,28 +1936,28 @@ algorithms.</p>
                 del wave[key]
             self._set_waveform(wave)
             self.NULL_CHAN_REMOVED = True
-        
+
         return off_chan
         # simply detect in which channel everything is zero, which means it&#39;s a reference channel or nothing is recorded here
 
     def cluster_separation(self, unit_no=0):
         &#34;&#34;&#34;
         Quantitatively measures the separation of a specific unit from other clusters
-        
+
         Parameters
         ----------
         unit_no : int
             Unit of interest. If &#39;0&#39;, pairwise comparison of all units are returned
-        
+
         Returns
         -------
         bc : ndarray
             Bhattacharyya coefficient
         dh : ndarray
             Hellinger distance
-            
+
         &#34;&#34;&#34;
-        
+
         # if unit_no==0 all units, matrix output for pairwise comparison,
         # else maximum BC for the specified unit
         feat = self.get_feat()
@@ -1962,7 +1994,7 @@ algorithms.</p>
         &#34;&#34;&#34;
         Quantitatively measures the similarity or distance of cluster of one unit
         in a spike dataset to cluster of another unit in another dataset
-        
+
         Parameters
         ----------
         nclust : Nclust
@@ -1971,17 +2003,17 @@ algorithms.</p>
             Unit of current Nclust object
         unit_2 : int
             Unit of another NClust object  under comparison
-        
+
         Returns
         -------
-        
+
         bc : ndarray
             Bhattacharyya coefficient
         dh : ndarray
             Hellinger distance
-            
+
         &#34;&#34;&#34;
-        
+
         if isinstance(nclust, NClust):
             if unit_1 in self.get_unit_list() and unit_2 in nclust.get_unit_list():
                 X1 = self.get_feat_by_unit(unit_no=unit_1)
@@ -2011,23 +2043,25 @@ algorithms.</p>
 <p><code>:obj:NSpike</code>
 A new NSpike() object</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def add_spike(self, spike=None, **kwargs):
     &#34;&#34;&#34;
     Adds new spike node to current NSpike() object
-    
+
     Parameters
     ----------
     spike : NSpike
         NSPike object. If None, new object is created
-    
+
     Returns
     -------
     `:obj:NSpike`
         A new NSpike() object
 
     &#34;&#34;&#34;
-    
+
     return self.spike.add_spike(spike=spike, **kwargs)</code></pre>
 </details>
 </dd>
@@ -2049,33 +2083,38 @@ A new NSpike() object</p></section>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def align_wave_peak(self, reach=300, factor=2):
     &#34;&#34;&#34;
     Align the waves by their peaks.
-    
+
     Parameters
     ----------
     reach : int
         Maximum allowed time-shift in microsecond
     factors : int
         Resampling factor
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     if not self.UPSAMPLED:
         self.resample_wave(factor=factor)
     if not self.ALLIGNED:
-        shift = round(reach/self.get_wave_timestamp()) # maximum 300microsecond allowed for shift
-        wave = self.get_waveform() # NC waves are stroed in waves[&#39;ch1&#39;], waves[&#39;ch2&#39;] etc. ways
+        # maximum 300microsecond allowed for shift
+        shift = round(reach / self.get_wave_timestamp())
+        # NC waves are stroed in waves[&#39;ch1&#39;], waves[&#39;ch2&#39;] etc. ways
+        wave = self.get_waveform()
         maxInd = shift + self.get_max_wave_chan()[2]
         shift_ind = int(np.median(maxInd)) - maxInd
         shift_ind[np.abs(shift_ind) &gt; shift] = 0
-        stacked_chan = np.empty((self.get_total_spikes(), self.get_samples_per_spike(), self.get_total_channels()))
+        stacked_chan = np.empty((self.get_total_spikes(
+        ), self.get_samples_per_spike(), self.get_total_channels()))
         keys = []
         i = 0
         for key, val in wave.items():
@@ -2083,9 +2122,12 @@ A new NSpike() object</p></section>
             keys.append(key)
             i += 1
 
-        stacked_chan = np.lib.pad(stacked_chan, [(0, 0), (shift, shift), (0, 0)], &#39;edge&#39;) # Shows error in Jupyter, check again
+        # Shows error in Jupyter, check again
+        stacked_chan = np.lib.pad(
+            stacked_chan, [(0, 0), (shift, shift), (0, 0)], &#39;edge&#39;)
 
-        stacked_chan = np.array([np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[shift: shift+ self.get_samples_per_spike()] for i in np.arange(shift_ind.size)])
+        stacked_chan = np.array([np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[
+                                shift: shift + self.get_samples_per_spike()] for i in np.arange(shift_ind.size)])
 
         for i, key in enumerate(keys):
             wave[key] = stacked_chan[:, :, i]
@@ -2114,18 +2156,20 @@ A new NSpike() object</p></section>
 <h2 id="see-also">See also</h2>
 <p><code>nc_spike.NSpike().burst</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def burst(self, burst_thresh=5, ibi_thresh=50):
     &#34;&#34;&#34;
     Burst analysis of spik-train
-    
+
     Delegates to NSpike().burst()
-    
+
     Parameters
     ----------
     burst_thresh : int
         Minimum ISI between consecutive spikes in a burst
-        
+
     ibi_thresh : int
         Minimum inter-burst interval between two bursting groups of spikes
 
@@ -2138,7 +2182,7 @@ A new NSpike() object</p></section>
     nc_spike.NSpike().burst
 
     &#34;&#34;&#34;
-    
+
     self.spike.burst(burst_thresh=burst_thresh, ibi_thresh=ibi_thresh)</code></pre>
 </details>
 </dd>
@@ -2160,25 +2204,27 @@ A new NSpike() object</p></section>
 <dd>Hellinger distance</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def cluster_separation(self, unit_no=0):
     &#34;&#34;&#34;
     Quantitatively measures the separation of a specific unit from other clusters
-    
+
     Parameters
     ----------
     unit_no : int
         Unit of interest. If &#39;0&#39;, pairwise comparison of all units are returned
-    
+
     Returns
     -------
     bc : ndarray
         Bhattacharyya coefficient
     dh : ndarray
         Hellinger distance
-        
+
     &#34;&#34;&#34;
-    
+
     # if unit_no==0 all units, matrix output for pairwise comparison,
     # else maximum BC for the specified unit
     feat = self.get_feat()
@@ -2236,12 +2282,14 @@ under comparison</dd>
 <dd>Hellinger distance</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def cluster_similarity(self, nclust=None, unit_1=None, unit_2=None):
     &#34;&#34;&#34;
     Quantitatively measures the similarity or distance of cluster of one unit
     in a spike dataset to cluster of another unit in another dataset
-    
+
     Parameters
     ----------
     nclust : Nclust
@@ -2250,17 +2298,17 @@ under comparison</dd>
         Unit of current Nclust object
     unit_2 : int
         Unit of another NClust object  under comparison
-    
+
     Returns
     -------
-    
+
     bc : ndarray
         Bhattacharyya coefficient
     dh : ndarray
         Hellinger distance
-        
+
     &#34;&#34;&#34;
-    
+
     if isinstance(nclust, NClust):
         if unit_1 in self.get_unit_list() and unit_2 in nclust.get_unit_list():
             X1 = self.get_feat_by_unit(unit_no=unit_1)
@@ -2286,11 +2334,13 @@ under comparison</dd>
 <dd>Identities of individual channels</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_channel_ids(self):
     &#34;&#34;&#34;
     Returns the identities of individual channels
-            
+
     Parameters
     ----------
     None
@@ -2301,7 +2351,7 @@ under comparison</dd>
         Identities of individual channels 
 
     &#34;&#34;&#34;
-    
+
     return self.spike.get_channel_ids()</code></pre>
 </details>
 </dd>
@@ -2321,34 +2371,37 @@ under comparison</dd>
 <dd>Matrix of size (number_spike X number_features)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
-<pre><code class="python">    def get_feat(self, npc = 2):
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def get_feat(self, npc=2):
         &#34;&#34;&#34;
         Returns the spike-waveform features.
-        
+
         Parameters
         ----------
         nc : int
             Number of principle components in each channel.
-        
+
         Returns
         -------
         feat : ndarray
             Matrix of size (number_spike X number_features)
-        
+
         &#34;&#34;&#34;
-        
+
         if not self.NULL_CHAN_REMOVED:
             self.remove_null_chan()
         if not self.ALLIGNED:
             self.align_wave_peak()
 
-        trough, trough_loc = self.get_min_wave_chan() # trough only in max_channel
+        trough, trough_loc = self.get_min_wave_chan()  # trough only in max_channel
         peak, peak_chan, peak_loc = self.get_max_wave_chan()
 #        amp = np.abs(peak-trough)
         pc = self.get_wave_pc(npc=npc)
         shape = (self.get_total_spikes(), 1)
-        feat = np.concatenate((peak.reshape(shape), trough.reshape(shape), pc), axis=1)
+        feat = np.concatenate(
+            (peak.reshape(shape), trough.reshape(shape), pc), axis=1)
 
         return feat</code></pre>
 </details>
@@ -2369,24 +2422,25 @@ under comparison</dd>
 <dd>Matrix of size (number_spike X number_features)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
-<pre><code class="python">def get_feat_by_unit(self, unit_no = None):
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_feat_by_unit(self, unit_no=None):
     &#34;&#34;&#34;
     Returns the spike-waveform features for a paricular unit.
-    
+
     Parameters
     ----------
     unit_no : int
         Unit of interest
-    
+
     Returns
     -------
     feat : ndarray
         Matrix of size (number_spike X number_features)
-    
+
     &#34;&#34;&#34;
-    
-    
+
     if unit_no in self.get_unit_list():
         feat = self.get_feat()
         return feat[self.get_unit_tags() == unit_no, :]
@@ -2410,21 +2464,23 @@ under comparison</dd>
 <dd>Maximum energy of the spikes</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_max_energy_chan(self):
     &#34;&#34;&#34;
     Returns the maximum energy of the spike waveforms
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     ndarray
         Maximum energy of the spikes
     &#34;&#34;&#34;
-    
+
     energy = self.get_wave_energy()
     return np.argmax(energy, axis=1)</code></pre>
 </details>
@@ -2449,15 +2505,17 @@ under comparison</dd>
 <dd>Peak location in the channel with strongest waveform</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_max_wave_chan(self):
     &#34;&#34;&#34;
     Returns the maximum of waveform peaks among the electrode groups.
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     max_wave_val : ndarray
@@ -2466,9 +2524,9 @@ under comparison</dd>
         Channel of the electrode group where a spike waveform is strongest
     peak_loc : ndarray
         Peak location in the channel with strongest waveform
-    
+
     &#34;&#34;&#34;
-    
+
     # Peak value at the highest channel, the highest channel, and the index of the peak
     peak, peak_loc = self.get_wave_peaks()
     max_wave_chan = np.argmax(peak, axis=1)
@@ -2494,28 +2552,30 @@ under comparison</dd>
 <dd>Index of minimum values</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_min_wave_chan(self):
     &#34;&#34;&#34;
     Returns the maximum of waveform peaks among the electrode groups.
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     ndarray
         Minimum value of the waveform at channels with maximum peak value
     ndarray
         Index of minimum values
-    
+
     &#34;&#34;&#34;
     # Peak value at the highest channel, the highest channel, and the index of the peak
     max_wave_chan = self.get_max_wave_chan()[1]
     trough, trough_loc = self.get_wave_min()
     return trough[np.arange(len(max_wave_chan)), max_wave_chan], \
-            trough_loc[np.arange(len(max_wave_chan)), max_wave_chan]</code></pre>
+        trough_loc[np.arange(len(max_wave_chan)), max_wave_chan]</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_clust.NClust.get_samples_per_spike"><code class="name flex">
@@ -2534,11 +2594,13 @@ under comparison</dd>
 <dd>Number of bytes to represent timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_samples_per_spike(self):
     &#34;&#34;&#34;
     Returns the number of bytes to represent each timestamp in the binary file
-            
+
     Parameters
     ----------
     None
@@ -2568,11 +2630,13 @@ under comparison</dd>
 <dd>Sampling rate for spike waveforms</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_sampling_rate(self):
     &#34;&#34;&#34;
     Returns the sampling rate of spike waveforms
-            
+
     Parameters
     ----------
     None
@@ -2583,7 +2647,7 @@ under comparison</dd>
         Sampling rate for spike waveforms
 
     &#34;&#34;&#34;
-    
+
     return self.spike.get_sampling_rate()</code></pre>
 </details>
 </dd>
@@ -2603,11 +2667,13 @@ under comparison</dd>
 <dd>Timebase for spike event timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_timebase(self):
     &#34;&#34;&#34;
     Returns the timebase for spike event timestamps
-            
+
     Parameters
     ----------
     None
@@ -2618,8 +2684,8 @@ under comparison</dd>
         Timebase for spike event timestamps
 
     &#34;&#34;&#34;
-    
-    return  self.spike.get_timebase()</code></pre>
+
+    return self.spike.get_timebase()</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_clust.NClust.get_timestamp"><code class="name flex">
@@ -2638,23 +2704,25 @@ under comparison</dd>
 <dd>Timestamps of the spiking waveforms</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
-<pre><code class="python">def get_timestamp(self, unit_no=None):    
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_timestamp(self, unit_no=None):
     &#34;&#34;&#34;
     Returns the timestamps of the spike-waveforms of specified unit
-    
+
     Parameters
     ----------
     unit_no : int
         Unit whose timestamps are to be returned
-    
+
     Returns
     -------
     ndarray
         Timestamps of the spiking waveforms
-        
+
     &#34;&#34;&#34;
-    
+
     self.spike.get_timestamp(unit_no=unit_no)</code></pre>
 </details>
 </dd>
@@ -2674,11 +2742,13 @@ under comparison</dd>
 <dd>Total number of electrode channels</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_total_channels(self):
     &#34;&#34;&#34;
     Returns total number of electrode channels in the spike data file
-            
+
     Parameters
     ----------
     None
@@ -2689,7 +2759,7 @@ under comparison</dd>
         Total number of electrode channels
 
     &#34;&#34;&#34;
-    
+
     return self.spike.get_total_channels()</code></pre>
 </details>
 </dd>
@@ -2709,11 +2779,13 @@ under comparison</dd>
 <dd>Total number of spikes</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_total_spikes(self):
     &#34;&#34;&#34;
     Returns total number of spikes in the recording
-            
+
     Parameters
     ----------
     None
@@ -2724,7 +2796,7 @@ under comparison</dd>
         Total number of spikes
 
     &#34;&#34;&#34;
-    
+
     return self.spike.get_total_spikes()</code></pre>
 </details>
 </dd>
@@ -2744,22 +2816,24 @@ under comparison</dd>
 <dd>List of units</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_list(self):
     &#34;&#34;&#34;
     Returns the list of units in a spike dataset
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     list
         List of units
-    
+
     &#34;&#34;&#34;
-    
+
     return self.spike.get_unit_list()</code></pre>
 </details>
 </dd>
@@ -2779,23 +2853,25 @@ under comparison</dd>
 <dd>Total number of spikes in the unit</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_spikes_count(self, unit_no=None):
     &#34;&#34;&#34;
     Returns the total number of spikes in a specified unit
-    
+
     Parameters
     ----------
     unit_no : int
         Unit whose count is returned
-    
+
     Returns
     -------
     int
         Total number of spikes in the unit
-    
+
     &#34;&#34;&#34;
-        
+
     return self.spike.get_unit_spikes_count(unit_no=unit_no)</code></pre>
 </details>
 </dd>
@@ -2815,21 +2891,23 @@ under comparison</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_tags(self):
     &#34;&#34;&#34;
     Returns tags of the spiking waveforms from clustering
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     return self.spike.get_unit_tags()</code></pre>
 </details>
 </dd>
@@ -2849,21 +2927,23 @@ under comparison</dd>
 <dd>Spike wavefoorms in each channel of the electrode group</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_waves(self, unit_no=None):
     &#34;&#34;&#34;
     Returns spike waveforms of a specific unit
-    
+
     Parameters
     ----------
     unit_no : int
         Unit whose waveforms are returned
-    
+
     Returns
     -------
     dict
         Spike wavefoorms in each channel of the electrode group 
-    
+
     &#34;&#34;&#34;
     return self.spike.get_unit_waves(unit_no=unit_no)</code></pre>
 </details>
@@ -2884,15 +2964,17 @@ under comparison</dd>
 <dd>Energy of spikes (num_spike X num_channels)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_wave_energy(self):
     &#34;&#34;&#34;
     Energy of the spike waveforms, measured as the summation of the square of samples
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     energy : ndarray
@@ -2901,7 +2983,8 @@ under comparison</dd>
     wave = self.get_waveform()
     energy = np.zeros((self.get_total_spikes(), len(wave.keys())))
     for i, key in enumerate(wave.keys()):
-        energy[:, i] = np.sum(np.square(wave[key]), 1)/10**6 # taken the enrgy in mV2
+        energy[:, i] = np.sum(np.square(wave[key]), 1) / \
+            10**6  # taken the enrgy in mV2
     return energy</code></pre>
 </details>
 </dd>
@@ -2924,11 +3007,13 @@ wavefforms</dd>
 <dd>Index of minimum value</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_wave_min(self):
     &#34;&#34;&#34;
     Returns the minimum values of the spike-waveforms.
-    
+
     Parameters
     ----------
     None
@@ -2939,9 +3024,9 @@ wavefforms</dd>
         Minimum value of the  wavefforms
     min_loc : ndarray
         Index of minimum value
-        
+
     &#34;&#34;&#34;
-    
+
     wave = self.get_waveform()
     min_w = np.zeros((self.get_total_spikes(), len(wave.keys())))
     min_loc = np.zeros((self.get_total_spikes(), len(wave.keys())))
@@ -2968,16 +3053,18 @@ wavefforms</dd>
 <dd>Principle components (num_waves X npc*num_channels)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_wave_pc(self, npc=2):
     &#34;&#34;&#34;
     Returns the Principle Components of the waveforms
-    
+
     Parameters
     ----------
     npc : int
         Number of principle components from waveforms of each channel
-    
+
     Returns
     -------
     pc : ndarray
@@ -2993,7 +3080,8 @@ wavefforms</dd>
         if npc and npc &lt; w_new.shape[1]:
             w_new = w_new[:, :npc]
         else:
-            w_new = w_new[:, 0:(find(np.cumsum(pc_var) &gt;= 0.95, 1, &#39;first&#39;)[0]+1)]
+            w_new = w_new[:, 0:(
+                find(np.cumsum(pc_var) &gt;= 0.95, 1, &#39;first&#39;)[0] + 1)]
         if not len(pc):
             pc = w_new
         else:
@@ -3017,11 +3105,13 @@ wavefforms</dd>
 <dd>Index of peak locations</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_wave_peaks(self):
     &#34;&#34;&#34;
     Returns the peaks of the spike-waveforms.
-    
+
     Parameters
     ----------
     None        
@@ -3033,10 +3123,11 @@ wavefforms</dd>
     peak_loc : ndarray
         Index of peak locations
     &#34;&#34;&#34;
-    
+
     wave = self.get_waveform()
     peak = np.zeros((self.get_total_spikes(), len(wave.keys())))
-    peak_loc = np.zeros((self.get_total_spikes(), len(wave.keys())), dtype=int)
+    peak_loc = np.zeros(
+        (self.get_total_spikes(), len(wave.keys())), dtype=int)
     for i, key in enumerate(wave.keys()):
         peak[:, i] = np.amax(wave[key], axis=1)
         peak_loc[:, i] = np.argmax(wave[key], axis=1)
@@ -3061,11 +3152,13 @@ represent samples of spike-waves.</p>
 <dd>Number of bytes to represent timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_wave_timestamp(self):
     &#34;&#34;&#34;
     Returns the temporal resolution to  represent samples of spike-waves.
-            
+
     Parameters
     ----------
     None
@@ -3076,10 +3169,11 @@ represent samples of spike-waves.</p>
         Number of bytes to represent timestamps
 
     &#34;&#34;&#34;
-    
+
     # resturn as microsecond
-    fs = self.spike.get_sampling_rate()/10**6 # fs downsampled so that the time is given in microsecond
-    return 1/fs</code></pre>
+    # fs downsampled so that the time is given in microsecond
+    fs = self.spike.get_sampling_rate() / 10**6
+    return 1 / fs</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_clust.NClust.get_waveform"><code class="name flex">
@@ -3097,11 +3191,13 @@ represent samples of spike-waves.</p>
 represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_waveform(self):
     &#34;&#34;&#34;
     Returns the waveforms in the spike dataset
-    
+
     Parameters
     ----------
     None        
@@ -3111,8 +3207,8 @@ represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
     dict
         Each key represents one channel of the electrode group, each value
         represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
-    
-    &#34;&#34;&#34; 
+
+    &#34;&#34;&#34;
     return self.spike.get_waveform()</code></pre>
 </details>
 </dd>
@@ -3130,32 +3226,34 @@ represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
 <pre><code>Timestamps of the spike-waveforms
 </code></pre></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_wavetime(self):
     &#34;&#34;&#34;
     Returns the timestamps of the waveforms, not the spiking-event timestamp
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
         Timestamps of the spike-waveforms
-        
+
     &#34;&#34;&#34;
-    
+
     # calculate the wavetime from the sampling rate and number of sample, returns in microsecond
     nsamp = self.spike.get_samples_per_spike()
     timestamp = self.get_wave_timestamp()
-    return np.arange(0, (nsamp)*timestamp, timestamp)</code></pre>
+    return np.arange(0, (nsamp) * timestamp, timestamp)</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_clust.NClust.isi"><code class="name flex">
 <span>def <span class="ident">isi</span></span>(<span>self, bins='auto', bound=None, density=False)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Calulates the ISI histogram of the spike train</p>
+<section class="desc"><p>Calculates the ISI histogram of the spike train</p>
 <p>Delegates to NSpike().isi()</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
@@ -3164,7 +3262,7 @@ represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
 <dt><strong><code>bound</code></strong> :&ensp;<code>int</code></dt>
 <dd>Length of the ISI histogram in msec</dd>
 <dt><strong><code>density</code></strong> :&ensp;<code>bool</code></dt>
-<dd>If true, normalized historagm is calcultaed</dd>
+<dd>If true, normalized histogram is calculated</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -3174,34 +3272,36 @@ represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
 <h2 id="see-also">See also</h2>
 <p><code>NSpike().isi()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def isi(self, bins=&#39;auto&#39;, bound=None, density=False):
     &#34;&#34;&#34;
-    Calulates the ISI histogram of the spike train
-    
+    Calculates the ISI histogram of the spike train
+
     Delegates to NSpike().isi()
-    
+
     Parameters
     ----------
     bins : str or int
         Number of ISI histogram bins. If &#39;auto&#39;, NumPy default is used
-        
+
     bound : int
         Length of the ISI histogram in msec
     density : bool
-        If true, normalized historagm is calcultaed
+        If true, normalized histogram is calculated
 
     Returns
     -------
     dict
         Graphical data of the analysis
-    
+
     See also
     --------
     NSpike().isi()
 
     &#34;&#34;&#34;
-    
+
     return self.spike.isi(bins=bins, bound=bound, density=density)</code></pre>
 </details>
 </dd>
@@ -3209,7 +3309,7 @@ represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
 <span>def <span class="ident">isi_corr</span></span>(<span>self, **kwargs)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Analysis of ISI autocrrelation histogram</p>
+<section class="desc"><p>Analysis of ISI autocorrelation histogram</p>
 <p>Delegates to NSpike().isi_auto_corr()</p>
 <h2 id="parameters">Parameters</h2>
 <p>**kwargs
@@ -3222,13 +3322,15 @@ Keyword arguments</p>
 <h2 id="see-also">See also</h2>
 <p><code>nc_spike.NSpike().isi_corr</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def isi_corr(self, **kwargs):
     &#34;&#34;&#34;
-    Analysis of ISI autocrrelation histogram
-    
+    Analysis of ISI autocorrelation histogram
+
     Delegates to NSpike().isi_auto_corr()
-    
+
     Parameters
     ----------            
     **kwargs
@@ -3244,7 +3346,7 @@ Keyword arguments</p>
     nc_spike.NSpike().isi_corr
 
     &#34;&#34;&#34;
-    
+
     return self.spike.isi_corr(**kwargs)</code></pre>
 </details>
 </dd>
@@ -3264,21 +3366,23 @@ Keyword arguments</p>
 <dd>Data format or recording system</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load(self, filename=None, system=None):
     &#34;&#34;&#34;
     Loads spike dataset from the file
-    
+
     Parameters
     ----------
     filename: str
         Name of the spike file
-    
+
     Returns
     -------
     system
         Data format or recording system
-    
+
     &#34;&#34;&#34;
     self.spike.load(filename=filename, system=system)</code></pre>
 </details>
@@ -3300,17 +3404,19 @@ filenames.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spike(self, names=None):
     &#34;&#34;&#34;
     Loads datasets of the spike nodes. Name of each node is used for obtaining the
     filenames.
-    
+
     Parameters
     ----------
     names : list of str
         Names of the nodes to load. If None, current NSpike() object is loaded
-    
+
     Returns
     -------
     None
@@ -3340,18 +3446,20 @@ filenames.</p>
 <h2 id="see-also">See also</h2>
 <p><code>NSpike().psth()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def psth(self, event_stamp, **kwargs):
     &#34;&#34;&#34;
     Calculates peri-stimulus time histogram (PSTH)
-    
+
     Delegates to NSpike().psth()
-    
+
     Parameters
     ----------
     event_stamp : ndarray
         Event timestamps
-        
+
     **kwargs
         Keyword arguments
 
@@ -3359,13 +3467,13 @@ filenames.</p>
     -------
     dict
         Graphical data of the analysis
-        
+
     See also
     --------
     NSpike().psth()
 
     &#34;&#34;&#34;
-    
+
     return self.spike.psth(event_stamp, **kwargs)</code></pre>
 </details>
 </dd>
@@ -3385,22 +3493,24 @@ filenames.</p>
 <dd>Channel number that has been removed</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def remove_null_chan(self):
     &#34;&#34;&#34;
     Removes the channel from the electrode group that has no spike in it
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     off_chan : int
         Channel number that has been removed
-        
+
     &#34;&#34;&#34;
-    
+
     wave = self.get_waveform()
     off_chan = []
     for key, w in wave.items():
@@ -3411,7 +3521,7 @@ filenames.</p>
             del wave[key]
         self._set_waveform(wave)
         self.NULL_CHAN_REMOVED = True
-    
+
     return off_chan</code></pre>
 </details>
 </dd>
@@ -3434,23 +3544,25 @@ filenames.</p>
 <dd>Upsampled wave timestamps</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def resample_wave(self, factor=2):
     &#34;&#34;&#34;
     Resamples spike waveforms
-    
+
     Parameters
     ----------
     factor : int
         Resampling factor
-    
+
     Returns
     -------
     wave : dict
         Upsampled waveforms
     uptime  ndarray
         Upsampled wave timestamps
-        
+
     &#34;&#34;&#34;
     # resample wave using spline interpolation using the resampled_time,return wave
     if not self.UPSAMPLED:
@@ -3458,17 +3570,19 @@ filenames.</p>
         uptime = self.resample_wavetime(factor=factor)
         wave = self.get_waveform()
         for key, w in wave.items():
-            f = sc.interpolate.interp1d(wavetime, w, axis=1, kind=&#39;quadratic&#39;)
+            f = sc.interpolate.interp1d(
+                wavetime, w, axis=1, kind=&#39;quadratic&#39;)
             wave[key] = f(uptime)
 
-        self.spike._set_sampling_rate(self.get_sampling_rate()*factor)
+        self.spike._set_sampling_rate(self.get_sampling_rate() * factor)
         self.spike._set_samples_per_spike(uptime.size)
         self.UPSAMPLED = True
-        
+
         return wave, uptime
-    
+
     else:
-        logging.warning(&#39;You can upsample only once. Please reload data from source file for changing sampling factor!&#39;)</code></pre>
+        logging.warning(
+            &#39;You can upsample only once. Please reload data from source file for changing sampling factor!&#39;)</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_clust.NClust.resample_wavetime"><code class="name flex">
@@ -3485,26 +3599,28 @@ filenames.</p>
 <pre><code>Resampled timestamps
 </code></pre></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def resample_wavetime(self, factor=2):
     &#34;&#34;&#34;
     Resamples the timestamps of spike-waveforms
-    
+
     Parameters
     ----------
     factor : int
         Resampling factor
-    
+
     Returns
     -------
         Resampled timestamps
-        
+
     &#34;&#34;&#34;
-    
+
     wavetime = self.get_wavetime()
     timestamp = self.get_wave_timestamp()
-    
-    return np.arange(0, wavetime[-1], timestamp/factor)</code></pre>
+
+    return np.arange(0, wavetime[-1], timestamp / factor)</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_clust.NClust.save_to_hdf5"><code class="name flex">
@@ -3526,27 +3642,29 @@ filenames.</p>
 <h2 id="also-see">Also see</h2>
 <p>nc_hdf.Nhdf().save_spike()</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def save_to_hdf5(self):
     &#34;&#34;&#34;
     Stores NSpike() object to HDF5 file
-    
+
     Delegates to NSPike().save_to_hdf5()
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     None
-    
+
     Also see
     --------
     nc_hdf.Nhdf().save_spike()
-    
+
     &#34;&#34;&#34;
-    
+
     self.spike.save_to_hdf5()</code></pre>
 </details>
 </dd>
@@ -3566,22 +3684,24 @@ filenames.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_unit_tags(self, new_tags=None):
     &#34;&#34;&#34;
     Returns tags of the spiking waveforms from clustering
-    
+
     Parameters
     ----------
     new_tags : ndarray
         Array that contains the tags for spike-waveforms based on the cluster number
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     self.spike.set_unit_tags(new_tags)</code></pre>
 </details>
 </dd>
@@ -3589,7 +3709,7 @@ filenames.</p>
 <span>def <span class="ident">wave_property</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Claulates different waveform properties for currently set unit</p>
+<section class="desc"><p>Calculates different waveform properties for currently set unit</p>
 <p>Delegates to NSpike().wave_property()</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
@@ -3604,13 +3724,15 @@ filenames.</p>
 <h2 id="see-also">See also</h2>
 <p><code>NSpike().wave_property()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def wave_property(self):
     &#34;&#34;&#34;
-    Claulates different waveform properties for currently set unit
-    
+    Calculates different waveform properties for currently set unit
+
     Delegates to NSpike().wave_property()
-    
+
     Parameters
     ----------
     None
@@ -3619,13 +3741,13 @@ filenames.</p>
     -------
     dict
         Graphical data of the analysis
-    
+
     See also
     --------
     NSpike().wave_property()
 
     &#34;&#34;&#34;
-    
+
     return self.spike.wave_property()</code></pre>
 </details>
 </dd>
@@ -3742,7 +3864,7 @@ filenames.</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
