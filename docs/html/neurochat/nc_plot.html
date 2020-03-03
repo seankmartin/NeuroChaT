@@ -868,11 +868,12 @@ def hd_rate_pred(hd_data, ax=None, **kwargs):
         plt.figure()
         ax = plt.gca(polar=True)
 
-    hd_rate(hd_data, ax=ax, **kwargs)
     bins = np.append(hd_data[&#39;bins&#39;], hd_data[&#39;bins&#39;][0])
     predRate = np.append(
         hd_data[&#39;hdPred&#39;], hd_data[&#39;hdPred&#39;][0])
     ax.plot(np.radians(bins), predRate, color=&#39;green&#39;)
+    rate = np.append(hd_data[&#39;smoothRate&#39;], hd_data[&#39;smoothRate&#39;][0])
+    ax.plot(np.radians(bins), rate, color=BLUE)
     ax.set_rticks(
         [hd_data[&#39;hdRate&#39;].max(), hd_data[&#39;hdPred&#39;].max()])
 
@@ -955,8 +956,13 @@ def hd_rate_ccw(hd_data):
 
     fig1 = plt.figure()
     ax = plt.gca(polar=True)
-    ax.plot(np.radians(hd_data[&#39;bins&#39;]), hd_data[&#39;hdRateCW&#39;], color=BLUE)
-    ax.plot(np.radians(hd_data[&#39;bins&#39;]), hd_data[&#39;hdRateCCW&#39;], color=RED)
+    bins = np.append(hd_data[&#39;bins&#39;], hd_data[&#39;bins&#39;][0])
+    predRate = np.append(
+        hd_data[&#39;hdRateCW&#39;], hd_data[&#39;hdRateCW&#39;][0])
+    ax.plot(np.radians(bins), predRate, color=BLUE)
+    predRate = np.append(
+        hd_data[&#39;hdRateCCW&#39;], hd_data[&#39;hdRateCCW&#39;][0])
+    ax.plot(np.radians(bins), predRate, color=RED)
     ax.set_title(&#39;Counter/clockwise firing rate&#39;)
     ax.set_rticks([hd_data[&#39;hdRateCW&#39;].max(), hd_data[&#39;hdRateCCW&#39;].max()])
 
@@ -2830,8 +2836,13 @@ head movements</dd>
 
     fig1 = plt.figure()
     ax = plt.gca(polar=True)
-    ax.plot(np.radians(hd_data[&#39;bins&#39;]), hd_data[&#39;hdRateCW&#39;], color=BLUE)
-    ax.plot(np.radians(hd_data[&#39;bins&#39;]), hd_data[&#39;hdRateCCW&#39;], color=RED)
+    bins = np.append(hd_data[&#39;bins&#39;], hd_data[&#39;bins&#39;][0])
+    predRate = np.append(
+        hd_data[&#39;hdRateCW&#39;], hd_data[&#39;hdRateCW&#39;][0])
+    ax.plot(np.radians(bins), predRate, color=BLUE)
+    predRate = np.append(
+        hd_data[&#39;hdRateCCW&#39;], hd_data[&#39;hdRateCCW&#39;][0])
+    ax.plot(np.radians(bins), predRate, color=RED)
     ax.set_title(&#39;Counter/clockwise firing rate&#39;)
     ax.set_rticks([hd_data[&#39;hdRateCW&#39;].max(), hd_data[&#39;hdRateCCW&#39;].max()])
 
@@ -2885,11 +2896,12 @@ head-direction vs spike-rate.</dd>
         plt.figure()
         ax = plt.gca(polar=True)
 
-    hd_rate(hd_data, ax=ax, **kwargs)
     bins = np.append(hd_data[&#39;bins&#39;], hd_data[&#39;bins&#39;][0])
     predRate = np.append(
         hd_data[&#39;hdPred&#39;], hd_data[&#39;hdPred&#39;][0])
     ax.plot(np.radians(bins), predRate, color=&#39;green&#39;)
+    rate = np.append(hd_data[&#39;smoothRate&#39;], hd_data[&#39;smoothRate&#39;][0])
+    ax.plot(np.radians(bins), rate, color=BLUE)
     ax.set_rticks(
         [hd_data[&#39;hdRate&#39;].max(), hd_data[&#39;hdPred&#39;].max()])
 
