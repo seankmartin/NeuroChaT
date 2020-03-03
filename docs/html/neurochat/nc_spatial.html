@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>neurochat.nc_spatial API documentation</title>
 <meta name="description" content="This module implements NSpatial Class for NeuroChaT software …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
@@ -23,7 +23,9 @@
 <p>This module implements NSpatial Class for NeuroChaT software</p>
 <p>@author: Md Nurul Islam; islammn at tcd dot ie</p>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
 This module implements NSpatial Class for NeuroChaT software
@@ -1752,7 +1754,13 @@ class NSpatial(NAbstract):
 
         hd_rate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
 
-        smoothRate = smooth_1d(hd_rate, filttype, filtsize)
+        extra_for_smooth = int(np.floor(filtsize / 2))
+        to_smooth_hd = np.concatenate([
+            hd_rate[len(hd_rate) - extra_for_smooth:],
+            hd_rate, 
+            hd_rate[:extra_for_smooth]])
+        smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+        smoothRate = smoothRate[2:len(smoothRate)-2]
 
         if update:
             _results[&#39;HD Skaggs&#39;] = self.skaggs_info(hd_rate, tcount)
@@ -3091,7 +3099,9 @@ activity of a unit.</p>
 <dd>Keyword arguments</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">class NSpatial(NAbstract):
     &#34;&#34;&#34;
     This data class is the placeholder for the dataset that contains information
@@ -4782,7 +4792,13 @@ activity of a unit.</p>
 
         hd_rate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
 
-        smoothRate = smooth_1d(hd_rate, filttype, filtsize)
+        extra_for_smooth = int(np.floor(filtsize / 2))
+        to_smooth_hd = np.concatenate([
+            hd_rate[len(hd_rate) - extra_for_smooth:],
+            hd_rate, 
+            hd_rate[:extra_for_smooth]])
+        smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+        smoothRate = smoothRate[2:len(smoothRate)-2]
 
         if update:
             _results[&#39;HD Skaggs&#39;] = self.skaggs_info(hd_rate, tcount)
@@ -6112,7 +6128,9 @@ These groups denote which neighbouring area the bin belongs to.</p>
 <dd>The number of adjacent bins that must be together to form a field</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">@staticmethod
 def place_field(pmap, thresh=0.2, required_neighbours=9):
     &#34;&#34;&#34;
@@ -6300,7 +6318,9 @@ Keyword arguments</p>
 <dd>A list of co-ordinates for each place field group</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">@staticmethod
 def place_field_centroid(pfield, fmap, group_num, **kwargs):
     &#34;&#34;&#34;
@@ -6347,7 +6367,9 @@ i.e., binned speed or head-direction</dd>
 <dd>Skaggs information content</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">@staticmethod
 def skaggs_info(firing_rate, visit_time):
     &#34;&#34;&#34;
@@ -6394,7 +6416,9 @@ def skaggs_info(firing_rate, visit_time):
 <dd>Spatial sparsity</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">@staticmethod
 def spatial_sparsity(firing_rate, visit_time):
     &#34;&#34;&#34;
@@ -6445,7 +6469,9 @@ is measured</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def angular_velocity(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates the firing rate of the unit at different binned angular head velocity.
@@ -6535,7 +6561,9 @@ environmental border</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">    def border(self, ftimes, **kwargs):        
         &#34;&#34;&#34;
         Analysis of the firing characteristic of a unit with respect to the
@@ -6688,7 +6716,9 @@ around current sample.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def calc_ang_vel(self, npoint=5):
     &#34;&#34;&#34;
     Calculates the angular head velocity of the animal from the direction data
@@ -6750,7 +6780,9 @@ animal in the arena</p>
 border</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def calc_border(self, **kwargs):
     &#34;&#34;&#34;
     Identifies the border of the recording arena from the trace of the foraging of the
@@ -6881,7 +6913,9 @@ border</dd>
 <dd>Angular head velocity of the animal</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_ang_vel(self):
     &#34;&#34;&#34;
     Returns angular head velocity of the animal
@@ -6916,7 +6950,9 @@ border</dd>
 <dd>Animal's distance from the border</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_border(self):
     &#34;&#34;&#34;
     Returns animal&#39;s distance from the border
@@ -6951,7 +6987,9 @@ border</dd>
 <dd>Head direction of the animal</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_direction(self):
     &#34;&#34;&#34;
     Returns head direction of the animal
@@ -6986,7 +7024,9 @@ border</dd>
 <dd>Duration of the experiment</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_duration(self):
     &#34;&#34;&#34;
     Returns the duration of the experiment
@@ -7032,7 +7072,9 @@ border</dd>
 <dd>direction of the animal at the time of the event</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_event_loc(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates location of the event from its timestamps.
@@ -7085,7 +7127,9 @@ border</dd>
 <dd>
 <section class="desc"><p>Returns the times where the subject is not moving</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_non_moving_times(self, **kwargs):
     &#34;&#34;&#34; Returns the times where the subject is not moving&#34;&#34;&#34;
     ranges = self.non_moving_periods(**kwargs)
@@ -7112,7 +7156,9 @@ border</dd>
 <dd>Pixel size</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_pixel_size(self):
     &#34;&#34;&#34;
     Returns the pixel size of the recorded arena
@@ -7146,7 +7192,9 @@ border</dd>
 <dd>X-coordinates of animal's location</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_pos_x(self):
     &#34;&#34;&#34;
     Returns the X-ccordinates of animal&#39;s location
@@ -7181,7 +7229,9 @@ border</dd>
 <dd>Y-coordinates of animal's location</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_pos_y(self):
     &#34;&#34;&#34;
     Returns the Y-ccordinates of animal&#39;s location
@@ -7216,7 +7266,9 @@ border</dd>
 <dd>Spatial data sampling rate</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_sampling_rate(self):
     &#34;&#34;&#34;
     Returns the sampling rate of the spatial samples
@@ -7251,7 +7303,9 @@ border</dd>
 <dd>Speed of the animal</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_speed(self):
     &#34;&#34;&#34;
     Returns speed of the animal
@@ -7285,7 +7339,9 @@ border</dd>
 <dd>Total spatial samples</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_time(self):
     &#34;&#34;&#34;
     Returns the time of individual spatial samples
@@ -7320,7 +7376,9 @@ border</dd>
 <dd>Temporal resolution of spatial samples</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_timestamp(self):
     &#34;&#34;&#34;
     Returns the temporal resolution of spatial samples
@@ -7355,7 +7413,9 @@ border</dd>
 <dd>Total spatial samples</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_total_samples(self):
     &#34;&#34;&#34;
     Returns the number of spatial samples
@@ -7389,7 +7449,9 @@ border</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_type(self):
     &#34;&#34;&#34;
     Returns the type of object. For NSpatial, this is always `spatial` type
@@ -7426,7 +7488,9 @@ as the animal traverses from the border to the cneter of the environment</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">    def gradient(self, ftimes, **kwargs):
         &#34;&#34;&#34;
         Analysis of gradient cell, a unit whose firing rate gradually increases 
@@ -7521,7 +7585,9 @@ of high activity in the firing-rate map
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def grid(self, ftimes, **kwargs):        
     &#34;&#34;&#34;
     Analysis of Grid cells characterised by formation of grid-like pattern
@@ -7639,7 +7705,9 @@ which shows the direction of the animal's head at each spike's occurring time.</
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_rate(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates the firing rate of the unit with respect to the head-direciton
@@ -7684,7 +7752,13 @@ which shows the direction of the animal's head at each spike's occurring time.</
 
     hd_rate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
 
-    smoothRate = smooth_1d(hd_rate, filttype, filtsize)
+    extra_for_smooth = int(np.floor(filtsize / 2))
+    to_smooth_hd = np.concatenate([
+        hd_rate[len(hd_rate) - extra_for_smooth:],
+        hd_rate, 
+        hd_rate[:extra_for_smooth]])
+    smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+    smoothRate = smoothRate[2:len(smoothRate)-2]
 
     if update:
         _results[&#39;HD Skaggs&#39;] = self.skaggs_info(hd_rate, tcount)
@@ -7768,7 +7842,9 @@ head-directional movement.</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_rate_ccw(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates the tuning curve but split into clock-wise vs counterclockwise
@@ -7877,7 +7953,9 @@ shift to the future by 2 spatial time resoultion.</dd>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_shift(self, ftimes, shift_ind=np.arange(-10, 11)):
     &#34;&#34;&#34;
     Analysis of firing specificity of the unit with respect to animal&#39;s head
@@ -7968,7 +8046,9 @@ is by chance or actually correlated to the head-direction of the animal</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_shuffle(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Shuffling analysis of the unit to see if the head-directional firing specifity
@@ -8054,7 +8134,9 @@ unit-activity as the animal traverses the environment.</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_time_lapse(self, ftimes):
     &#34;&#34;&#34;
     Calculates the tuning curve and idnetifies the location of the spiking events
@@ -8149,7 +8231,9 @@ predicted firing rate and the caclulated firing rate.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def interdependence(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Interdependence analysis where firing rate of each variable is predicted
@@ -8250,7 +8334,9 @@ predicted firing rate and the caclulated firing rate.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load(self, filename=None, system=None):
     &#34;&#34;&#34;
     Loads the spatial object         
@@ -8301,7 +8387,9 @@ predicted firing rate and the caclulated firing rate.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_lfp(self):
     &#34;&#34;&#34;
     Loads the composite lfp object         
@@ -8336,7 +8424,9 @@ predicted firing rate and the caclulated firing rate.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spatial_Axona(self, file_name):
     &#34;&#34;&#34;
     Loads Axona format spatial data to the NSpatial() object
@@ -8390,7 +8480,9 @@ predicted firing rate and the caclulated firing rate.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spatial_NWB(self, file_name):
     &#34;&#34;&#34;
     Loads HDF5 format spatial data to the NSpatial() object
@@ -8475,7 +8567,9 @@ predicted firing rate and the caclulated firing rate.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spatial_Neuralynx(self, file_name):
     &#34;&#34;&#34;
     Loads Neuralynx format spatial data to the NSpatial() object
@@ -8591,7 +8685,9 @@ predicted firing rate and the caclulated firing rate.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_spike(self):
     &#34;&#34;&#34;
     Loads the composing spike object         
@@ -8628,7 +8724,9 @@ map of the firing rate of the animal with respect to its location</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_auto_corr(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates the two-dimensional correlation of firing map which is the
@@ -8714,7 +8812,9 @@ respect to location, also called firing map
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">    def loc_rot_corr(self, ftimes, **kwargs):
         &#34;&#34;&#34;
         Calculates the rotational correlation of the locational firing rate of the animal with
@@ -8797,7 +8897,9 @@ shift to the future by 2 spatial time resoultion.</dd>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_shift(self, ftimes, shift_ind=np.arange(-10, 11), **kwargs):
     &#34;&#34;&#34;
     Analysis of firing specificity of the unit with respect to animal&#39;s location
@@ -8899,7 +9001,9 @@ is by chance or actually correlated to the location of the animal</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_shuffle(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Shuffling analysis of the unit to see if the locational firing specifity
@@ -9000,7 +9104,9 @@ unit-activity as the animal traverses the environment.</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_time_lapse(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates the firing rate map and idnetifies the location of the spiking events
@@ -9111,7 +9217,9 @@ to regress the instantaneous firing rate of the unit.</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">    def multiple_regression(self, ftimes, **kwargs):        
         &#34;&#34;&#34;
         Multiple-rgression analysis where firing rate for each variable, namely
@@ -9225,7 +9333,9 @@ to regress the instantaneous firing rate of the unit.</p>
 <dd>any speed above this thresh is considered to be movement</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def non_moving_periods(self, **kwargs):
     &#34;&#34;&#34;
     Returns a number of tuples indicating ranges where the subject is not moving
@@ -9273,7 +9383,9 @@ trace of the animal in the arena, commonly known as Spike Plot.</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def place(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates the two-dimensional firing rate of the unit with respect to
@@ -9457,7 +9569,9 @@ and then averaging remaining locations' co-ordinates.</p>
 <dd>The centroid of the place field</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def place_field_centroid_zscore(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     A naive method to find the centroid of the place field using the 
@@ -9517,7 +9631,9 @@ and then averaging remaining locations' co-ordinates.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def save_to_hdf5(self, file_name=None, system=None):
     &#34;&#34;&#34;
     Save spatial dataset to HDF5 file         
@@ -9561,7 +9677,9 @@ and then averaging remaining locations' co-ordinates.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_ang_vel(self, ang_vel):
     &#34;&#34;&#34;
     Sets the angular head velocity (AHV) of the animal
@@ -9596,7 +9714,9 @@ and then averaging remaining locations' co-ordinates.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_border(self, border):
     &#34;&#34;&#34;
     Sets the distance of the animal from the arena border
@@ -9635,7 +9755,9 @@ and then averaging remaining locations' co-ordinates.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_event(self, event, **kwargs):
     &#34;&#34;&#34;
     Sets the NEvent() object to NSpatial().         
@@ -9675,7 +9797,9 @@ and then averaging remaining locations' co-ordinates.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_event_filename(self, filename=None):
     &#34;&#34;&#34;
     Sets the filename for the event
@@ -9711,7 +9835,9 @@ and then averaging remaining locations' co-ordinates.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_event_name(self, name=None):
     &#34;&#34;&#34;
     Sets the name of the event object.         
@@ -9749,7 +9875,9 @@ is provided, a new NLfp() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_lfp(self, lfp, **kwargs):
     &#34;&#34;&#34;
     Adds the NLfp object to NSpatial object 
@@ -9792,7 +9920,9 @@ is provided, a new NLfp() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_lfp_filename(self, filename=None):
     &#34;&#34;&#34;
     Sets file name of the lfp dataset
@@ -9825,7 +9955,9 @@ is provided, a new NLfp() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_lfp_name(self, name=None):
     &#34;&#34;&#34;
     Sets the name of the lfp dataset
@@ -9860,7 +9992,9 @@ is provided, a new NLfp() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_pixel_size(self, pixel_size):
     &#34;&#34;&#34;
     Sets the size of pixel size by which the entire foraged arena is tessellated
@@ -9897,7 +10031,9 @@ is provided, a new NSpike() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_spike(self, spike, **kwargs):
     &#34;&#34;&#34;
     Adds the NSpike object to NSpatial object 
@@ -9941,7 +10077,9 @@ is provided, a new NSpike() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_spike_filename(self, filename=None):
     &#34;&#34;&#34;
     Sets file name of the spike dataset
@@ -9976,7 +10114,9 @@ is provided, a new NSpike() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_spike_name(self, name=None):
     &#34;&#34;&#34;
     Sets the name of the spike dataset
@@ -10012,7 +10152,9 @@ is provided, a new NSpike() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_system(self, system=None):
     &#34;&#34;&#34;
     Sets the data format or recording system.
@@ -10055,7 +10197,9 @@ is provided, a new NSpike() object is created.</dd>
 <h2 id="see-also">See also</h2>
 <p><code>nc_circular.CircStat().circ_smooth()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def smooth_direction(self):
     &#34;&#34;&#34;
     Smoothes the angular head direction data using a moving circular average
@@ -10095,7 +10239,9 @@ is provided, a new NSpike() object is created.</dd>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def smooth_speed(self):
     &#34;&#34;&#34;
     Smoothes the speed data using a moving-average box filter
@@ -10133,7 +10279,9 @@ is measured</p>
 <dd>Graphical data of the analysis</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def speed(self, ftimes, **kwargs):
     &#34;&#34;&#34;
     Calculates the firing rate of the unit at different binned speeds.
@@ -10211,7 +10359,9 @@ This is to easier match ndata which assumes recordings start at 0.</p>
 <dd>subsampled version of initial spatial object</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def subsample(self, sample_range=None):
     &#34;&#34;&#34;
     Extract a time range from the positions.
@@ -10365,7 +10515,7 @@ This is to easier match ndata which assumes recordings start at 0.</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

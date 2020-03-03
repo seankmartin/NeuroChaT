@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>neurochat.nc_uigetfiles API documentation</title>
 <meta name="description" content="This module implements UiGetFiles Class for NeuroChaT that provides the graphical
 interface and functionalities for manually selecting files …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
@@ -25,7 +25,9 @@ interface and functionalities for manually selecting files …" />
 interface and functionalities for manually selecting files.</p>
 <p>@author: Md Nurul Islam; islammn at tcd dot ie</p>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
 This module implements UiGetFiles Class for NeuroChaT that provides the graphical
@@ -41,22 +43,24 @@ from functools import partial
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 from neurochat.nc_uiutils import add_push_button, add_combo_box, add_label, add_line_edit,\
-                    xlt_from_utf8
+    xlt_from_utf8
+
 
 class UiGetFiles(QtWidgets.QDialog):
     DOWN = 1
     UP = -1
+
     def __init__(self, parent=None, filters=[&#39;.pdf&#39;, &#39;.ps&#39;]):
         &#34;&#34;&#34;
         Instantiate the UiGetFiles class. 
-        
+
         Parameters
         ----------
         parent
             Parent widget if any
         filters : list of str
             File filters for manual selection
-            
+
         Attributes
         ----------
         parent
@@ -67,9 +71,9 @@ class UiGetFiles(QtWidgets.QDialog):
             Currently set filter
         files : list
             List of selected files
-            
+
         &#34;&#34;&#34;
-        
+
         super().__init__(parent)
         self.parent = parent
         self.filters = filters
@@ -77,39 +81,45 @@ class UiGetFiles(QtWidgets.QDialog):
         self.files = []
         self.dir_icon = self.style().standardIcon(QtWidgets.QStyle.SP_DirIcon)
         self.file_icon = self.style().standardIcon(QtWidgets.QStyle.SP_FileIcon)
-        
+
     def setup_ui(self):
         &#34;&#34;&#34;
         Sets up the elements of UiGetFiles class
-        
+
         &#34;&#34;&#34;
-        
+
         self.setObjectName(xlt_from_utf8(&#34;getFilesWindow&#34;))
         self.setEnabled(True)
         self.setFixedSize(680, 400)
-        self.setWindowTitle(QtWidgets.QApplication.translate(&#34;getFilesWindow&#34;, &#34;Select files&#34;, None))
+        self.setWindowTitle(QtWidgets.QApplication.translate(
+            &#34;getFilesWindow&#34;, &#34;Select files&#34;, None))
 
         self.dir_list = QtWidgets.QListView(self)
         self.dir_list.setObjectName(xlt_from_utf8(&#34;dir_list&#34;))
-        self.dir_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.dir_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.dir_model = QtGui.QStandardItemModel(self.dir_list)
         self.dir_list.setModel(self.dir_model)
 
         self.file_list = QtWidgets.QListView(self)
         self.file_list.setObjectName(xlt_from_utf8(&#34;file_list&#34;))
-        self.file_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.file_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.file_model = QtGui.QStandardItemModel(self.file_list)
         self.file_list.setModel(self.file_model)
 
         button_layout = QtWidgets.QVBoxLayout()
         self.add_button = add_push_button(text=&#34;Add&#34;, obj_name=&#34;addButton&#34;)
-        self.remove_button = add_push_button(text=&#34;Remove&#34;, obj_name=&#34;removeButton&#34;)
+        self.remove_button = add_push_button(
+            text=&#34;Remove&#34;, obj_name=&#34;removeButton&#34;)
         self.up_button = add_push_button(text=&#34;Move Up&#34;, obj_name=&#34;upButton&#34;)
-        self.down_button = add_push_button(text=&#34;Move Down&#34;, obj_name=&#34;downButton&#34;)
+        self.down_button = add_push_button(
+            text=&#34;Move Down&#34;, obj_name=&#34;downButton&#34;)
         self.done_button = add_push_button(text=&#34;Done&#34;, obj_name=&#34;doneButton&#34;)
-        self.cancel_button = add_push_button(text=&#34;Cancel&#34;, obj_name=&#34;cancelButton&#34;)
+        self.cancel_button = add_push_button(
+            text=&#34;Cancel&#34;, obj_name=&#34;cancelButton&#34;)
 
         button_layout.addWidget(self.add_button)
         button_layout.addWidget(self.remove_button)
@@ -124,12 +134,15 @@ class UiGetFiles(QtWidgets.QDialog):
         self.filter_box = add_combo_box(obj_name=&#34;filterBox&#34;)
         self.filter_box.addItems(self.filters)
 
-        self.folder_label = add_label(text=&#34;Current Folder&#34;, obj_name=&#34;folderLabel&#34;)
-        self.folder_line = add_line_edit(text=os.getcwd(), obj_name=&#34;folderLine&#34;)
+        self.folder_label = add_label(
+            text=&#34;Current Folder&#34;, obj_name=&#34;folderLabel&#34;)
+        self.folder_line = add_line_edit(
+            text=os.getcwd(), obj_name=&#34;folderLine&#34;)
 
         self.dir_box = add_combo_box(obj_name=&#34;dirBox&#34;)
         self.dir_box.addItems(os.getcwd().split(os.sep))
-        self.dir_box.setCurrentIndex(self.dir_box.findText(os.getcwd().split(os.sep)[-1]))
+        self.dir_box.setCurrentIndex(
+            self.dir_box.findText(os.getcwd().split(os.sep)[-1]))
         self.back_button = add_push_button(text=&#34;Back&#34;, obj_name=&#34;backButton&#34;)
 
         dir_layout = QtWidgets.QHBoxLayout()
@@ -157,14 +170,15 @@ class UiGetFiles(QtWidgets.QDialog):
     def behaviour_ui(self):
         &#34;&#34;&#34;
         Sets up the behaviour of UiGetFiles class
-        
+
         &#34;&#34;&#34;
-        
+
         self.filter_box.currentIndexChanged[str].connect(self.filter_changed)
         self.folder_line.textEdited[str].connect(self.line_edited)
         self.dir_box.currentIndexChanged[int].connect(self.dir_changed)
         self.back_button.clicked.connect(self.hierarchy_changed)
-        self.dir_list.activated[QtCore.QModelIndex].connect(self.item_activated)
+        self.dir_list.activated[QtCore.QModelIndex].connect(
+            self.item_activated)
         self.add_button.clicked.connect(self.add_items)
         self.remove_button.clicked.connect(self.remove_items)
         self.up_button.clicked.connect(partial(self.move_items, &#39;up&#39;))
@@ -178,57 +192,59 @@ class UiGetFiles(QtWidgets.QDialog):
     def filter_changed(self, value):
         &#34;&#34;&#34;
         Called if the filter changed to update for the new selection
-        
+
         Parameters
         ----------
         value
             Currently set filter
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.current_filter = value
         self.update_list(self.folder_line.text())
-        
+
     def line_edited(self, value):
         &#34;&#34;&#34;
         Called if the directory text box in the widget is changed to update the list of new subdirectories
-        
+
         Parameters
         ----------
         value
             Newly set text in the directory box.
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         if os.path.exists(value):
             self.dir_box.clear()
             self.dir_box.addItems(value.split(os.sep))
-            self.dir_box.setCurrentIndex(self.dir_box.findText(value.split(os.sep)[-1]))
+            self.dir_box.setCurrentIndex(
+                self.dir_box.findText(value.split(os.sep)[-1]))
 
     def dir_changed(self, value):
         &#34;&#34;&#34;
         Called if the subdirectoy combo-box in the widget is changed to update the list of new subdirectories
-        
+
         Parameters
         ----------
         value
             Newly set item number in the combo-box of subdirectories.
-        
+
         Returns
         -------
         None
-        
-        &#34;&#34;&#34;    
-        
-        directory = os.sep.join([self.dir_box.itemText(i) for i in range(value+ 1)])
+
+        &#34;&#34;&#34;
+
+        directory = os.sep.join([self.dir_box.itemText(i)
+                                 for i in range(value + 1)])
         if os.sep not in directory:
             directory += os.sep
         self.folder_line.setText(directory)
@@ -237,17 +253,17 @@ class UiGetFiles(QtWidgets.QDialog):
     def update_list(self, directory):
         &#34;&#34;&#34;
         Updates the list of folders and sets the item model for the scrollable list 
-        
+
         Parameters
         ----------
         directory
             New directory whose folders and files are listed
-        
+
         Returns
         -------
         None
-        
-        &#34;&#34;&#34;        
+
+        &#34;&#34;&#34;
         self.dir_model.clear()
         if os.path.isdir(directory):
             dir_content = os.listdir(directory)
@@ -266,64 +282,66 @@ class UiGetFiles(QtWidgets.QDialog):
     def hierarchy_changed(self):
         &#34;&#34;&#34;
         Called if the directory hierarchy is changed
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        curr_ind = self.dir_box.currentIndex()-1
+
+        curr_ind = self.dir_box.currentIndex() - 1
         if curr_ind &gt;= 0:
             self.dir_box.setCurrentIndex(curr_ind)
-            
+
     def item_activated(self, qind):
         &#34;&#34;&#34;
         Called if any of the model item in the list of folders and files is double-clicked
-        
+
         Parameters
         ----------
         quind
             Indix of new model item
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         data = self.dir_model.itemFromIndex(qind).text()
         directory = os.path.join(self.folder_line.text(), data)
         if os.path.isdir(directory):
-            self.folder_line.setText(directory) # setText() does not invoke textEdited(), manually calling line_eidted()
+            # setText() does not invoke textEdited(), manually calling line_eidted()
+            self.folder_line.setText(directory)
             self.line_edited(directory)
 
     def add_items(self):
         &#34;&#34;&#34;
         Called if the add button is clicked. Adds selected model item to the right side
         selected file box if that passes the filter
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         qind = self.dir_list.selectedIndexes()
         items = [self.dir_model.itemFromIndex(i) for i in qind]
-        curr_files = [self.file_model.item(i).text() for i in range(self.file_model.rowCount())]
+        curr_files = [self.file_model.item(i).text()
+                      for i in range(self.file_model.rowCount())]
 
         for it in items:
             if os.path.isfile(os.path.join(self.folder_line.text(), it.text())) \
-                                        and it.text().endswith(self.filter_box.currentText()):
+                    and it.text().endswith(self.filter_box.currentText()):
                 if not curr_files or it.text() not in curr_files:
                     self.file_model.appendRow(it.clone())
 
@@ -333,46 +351,47 @@ class UiGetFiles(QtWidgets.QDialog):
         &#34;&#34;&#34;
         Removes the item which is added to the selection list. Updates the item
         model.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
-        &#34;&#34;&#34;        
-        
+
+        &#34;&#34;&#34;
+
         qind = self.file_list.selectedIndexes()
         rows = [i.row() for i in qind][::-1]
         for r in rows:
-            self.file_model.removeRow(r) # Rows change after each removal, so the one in the highest index are not deleted
+            # Rows change after each removal, so the one in the highest index are not deleted
+            self.file_model.removeRow(r)
         self.file_list.setModel(self.file_model)
 
     def move_items(self, direction=&#39;down&#39;):
         &#34;&#34;&#34;
         Moves item in the item model by changing their indices.
-        
+
         Parameters
         ----------
         direction : str
             Direction of moving &#39;down&#39; or &#39;up&#39;
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        # -1= move up, +1= move down        
+        # -1= move up, +1= move down
         qind = self.file_list.selectedIndexes()
         rows = [i.row() for i in qind]
         if direction == &#39;up&#39;:
             rows.sort(reverse=False)
-            newRows = [r- 1 for r in rows]
+            newRows = [r - 1 for r in rows]
         elif direction == &#39;down&#39;:
             rows.sort(reverse=True)
-            newRows = [r+ 1 for r in rows]
+            newRows = [r + 1 for r in rows]
 
         for i, row in enumerate(rows):
             if not 0 &lt;= newRows[i] &lt; self.file_model.rowCount():
@@ -381,57 +400,57 @@ class UiGetFiles(QtWidgets.QDialog):
             self.file_model.insertRow(newRows[i], rowItem)
 
         self.file_list.setModel(self.file_model)
-        
+
     def done(self):
         &#34;&#34;&#34;
         Sets the list of files and closes the widget.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        self.files = [os.path.join(self.folder_line.text(), self.file_model.item(i).text()) \
-                for i in range(self.file_model.rowCount())]
+
+        self.files = [os.path.join(self.folder_line.text(), self.file_model.item(i).text())
+                      for i in range(self.file_model.rowCount())]
         self.close_dialog()
-        
+
     def close_dialog(self):
         &#34;&#34;&#34;
         Closes the widget for file selection.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.file_model.clear()
         self.close()
-        
+
     def get_files(self):
         &#34;&#34;&#34;
         Returns the list of files.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             List of selected files
-        
+
         &#34;&#34;&#34;
-        
+
         return self.files</code></pre>
 </details>
 </section>
@@ -470,21 +489,24 @@ class UiGetFiles(QtWidgets.QDialog):
 <dd>List of selected files</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">class UiGetFiles(QtWidgets.QDialog):
     DOWN = 1
     UP = -1
+
     def __init__(self, parent=None, filters=[&#39;.pdf&#39;, &#39;.ps&#39;]):
         &#34;&#34;&#34;
         Instantiate the UiGetFiles class. 
-        
+
         Parameters
         ----------
         parent
             Parent widget if any
         filters : list of str
             File filters for manual selection
-            
+
         Attributes
         ----------
         parent
@@ -495,9 +517,9 @@ class UiGetFiles(QtWidgets.QDialog):
             Currently set filter
         files : list
             List of selected files
-            
+
         &#34;&#34;&#34;
-        
+
         super().__init__(parent)
         self.parent = parent
         self.filters = filters
@@ -505,39 +527,45 @@ class UiGetFiles(QtWidgets.QDialog):
         self.files = []
         self.dir_icon = self.style().standardIcon(QtWidgets.QStyle.SP_DirIcon)
         self.file_icon = self.style().standardIcon(QtWidgets.QStyle.SP_FileIcon)
-        
+
     def setup_ui(self):
         &#34;&#34;&#34;
         Sets up the elements of UiGetFiles class
-        
+
         &#34;&#34;&#34;
-        
+
         self.setObjectName(xlt_from_utf8(&#34;getFilesWindow&#34;))
         self.setEnabled(True)
         self.setFixedSize(680, 400)
-        self.setWindowTitle(QtWidgets.QApplication.translate(&#34;getFilesWindow&#34;, &#34;Select files&#34;, None))
+        self.setWindowTitle(QtWidgets.QApplication.translate(
+            &#34;getFilesWindow&#34;, &#34;Select files&#34;, None))
 
         self.dir_list = QtWidgets.QListView(self)
         self.dir_list.setObjectName(xlt_from_utf8(&#34;dir_list&#34;))
-        self.dir_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.dir_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.dir_model = QtGui.QStandardItemModel(self.dir_list)
         self.dir_list.setModel(self.dir_model)
 
         self.file_list = QtWidgets.QListView(self)
         self.file_list.setObjectName(xlt_from_utf8(&#34;file_list&#34;))
-        self.file_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.file_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.file_model = QtGui.QStandardItemModel(self.file_list)
         self.file_list.setModel(self.file_model)
 
         button_layout = QtWidgets.QVBoxLayout()
         self.add_button = add_push_button(text=&#34;Add&#34;, obj_name=&#34;addButton&#34;)
-        self.remove_button = add_push_button(text=&#34;Remove&#34;, obj_name=&#34;removeButton&#34;)
+        self.remove_button = add_push_button(
+            text=&#34;Remove&#34;, obj_name=&#34;removeButton&#34;)
         self.up_button = add_push_button(text=&#34;Move Up&#34;, obj_name=&#34;upButton&#34;)
-        self.down_button = add_push_button(text=&#34;Move Down&#34;, obj_name=&#34;downButton&#34;)
+        self.down_button = add_push_button(
+            text=&#34;Move Down&#34;, obj_name=&#34;downButton&#34;)
         self.done_button = add_push_button(text=&#34;Done&#34;, obj_name=&#34;doneButton&#34;)
-        self.cancel_button = add_push_button(text=&#34;Cancel&#34;, obj_name=&#34;cancelButton&#34;)
+        self.cancel_button = add_push_button(
+            text=&#34;Cancel&#34;, obj_name=&#34;cancelButton&#34;)
 
         button_layout.addWidget(self.add_button)
         button_layout.addWidget(self.remove_button)
@@ -552,12 +580,15 @@ class UiGetFiles(QtWidgets.QDialog):
         self.filter_box = add_combo_box(obj_name=&#34;filterBox&#34;)
         self.filter_box.addItems(self.filters)
 
-        self.folder_label = add_label(text=&#34;Current Folder&#34;, obj_name=&#34;folderLabel&#34;)
-        self.folder_line = add_line_edit(text=os.getcwd(), obj_name=&#34;folderLine&#34;)
+        self.folder_label = add_label(
+            text=&#34;Current Folder&#34;, obj_name=&#34;folderLabel&#34;)
+        self.folder_line = add_line_edit(
+            text=os.getcwd(), obj_name=&#34;folderLine&#34;)
 
         self.dir_box = add_combo_box(obj_name=&#34;dirBox&#34;)
         self.dir_box.addItems(os.getcwd().split(os.sep))
-        self.dir_box.setCurrentIndex(self.dir_box.findText(os.getcwd().split(os.sep)[-1]))
+        self.dir_box.setCurrentIndex(
+            self.dir_box.findText(os.getcwd().split(os.sep)[-1]))
         self.back_button = add_push_button(text=&#34;Back&#34;, obj_name=&#34;backButton&#34;)
 
         dir_layout = QtWidgets.QHBoxLayout()
@@ -585,14 +616,15 @@ class UiGetFiles(QtWidgets.QDialog):
     def behaviour_ui(self):
         &#34;&#34;&#34;
         Sets up the behaviour of UiGetFiles class
-        
+
         &#34;&#34;&#34;
-        
+
         self.filter_box.currentIndexChanged[str].connect(self.filter_changed)
         self.folder_line.textEdited[str].connect(self.line_edited)
         self.dir_box.currentIndexChanged[int].connect(self.dir_changed)
         self.back_button.clicked.connect(self.hierarchy_changed)
-        self.dir_list.activated[QtCore.QModelIndex].connect(self.item_activated)
+        self.dir_list.activated[QtCore.QModelIndex].connect(
+            self.item_activated)
         self.add_button.clicked.connect(self.add_items)
         self.remove_button.clicked.connect(self.remove_items)
         self.up_button.clicked.connect(partial(self.move_items, &#39;up&#39;))
@@ -606,57 +638,59 @@ class UiGetFiles(QtWidgets.QDialog):
     def filter_changed(self, value):
         &#34;&#34;&#34;
         Called if the filter changed to update for the new selection
-        
+
         Parameters
         ----------
         value
             Currently set filter
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.current_filter = value
         self.update_list(self.folder_line.text())
-        
+
     def line_edited(self, value):
         &#34;&#34;&#34;
         Called if the directory text box in the widget is changed to update the list of new subdirectories
-        
+
         Parameters
         ----------
         value
             Newly set text in the directory box.
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         if os.path.exists(value):
             self.dir_box.clear()
             self.dir_box.addItems(value.split(os.sep))
-            self.dir_box.setCurrentIndex(self.dir_box.findText(value.split(os.sep)[-1]))
+            self.dir_box.setCurrentIndex(
+                self.dir_box.findText(value.split(os.sep)[-1]))
 
     def dir_changed(self, value):
         &#34;&#34;&#34;
         Called if the subdirectoy combo-box in the widget is changed to update the list of new subdirectories
-        
+
         Parameters
         ----------
         value
             Newly set item number in the combo-box of subdirectories.
-        
+
         Returns
         -------
         None
-        
-        &#34;&#34;&#34;    
-        
-        directory = os.sep.join([self.dir_box.itemText(i) for i in range(value+ 1)])
+
+        &#34;&#34;&#34;
+
+        directory = os.sep.join([self.dir_box.itemText(i)
+                                 for i in range(value + 1)])
         if os.sep not in directory:
             directory += os.sep
         self.folder_line.setText(directory)
@@ -665,17 +699,17 @@ class UiGetFiles(QtWidgets.QDialog):
     def update_list(self, directory):
         &#34;&#34;&#34;
         Updates the list of folders and sets the item model for the scrollable list 
-        
+
         Parameters
         ----------
         directory
             New directory whose folders and files are listed
-        
+
         Returns
         -------
         None
-        
-        &#34;&#34;&#34;        
+
+        &#34;&#34;&#34;
         self.dir_model.clear()
         if os.path.isdir(directory):
             dir_content = os.listdir(directory)
@@ -694,64 +728,66 @@ class UiGetFiles(QtWidgets.QDialog):
     def hierarchy_changed(self):
         &#34;&#34;&#34;
         Called if the directory hierarchy is changed
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        curr_ind = self.dir_box.currentIndex()-1
+
+        curr_ind = self.dir_box.currentIndex() - 1
         if curr_ind &gt;= 0:
             self.dir_box.setCurrentIndex(curr_ind)
-            
+
     def item_activated(self, qind):
         &#34;&#34;&#34;
         Called if any of the model item in the list of folders and files is double-clicked
-        
+
         Parameters
         ----------
         quind
             Indix of new model item
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         data = self.dir_model.itemFromIndex(qind).text()
         directory = os.path.join(self.folder_line.text(), data)
         if os.path.isdir(directory):
-            self.folder_line.setText(directory) # setText() does not invoke textEdited(), manually calling line_eidted()
+            # setText() does not invoke textEdited(), manually calling line_eidted()
+            self.folder_line.setText(directory)
             self.line_edited(directory)
 
     def add_items(self):
         &#34;&#34;&#34;
         Called if the add button is clicked. Adds selected model item to the right side
         selected file box if that passes the filter
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         qind = self.dir_list.selectedIndexes()
         items = [self.dir_model.itemFromIndex(i) for i in qind]
-        curr_files = [self.file_model.item(i).text() for i in range(self.file_model.rowCount())]
+        curr_files = [self.file_model.item(i).text()
+                      for i in range(self.file_model.rowCount())]
 
         for it in items:
             if os.path.isfile(os.path.join(self.folder_line.text(), it.text())) \
-                                        and it.text().endswith(self.filter_box.currentText()):
+                    and it.text().endswith(self.filter_box.currentText()):
                 if not curr_files or it.text() not in curr_files:
                     self.file_model.appendRow(it.clone())
 
@@ -761,46 +797,47 @@ class UiGetFiles(QtWidgets.QDialog):
         &#34;&#34;&#34;
         Removes the item which is added to the selection list. Updates the item
         model.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
-        &#34;&#34;&#34;        
-        
+
+        &#34;&#34;&#34;
+
         qind = self.file_list.selectedIndexes()
         rows = [i.row() for i in qind][::-1]
         for r in rows:
-            self.file_model.removeRow(r) # Rows change after each removal, so the one in the highest index are not deleted
+            # Rows change after each removal, so the one in the highest index are not deleted
+            self.file_model.removeRow(r)
         self.file_list.setModel(self.file_model)
 
     def move_items(self, direction=&#39;down&#39;):
         &#34;&#34;&#34;
         Moves item in the item model by changing their indices.
-        
+
         Parameters
         ----------
         direction : str
             Direction of moving &#39;down&#39; or &#39;up&#39;
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        # -1= move up, +1= move down        
+        # -1= move up, +1= move down
         qind = self.file_list.selectedIndexes()
         rows = [i.row() for i in qind]
         if direction == &#39;up&#39;:
             rows.sort(reverse=False)
-            newRows = [r- 1 for r in rows]
+            newRows = [r - 1 for r in rows]
         elif direction == &#39;down&#39;:
             rows.sort(reverse=True)
-            newRows = [r+ 1 for r in rows]
+            newRows = [r + 1 for r in rows]
 
         for i, row in enumerate(rows):
             if not 0 &lt;= newRows[i] &lt; self.file_model.rowCount():
@@ -809,57 +846,57 @@ class UiGetFiles(QtWidgets.QDialog):
             self.file_model.insertRow(newRows[i], rowItem)
 
         self.file_list.setModel(self.file_model)
-        
+
     def done(self):
         &#34;&#34;&#34;
         Sets the list of files and closes the widget.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
-        self.files = [os.path.join(self.folder_line.text(), self.file_model.item(i).text()) \
-                for i in range(self.file_model.rowCount())]
+
+        self.files = [os.path.join(self.folder_line.text(), self.file_model.item(i).text())
+                      for i in range(self.file_model.rowCount())]
         self.close_dialog()
-        
+
     def close_dialog(self):
         &#34;&#34;&#34;
         Closes the widget for file selection.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         &#34;&#34;&#34;
-        
+
         self.file_model.clear()
         self.close()
-        
+
     def get_files(self):
         &#34;&#34;&#34;
         Returns the list of files.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
             List of selected files
-        
+
         &#34;&#34;&#34;
-        
+
         return self.files</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -901,29 +938,32 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def add_items(self):
     &#34;&#34;&#34;
     Called if the add button is clicked. Adds selected model item to the right side
     selected file box if that passes the filter
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     qind = self.dir_list.selectedIndexes()
     items = [self.dir_model.itemFromIndex(i) for i in qind]
-    curr_files = [self.file_model.item(i).text() for i in range(self.file_model.rowCount())]
+    curr_files = [self.file_model.item(i).text()
+                  for i in range(self.file_model.rowCount())]
 
     for it in items:
         if os.path.isfile(os.path.join(self.folder_line.text(), it.text())) \
-                                    and it.text().endswith(self.filter_box.currentText()):
+                and it.text().endswith(self.filter_box.currentText()):
             if not curr_files or it.text() not in curr_files:
                 self.file_model.appendRow(it.clone())
 
@@ -936,18 +976,21 @@ selected file box if that passes the filter</p>
 <dd>
 <section class="desc"><p>Sets up the behaviour of UiGetFiles class</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def behaviour_ui(self):
     &#34;&#34;&#34;
     Sets up the behaviour of UiGetFiles class
-    
+
     &#34;&#34;&#34;
-    
+
     self.filter_box.currentIndexChanged[str].connect(self.filter_changed)
     self.folder_line.textEdited[str].connect(self.line_edited)
     self.dir_box.currentIndexChanged[int].connect(self.dir_changed)
     self.back_button.clicked.connect(self.hierarchy_changed)
-    self.dir_list.activated[QtCore.QModelIndex].connect(self.item_activated)
+    self.dir_list.activated[QtCore.QModelIndex].connect(
+        self.item_activated)
     self.add_button.clicked.connect(self.add_items)
     self.remove_button.clicked.connect(self.remove_items)
     self.up_button.clicked.connect(partial(self.move_items, &#39;up&#39;))
@@ -975,21 +1018,23 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def close_dialog(self):
     &#34;&#34;&#34;
     Closes the widget for file selection.
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     self.file_model.clear()
     self.close()</code></pre>
 </details>
@@ -1010,23 +1055,26 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def dir_changed(self, value):
     &#34;&#34;&#34;
     Called if the subdirectoy combo-box in the widget is changed to update the list of new subdirectories
-    
+
     Parameters
     ----------
     value
         Newly set item number in the combo-box of subdirectories.
-    
+
     Returns
     -------
     None
-    
-    &#34;&#34;&#34;    
-    
-    directory = os.sep.join([self.dir_box.itemText(i) for i in range(value+ 1)])
+
+    &#34;&#34;&#34;
+
+    directory = os.sep.join([self.dir_box.itemText(i)
+                             for i in range(value + 1)])
     if os.sep not in directory:
         directory += os.sep
     self.folder_line.setText(directory)
@@ -1049,23 +1097,25 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def done(self):
     &#34;&#34;&#34;
     Sets the list of files and closes the widget.
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
-    self.files = [os.path.join(self.folder_line.text(), self.file_model.item(i).text()) \
-            for i in range(self.file_model.rowCount())]
+
+    self.files = [os.path.join(self.folder_line.text(), self.file_model.item(i).text())
+                  for i in range(self.file_model.rowCount())]
     self.close_dialog()</code></pre>
 </details>
 </dd>
@@ -1085,22 +1135,24 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def filter_changed(self, value):
     &#34;&#34;&#34;
     Called if the filter changed to update for the new selection
-    
+
     Parameters
     ----------
     value
         Currently set filter
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     self.current_filter = value
     self.update_list(self.folder_line.text())</code></pre>
 </details>
@@ -1121,22 +1173,24 @@ selected file box if that passes the filter</p>
 <dd>List of selected files</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_files(self):
     &#34;&#34;&#34;
     Returns the list of files.
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     list
         List of selected files
-    
+
     &#34;&#34;&#34;
-    
+
     return self.files</code></pre>
 </details>
 </dd>
@@ -1156,22 +1210,24 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hierarchy_changed(self):
     &#34;&#34;&#34;
     Called if the directory hierarchy is changed
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
-    curr_ind = self.dir_box.currentIndex()-1
+
+    curr_ind = self.dir_box.currentIndex() - 1
     if curr_ind &gt;= 0:
         self.dir_box.setCurrentIndex(curr_ind)</code></pre>
 </details>
@@ -1192,26 +1248,29 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def item_activated(self, qind):
     &#34;&#34;&#34;
     Called if any of the model item in the list of folders and files is double-clicked
-    
+
     Parameters
     ----------
     quind
         Indix of new model item
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     data = self.dir_model.itemFromIndex(qind).text()
     directory = os.path.join(self.folder_line.text(), data)
     if os.path.isdir(directory):
-        self.folder_line.setText(directory) # setText() does not invoke textEdited(), manually calling line_eidted()
+        # setText() does not invoke textEdited(), manually calling line_eidted()
+        self.folder_line.setText(directory)
         self.line_edited(directory)</code></pre>
 </details>
 </dd>
@@ -1231,26 +1290,29 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def line_edited(self, value):
     &#34;&#34;&#34;
     Called if the directory text box in the widget is changed to update the list of new subdirectories
-    
+
     Parameters
     ----------
     value
         Newly set text in the directory box.
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    
+
     if os.path.exists(value):
         self.dir_box.clear()
         self.dir_box.addItems(value.split(os.sep))
-        self.dir_box.setCurrentIndex(self.dir_box.findText(value.split(os.sep)[-1]))</code></pre>
+        self.dir_box.setCurrentIndex(
+            self.dir_box.findText(value.split(os.sep)[-1]))</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_uigetfiles.UiGetFiles.move_items"><code class="name flex">
@@ -1269,30 +1331,32 @@ selected file box if that passes the filter</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def move_items(self, direction=&#39;down&#39;):
     &#34;&#34;&#34;
     Moves item in the item model by changing their indices.
-    
+
     Parameters
     ----------
     direction : str
         Direction of moving &#39;down&#39; or &#39;up&#39;
-    
+
     Returns
     -------
     None
-    
+
     &#34;&#34;&#34;
-    # -1= move up, +1= move down        
+    # -1= move up, +1= move down
     qind = self.file_list.selectedIndexes()
     rows = [i.row() for i in qind]
     if direction == &#39;up&#39;:
         rows.sort(reverse=False)
-        newRows = [r- 1 for r in rows]
+        newRows = [r - 1 for r in rows]
     elif direction == &#39;down&#39;:
         rows.sort(reverse=True)
-        newRows = [r+ 1 for r in rows]
+        newRows = [r + 1 for r in rows]
 
     for i, row in enumerate(rows):
         if not 0 &lt;= newRows[i] &lt; self.file_model.rowCount():
@@ -1320,26 +1384,29 @@ model.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def remove_items(self):
     &#34;&#34;&#34;
     Removes the item which is added to the selection list. Updates the item
     model.
-    
+
     Parameters
     ----------
     None
-    
+
     Returns
     -------
     None
-    
-    &#34;&#34;&#34;        
-    
+
+    &#34;&#34;&#34;
+
     qind = self.file_list.selectedIndexes()
     rows = [i.row() for i in qind][::-1]
     for r in rows:
-        self.file_model.removeRow(r) # Rows change after each removal, so the one in the highest index are not deleted
+        # Rows change after each removal, so the one in the highest index are not deleted
+        self.file_model.removeRow(r)
     self.file_list.setModel(self.file_model)</code></pre>
 </details>
 </dd>
@@ -1349,39 +1416,47 @@ model.</p>
 <dd>
 <section class="desc"><p>Sets up the elements of UiGetFiles class</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def setup_ui(self):
     &#34;&#34;&#34;
     Sets up the elements of UiGetFiles class
-    
+
     &#34;&#34;&#34;
-    
+
     self.setObjectName(xlt_from_utf8(&#34;getFilesWindow&#34;))
     self.setEnabled(True)
     self.setFixedSize(680, 400)
-    self.setWindowTitle(QtWidgets.QApplication.translate(&#34;getFilesWindow&#34;, &#34;Select files&#34;, None))
+    self.setWindowTitle(QtWidgets.QApplication.translate(
+        &#34;getFilesWindow&#34;, &#34;Select files&#34;, None))
 
     self.dir_list = QtWidgets.QListView(self)
     self.dir_list.setObjectName(xlt_from_utf8(&#34;dir_list&#34;))
-    self.dir_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+    self.dir_list.setSelectionMode(
+        QtWidgets.QAbstractItemView.ExtendedSelection)
 
     self.dir_model = QtGui.QStandardItemModel(self.dir_list)
     self.dir_list.setModel(self.dir_model)
 
     self.file_list = QtWidgets.QListView(self)
     self.file_list.setObjectName(xlt_from_utf8(&#34;file_list&#34;))
-    self.file_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+    self.file_list.setSelectionMode(
+        QtWidgets.QAbstractItemView.ExtendedSelection)
 
     self.file_model = QtGui.QStandardItemModel(self.file_list)
     self.file_list.setModel(self.file_model)
 
     button_layout = QtWidgets.QVBoxLayout()
     self.add_button = add_push_button(text=&#34;Add&#34;, obj_name=&#34;addButton&#34;)
-    self.remove_button = add_push_button(text=&#34;Remove&#34;, obj_name=&#34;removeButton&#34;)
+    self.remove_button = add_push_button(
+        text=&#34;Remove&#34;, obj_name=&#34;removeButton&#34;)
     self.up_button = add_push_button(text=&#34;Move Up&#34;, obj_name=&#34;upButton&#34;)
-    self.down_button = add_push_button(text=&#34;Move Down&#34;, obj_name=&#34;downButton&#34;)
+    self.down_button = add_push_button(
+        text=&#34;Move Down&#34;, obj_name=&#34;downButton&#34;)
     self.done_button = add_push_button(text=&#34;Done&#34;, obj_name=&#34;doneButton&#34;)
-    self.cancel_button = add_push_button(text=&#34;Cancel&#34;, obj_name=&#34;cancelButton&#34;)
+    self.cancel_button = add_push_button(
+        text=&#34;Cancel&#34;, obj_name=&#34;cancelButton&#34;)
 
     button_layout.addWidget(self.add_button)
     button_layout.addWidget(self.remove_button)
@@ -1396,12 +1471,15 @@ model.</p>
     self.filter_box = add_combo_box(obj_name=&#34;filterBox&#34;)
     self.filter_box.addItems(self.filters)
 
-    self.folder_label = add_label(text=&#34;Current Folder&#34;, obj_name=&#34;folderLabel&#34;)
-    self.folder_line = add_line_edit(text=os.getcwd(), obj_name=&#34;folderLine&#34;)
+    self.folder_label = add_label(
+        text=&#34;Current Folder&#34;, obj_name=&#34;folderLabel&#34;)
+    self.folder_line = add_line_edit(
+        text=os.getcwd(), obj_name=&#34;folderLine&#34;)
 
     self.dir_box = add_combo_box(obj_name=&#34;dirBox&#34;)
     self.dir_box.addItems(os.getcwd().split(os.sep))
-    self.dir_box.setCurrentIndex(self.dir_box.findText(os.getcwd().split(os.sep)[-1]))
+    self.dir_box.setCurrentIndex(
+        self.dir_box.findText(os.getcwd().split(os.sep)[-1]))
     self.back_button = add_push_button(text=&#34;Back&#34;, obj_name=&#34;backButton&#34;)
 
     dir_layout = QtWidgets.QHBoxLayout()
@@ -1443,21 +1521,23 @@ model.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def update_list(self, directory):
     &#34;&#34;&#34;
     Updates the list of folders and sets the item model for the scrollable list 
-    
+
     Parameters
     ----------
     directory
         New directory whose folders and files are listed
-    
+
     Returns
     -------
     None
-    
-    &#34;&#34;&#34;        
+
+    &#34;&#34;&#34;
     self.dir_model.clear()
     if os.path.isdir(directory):
         dir_content = os.listdir(directory)
@@ -1519,7 +1599,7 @@ model.</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

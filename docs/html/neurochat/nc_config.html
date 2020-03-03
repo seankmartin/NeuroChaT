@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>neurochat.nc_config API documentation</title>
 <meta name="description" content="This module implements Configuration Class for NeuroChaT software …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
@@ -23,7 +23,9 @@
 <p>This module implements Configuration Class for NeuroChaT software</p>
 <p>@author: Md Nurul Islam; islammn at tcd dot ie</p>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
 This module implements Configuration Class for NeuroChaT software
@@ -938,7 +940,9 @@ and 'Listed Units'</dd>
 <dd>A dict indicating a menu analysis method.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">class Configuration(object):
     &#34;&#34;&#34;
     The Configuration object is the placeholder for all the settings of NeuroChaT
@@ -1787,7 +1791,9 @@ and 'Listed Units'</dd>
 <dd>Modes and their IDs</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_all_modes(self):
     &#34;&#34;&#34;
     Returns the analysis modes in NeuroChaT
@@ -1825,7 +1831,9 @@ for all the analyses are returned</p>
 <dd>True if selected, False if not.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_analysis(self, name=None):
     &#34;&#34;&#34;
     Returns the selection of an analysis. If name is &#39;all&#39;, selction values
@@ -1869,7 +1877,9 @@ for all the analyses are returned</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_analysis_list(self):
     &#34;&#34;&#34;
     Returns a list of analysis
@@ -1903,7 +1913,9 @@ for all the analyses are returned</p>
 <dd>ID of analysis mode</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_analysis_mode(self):
     &#34;&#34;&#34;
     Returns the mode of analysis and mode ID
@@ -1938,7 +1950,9 @@ for all the analyses are returned</p>
 <dd>Cell type set for analyses</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_cell_type(self):
     &#34;&#34;&#34;
     Returns the type of cell set to analyse
@@ -1973,7 +1987,9 @@ for all the analyses are returned</p>
 <dd>Name of the configuration file</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_config_dir(self):
     &#34;&#34;&#34;
     Returns the directory of configuration file
@@ -2008,7 +2024,9 @@ for all the analyses are returned</p>
 <dd>Name of configuration file</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_config_file(self):
     &#34;&#34;&#34;
     Returns the name of the configuration file
@@ -2043,7 +2061,9 @@ for all the analyses are returned</p>
 <dd>Data directory</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_data_dir(self):
     &#34;&#34;&#34;
     Returns the data directory
@@ -2078,7 +2098,9 @@ for all the analyses are returned</p>
 <dd>Data format or recording system</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_data_format(self):
     &#34;&#34;&#34;
     Returns the data format or recording system
@@ -2112,7 +2134,9 @@ for all the analyses are returned</p>
 <dd>Filename of the Excel list</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_excel_file(self):
     &#34;&#34;&#34;
     Returns the filename of the Excel list
@@ -2147,7 +2171,9 @@ for all the analyses are returned</p>
 <dd>Export format of output graphics</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_graphic_format(self):
     &#34;&#34;&#34;
     Returns output graphics file format
@@ -2181,7 +2207,9 @@ for all the analyses are returned</p>
 <dd>Filename of the lfp data</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_lfp_file(self):
     &#34;&#34;&#34;
     Returns the filename of the lfp data
@@ -2216,7 +2244,9 @@ for all the analyses are returned</p>
 <dd>Filename of the HDF5 data</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_nwb_file(self):
     &#34;&#34;&#34;
     Returns the filename of the HDF5 data
@@ -2251,7 +2281,9 @@ for all the analyses are returned</p>
 <dd>List of parameter names</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_param_list(self):
     &#34;&#34;&#34;
     Returns the list of all paramaeters
@@ -2287,7 +2319,9 @@ a list of values are returned.</p>
 <dd>Paramater value(s)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_params(self, name=None):
     &#34;&#34;&#34;
     Gets the value of parameter. If a list of parameter names are provided,
@@ -2340,7 +2374,9 @@ a list of values are returned.</p>
 <dd>Dictionary of parameters and their values</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_params_by_analysis(self, analysis=None):
     &#34;&#34;&#34;
     Returns the paramters and their values
@@ -2384,7 +2420,9 @@ a list of values are returned.</p>
 <dd>Filename of the spatial data</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_spatial_file(self):
     &#34;&#34;&#34;
     Returns the filename of the spatial data
@@ -2409,7 +2447,9 @@ a list of values are returned.</p>
 <dd>
 <section class="desc"></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_special_analysis(self):
     return self.special_analysis</code></pre>
 </details>
@@ -2430,7 +2470,9 @@ a list of values are returned.</p>
 <dd>Filename of spike data</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_spike_file(self):
     &#34;&#34;&#34;
     Returns the filename of the spike data
@@ -2465,7 +2507,9 @@ a list of values are returned.</p>
 <dd>Unit nmber</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_unit_no(self):
     &#34;&#34;&#34;
     Returns the unit number that is already set
@@ -2499,7 +2543,9 @@ a list of values are returned.</p>
 <dd>Name of the configuration file</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def load_config(self, filename=None):
     &#34;&#34;&#34;
     Imports the configuration data from a .ncfg file
@@ -2540,7 +2586,9 @@ a list of values are returned.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def save_config(self, filename=None):
     &#34;&#34;&#34;
     Exports the configuration data to .ncfg file
@@ -2583,7 +2631,9 @@ a list of values are returned.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_analysis(self, name=None, value=None):
     &#34;&#34;&#34;
     Sets the selection of an analysis
@@ -2630,7 +2680,9 @@ a list of values are returned.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_analysis_mode(self, analysis_mode=None):
     &#34;&#34;&#34;
     Sets the mode of analysis
@@ -2674,7 +2726,9 @@ a list of values are returned.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_cell_type(self, cell_type=None):
     &#34;&#34;&#34;
     Sets the type of cell to analyse
@@ -2709,7 +2763,9 @@ a list of values are returned.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_config_dir(self, directory=None):
     &#34;&#34;&#34;
     Sets the directory of configuration file
@@ -2747,7 +2803,9 @@ a list of values are returned.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_config_file(self, filename):
     &#34;&#34;&#34;
     Sets the name of the configuration file
@@ -2782,7 +2840,9 @@ a list of values are returned.</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_data_dir(self, directory=None):
     &#34;&#34;&#34;
     Sets the data directory
@@ -2820,7 +2880,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_data_format(self, file_format=None):
     &#34;&#34;&#34;
     Sets the format of the data or recording system
@@ -2856,7 +2918,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_excel_file(self, excel_file=None):
     &#34;&#34;&#34;
     Sets filename of the Excel list
@@ -2894,7 +2958,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_graphic_format(self, graphic_format=None):
     &#34;&#34;&#34;
     Sets output graphics file format
@@ -2934,7 +3000,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_lfp_file(self, lfp_file=None):
     &#34;&#34;&#34;
     Sets filename of the lfp data
@@ -2970,7 +3038,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_nwb_file(self, nwb_file=None):
     &#34;&#34;&#34;
     Sets filename of the HDF5 data
@@ -3008,7 +3078,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_param(self, name=None, value=None):
     &#34;&#34;&#34;
     Sets the value of a parameter
@@ -3048,7 +3120,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_spatial_file(self, spatial_file=None):
     &#34;&#34;&#34;
     Sets filename of the spatial data
@@ -3073,7 +3147,9 @@ Format of the data or recording system</p>
 <dd>
 <section class="desc"></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_special_analysis(self, in_dict={}):
     self.special_analysis = in_dict</code></pre>
 </details>
@@ -3094,7 +3170,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_spike_file(self, spike_file=None):
     &#34;&#34;&#34;
     Sets filename of the spike data
@@ -3130,7 +3208,9 @@ Format of the data or recording system</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_unit_no(self, unit_no=None):
     &#34;&#34;&#34;
     Sets the unit no to analyse in &#39;Single Unit&#39; analysis
@@ -3217,7 +3297,7 @@ Format of the data or recording system</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

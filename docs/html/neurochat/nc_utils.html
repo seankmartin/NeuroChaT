@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>neurochat.nc_utils API documentation</title>
 <meta name="description" content="This module implements utility functions and classes for NeuroChaT software …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
@@ -23,7 +23,9 @@
 <p>This module implements utility functions and classes for NeuroChaT software</p>
 <p>@author: Md Nurul Islam; islammn at tcd dot ie</p>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
 This module implements utility functions and classes for NeuroChaT software
@@ -1223,7 +1225,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>The angle in degrees</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def angle_between_points(a, b, c):
     &#34;&#34;&#34;
     Returns the angle between the lines ab and bc, &lt;abc
@@ -1276,7 +1280,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>Bhattacharyya coefficient and Bhattacharyya distance</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def bhatt(X1, X2):
     &#34;&#34;&#34;
     Calculates Bhattacharyya coefficient and Bhattacharyya distance between two distributions
@@ -1334,7 +1340,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>Filtered signal</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def butter_filter(x, Fs, *args):
     &#34;&#34;&#34;
     Filtering function using bidirectional zero-phase shift Butterworth filter.
@@ -1427,7 +1435,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>Co-ordinate of the centre of mass</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def centre_of_mass(co_ords, weights, axis=0):
     &#34;&#34;&#34;
     Calculates the co-ordinate centre of mass for a system of particles with co ords and weights
@@ -1484,7 +1494,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>Chopped firing map</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def chop_edges(x, xlen, ylen):
     &#34;&#34;&#34;
     Chope the edges of a firing rate map if they are not visited at ll or with zero firing rate
@@ -1578,7 +1590,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>Correlation coefficient of input arrays</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def corr_coeff(x1, x2):
     &#34;&#34;&#34;
     Correlation coefficient between two numeric series or two signals.
@@ -1608,7 +1622,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>
 <section class="desc"><p>Calculate the rms of a in windows of N data points.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def distinct_window_rms(a, N):
     &#34;&#34;&#34;
     Calculate the rms of a in windows of N data points.
@@ -1651,7 +1667,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>Minima indices</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def extrema(x, mincap=None, maxcap=None):
     &#34;&#34;&#34;
     Finds the extrema in a numeric array or a signal
@@ -1730,7 +1748,9 @@ def remove_extension(filename, keep_dot=True, return_ext=False):
 <dd>FFt frequency</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def fft_psd(x, Fs, nfft=None, side=&#39;one&#39;, ptype=&#39;psd&#39;):
     &#34;&#34;&#34;
     Calculates the Fast Fourier Transform (FFT) of a signal.
@@ -1804,7 +1824,9 @@ are returned. If 'last', last n entrues are returned.</dd>
 <dd>Indices of non-zero entries.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def find(X, n=None, direction=&#39;all&#39;):
     &#34;&#34;&#34;
     Finds the non-zero entries of a signal or array.
@@ -1860,7 +1882,9 @@ are returned. If 'last', last n entrues are returned.</dd>
 <dd>y-indices of non-zero entries.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def find2d(X, n=None):
     &#34;&#34;&#34;
     Finds the non-zero entries of a matrix.
@@ -1915,7 +1939,9 @@ are returned. If 'last', last n entrues are returned.</dd>
 <dd>Indices of non-zero chunks</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def find_chunk(x):
     &#34;&#34;&#34;
     Finds size and indeices of chunks of non-zero segments in an array
@@ -1970,7 +1996,9 @@ thresh : float
 Don't consider any peaks with a value below this, default 0</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def find_peaks(data, **kwargs):
     &#34;&#34;&#34;
     Returns the peaks in the data based on gradient calculations
@@ -2025,7 +2053,9 @@ values from arr, arr is assumed to be a sorted list</p>
 <dd>A list of tuples, ranges in arr where truth values are truth_arr</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     &#34;&#34;&#34;
     Returns a list of ranges where truth values occur and the corresponding
@@ -2096,7 +2126,9 @@ values from arr, arr is assumed to be a sorted list</p>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def get_all_files_in_dir(
         in_dir, ext=None, return_absolute=True, 
         recursive=False, verbose=False, re_filter=None, 
@@ -2194,7 +2226,9 @@ values from arr, arr is assumed to be a sorted list</p>
 <dd>A list of colours as rgb tuples with values in 0 to 1</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">@static_vars(colorcells=[])
 def get_axona_colours(index=None):
     &#34;&#34;&#34;
@@ -2272,7 +2306,9 @@ def get_axona_colours(index=None):
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def has_ext(filename, ext, case_sensitive_ext=False):
     &#34;&#34;&#34;
     Check if the filename ends in the extension
@@ -2317,7 +2353,9 @@ def get_axona_colours(index=None):
 <dd>Calculated Hellinger distance</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hellinger(X1, X2):
     &#34;&#34;&#34;
     Calculates Hellinger distance between two distributions.
@@ -2360,7 +2398,9 @@ def get_axona_colours(index=None):
 <dd>Histogram bins(lowers edges)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def histogram(x, bins):    
     &#34;&#34;&#34;
     Calculates the histogram count of input array
@@ -2412,7 +2452,9 @@ def get_axona_colours(index=None):
 <dd>Histogram bins in y-axis (lowers edges)</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def histogram2d(y, x, ybins, xbins):
     &#34;&#34;&#34;
     Calculates the joint histogram count of two arrays
@@ -2468,7 +2510,9 @@ def get_axona_colours(index=None):
 <dd>Dictionary with results of least-square optimization of linear regression</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def linfit(X, Y, getPartial=False):
     &#34;&#34;&#34;
     Calculates the linear regression coefficients in least-square sense.
@@ -2534,7 +2578,9 @@ def get_axona_colours(index=None):
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def log_exception(ex, more_info=&#34;&#34;):
     &#34;&#34;&#34;
     Log an expection and additional info
@@ -2563,7 +2609,9 @@ def get_axona_colours(index=None):
 <dd>
 <section class="desc"><p>Makes directory structure for given location</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def make_dir_if_not_exists(location):
     &#34;&#34;&#34;Makes directory structure for given location&#34;&#34;&#34;
     os.makedirs(os.path.dirname(location), exist_ok=True)</code></pre>
@@ -2593,7 +2641,9 @@ def get_axona_colours(index=None):
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def nxl_write(
     file_name, data_frame, sheet_name=&#39;Sheet1&#39;, startRow=0, startColumn=0):
     &#34;&#34;&#34;
@@ -2631,7 +2681,9 @@ def get_axona_colours(index=None):
 <dd>
 <section class="desc"></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def remove_extension(filename, keep_dot=True, return_ext=False):
     modifier = 0 if keep_dot else 1
     ext = filename.split(&#34;.&#34;)[-1]
@@ -2663,7 +2715,9 @@ and fitted values from a model</p>
 <dd>Dictionary of residual statistics</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def residual_stat(y, y_fit, p):
     &#34;&#34;&#34;
     Calculates the goodness of fit and other residual statistics between observed
@@ -2718,7 +2772,9 @@ and fitted values from a model</p>
 <dd>Rotated matrix</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def rot_2d(x, theta):
     &#34;&#34;&#34;
     Rotates a firing map by a specified angle
@@ -2762,7 +2818,9 @@ and '1' for along-row filtering.</dd>
 <dd>Filtered data</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def smooth_1d(x, filttype=&#39;b&#39;, filtsize=5, **kwargs):
     &#34;&#34;&#34;
     Filters a 1D array or signal.
@@ -2827,7 +2885,9 @@ and '1' for along-row filtering.</dd>
 <dd>Filtered matrix</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def smooth_2d(x, filttype=&#39;b&#39;, filtsize=5):
     &#34;&#34;&#34;
     Filters a 2D array or signal.
@@ -2871,7 +2931,9 @@ and '1' for along-row filtering.</dd>
 <dd>
 <section class="desc"></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def static_vars(**kwargs):
     def decorate(func):
         for k in kwargs:
@@ -2890,7 +2952,9 @@ and '1' for along-row filtering.</dd>
 mode valid will have no border effects
 mode same will produce a value for each input</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def window_rms(a, window_size, mode=&#34;same&#34;):
     &#34;&#34;&#34;
     Calculate the rms envelope, similar to matlab.  
@@ -2918,7 +2982,9 @@ It formats the incoming message in HTML and sends it to the log interface of Neu
 <p>Initializes the instance - basically setting the formatter to None
 and the filter list to empty.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">class NLog(logging.Handler):
     &#34;&#34;&#34;
     Class for handling log information (messages, errors and warnings) for NeuroChaT.
@@ -2996,7 +3062,9 @@ and the filter list to empty.</p></section>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def emit(self, record):
     &#34;&#34;&#34;
     Formats the incoming record and 
@@ -3035,7 +3103,9 @@ and the filter list to empty.</p></section>
 <dd>&nbsp;</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def setup(self):
     &#34;&#34;&#34;
     Removes all the logging handlers and sets up a new logger with HTML formatting.
@@ -3065,12 +3135,14 @@ and the filter list to empty.</p></section>
 </dd>
 <dt id="neurochat.nc_utils.Singleton"><code class="flex name class">
 <span>class <span class="ident">Singleton</span></span>
-<span>(</span><span>*args, **kwargs)</span>
+<span>(</span><span>*arg, **kwarg)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Creates a Singleton object created from a subclass of this class</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">class Singleton(object):
     &#34;&#34;&#34;
     Creates a Singleton object created from a subclass of this class
@@ -3150,7 +3222,7 @@ and the filter list to empty.</p></section>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

@@ -122,15 +122,15 @@ def place_cell_summary(
             data_idx, unit_idx = collection._index_to_data_pos(i)
             filename = collection.get_file_dict()["Spike"][data_idx][0]
             unit_number = collection.get_units(data_idx)[unit_idx]
-            print("Working on {} unit {} out of {}".format(
+            logging.info("Working on {} unit {} out of {}".format(
                 filename, unit_number, len(
-                    collection.get_units(data_idx)) - 1))
+                    collection.get_units(data_idx))))
 
             count = data.spike.get_unit_spikes_count()
             # Skip very low count cells
             if count < 5:
                 skipped += 1
-                print("Skipping as only {} spikes".format(count))
+                logging.warning("Skipping as only {} spikes".format(count))
             else:
                 duration = data.spike.get_duration()
                 good = True
@@ -141,7 +141,7 @@ def place_cell_summary(
                 # Schoenenberger et al, 2016
                 if filter_low_freq:
                     if (count / duration) < 0.25 or (count / duration) > 7:
-                        print("Reject spike frequency {}".format(
+                        logging.info("Reject spike frequency {}".format(
                             count / duration))
                         good = False
 
@@ -155,7 +155,7 @@ def place_cell_summary(
                         good = False
                         first_str_part = "Reject "
 
-                    print((
+                    logging.info((
                         first_str_part +
                         "Skaggs {:2f}, " +
                         "Sparsity {:2f}, " +
@@ -200,7 +200,6 @@ def place_cell_summary(
                     bad_isidata = []
                     bad_units = []
                     skipped = 0
-                    print("ERROR: Found too many units in the collection")
                     raise Exception(
                         "Accumlated more units than possible " +
                         "bad {} good {} total {}".format(
@@ -244,11 +243,12 @@ def place_cell_summary(
                 if save_data:
                     try:
                         spike_name = os.path.basename(filename)
-                        parts = spike_name.split(".")
+                        final_bname, final_ext = os.path.splitext(spike_name)
+                        final_ext = final_ext[1:]
                         f_dir = os.path.dirname(filename)
 
                         data_basename = (
-                            parts[0] + "_" + parts[1] + "_" +
+                            final_bname + "_" + final_ext + "_" +
                             str(unit_number) + opt_end + ".csv")
                         if base_dir is not None:
                             main_dir = base_dir
@@ -275,15 +275,18 @@ def place_cell_summary(
             if unit_idx == len(collection.get_units(data_idx)) - 1:
                 if ((len(bad_units) + len(good_units)) !=
                         len(collection.get_units(data_idx)) - skipped):
-                    print("ERROR: Did not cover all units in the collection")
-                    print("Good {}, Bad {}, Total {}".format(
-                        bad_units, good_units, collection.get_units(data_idx)))
+                    raise ValueError(
+                        "Did not cover all units in the collection")
+                logging.info("Good {}, Bad {}, Total {}".format(
+                    bad_units, good_units, collection.get_units(data_idx)))
                 spike_name = os.path.basename(filename)
-                parts = spike_name.split(".")
+                final_bname, final_ext = os.path.splitext(spike_name)
+                final_ext = final_ext[1:]
                 f_dir = os.path.dirname(filename)
 
                 out_basename = (
-                    parts[0] + "_" + parts[1] + opt_end + "." + output_format)
+                    final_bname + "_" + final_ext +
+                    opt_end + "." + output_format)
 
                 if base_dir is not None:
                     main_dir = base_dir
@@ -311,12 +314,12 @@ def place_cell_summary(
 
                 if len(named_units) > 0:
                     if filter_place_cells:
-                        print((
+                        logging.info((
                             "Plotting summary for {} " +
                             "spatial units {}").format(
                             spike_name, named_units))
                     else:
-                        print((
+                        logging.info((
                             "Plotting summary for {} " +
                             "units {}").format(
                             spike_name, named_units))
@@ -345,7 +348,7 @@ def place_cell_summary(
                                 out_name = os.path.join(
                                     main_dir, out_dirname, iname)
 
-                            print("Saving place cell figure to {}".format(
+                            logging.info("Saving place cell figure to {}".format(
                                 out_name))
                             make_dir_if_not_exists(out_name)
                             f.savefig(out_name, dpi=dpi, format=output_format)
@@ -357,7 +360,7 @@ def place_cell_summary(
                         else:
                             out_name = os.path.join(
                                 main_dir, out_dirname, out_basename)
-                        print("Saving place cell figure to {}".format(
+                        logging.info("Saving place cell figure to {}".format(
                             out_name))
                         make_dir_if_not_exists(out_name)
                         fig.savefig(out_name, dpi=dpi, format=output_format)
@@ -366,7 +369,7 @@ def place_cell_summary(
                     gc.collect()
 
                 if len(bad_named_units) > 0:
-                    print((
+                    logging.info((
                         "Plotting bad summary for {} " +
                         "non-spatial units {}").format(
                         spike_name, bad_named_units))
@@ -390,7 +393,7 @@ def place_cell_summary(
                             out_name = os.path.join(
                                 main_dir, out_dirname, "bad", iname)
 
-                            print("Saving place cell figure to {}".format(
+                            logging.info("Saving place cell figure to {}".format(
                                 out_name))
                             make_dir_if_not_exists(out_name)
                             f.savefig(out_name, dpi=dpi,
@@ -399,7 +402,7 @@ def place_cell_summary(
                     else:
                         out_name = os.path.join(
                             main_dir, out_dirname, "bad", out_basename)
-                        print("Saving place cell figure to {}".format(
+                        logging.info("Saving place cell figure to {}".format(
                             out_name))
                         make_dir_if_not_exists(out_name)
                         fig.savefig(out_name, dpi=dpi,

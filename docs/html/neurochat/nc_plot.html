@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.6.3" />
+<meta name="generator" content="pdoc 0.7.5" />
 <title>neurochat.nc_plot API documentation</title>
 <meta name="description" content="This module implements plotting functions for NeuroChaT analyses …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
@@ -23,7 +23,9 @@
 <p>This module implements plotting functions for NeuroChaT analyses.</p>
 <p>@author: Md Nurul Islam; islammn at tcd dot ie</p>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
 This module implements plotting functions for NeuroChaT analyses.
@@ -2372,7 +2374,9 @@ def print_place_cells(
 <dd>Scatter plot of angular velocity vs spike-rate superimposed with fitted rate</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def angular_velocity(angVel_data):
     &#34;&#34;&#34;
     Plots the angular head velocity of the animal vs spike rate
@@ -2430,7 +2434,9 @@ def print_place_cells(
 <dd>Mean distance distance from border vs firing-rate percentage</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def border(border_data):
     &#34;&#34;&#34;
     Plots the analysis replay_data from border analysis
@@ -2503,7 +2509,9 @@ def print_place_cells(
 <dd>Distance from border vs spike rate</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def dist_rate(dist_data):
     &#34;&#34;&#34;
     Plots the firing rate vs distance from border
@@ -2556,7 +2564,9 @@ def print_place_cells(
 <dd>Mean distance distance from border vs firing-rate percentage</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def gradient(gradient_data):
     &#34;&#34;&#34;
     Plots the replay_data from gradient cell analysis
@@ -2611,7 +2621,9 @@ def print_place_cells(
 <dd>Rotational correlation of autocorrelation map</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def grid(grid_data):
     &#34;&#34;&#34;
     Plots the replay_data from grid analysis
@@ -2691,7 +2703,9 @@ def print_place_cells(
 <dd>Polar plot of head-direction vs spike-rate. Predicted firing rate is also plotted.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_firing(hd_data):
     &#34;&#34;&#34;
     Plots the analysis of head directional correlation to spike-rate
@@ -2738,7 +2752,9 @@ def print_place_cells(
 <dd>Axes of the polar plot of head-direction vs spike-rate.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_rate(hd_data, ax=None, **kwargs):
     &#34;&#34;&#34;
     Plot head direction vs spike rate.
@@ -2791,7 +2807,9 @@ clockwise and counterclockwise
 head movements</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_rate_ccw(hd_data):
     &#34;&#34;&#34;
     Plots the analysis replay_data of head directional correlation to spike-rate
@@ -2841,7 +2859,9 @@ head movements</dd>
 head-direction vs spike-rate.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_rate_pred(hd_data, ax=None, **kwargs):
     &#34;&#34;&#34;
     Plot predicted and actual head direction from the positional data.
@@ -2892,7 +2912,9 @@ head-direction vs spike-rate.</dd>
 <dd>Time-lapsed head-drectional firing rate plot</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_rate_time_lapse(hd_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of head directional time-lapse analysis
@@ -2950,7 +2972,9 @@ head-direction vs spike-rate.</dd>
 <dd>Distribution of Von Mises concentration parameter Kapppa</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_shuffle(hd_shuffle_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of head directional shuffling analysis
@@ -3016,7 +3040,9 @@ head-direction vs spike-rate.</dd>
 <dd>Axis of the polar plot of head-direction during spiking events.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_spike(hd_data, ax=None):
     &#34;&#34;&#34;
     Plots the head-direction of the animal at the time of spiking-events in polar scatter plot.
@@ -3063,7 +3089,9 @@ head-direction vs spike-rate.</dd>
 <dd>Time-lapsed spike-plots</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_spike_time_lapse(hd_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of head directional time-lapse analysis
@@ -3123,7 +3151,9 @@ head-direction vs spike-rate.</dd>
 <dd>Skaggs information content of head directional firing in shifted time of spiking events</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def hd_time_shift(hd_shift_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of head directional time-shift analysis
@@ -3195,7 +3225,9 @@ vs interval-after.</p>
 <dd>2D histogram of the ISI-before vs ISI-after in log-log scale</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def isi(isi_data, axes=[None, None, None], **kwargs):
     &#34;&#34;&#34;
     Plots Interspike interval histogram and scatter plots of interval-before
@@ -3309,7 +3341,9 @@ title : str</p>
 <dd>ISI correlation histogram</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def isi_corr(isi_corr_data, ax=None, **kwargs):
     &#34;&#34;&#34;
     Plots ISI correlation.
@@ -3382,7 +3416,9 @@ title : str</p>
 <dd>The figure plotted to, or None if an axes is provided</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def largest_waveform(wave_data, ax=None):
     &#34;&#34;&#34;
     Plot the largest waveform in electrode groups.
@@ -3434,7 +3470,9 @@ Dashed - A thicker dashed line</dd>
 <dd>Line plot of LFP spectrum using Welch's method</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def lfp_spectrum(plot_data, ax=None, color=None, style=&#34;Solid&#34;):
     &#34;&#34;&#34;
     Plots LFP spectrum analysis data
@@ -3500,7 +3538,9 @@ Dashed - A thicker dashed line</dd>
 <dd>3D plot of short-term FFT of the LFP signal</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def lfp_spectrum_tr(plot_data, ax=None):
     &#34;&#34;&#34;
     Plots time-resolved LFP spectrum analysis data
@@ -3551,7 +3591,9 @@ Dashed - A thicker dashed line</dd>
 <dd>Spatial correlation map</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_auto_corr(locAuto_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of locational firing rate autocorrelation
@@ -3613,7 +3655,9 @@ Dashed - A thicker dashed line</dd>
 <dd>Spike-plot and firing rate map in two subplots respectively</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_firing(place_data, **kwargs):
     &#34;&#34;&#34;
     Plots the analysis replay_data of locational correlation to spike-rate
@@ -3660,7 +3704,9 @@ with a place map</p>
 <dd>Spike-plot and firing rate map and place field in three subplots respectively</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_firing_and_place(place_data, smooth=True, **kwargs):
     &#34;&#34;&#34;
     Plots the analysis of locational correlation to spike-rate
@@ -3717,7 +3763,9 @@ along with the centroid of the place field.</p>
 <dd>Spike-plot and firing rate map in two subplots respectively</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_place_centroid(place_data, centroid):
     &#34;&#34;&#34;
     Plots the analysis replay_data of locational correlation to spike-rate
@@ -3769,7 +3817,9 @@ along with the centroid of the place field.</p>
 <dd>Axis of the spike-plot</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_place_field(place_data, ax=None):
     &#34;&#34;&#34;
     Plots the location of the place field(s) of the unit.
@@ -3843,7 +3893,9 @@ Returns</p>
 <dd>Axis of the firing rate map</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     &#34;&#34;&#34;
     Plots location vs spike rate
@@ -3970,7 +4022,9 @@ Returns</p>
 <dd>Time-lapsed firing-rate map</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_rate_time_lapse(place_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of locational time-lapse analysis
@@ -4027,7 +4081,9 @@ Returns</p>
 <dd>Distribution of Skaggs IC, sparsity and spatial coherecne in three subplots</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_shuffle(loc_shuffle_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of locational shuffling analysis
@@ -4107,7 +4163,9 @@ Returns</p>
 <dd>Axis of the spike-plot</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_spike(place_data, ax=None, **kwargs):
     &#34;&#34;&#34;
     Plots the location of spiking-events (spike-plot) along with the trace of animal in the enviroment.
@@ -4166,7 +4224,9 @@ Returns</p>
 <dd>Time-lapsed spike-plots</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_spike_time_lapse(place_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of locational time-lapse analysis
@@ -4226,7 +4286,9 @@ Returns</p>
 <dd>Coherence of locational firing in shifted time of spiking events</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def loc_time_shift(loc_shift_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of locational time-shift analysis
@@ -4305,7 +4367,9 @@ Returns</p>
 <dd>Bar plot of multiple regression replay_data</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def multiple_regression(mra_data):
     &#34;&#34;&#34;
     Plots the replay_data of multiple regression analysis.
@@ -4359,7 +4423,9 @@ Returns</p>
 <dd>The angle between the points</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def plot_angle_between_points(points, xlim, ylim, ax=None):
     &#34;&#34;&#34;
     Plots the angle between three points
@@ -4434,7 +4500,9 @@ Returns</p>
 spike-field coherence and PLV in four subplots</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def plv(plv_data):
     &#34;&#34;&#34;
     Plots the analysis replay_data of Phase-locking value (PLV)
@@ -4520,7 +4588,9 @@ spike-field coherence and PLV in four subplots</dd>
 <dd>Plot of SFC</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def plv_bs(plv_data):
     &#34;&#34;&#34;
     Plots the analysis replay_data of bootstrapped Phase-locking value (PLV)
@@ -4632,7 +4702,9 @@ spike-field coherence and PLV in four subplots</dd>
 <dd>Plot of SFC</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def plv_tr(plv_data):
     &#34;&#34;&#34;
     Plots the analysis replay_data of time-resolved Phase-locking value (PLV)
@@ -4696,7 +4768,9 @@ spike-field coherence and PLV in four subplots</dd>
 <dd>
 <section class="desc"></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def print_place_cells(
         rows, cols=7, size_multiplier=4, wspace=0.3, hspace=0.3,
         placedata=None, wavedata=None, graphdata=None, isidata=None,
@@ -4826,7 +4900,9 @@ spike-field coherence and PLV in four subplots</dd>
 <dd>Rotational correlation plot</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def rot_corr(plot_data):
     &#34;&#34;&#34;
     Plots the analysis outcome of rotational correlation of spatial autocorrelation map.
@@ -4869,7 +4945,9 @@ Additional keyword arguments are
 passed on to matplotlib's "plot" command. Returns the matplotlib figure
 object containg the subplot grid.</p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def scatterplot_matrix(_data, names=[], **kwargs):
     &#34;&#34;&#34;Plots a scatterplot matrix of subplots.  Each row of &#34;_data&#34; is plotted
     against other rows, resulting in a nrows by nrows grid of subplots with the
@@ -4931,7 +5009,9 @@ backend of Matplotlib</p>
 <h2 id="see-also">See also</h2>
 <p><code>matplotlib.pyplot.switch_backend()</code></p></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def set_backend(backend):
     &#34;&#34;&#34;
     Sets the  backend of Matplotlib
@@ -4971,7 +5051,9 @@ backend of Matplotlib</p>
 <dd>Scatter plot of speed vs spike-rate superimposed with fitted rate</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def speed(speed_data):
     &#34;&#34;&#34;
     Plots the speed of the animal vs spike rate
@@ -5024,7 +5106,9 @@ backend of Matplotlib</p>
 <dd>Phase-raster in one subplot, phase histogram in another</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def spike_phase(phase_data):
     &#34;&#34;&#34;
     Plots the analysis replay_data of spike-LFP phase locking
@@ -5122,7 +5206,9 @@ A set of keyword arguments to change graph appearance</p>
 <dd>The spike raster</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def spike_raster(events, xlim=None, colors=[0, 0, 0], ax=None, **kwargs):
     &#34;&#34;&#34;
     Plots the spike raster for a number of units
@@ -5199,7 +5285,9 @@ A set of keyword arguments to change graph appearance</p>
 <dd>Mean distance distance from border vs firing-rate percentage</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def stair_plot(dist_data):
     &#34;&#34;&#34;
     Plots the stairs of mean distance vs firing-rate bands
@@ -5254,7 +5342,9 @@ title : str</p>
 <dd>ISI correlation histogram superimposed with fitted sinusoidal curve.</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def theta_cell(plot_data, ax=None, **kwargs):
     &#34;&#34;&#34;
     Plots theta-modulated cell and theta-skipping cell analysis data
@@ -5295,7 +5385,9 @@ title : str</p>
 <dd>Matlab figure object</dd>
 </dl></section>
 <details class="source">
-<summary>Source code</summary>
+<summary>
+<span>Expand source code</span>
+</summary>
 <pre><code class="python">def wave_property(wave_data, plots=[2, 2]):
     &#34;&#34;&#34;
     Plots mean +/-std of waveforms in electrode groups
@@ -5397,7 +5489,7 @@ title : str</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

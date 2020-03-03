@@ -1,6 +1,6 @@
 # NeuroChaT
 
-NeuroChaT is an open-source neuron characterisation toolbox.
+NeuroChaT is an open-source neuron characterisation toolbox. It is described in our paper on [Wellcome Open Research](https://wellcomeopenresearch.org/articles/4-196)
 
 ## Author Contributions
 
@@ -48,6 +48,15 @@ python neurochat_gui\neurochat_ui.py
 ```
 
 This method only allows the GUI program to function, any other file will need to modify the python path to use neurochat.
+
+## Getting Started
+
+The best ways to get started with NeuroChaT are:
+
+1. For using the UI, download the [executable file for Windows](https://github.com/seankmartin/NeuroChaT/releases/tag/v1.1.0) and check out the [user manual](https://github.com/seankmartin/NeuroChaT/blob/master/docs/NeuroChaT%20User%20Guide.pdf).
+2. For using the Python Code, checkout the nice [notebook](https://github.com/seankmartin/NeuroChaT/blob/master/notebooks/api_use_guide.ipynb) made by Md Nurul Islam, a [repository](https://github.com/seankmartin/NeuroChaT_API_Scripts) containing a set of scripts using NeuroChat by Sean Martin, and [examples](https://github.com/seankmartin/NeuroChaT/tree/master/examples) in this repository.
+
+We are open to collaborators, questions, etc. so feel free to get in touch!
 
 ## Documentation
 
