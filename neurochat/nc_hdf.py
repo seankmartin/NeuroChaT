@@ -212,16 +212,18 @@ class Nhdf(object):
         if system == 'NWB':
             hdf_name = file_name.split('+')[0]
         if os.path.exists(file_name):
-            words = file_name.split(os.sep)
-            f_path = os.sep.join(words[0:-1])
-            f_name = words[-1]
+            f_path, f_name = os.path.split(file_name)
             if system == 'Axona':
                 if data_type == 'spike' or data_type == 'lfp':
-                    hdf_name = os.sep.join([f_path, f_name.split('.')[0]+'.hdf5'])
+                    hdf_name = os.sep.join(
+                        [f_path, os.path.splitext(f_name)[0] + '.hdf5'])
                 elif data_type == 'spatial':
-                    hdf_name = os.sep.join([f_path, '_'.join(f_name.split('.')[0].split('_')[:-1])+'.hdf5'])
+                    hdf_name = os.sep.join(
+                        [f_path,
+                         '_'.join(os.path.splitext(f_name)[0].split('_')[:-1]) + '.hdf5'])
             elif system == 'Neuralynx':
-                hdf_name = os.sep.join([f_path, f_path.split(os.sep)[-1]+'.hdf5'])
+                hdf_name = os.sep.join(
+                    [f_path, f_path.split(os.sep)[-1] + '.hdf5'])
 
         return hdf_name
 
@@ -287,7 +289,8 @@ class Nhdf(object):
             if system == 'NWB':
                 tag = f_name.split('+')[-1].split('/')[-1]
             else:
-                name, ext = os.path.basename(f_name).split('.')
+                name, ext = os.path.splitext(os.path.basename(f_name))
+                ext = ext[1:]
                 if system == 'Axona':
                     tag = ext
                 elif system == 'Neuralynx':

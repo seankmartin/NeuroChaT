@@ -1524,13 +1524,14 @@ class NSpike(NBase):
         None
         
         """
-        words = file_name.split(sep=os.sep)
-        file_directory = os.sep.join(words[0:-1])
-        file_tag = words[-1].split(sep='.')[0]
-        tet_no = words[-1].split(sep='.')[1]
-        set_file = file_directory + os.sep + file_tag + '.set'
-        cut_file = file_directory + os.sep + file_tag + '_' + tet_no + '.cut'
-        clu_file = file_directory + os.sep + file_tag + '.clu.' + tet_no
+        file_directory, file_basename = os.path.split(file_name)
+        file_tag, tet_no = os.path.splitext(file_basename)
+        tet_no = tet_no[1:]
+        set_file = os.path.join(file_directory, file_tag + '.set')
+        cut_file = os.path.join(
+            file_directory, file_tag + '_' + tet_no + '.cut')
+        clu_file = os.path.join(
+            file_directory, file_tag + '.clu.' + tet_no)
 
         self._set_data_source(file_name)
         self._set_source_format('Axona')

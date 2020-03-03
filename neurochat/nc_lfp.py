@@ -1372,10 +1372,10 @@ class NLfp(NBase):
         None
 
         """
-
-        words = file_name.split(sep=os.sep)
-        file_directory = os.sep.join(words[0:-1])
-        file_tag, file_extension = words[-1].split('.')
+        file_directory, file_basename = os.path.split(file_name)
+        file_tag, file_extension = os.path.splitext(file_basename)
+        file_extension = file_extension[1:]
+        set_file = os.path.join(file_directory, file_tag + '.set')
         set_file = file_directory + os.sep + file_tag + '.set'
 
         self._set_data_source(file_name)
@@ -1642,5 +1642,3 @@ class NLfp(NBase):
         per_removed = len(thr_locs)/len(samples)*100
         # print(len(thr_locs), len(thr_time))
         return mean, std, thr_locs, thr_vals, thr_time, per_removed
-
-

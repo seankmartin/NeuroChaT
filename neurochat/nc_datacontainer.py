@@ -250,8 +250,7 @@ class NDataContainer():
         """Set the list of units for the collection."""
         self._units = []
         if self.get_file_dict() == {}:
-            print("Error: Can't set units for empty collection")
-            return
+            raise ValueError("Can't set units for empty collection")
         if units == 'all':
             if self._load_on_fly:
                 vals = self.get_file_dict()["Spike"]
@@ -494,9 +493,15 @@ class NDataContainer():
                         stm_name = fname
                         break
 
+                if os.path.isfile(os.path.join(directory, cut_name)):
+                    cluster_name = cut_name
+                else:
+                    cluster_name = clu_name
+
                 logging.info(
-                    "Adding tetrode {} with clusters {}, positions {}".format(
+                    "Adding tetrode {} with spikes {}, clusters {}, positions {}".format(
                         tetrode, os.path.basename(spike_name),
+                        os.path.basename(cluster_name),
                         os.path.basename(pos_name))
                 )
                 num_found += 1
@@ -505,7 +510,7 @@ class NDataContainer():
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
                 self.add_files(NDataContainer.EFileType.STM, [stm_name])
         if num_found == 0:
-            print("Did not find any Axona files to add")
+            logging.warning("Did not find any Axona files to add")
             return
         self.set_units()
 
@@ -524,7 +529,8 @@ class NDataContainer():
             make_dir_if_not_exists(out_loc)
             with open(out_loc, 'w') as f:
                 f.write(str(self))
-            print("Wrote list of files considered to {}".format(out_loc))
+            logging.info(
+                "Wrote list of files considered to {}".format(out_loc))
             return out_loc
         return None
 
@@ -746,7 +752,8 @@ class NDataContainer():
                         print("Removed {} with {} units".format(
                             os.path.basename(name[0]), unit_count))
                 if self._unit_count.pop(i) != unit_count:
-                    print("Error in remove recording {}".format(name))
+                    raise ValueError(
+                        "Error in remove recording {}".format(name))
                 self._last_data_pt = (1, None)
                 self._units.pop(i)
                 if not self._load_on_fly:
@@ -792,10 +799,11 @@ class NDataContainer():
         filename = self.get_file_dict()["Spike"][data_idx][0]
         unit_number = self.get_units(data_idx)[unit_idx]
         spike_name = os.path.basename(filename)
-        parts = spike_name.split(".")
+        final_bname, final_ext = os.path.splitext(spike_name)
+        final_ext = final_ext[1:]
         f_dir = os.path.dirname(filename)
         data_basename = (
-            parts[0] + "_" + parts[1] + "_" +
+            final_bname + "_" + final_ext + "_" +
             str(unit_number) + opt_end + "." + ext)
         if base_dir is not None:
             main_dir = base_dir
