@@ -303,10 +303,10 @@ def place_cell_summary(
             if unit_idx == len(collection.get_units(data_idx)) - 1:
                 if ((len(bad_units) + len(good_units)) !=
                         len(collection.get_units(data_idx)) - skipped):
+                    logging.error(&#34;Good {}, Bad {}, Total {}&#34;.format(
+                        good_units, bad_units, collection.get_units(data_idx)))
                     raise ValueError(
                         &#34;Did not cover all units in the collection&#34;)
-                logging.info(&#34;Good {}, Bad {}, Total {}&#34;.format(
-                    bad_units, good_units, collection.get_units(data_idx)))
                 spike_name = os.path.basename(filename)
                 final_bname, final_ext = os.path.splitext(spike_name)
                 final_ext = final_ext[1:]
@@ -1365,10 +1365,10 @@ Input should be some subset and/or permutation of these</dd>
             if unit_idx == len(collection.get_units(data_idx)) - 1:
                 if ((len(bad_units) + len(good_units)) !=
                         len(collection.get_units(data_idx)) - skipped):
+                    logging.error(&#34;Good {}, Bad {}, Total {}&#34;.format(
+                        good_units, bad_units, collection.get_units(data_idx)))
                     raise ValueError(
                         &#34;Did not cover all units in the collection&#34;)
-                logging.info(&#34;Good {}, Bad {}, Total {}&#34;.format(
-                    bad_units, good_units, collection.get_units(data_idx)))
                 spike_name = os.path.basename(filename)
                 final_bname, final_ext = os.path.splitext(spike_name)
                 final_ext = final_ext[1:]

@@ -840,11 +840,12 @@ def hd_rate_pred(hd_data, ax=None, **kwargs):
         plt.figure()
         ax = plt.gca(polar=True)
 
-    hd_rate(hd_data, ax=ax, **kwargs)
     bins = np.append(hd_data['bins'], hd_data['bins'][0])
     predRate = np.append(
         hd_data['hdPred'], hd_data['hdPred'][0])
     ax.plot(np.radians(bins), predRate, color='green')
+    rate = np.append(hd_data['smoothRate'], hd_data['smoothRate'][0])
+    ax.plot(np.radians(bins), rate, color=BLUE)
     ax.set_rticks(
         [hd_data['hdRate'].max(), hd_data['hdPred'].max()])
 
@@ -927,8 +928,13 @@ def hd_rate_ccw(hd_data):
 
     fig1 = plt.figure()
     ax = plt.gca(polar=True)
-    ax.plot(np.radians(hd_data['bins']), hd_data['hdRateCW'], color=BLUE)
-    ax.plot(np.radians(hd_data['bins']), hd_data['hdRateCCW'], color=RED)
+    bins = np.append(hd_data['bins'], hd_data['bins'][0])
+    predRate = np.append(
+        hd_data['hdRateCW'], hd_data['hdRateCW'][0])
+    ax.plot(np.radians(bins), predRate, color=BLUE)
+    predRate = np.append(
+        hd_data['hdRateCCW'], hd_data['hdRateCCW'][0])
+    ax.plot(np.radians(bins), predRate, color=RED)
     ax.set_title('Counter/clockwise firing rate')
     ax.set_rticks([hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()])
 

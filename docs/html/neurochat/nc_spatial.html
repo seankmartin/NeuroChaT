@@ -1807,7 +1807,13 @@ class NSpatial(NAbstract):
                 tmap /= self.get_sampling_rate()
                 hdPred[i] = np.sum(fmap*tmap)/ tmap.sum()
 
-            graph_data[&#39;hdPred&#39;] = smooth_1d(hdPred, &#39;b&#39;, 5)
+            to_smooth_hd_pred = np.concatenate([
+                hdPred[len(hdPred) - extra_for_smooth:],
+                hdPred, 
+                hdPred[:extra_for_smooth]])
+            smoothRatePred = smooth_1d(to_smooth_hd_pred, filttype, filtsize)
+            smoothRatePred = smoothRatePred[2:len(smoothRatePred)-2]
+            graph_data[&#39;hdPred&#39;] = smoothRatePred
             self.update_result(_results)
 
         graph_data[&#39;hd&#39;] = direction
@@ -1869,13 +1875,28 @@ class NSpatial(NAbstract):
         tcount = tcount/ self.get_sampling_rate()
         spike_count = histogram(cwSpike_hd, edges)[0].astype(tcount.dtype)
         cwRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
-        cwRate = np.interp(binInterp, bins, smooth_1d(cwRate, filttype, filtsize))
+        extra_for_smooth = int(np.floor(filtsize / 2))
+        to_smooth_hd = np.concatenate([
+            cwRate[len(cwRate) - extra_for_smooth:],
+            cwRate,
+            cwRate[:extra_for_smooth]])
+        smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+        smoothRate = smoothRate[2:len(smoothRate) - 2]
+        smoothcwRate = smoothRate
+        cwRate = smoothcwRate
 
         tcount, ind, bins = histogram(ccw_dir, edges)
         tcount = tcount/ self.get_sampling_rate()
         spike_count = histogram(ccwSpike_hd, edges)[0].astype(tcount.dtype)
         ccwRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
-        ccwRate = np.interp(binInterp, bins, smooth_1d(ccwRate, filttype, filtsize))
+        to_smooth_hd = np.concatenate([
+            ccwRate[len(ccwRate) - extra_for_smooth:],
+            ccwRate, 
+            ccwRate[:extra_for_smooth]])
+        smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+        smoothRate = smoothRate[2:len(smoothRate)-2]
+        smoothccwRate = smoothRate
+        ccwRate = smoothccwRate
 
         if update:
             _results[&#39;HD Delta&#39;] = binInterp[np.argmax(ccwRate)]- binInterp[np.argmax(cwRate)]
@@ -1885,7 +1906,7 @@ class NSpatial(NAbstract):
             _results[&#39;HD Peak Rate CCW&#39;] = np.amax(ccwRate)
             self.update_result(_results)
 
-        graph_data[&#39;bins&#39;] = binInterp
+        graph_data[&#39;bins&#39;] = bins
         graph_data[&#39;hdRateCW&#39;] = cwRate
         graph_data[&#39;hdRateCCW&#39;] = ccwRate
 
@@ -4845,7 +4866,13 @@ activity of a unit.</p>
                 tmap /= self.get_sampling_rate()
                 hdPred[i] = np.sum(fmap*tmap)/ tmap.sum()
 
-            graph_data[&#39;hdPred&#39;] = smooth_1d(hdPred, &#39;b&#39;, 5)
+            to_smooth_hd_pred = np.concatenate([
+                hdPred[len(hdPred) - extra_for_smooth:],
+                hdPred, 
+                hdPred[:extra_for_smooth]])
+            smoothRatePred = smooth_1d(to_smooth_hd_pred, filttype, filtsize)
+            smoothRatePred = smoothRatePred[2:len(smoothRatePred)-2]
+            graph_data[&#39;hdPred&#39;] = smoothRatePred
             self.update_result(_results)
 
         graph_data[&#39;hd&#39;] = direction
@@ -4907,13 +4934,28 @@ activity of a unit.</p>
         tcount = tcount/ self.get_sampling_rate()
         spike_count = histogram(cwSpike_hd, edges)[0].astype(tcount.dtype)
         cwRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
-        cwRate = np.interp(binInterp, bins, smooth_1d(cwRate, filttype, filtsize))
+        extra_for_smooth = int(np.floor(filtsize / 2))
+        to_smooth_hd = np.concatenate([
+            cwRate[len(cwRate) - extra_for_smooth:],
+            cwRate,
+            cwRate[:extra_for_smooth]])
+        smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+        smoothRate = smoothRate[2:len(smoothRate) - 2]
+        smoothcwRate = smoothRate
+        cwRate = smoothcwRate
 
         tcount, ind, bins = histogram(ccw_dir, edges)
         tcount = tcount/ self.get_sampling_rate()
         spike_count = histogram(ccwSpike_hd, edges)[0].astype(tcount.dtype)
         ccwRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
-        ccwRate = np.interp(binInterp, bins, smooth_1d(ccwRate, filttype, filtsize))
+        to_smooth_hd = np.concatenate([
+            ccwRate[len(ccwRate) - extra_for_smooth:],
+            ccwRate, 
+            ccwRate[:extra_for_smooth]])
+        smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+        smoothRate = smoothRate[2:len(smoothRate)-2]
+        smoothccwRate = smoothRate
+        ccwRate = smoothccwRate
 
         if update:
             _results[&#39;HD Delta&#39;] = binInterp[np.argmax(ccwRate)]- binInterp[np.argmax(cwRate)]
@@ -4923,7 +4965,7 @@ activity of a unit.</p>
             _results[&#39;HD Peak Rate CCW&#39;] = np.amax(ccwRate)
             self.update_result(_results)
 
-        graph_data[&#39;bins&#39;] = binInterp
+        graph_data[&#39;bins&#39;] = bins
         graph_data[&#39;hdRateCW&#39;] = cwRate
         graph_data[&#39;hdRateCCW&#39;] = ccwRate
 
@@ -7805,7 +7847,13 @@ which shows the direction of the animal's head at each spike's occurring time.</
             tmap /= self.get_sampling_rate()
             hdPred[i] = np.sum(fmap*tmap)/ tmap.sum()
 
-        graph_data[&#39;hdPred&#39;] = smooth_1d(hdPred, &#39;b&#39;, 5)
+        to_smooth_hd_pred = np.concatenate([
+            hdPred[len(hdPred) - extra_for_smooth:],
+            hdPred, 
+            hdPred[:extra_for_smooth]])
+        smoothRatePred = smooth_1d(to_smooth_hd_pred, filttype, filtsize)
+        smoothRatePred = smoothRatePred[2:len(smoothRatePred)-2]
+        graph_data[&#39;hdPred&#39;] = smoothRatePred
         self.update_result(_results)
 
     graph_data[&#39;hd&#39;] = direction
@@ -7890,13 +7938,28 @@ head-directional movement.</p>
     tcount = tcount/ self.get_sampling_rate()
     spike_count = histogram(cwSpike_hd, edges)[0].astype(tcount.dtype)
     cwRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
-    cwRate = np.interp(binInterp, bins, smooth_1d(cwRate, filttype, filtsize))
+    extra_for_smooth = int(np.floor(filtsize / 2))
+    to_smooth_hd = np.concatenate([
+        cwRate[len(cwRate) - extra_for_smooth:],
+        cwRate,
+        cwRate[:extra_for_smooth]])
+    smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+    smoothRate = smoothRate[2:len(smoothRate) - 2]
+    smoothcwRate = smoothRate
+    cwRate = smoothcwRate
 
     tcount, ind, bins = histogram(ccw_dir, edges)
     tcount = tcount/ self.get_sampling_rate()
     spike_count = histogram(ccwSpike_hd, edges)[0].astype(tcount.dtype)
     ccwRate = np.divide(spike_count, tcount, out=np.zeros_like(spike_count), where=tcount != 0, casting=&#39;unsafe&#39;)
-    ccwRate = np.interp(binInterp, bins, smooth_1d(ccwRate, filttype, filtsize))
+    to_smooth_hd = np.concatenate([
+        ccwRate[len(ccwRate) - extra_for_smooth:],
+        ccwRate, 
+        ccwRate[:extra_for_smooth]])
+    smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
+    smoothRate = smoothRate[2:len(smoothRate)-2]
+    smoothccwRate = smoothRate
+    ccwRate = smoothccwRate
 
     if update:
         _results[&#39;HD Delta&#39;] = binInterp[np.argmax(ccwRate)]- binInterp[np.argmax(cwRate)]
@@ -7906,7 +7969,7 @@ head-directional movement.</p>
         _results[&#39;HD Peak Rate CCW&#39;] = np.amax(ccwRate)
         self.update_result(_results)
 
-    graph_data[&#39;bins&#39;] = binInterp
+    graph_data[&#39;bins&#39;] = bins
     graph_data[&#39;hdRateCW&#39;] = cwRate
     graph_data[&#39;hdRateCCW&#39;] = ccwRate
 
