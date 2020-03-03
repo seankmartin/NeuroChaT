@@ -277,8 +277,8 @@ def place_cell_summary(
                         len(collection.get_units(data_idx)) - skipped):
                     raise ValueError(
                         "Did not cover all units in the collection")
-                    logging.info("Good {}, Bad {}, Total {}".format(
-                        bad_units, good_units, collection.get_units(data_idx)))
+                logging.info("Good {}, Bad {}, Total {}".format(
+                    bad_units, good_units, collection.get_units(data_idx)))
                 spike_name = os.path.basename(filename)
                 final_bname, final_ext = os.path.splitext(spike_name)
                 final_ext = final_ext[1:]
