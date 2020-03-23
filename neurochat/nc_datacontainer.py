@@ -459,6 +459,7 @@ class NDataContainer():
             re_filter=re_filter, return_absolute=True)
 
         num_found = 0
+        cluster_files = []
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
@@ -498,6 +499,7 @@ class NDataContainer():
                 else:
                     cluster_name = clu_name
 
+                cluster_files.append(cluster_name)
                 logging.info(
                     "Adding tetrode {} with spikes {}, clusters {}, positions {}".format(
                         tetrode, os.path.basename(spike_name),
@@ -532,7 +534,7 @@ class NDataContainer():
             logging.info(
                 "Wrote list of files considered to {}".format(out_loc))
             return out_loc
-        return None
+        return cluster_files
 
     def merge(self, indices, force_equal_units=True):
         """
