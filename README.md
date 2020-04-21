@@ -1,6 +1,6 @@
 # NeuroChaT
 
-NeuroChaT is an open-source neuron characterisation toolbox. It is described in our paper on [Wellcome Open Research](https://wellcomeopenresearch.org/articles/4-196)
+NeuroChaT (RRID:SCR_018020) is an open-source neuron characterisation toolbox. It is described in our paper on [Wellcome Open Research](https://wellcomeopenresearch.org/articles/4-196).
 
 ## Author Contributions
 

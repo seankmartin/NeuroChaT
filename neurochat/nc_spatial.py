@@ -780,7 +780,7 @@ class NSpatial(NAbstract):
         if filename is None:
             filename = self._filename
         else:
-            filename = self._filename
+            self._filename = filename
         loader = getattr(self, 'load_spatial_'+ system)
         loader(filename)
         try:

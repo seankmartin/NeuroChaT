@@ -60,6 +60,7 @@ import scipy.stats as stats
 import scipy.signal as sg
 from scipy.fftpack import fft
 
+
 class NLfp(NBase):
     &#34;&#34;&#34;
     This data class is the placeholder for the dataset that contains information
@@ -162,7 +163,6 @@ class NLfp(NBase):
         &#34;&#34;&#34;
 
         return self._file_tag
-
 
     def get_timestamp(self):
         &#34;&#34;&#34;
@@ -498,20 +498,19 @@ class NLfp(NBase):
 
         &#34;&#34;&#34;
 
-        cls= kwargs.get(&#39;cls&#39;, None)
+        cls = kwargs.get(&#39;cls&#39;, None)
         if not inspect.isclass(cls):
             try:
                 data_type = spike.get_type()
                 if data_type == &#39;spike&#39;:
                     cls = spike.__class__
             except:
-                 logging.error(&#39;Data type cannot be determined!&#39;)
+                logging.error(&#39;Data type cannot be determined!&#39;)
         if inspect.isclass(cls):
-             new_spike = self._add_node(cls, spike, &#39;spike&#39;, **kwargs)
-             return new_spike
+            new_spike = self._add_node(cls, spike, &#39;spike&#39;, **kwargs)
+            return new_spike
         else:
             logging.error(&#39;Cannot add the spike data!&#39;)
-
 
     def load_spike(self, names=&#39;all&#39;):
         &#34;&#34;&#34;
@@ -528,7 +527,6 @@ class NLfp(NBase):
         None
 
         &#34;&#34;&#34;
-
 
         if names == &#39;all&#39;:
             for spike in self._spikes:
@@ -611,16 +609,16 @@ class NLfp(NBase):
             lfp = self.get_samples()
 
         window = kwargs.get(&#39;window&#39;, 1.0)
-        window = sg.get_window(&#39;hann&#39;, int(window*Fs)) if isinstance(window, float)\
-                or isinstance(window, int) else window
+        window = sg.get_window(&#39;hann&#39;, int(window * Fs)) if isinstance(window, float)\
+            or isinstance(window, int) else window
 
-        win_sec = np.ceil(window.size/Fs)
+        win_sec = np.ceil(window.size / Fs)
 
-        noverlap = kwargs.get(&#39;noverlap&#39;, 0.5*win_sec)
-        noverlap = noverlap if noverlap &lt; win_sec else 0.5*win_sec
-        noverlap = np.ceil(noverlap*Fs)
+        noverlap = kwargs.get(&#39;noverlap&#39;, 0.5 * win_sec)
+        noverlap = noverlap if noverlap &lt; win_sec else 0.5 * win_sec
+        noverlap = np.ceil(noverlap * Fs)
 
-        nfft = kwargs.get(&#39;nfft&#39;, 2*Fs)
+        nfft = kwargs.get(&#39;nfft&#39;, 2 * Fs)
         nfft = np.power(2, int(np.ceil(np.log2(nfft))))
 
         ptype = kwargs.get(&#39;ptype&#39;, &#39;psd&#39;)
@@ -629,7 +627,7 @@ class NLfp(NBase):
         prefilt = kwargs.get(&#39;prefilt&#39;, True)
         _filter = kwargs.get(&#39;filtset&#39;, [10, 1.5, 40, &#39;bandpass&#39;])
 
-        fmax = kwargs.get(&#39;fmax&#39;, Fs/2)
+        fmax = kwargs.get(&#39;fmax&#39;, Fs / 2)
 
         if prefilt:
             lfp = butter_filter(lfp, Fs, *_filter)
@@ -637,15 +635,15 @@ class NLfp(NBase):
         tr = kwargs.get(&#39;tr&#39;, False)
         db = kwargs.get(&#39;db&#39;, False)
         if tr:
-            f, t, Sxx = sg.spectrogram(lfp, fs=Fs, \
-                    window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
-                    detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
+            f, t, Sxx = sg.spectrogram(lfp, fs=Fs,
+                                       window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                                       detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
             graph_data[&#39;t&#39;] = t + self.get_timestamp()[0]
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
-                Sxx = 10*np.log10(Sxx/np.amax(Sxx))
+                Sxx = 10 * np.log10(Sxx / np.amax(Sxx))
                 Sxx = Sxx.flatten()
                 Sxx[find(Sxx &lt; -40)] = -40
                 Sxx = np.reshape(Sxx, [f.size, t.size])
@@ -654,14 +652,14 @@ class NLfp(NBase):
 #            graph_data[&#39;Sxx&#39;] = np.array([Sxx[i, :] for i in find(f&lt;= fmax)])
             graph_data[&#39;Sxx&#39;] = Sxx[find(f &lt;= fmax), :]
         else:
-            f, Pxx = sg.welch(lfp, fs=Fs, \
-                    window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
-                    detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
+            f, Pxx = sg.welch(lfp, fs=Fs,
+                              window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                              detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
-                Pxx = 10*np.log10(Pxx/Pxx.max())
+                Pxx = 10 * np.log10(Pxx / Pxx.max())
                 Pxx[find(Pxx &lt; -40)] = -40
             graph_data[&#39;Pxx&#39;] = Pxx[find(f &lt;= fmax)]
 
@@ -686,19 +684,19 @@ class NLfp(NBase):
 
         &#34;&#34;&#34;
 
-        _results= oDict()
+        _results = oDict()
         graph_data = oDict()
 
         cs = CircStat()
 
-        lfp = self.get_samples()*1000
+        lfp = self.get_samples() * 1000
         Fs = self.get_sampling_rate()
         time = self.get_timestamp()
 
         # Input parameters
-        bins = int(360/kwargs.get(&#39;binsize&#39;, 5))
-        rbinsize = kwargs.get(&#39;rbinsize&#39;, 2) # raster binsize
-        rbins = int(360/rbinsize)
+        bins = int(360 / kwargs.get(&#39;binsize&#39;, 5))
+        rbinsize = kwargs.get(&#39;rbinsize&#39;, 2)  # raster binsize
+        rbins = int(360 / rbinsize)
         fwin = kwargs.get(&#39;fwin&#39;, [6, 12])
         pratio = kwargs.get(&#39;pratio&#39;, 0.2)
         aratio = kwargs.get(&#39;aratio&#39;, 0.15)
@@ -709,7 +707,7 @@ class NLfp(NBase):
         _filter = [5, fmin, fmax, &#39;bandpass&#39;]
         _prefilt = kwargs.get(&#39;filtset&#39;, [10, 1.5, 40, &#39;bandpass&#39;])
 
-        b_lfp = butter_filter(lfp, Fs, *_filter) # band LFP
+        b_lfp = butter_filter(lfp, Fs, *_filter)  # band LFP
         lfp = butter_filter(lfp, Fs, *_prefilt)
 
     # Measure phase
@@ -723,7 +721,7 @@ class NLfp(NBase):
         ephase = np.interp(event_stamp, time, phase)
 
         p2p = np.abs(np.max(lfp) - np.min(lfp))
-        xline = 0.5* np.mean(mag) # cross line
+        xline = 0.5 * np.mean(mag)  # cross line
 
         # Detection algo
         # zero cross
@@ -731,31 +729,32 @@ class NLfp(NBase):
         mag2 = mag[1:-2]
         mag3 = mag[2:-1]
 
-        xind = np.union1d(find(np.logical_and(mag1 &lt; xline, mag2 &gt; xline)), \
-                find(np.logical_and(np.logical_and(mag1 &lt; xline, mag2 == xline), mag3 &gt; xline)))
+        xind = np.union1d(find(np.logical_and(mag1 &lt; xline, mag2 &gt; xline)),
+                          find(np.logical_and(np.logical_and(mag1 &lt; xline, mag2 == xline), mag3 &gt; xline)))
 
         # Ignore segments &lt;1/fmax
         i = 0
-        rcount = np.empty([0,])
+        rcount = np.empty([0, ])
         bcount = np.empty([0, 0])
 
-        phBins = np.arange(0, 360, 360/bins)
-        rbins = np.arange(0, 360, 360/rbins)
+        phBins = np.arange(0, 360, 360 / bins)
+        rbins = np.arange(0, 360, 360 / rbins)
 
         seg_count = 0
-        while i &lt; len(xind)-1:
-            k = i+1
-            while time[xind[k]]- time[xind[i]] &lt; 1/fmin and k &lt; len(xind)-1:
+        while i &lt; len(xind) - 1:
+            k = i + 1
+            while time[xind[k]] - time[xind[i]] &lt; 1 / fmin and k &lt; len(xind) - 1:
                 k += 1
 #            print(time[xind[i]], time[xind[k]])
             s_lfp = lfp[xind[i]: xind[k]]
-            s_p2p = np.abs(np.max(s_lfp)- np.min(s_lfp))
+            s_p2p = np.abs(np.max(s_lfp) - np.min(s_lfp))
 
-            if s_p2p &gt;= aratio*p2p:
+            if s_p2p &gt;= aratio * p2p:
                 s_psd, f = fft_psd(s_lfp, Fs)
-                if np.sum(s_psd[np.logical_and(f &gt;= fmin, f &lt;= fmax)]) &gt; pratio* np.sum(s_psd):
+                if np.sum(s_psd[np.logical_and(f &gt;= fmin, f &lt;= fmax)]) &gt; pratio * np.sum(s_psd):
                     # Phase distribution
-                    s_phase = ephase[np.logical_and(event_stamp &gt; time[xind[i]], event_stamp &lt;= time[xind[k]])]
+                    s_phase = ephase[np.logical_and(
+                        event_stamp &gt; time[xind[i]], event_stamp &lt;= time[xind[k]])]
 #                    print(s_phase.shape, s_phase.shape)
 
                     if not s_phase.shape[0]:
@@ -771,7 +770,8 @@ class NLfp(NBase):
                         else:
                             rcount = np.append(rcount, temp_count)
 
-                        temp_count = np.histogram(s_phase, bins=bins, range=[0, 360])
+                        temp_count = np.histogram(
+                            s_phase, bins=bins, range=[0, 360])
                         temp_count = np.resize(temp_count[0], [1, bins])
                         if not len(bcount):
                             bcount = temp_count
@@ -788,11 +788,11 @@ class NLfp(NBase):
 
         cs.calc_stat()
         result = cs.get_result()
-        meanTheta = result[&#39;meanTheta&#39;]*np.pi/180
+        meanTheta = result[&#39;meanTheta&#39;] * np.pi / 180
 
-        _results[&#39;LFP Spike Mean Phase&#39;]= result[&#39;meanTheta&#39;]
-        _results[&#39;LFP Spike Mean Phase Count&#39;]= result[&#39;meanRho&#39;]
-        _results[&#39;LFP Spike Phase Res Vect&#39;]= result[&#39;resultant&#39;]
+        _results[&#39;LFP Spike Mean Phase&#39;] = result[&#39;meanTheta&#39;]
+        _results[&#39;LFP Spike Mean Phase Count&#39;] = result[&#39;meanRho&#39;]
+        _results[&#39;LFP Spike Phase Res Vect&#39;] = result[&#39;resultant&#39;]
 
         graph_data[&#39;meanTheta&#39;] = meanTheta
         graph_data[&#39;phCount&#39;] = phCount
@@ -874,23 +874,25 @@ class NLfp(NBase):
         &#34;&#34;&#34;
         graph_data = oDict()
 
-        lfp = self.get_samples()*1000
+        lfp = self.get_samples() * 1000
         Fs = self.get_sampling_rate()
         time = self.get_timestamp()
 
         window = np.array(kwargs.get(&#39;window&#39;, [-0.5, 0.5]))
-        win = np.ceil(window*Fs).astype(int)
+        win = np.ceil(window * Fs).astype(int)
         win = np.arange(win[0], win[1])
         slep_win = sg.hann(win.size, False)
 
         nfft = kwargs.get(&#39;nfft&#39;, 1024)
-        mode = kwargs.get(&#39;mode&#39;, None) # None, &#39;bs&#39;, &#39;tr&#39; bs=bootstrp, tr=time-resolved
+        # None, &#39;bs&#39;, &#39;tr&#39; bs=bootstrp, tr=time-resolved
+        mode = kwargs.get(&#39;mode&#39;, None)
         fwin = kwargs.get(&#39;fwin&#39;, [])
 
-        xf = np.arange(0, Fs, Fs/nfft)
-        f = xf[0: int(nfft/2)+ 1]
+        xf = np.arange(0, Fs, Fs / nfft)
+        f = xf[0: int(nfft / 2) + 1]
 
-        ind = np.arange(f.size) if len(fwin) == 0 else find(np.logical_and(f &gt;= fwin[0], f &lt;= fwin[1]))
+        ind = np.arange(f.size) if len(fwin) == 0 else find(
+            np.logical_and(f &gt;= fwin[0], f &lt;= fwin[1]))
 
         if mode == &#39;bs&#39;:
             nsample = kwargs.get(&#39;nsample&#39;, 50)
@@ -903,8 +905,8 @@ class NLfp(NBase):
             PLV = np.empty([nrep, ind.size])
 
             for i in np.arange(nrep):
-                data = self.plv(np.random.choice(event_stamp, nsample, False), \
-                        window=window, nfft=nfft, mode=None, fwin=fwin)
+                data = self.plv(np.random.choice(event_stamp, nsample, False),
+                                window=window, nfft=nfft, mode=None, fwin=fwin)
                 t = data[&#39;t&#39;]
                 STA[i, :] = data[&#39;STA&#39;]
                 fSTA[i, :] = data[&#39;fSTA&#39;]
@@ -929,8 +931,8 @@ class NLfp(NBase):
         elif mode == &#39;tr&#39;:
             nsample = kwargs.get(&#39;nsample&#39;, None)
 
-            slide = kwargs.get(&#39;slide&#39;, 25) # in ms
-            slide = slide/1000 # convert to sec
+            slide = kwargs.get(&#39;slide&#39;, 25)  # in ms
+            slide = slide / 1000  # convert to sec
 
             offset = np.arange(window[0], window[-1], slide)
             nwin = offset.size
@@ -946,8 +948,8 @@ class NLfp(NBase):
                 stamp = np.random.choice(event_stamp, nsample, False)
 
             for i in np.arange(nwin):
-                data = self.plv(stamp + offset[i], \
-                        nfft=nfft, mode=None, fwin=fwin, window=window)
+                data = self.plv(stamp + offset[i],
+                                nfft=nfft, mode=None, fwin=fwin, window=window)
                 t = data[&#39;t&#39;]
                 fSTA[i, :] = data[&#39;fSTA&#39;]
                 STP[i, :] = data[&#39;STP&#39;]
@@ -964,25 +966,25 @@ class NLfp(NBase):
         elif mode is None:
             center = time.searchsorted(event_stamp)
             # Keep windows within data
-            center = np.array([center[i] for i in range(0, len(event_stamp)) \
-                if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
+            center = np.array([center[i] for i in range(0, len(event_stamp))
+                               if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
 
             sta_data = self.event_trig_average(event_stamp, **kwargs)
             STA = sta_data[&#39;ETA&#39;]
 
             fSTA = fft(np.multiply(STA, slep_win), nfft)
 
-            fSTA = np.absolute(fSTA[0: int(nfft/2)+ 1])**2/nfft**2
-            fSTA[1:-1] = 2*fSTA[1:-1]
+            fSTA = np.absolute(fSTA[0: int(nfft / 2) + 1])**2 / nfft**2
+            fSTA[1:-1] = 2 * fSTA[1:-1]
 
-            fLFP = np.array([fft(np.multiply(lfp[x+ win], slep_win), nfft) \
-                    for x in center])
+            fLFP = np.array([fft(np.multiply(lfp[x + win], slep_win), nfft)
+                             for x in center])
 
-            STP = np.absolute(fLFP[:, 0: int(nfft/2)+ 1])**2/nfft**2
-            STP[:, 1:-1] = 2*STP[:, 1:-1]
+            STP = np.absolute(fLFP[:, 0: int(nfft / 2) + 1])**2 / nfft**2
+            STP[:, 1:-1] = 2 * STP[:, 1:-1]
             STP = STP.mean(0)
 
-            SFC = np.divide(fSTA, STP)*100
+            SFC = np.divide(fSTA, STP) * 100
 
             PLV = np.copy(fLFP)
 
@@ -990,8 +992,8 @@ class NLfp(NBase):
             PLV = np.divide(PLV, np.absolute(PLV))
             PLV[np.isnan(PLV)] = 0
 
-            PLV = np.absolute(PLV.mean(0))[0: int(nfft/2)+ 1]
-            PLV[1:-1] = 2*PLV[1:-1]
+            PLV = np.absolute(PLV.mean(0))[0: int(nfft / 2) + 1]
+            PLV[1:-1] = 2 * PLV[1:-1]
 
             graph_data[&#39;t&#39;] = sta_data[&#39;t&#39;]
             graph_data[&#39;f&#39;] = f[ind]
@@ -1031,7 +1033,8 @@ class NLfp(NBase):
             try:
                 data_type = spike.get_type()
             except:
-                logging.error(&#39;The data type of the addes object cannot be determined!&#39;)
+                logging.error(
+                    &#39;The data type of the addes object cannot be determined!&#39;)
 
             if data_type == &#39;spike&#39;:
                 event_stamp = spike.get_unit_stamp()
@@ -1041,21 +1044,21 @@ class NLfp(NBase):
         if event_stamp is None:
             logging.error(&#39;No valid event timestamp or spike is provided&#39;)
         else:
-            lfp = self.get_samples()*1000
+            lfp = self.get_samples() * 1000
             Fs = self.get_sampling_rate()
             time = self.get_timestamp()
             center = time.searchsorted(event_stamp, side=&#39;left&#39;)
-            win = np.ceil(window*Fs).astype(int)
+            win = np.ceil(window * Fs).astype(int)
             win = np.arange(win[0], win[1])
 
             # Keep windows within data
-            center = np.array([center[i] for i in range(0, len(event_stamp)) \
-                if center[i]+ win[0] &gt;= 0 and center[i]+ win[-1] &lt;= time.size])
+            center = np.array([center[i] for i in range(0, len(event_stamp))
+                               if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
 
-            eta = reduce(lambda y, x: y+ lfp[x+ win], center)
-            eta = eta/center.size
+            eta = reduce(lambda y, x: y + lfp[x + win], center)
+            eta = eta / center.size
 
-            graph_data[&#39;t&#39;] = win/Fs
+            graph_data[&#39;t&#39;] = win / Fs
             graph_data[&#39;ETA&#39;] = eta
             graph_data[&#39;center&#39;] = center
 
@@ -1254,7 +1257,7 @@ class NLfp(NBase):
         output = {
             &#34;bandpower&#34;: bp,
             &#34;total_power&#34;: tp,
-            &#34;relative_power&#34;: bp/tp}
+            &#34;relative_power&#34;: bp / tp}
         return output
 
     def bandpower_ratio(self, first_band, second_band, win_sec, **kwargs):
@@ -1367,8 +1370,8 @@ class NLfp(NBase):
 
             if path in hdf.f:
                 g = hdf.f[path]
-            elif &#39;/processing/Neural Continuous/LFP/&#39;+ path in hdf.f:
-                path = &#39;/processing/Neural Continuous/LFP/&#39;+ path
+            elif &#39;/processing/Neural Continuous/LFP/&#39; + path in hdf.f:
+                path = &#39;/processing/Neural Continuous/LFP/&#39; + path
                 g = hdf.f[path]
             else:
                 logging.error(&#39;Specified path does not exist!&#39;)
@@ -1380,7 +1383,8 @@ class NLfp(NBase):
 
             self._set_samples(hdf.get_dataset(group=g, name=&#39;data&#39;))
             self._set_timestamp(hdf.get_dataset(group=g, name=&#39;timestamps&#39;))
-            self._set_total_samples(hdf.get_dataset(group=g, name=&#39;num_samples&#39;))
+            self._set_total_samples(
+                hdf.get_dataset(group=g, name=&#39;num_samples&#39;))
 
             hdf.close()
         else:
@@ -1404,7 +1408,6 @@ class NLfp(NBase):
         file_tag, file_extension = os.path.splitext(file_basename)
         file_extension = file_extension[1:]
         set_file = os.path.join(file_directory, file_tag + &#39;.set&#39;)
-        set_file = file_directory + os.sep + file_tag + &#39;.set&#39;
 
         self._set_data_source(file_name)
         self._set_source_format(&#39;Axona&#39;)
@@ -1421,7 +1424,8 @@ class NLfp(NBase):
                     if line == &#39;&#39;:
                         break
                     if line.startswith(&#39;trial_date&#39;):
-                        self._set_date(&#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
+                        self._set_date(
+                            &#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
                     if line.startswith(&#39;trial_time&#39;):
                         self._set_time(line.split()[1])
                     if line.startswith(&#39;experimenter&#39;):
@@ -1435,10 +1439,12 @@ class NLfp(NBase):
                     if line.startswith(&#39;num_chans&#39;):
                         self._set_total_channel(int(&#39;&#39;.join(line.split()[1:])))
                     if line.startswith(&#39;sample_rate&#39;):
-                        self._set_sampling_rate(float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
+                        self._set_sampling_rate(
+                            float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
                     if line.startswith(&#39;bytes_per_sample&#39;):
-                        self._set_bytes_per_sample(int(&#39;&#39;.join(line.split()[1:])))
-                    if line.startswith(&#39;num_&#39;+ file_extension[:3].upper() + &#39;_samples&#39;):
+                        self._set_bytes_per_sample(
+                            int(&#39;&#39;.join(line.split()[1:])))
+                    if line.startswith(&#39;num_&#39; + file_extension[:3].upper() + &#39;_samples&#39;):
                         self._set_total_samples(int(&#39;&#39;.join(line.split()[1:])))
                     if line.startswith(&#34;data_start&#34;):
                         break
@@ -1461,26 +1467,27 @@ class NLfp(NBase):
 
                 eeg_ID = re.findall(r&#39;\d+&#39;, file_extension)
                 self.set_file_tag(1 if not eeg_ID else int(eeg_ID[0]))
-                max_ADC_count = 2**(8*bytes_per_sample-1)-1
-                max_byte_value = 2**(8*bytes_per_sample)
+                max_ADC_count = 2**(8 * bytes_per_sample - 1) - 1
+                max_byte_value = 2**(8 * bytes_per_sample)
 
                 with open(set_file, &#39;r&#39;, encoding=&#39;latin-1&#39;) as f_set:
                     lines = f_set.readlines()
-                    channel_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))\
-                                for line in lines if line.startswith(&#39;EEG_ch_&#39;)])
+                    channel_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))
+                                          for line in lines if line.startswith(&#39;EEG_ch_&#39;)])
                     channel_id = channel_lines[self.get_file_tag()]
                     self.set_channel_id(channel_id)
 
-                    gain_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))\
-                            for line in lines if &#39;gain_ch_&#39; in line])
-                    gain = gain_lines[channel_id-1]
+                    gain_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))
+                                       for line in lines if &#39;gain_ch_&#39; in line])
+                    gain = gain_lines[channel_id - 1]
 
                     for line in lines:
                         if line.startswith(&#39;ADC_fullscale_mv&#39;):
-                            self._set_fullscale_mv(int(re.findall(r&#39;\d+.\d+|d+&#39;, line)[0]))
+                            self._set_fullscale_mv(
+                                int(re.findall(r&#39;\d+.\d+|d+&#39;, line)[0]))
                             break
-                    AD_bit_uvolt = 2*self.get_fullscale_mv()/ \
-                                    (gain*np.power(2, 8*bytes_per_sample))
+                    AD_bit_uvolt = 2 * self.get_fullscale_mv() / \
+                        (gain * np.power(2, 8 * bytes_per_sample))
 
                 record_size = bytes_per_sample
                 sample_le = 256**(np.arange(0, bytes_per_sample, 1))
@@ -1495,17 +1502,20 @@ class NLfp(NBase):
                     lfp_wave = np.zeros([num_samples, ], dtype=np.float64)
                     for k in np.arange(0, bytes_per_sample, 1):
                         byte_offset = k
-                        sample_value = (sample_le[k]* byte_buffer[byte_offset \
-                                    :byte_offset+ len_bytebuffer- end_offset- record_size\
-                                    :record_size])
+                        sample_value = (sample_le[k] * byte_buffer[byte_offset:byte_offset +
+                                                                   len_bytebuffer - end_offset - record_size:record_size])
                         if sample_value.size &lt; num_samples:
-                            sample_value = np.append(sample_value, np.zeros([num_samples-sample_value.size,]))
-                        sample_value = sample_value.astype(np.float64, casting=&#39;unsafe&#39;, copy=False)
+                            sample_value = np.append(sample_value, np.zeros(
+                                [num_samples - sample_value.size, ]))
+                        sample_value = sample_value.astype(
+                            np.float64, casting=&#39;unsafe&#39;, copy=False)
                         np.add(lfp_wave, sample_value, out=lfp_wave)
-                    np.putmask(lfp_wave, lfp_wave &gt; max_ADC_count, lfp_wave- max_byte_value)
+                    np.putmask(lfp_wave, lfp_wave &gt; max_ADC_count,
+                               lfp_wave - max_byte_value)
 
-                    self._set_samples(lfp_wave*AD_bit_uvolt)
-                    self._set_timestamp(np.arange(0, num_samples, 1)/self.get_sampling_rate())
+                    self._set_samples(lfp_wave * AD_bit_uvolt)
+                    self._set_timestamp(
+                        np.arange(0, num_samples, 1) / self.get_sampling_rate())
 
         else:
             logging.error(
@@ -1531,9 +1541,9 @@ class NLfp(NBase):
 
         # Format description for the NLX file:
 
-        resamp_freq = 250 # NeuroChaT subsamples the original recording from 32000 to 250
+        resamp_freq = 250  # NeuroChaT subsamples the original recording from 32000 to 250
 
-        header_offset = 16*1024 # fixed for NLX files
+        header_offset = 16 * 1024  # fixed for NLX files
 
         bytes_per_timestamp = 8
         bytes_chan_no = 4
@@ -1542,8 +1552,8 @@ class NLfp(NBase):
         bytes_per_sample = 2
         samples_per_record = 512
 
-        max_byte_value = np.power(2, bytes_per_sample*8)
-        max_ADC_count = np.power(2, bytes_per_sample*8- 1)-1
+        max_byte_value = np.power(2, bytes_per_sample * 8)
+        max_ADC_count = np.power(2, bytes_per_sample * 8 - 1) - 1
         AD_bit_uvolt = 10**-6
 
         self._set_bytes_per_sample(bytes_per_sample)
@@ -1560,34 +1570,40 @@ class NLfp(NBase):
                 if line == &#39;&#39;:
                     break
                 if &#39;SamplingFrequency&#39; in line:
-                    self._set_sampling_rate(float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))) # We are subsampling from the blocks of 512 samples per record
+                    # We are subsampling from the blocks of 512 samples per record
+                    self._set_sampling_rate(
+                        float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
                 if &#39;RecordSize&#39; in line:
-                    record_size = int(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
+                    record_size = int(
+                        &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
                 if &#39;Time Opened&#39; in line:
                     self._set_date(re.search(r&#39;\d+/\d+/\d+&#39;, line).group())
                     self._set_time(re.search(r&#39;\d+:\d+:\d+&#39;, line).group())
                 if &#39;FileVersion&#39; in line:
                     self._set_file_version(line.split()[1])
                 if &#39;ADMaxValue&#39; in line:
-                    max_ADC_count = float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
+                    max_ADC_count = float(
+                        &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
                 if &#39;ADBitVolts&#39; in line:
-                    AD_bit_uvolt = float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))*(10**6)
+                    AD_bit_uvolt = float(
+                        &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))) * (10**6)
 
-            self._set_fullscale_mv(max_byte_value*AD_bit_uvolt/2) # gain = 1 assumed to keep in similarity to Axona
+            # gain = 1 assumed to keep in similarity to Axona
+            self._set_fullscale_mv(max_byte_value * AD_bit_uvolt / 2)
 
             if not record_size:
-                record_size = bytes_per_timestamp+ \
-                             bytes_chan_no+ \
-                             bytes_sample_freq+ \
-                             bytes_num_valid_samples+ \
-                             bytes_per_sample*samples_per_record
+                record_size = bytes_per_timestamp + \
+                    bytes_chan_no + \
+                    bytes_sample_freq + \
+                    bytes_num_valid_samples + \
+                    bytes_per_sample * samples_per_record
 
             time_offset = 0
-            sample_freq_offset = bytes_per_timestamp+ bytes_chan_no
-            num_valid_samples_offset = sample_freq_offset+ bytes_sample_freq
-            sample_offset = num_valid_samples_offset+ bytes_num_valid_samples
+            sample_freq_offset = bytes_per_timestamp + bytes_chan_no
+            num_valid_samples_offset = sample_freq_offset + bytes_sample_freq
+            sample_offset = num_valid_samples_offset + bytes_num_valid_samples
             f.seek(0, 2)
-            num_samples = int((f.tell()- header_offset)/record_size)
+            num_samples = int((f.tell() - header_offset) / record_size)
 
             f.seek(header_offset, 0)
             time = np.array([])
@@ -1595,23 +1611,26 @@ class NLfp(NBase):
             sample_le = 256**(np.arange(0, bytes_per_sample, 1))
             for _ in np.arange(num_samples):
                 sample_bytes = np.fromfile(f, dtype=&#39;uint8&#39;, count=record_size)
-                block_start = int.from_bytes(sample_bytes[time_offset+ \
-                                np.arange(bytes_per_timestamp)], byteorder=&#39;little&#39;, signed=False)/10**6
-                valid_samples = int.from_bytes(sample_bytes[num_valid_samples_offset+ \
-                                np.arange(bytes_num_valid_samples)], byteorder=&#39;little&#39;, signed=False)
-                sampling_freq = int.from_bytes(sample_bytes[sample_freq_offset+ \
-                                np.arange(bytes_sample_freq)], byteorder=&#39;little&#39;, signed=False)
+                block_start = int.from_bytes(sample_bytes[time_offset +
+                                                          np.arange(bytes_per_timestamp)], byteorder=&#39;little&#39;, signed=False) / 10**6
+                valid_samples = int.from_bytes(sample_bytes[num_valid_samples_offset +
+                                                            np.arange(bytes_num_valid_samples)], byteorder=&#39;little&#39;, signed=False)
+                sampling_freq = int.from_bytes(sample_bytes[sample_freq_offset +
+                                                            np.arange(bytes_sample_freq)], byteorder=&#39;little&#39;, signed=False)
 
-                wave_bytes = sample_bytes[sample_offset+ np.arange(valid_samples* bytes_per_sample)]\
-                                .reshape([valid_samples, bytes_per_sample])
+                wave_bytes = sample_bytes[sample_offset + np.arange(valid_samples * bytes_per_sample)]\
+                    .reshape([valid_samples, bytes_per_sample])
                 block_wave = np.dot(wave_bytes, sample_le)
                 #    for k in np.arange(valid_samples):
                 #        block_wave[k] = int.from_bytes(sample_bytes[sample_offset+ k*bytes_per_sample+ \
                 #                    np.arange(bytes_per_sample)], byteorder=&#39;little&#39;, signed=False)
-                np.putmask(block_wave, block_wave &gt; max_ADC_count, block_wave - max_byte_value)
-                block_wave = block_wave*AD_bit_uvolt
-                block_time = block_start +  np.arange(valid_samples)/ sampling_freq
-                interp_time = np.arange(block_start, block_time[-1], 1/resamp_freq)
+                np.putmask(block_wave, block_wave &gt; max_ADC_count,
+                           block_wave - max_byte_value)
+                block_wave = block_wave * AD_bit_uvolt
+                block_time = block_start + \
+                    np.arange(valid_samples) / sampling_freq
+                interp_time = np.arange(
+                    block_start, block_time[-1], 1 / resamp_freq)
                 interp_wave = np.interp(interp_time, block_time, block_wave)
                 time = np.append(time, interp_time)
                 lfp_wave = np.append(lfp_wave, interp_wave)
@@ -1624,7 +1643,7 @@ class NLfp(NBase):
     def find_artf(self, sd_thresh=3, min_artf_freq=8):
         &#34;&#34;&#34;
         Obtains locations of signal above threshold in windows.
-        
+
         NOTE this function is still a work in progress and may see future changes.
 
         Parameters
@@ -1641,11 +1660,11 @@ class NLfp(NBase):
         std = np.std(samples)
         mean = np.mean(samples)
         over_thresh = np.logical_or(
-            samples &gt;= mean + sd_thresh*std,
-            samples &lt;= mean - sd_thresh*std)
-        # use np.where on the logical or if not using find_true_ranges    
+            samples &gt;= mean + sd_thresh * std,
+            samples &lt;= mean - sd_thresh * std)
+        # use np.where on the logical or if not using find_true_ranges
         _, thr_locs = find_true_ranges(
-            [i for i in range(len(samples))], over_thresh, 
+            [i for i in range(len(samples))], over_thresh,
             min_range=1, return_idxs=True)
         final_thr_locs = []
         if len(thr_locs) == 0:
@@ -1653,10 +1672,10 @@ class NLfp(NBase):
             thr_vals = []
             thr_time = []
         else:
-            for i in range(len(thr_locs)-1):
+            for i in range(len(thr_locs) - 1):
                 # Set based on sampling freq/max freq of interest.
-                if thr_locs[i+1] - thr_locs[i] &lt;= ceil(Fs/min_artf_freq):
-                    for j in range(thr_locs[i], thr_locs[i+1]):
+                if thr_locs[i + 1] - thr_locs[i] &lt;= ceil(Fs / min_artf_freq):
+                    for j in range(thr_locs[i], thr_locs[i + 1]):
                         final_thr_locs.append(j)
                 else:
                     final_thr_locs.append(thr_locs[i])
@@ -1667,7 +1686,7 @@ class NLfp(NBase):
             # print(&#39;changed: &#39;, len(thr_locs))
             thr_vals = self.get_samples()[thr_locs]
             thr_time = self.get_timestamp()[thr_locs]
-        per_removed = len(thr_locs)/len(samples)*100
+        per_removed = len(thr_locs) / len(samples) * 100
         # print(len(thr_locs), len(thr_time))
         return mean, std, thr_locs, thr_vals, thr_time, per_removed</code></pre>
 </details>
@@ -1802,7 +1821,6 @@ LFP signal in the recording.</p>
 
         return self._file_tag
 
-
     def get_timestamp(self):
         &#34;&#34;&#34;
         Returns the timestamps of the LFP waveform
@@ -2137,20 +2155,19 @@ LFP signal in the recording.</p>
 
         &#34;&#34;&#34;
 
-        cls= kwargs.get(&#39;cls&#39;, None)
+        cls = kwargs.get(&#39;cls&#39;, None)
         if not inspect.isclass(cls):
             try:
                 data_type = spike.get_type()
                 if data_type == &#39;spike&#39;:
                     cls = spike.__class__
             except:
-                 logging.error(&#39;Data type cannot be determined!&#39;)
+                logging.error(&#39;Data type cannot be determined!&#39;)
         if inspect.isclass(cls):
-             new_spike = self._add_node(cls, spike, &#39;spike&#39;, **kwargs)
-             return new_spike
+            new_spike = self._add_node(cls, spike, &#39;spike&#39;, **kwargs)
+            return new_spike
         else:
             logging.error(&#39;Cannot add the spike data!&#39;)
-
 
     def load_spike(self, names=&#39;all&#39;):
         &#34;&#34;&#34;
@@ -2167,7 +2184,6 @@ LFP signal in the recording.</p>
         None
 
         &#34;&#34;&#34;
-
 
         if names == &#39;all&#39;:
             for spike in self._spikes:
@@ -2250,16 +2266,16 @@ LFP signal in the recording.</p>
             lfp = self.get_samples()
 
         window = kwargs.get(&#39;window&#39;, 1.0)
-        window = sg.get_window(&#39;hann&#39;, int(window*Fs)) if isinstance(window, float)\
-                or isinstance(window, int) else window
+        window = sg.get_window(&#39;hann&#39;, int(window * Fs)) if isinstance(window, float)\
+            or isinstance(window, int) else window
 
-        win_sec = np.ceil(window.size/Fs)
+        win_sec = np.ceil(window.size / Fs)
 
-        noverlap = kwargs.get(&#39;noverlap&#39;, 0.5*win_sec)
-        noverlap = noverlap if noverlap &lt; win_sec else 0.5*win_sec
-        noverlap = np.ceil(noverlap*Fs)
+        noverlap = kwargs.get(&#39;noverlap&#39;, 0.5 * win_sec)
+        noverlap = noverlap if noverlap &lt; win_sec else 0.5 * win_sec
+        noverlap = np.ceil(noverlap * Fs)
 
-        nfft = kwargs.get(&#39;nfft&#39;, 2*Fs)
+        nfft = kwargs.get(&#39;nfft&#39;, 2 * Fs)
         nfft = np.power(2, int(np.ceil(np.log2(nfft))))
 
         ptype = kwargs.get(&#39;ptype&#39;, &#39;psd&#39;)
@@ -2268,7 +2284,7 @@ LFP signal in the recording.</p>
         prefilt = kwargs.get(&#39;prefilt&#39;, True)
         _filter = kwargs.get(&#39;filtset&#39;, [10, 1.5, 40, &#39;bandpass&#39;])
 
-        fmax = kwargs.get(&#39;fmax&#39;, Fs/2)
+        fmax = kwargs.get(&#39;fmax&#39;, Fs / 2)
 
         if prefilt:
             lfp = butter_filter(lfp, Fs, *_filter)
@@ -2276,15 +2292,15 @@ LFP signal in the recording.</p>
         tr = kwargs.get(&#39;tr&#39;, False)
         db = kwargs.get(&#39;db&#39;, False)
         if tr:
-            f, t, Sxx = sg.spectrogram(lfp, fs=Fs, \
-                    window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
-                    detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
+            f, t, Sxx = sg.spectrogram(lfp, fs=Fs,
+                                       window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                                       detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
             graph_data[&#39;t&#39;] = t + self.get_timestamp()[0]
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
-                Sxx = 10*np.log10(Sxx/np.amax(Sxx))
+                Sxx = 10 * np.log10(Sxx / np.amax(Sxx))
                 Sxx = Sxx.flatten()
                 Sxx[find(Sxx &lt; -40)] = -40
                 Sxx = np.reshape(Sxx, [f.size, t.size])
@@ -2293,14 +2309,14 @@ LFP signal in the recording.</p>
 #            graph_data[&#39;Sxx&#39;] = np.array([Sxx[i, :] for i in find(f&lt;= fmax)])
             graph_data[&#39;Sxx&#39;] = Sxx[find(f &lt;= fmax), :]
         else:
-            f, Pxx = sg.welch(lfp, fs=Fs, \
-                    window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
-                    detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
+            f, Pxx = sg.welch(lfp, fs=Fs,
+                              window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                              detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
-                Pxx = 10*np.log10(Pxx/Pxx.max())
+                Pxx = 10 * np.log10(Pxx / Pxx.max())
                 Pxx[find(Pxx &lt; -40)] = -40
             graph_data[&#39;Pxx&#39;] = Pxx[find(f &lt;= fmax)]
 
@@ -2325,19 +2341,19 @@ LFP signal in the recording.</p>
 
         &#34;&#34;&#34;
 
-        _results= oDict()
+        _results = oDict()
         graph_data = oDict()
 
         cs = CircStat()
 
-        lfp = self.get_samples()*1000
+        lfp = self.get_samples() * 1000
         Fs = self.get_sampling_rate()
         time = self.get_timestamp()
 
         # Input parameters
-        bins = int(360/kwargs.get(&#39;binsize&#39;, 5))
-        rbinsize = kwargs.get(&#39;rbinsize&#39;, 2) # raster binsize
-        rbins = int(360/rbinsize)
+        bins = int(360 / kwargs.get(&#39;binsize&#39;, 5))
+        rbinsize = kwargs.get(&#39;rbinsize&#39;, 2)  # raster binsize
+        rbins = int(360 / rbinsize)
         fwin = kwargs.get(&#39;fwin&#39;, [6, 12])
         pratio = kwargs.get(&#39;pratio&#39;, 0.2)
         aratio = kwargs.get(&#39;aratio&#39;, 0.15)
@@ -2348,7 +2364,7 @@ LFP signal in the recording.</p>
         _filter = [5, fmin, fmax, &#39;bandpass&#39;]
         _prefilt = kwargs.get(&#39;filtset&#39;, [10, 1.5, 40, &#39;bandpass&#39;])
 
-        b_lfp = butter_filter(lfp, Fs, *_filter) # band LFP
+        b_lfp = butter_filter(lfp, Fs, *_filter)  # band LFP
         lfp = butter_filter(lfp, Fs, *_prefilt)
 
     # Measure phase
@@ -2362,7 +2378,7 @@ LFP signal in the recording.</p>
         ephase = np.interp(event_stamp, time, phase)
 
         p2p = np.abs(np.max(lfp) - np.min(lfp))
-        xline = 0.5* np.mean(mag) # cross line
+        xline = 0.5 * np.mean(mag)  # cross line
 
         # Detection algo
         # zero cross
@@ -2370,31 +2386,32 @@ LFP signal in the recording.</p>
         mag2 = mag[1:-2]
         mag3 = mag[2:-1]
 
-        xind = np.union1d(find(np.logical_and(mag1 &lt; xline, mag2 &gt; xline)), \
-                find(np.logical_and(np.logical_and(mag1 &lt; xline, mag2 == xline), mag3 &gt; xline)))
+        xind = np.union1d(find(np.logical_and(mag1 &lt; xline, mag2 &gt; xline)),
+                          find(np.logical_and(np.logical_and(mag1 &lt; xline, mag2 == xline), mag3 &gt; xline)))
 
         # Ignore segments &lt;1/fmax
         i = 0
-        rcount = np.empty([0,])
+        rcount = np.empty([0, ])
         bcount = np.empty([0, 0])
 
-        phBins = np.arange(0, 360, 360/bins)
-        rbins = np.arange(0, 360, 360/rbins)
+        phBins = np.arange(0, 360, 360 / bins)
+        rbins = np.arange(0, 360, 360 / rbins)
 
         seg_count = 0
-        while i &lt; len(xind)-1:
-            k = i+1
-            while time[xind[k]]- time[xind[i]] &lt; 1/fmin and k &lt; len(xind)-1:
+        while i &lt; len(xind) - 1:
+            k = i + 1
+            while time[xind[k]] - time[xind[i]] &lt; 1 / fmin and k &lt; len(xind) - 1:
                 k += 1
 #            print(time[xind[i]], time[xind[k]])
             s_lfp = lfp[xind[i]: xind[k]]
-            s_p2p = np.abs(np.max(s_lfp)- np.min(s_lfp))
+            s_p2p = np.abs(np.max(s_lfp) - np.min(s_lfp))
 
-            if s_p2p &gt;= aratio*p2p:
+            if s_p2p &gt;= aratio * p2p:
                 s_psd, f = fft_psd(s_lfp, Fs)
-                if np.sum(s_psd[np.logical_and(f &gt;= fmin, f &lt;= fmax)]) &gt; pratio* np.sum(s_psd):
+                if np.sum(s_psd[np.logical_and(f &gt;= fmin, f &lt;= fmax)]) &gt; pratio * np.sum(s_psd):
                     # Phase distribution
-                    s_phase = ephase[np.logical_and(event_stamp &gt; time[xind[i]], event_stamp &lt;= time[xind[k]])]
+                    s_phase = ephase[np.logical_and(
+                        event_stamp &gt; time[xind[i]], event_stamp &lt;= time[xind[k]])]
 #                    print(s_phase.shape, s_phase.shape)
 
                     if not s_phase.shape[0]:
@@ -2410,7 +2427,8 @@ LFP signal in the recording.</p>
                         else:
                             rcount = np.append(rcount, temp_count)
 
-                        temp_count = np.histogram(s_phase, bins=bins, range=[0, 360])
+                        temp_count = np.histogram(
+                            s_phase, bins=bins, range=[0, 360])
                         temp_count = np.resize(temp_count[0], [1, bins])
                         if not len(bcount):
                             bcount = temp_count
@@ -2427,11 +2445,11 @@ LFP signal in the recording.</p>
 
         cs.calc_stat()
         result = cs.get_result()
-        meanTheta = result[&#39;meanTheta&#39;]*np.pi/180
+        meanTheta = result[&#39;meanTheta&#39;] * np.pi / 180
 
-        _results[&#39;LFP Spike Mean Phase&#39;]= result[&#39;meanTheta&#39;]
-        _results[&#39;LFP Spike Mean Phase Count&#39;]= result[&#39;meanRho&#39;]
-        _results[&#39;LFP Spike Phase Res Vect&#39;]= result[&#39;resultant&#39;]
+        _results[&#39;LFP Spike Mean Phase&#39;] = result[&#39;meanTheta&#39;]
+        _results[&#39;LFP Spike Mean Phase Count&#39;] = result[&#39;meanRho&#39;]
+        _results[&#39;LFP Spike Phase Res Vect&#39;] = result[&#39;resultant&#39;]
 
         graph_data[&#39;meanTheta&#39;] = meanTheta
         graph_data[&#39;phCount&#39;] = phCount
@@ -2513,23 +2531,25 @@ LFP signal in the recording.</p>
         &#34;&#34;&#34;
         graph_data = oDict()
 
-        lfp = self.get_samples()*1000
+        lfp = self.get_samples() * 1000
         Fs = self.get_sampling_rate()
         time = self.get_timestamp()
 
         window = np.array(kwargs.get(&#39;window&#39;, [-0.5, 0.5]))
-        win = np.ceil(window*Fs).astype(int)
+        win = np.ceil(window * Fs).astype(int)
         win = np.arange(win[0], win[1])
         slep_win = sg.hann(win.size, False)
 
         nfft = kwargs.get(&#39;nfft&#39;, 1024)
-        mode = kwargs.get(&#39;mode&#39;, None) # None, &#39;bs&#39;, &#39;tr&#39; bs=bootstrp, tr=time-resolved
+        # None, &#39;bs&#39;, &#39;tr&#39; bs=bootstrp, tr=time-resolved
+        mode = kwargs.get(&#39;mode&#39;, None)
         fwin = kwargs.get(&#39;fwin&#39;, [])
 
-        xf = np.arange(0, Fs, Fs/nfft)
-        f = xf[0: int(nfft/2)+ 1]
+        xf = np.arange(0, Fs, Fs / nfft)
+        f = xf[0: int(nfft / 2) + 1]
 
-        ind = np.arange(f.size) if len(fwin) == 0 else find(np.logical_and(f &gt;= fwin[0], f &lt;= fwin[1]))
+        ind = np.arange(f.size) if len(fwin) == 0 else find(
+            np.logical_and(f &gt;= fwin[0], f &lt;= fwin[1]))
 
         if mode == &#39;bs&#39;:
             nsample = kwargs.get(&#39;nsample&#39;, 50)
@@ -2542,8 +2562,8 @@ LFP signal in the recording.</p>
             PLV = np.empty([nrep, ind.size])
 
             for i in np.arange(nrep):
-                data = self.plv(np.random.choice(event_stamp, nsample, False), \
-                        window=window, nfft=nfft, mode=None, fwin=fwin)
+                data = self.plv(np.random.choice(event_stamp, nsample, False),
+                                window=window, nfft=nfft, mode=None, fwin=fwin)
                 t = data[&#39;t&#39;]
                 STA[i, :] = data[&#39;STA&#39;]
                 fSTA[i, :] = data[&#39;fSTA&#39;]
@@ -2568,8 +2588,8 @@ LFP signal in the recording.</p>
         elif mode == &#39;tr&#39;:
             nsample = kwargs.get(&#39;nsample&#39;, None)
 
-            slide = kwargs.get(&#39;slide&#39;, 25) # in ms
-            slide = slide/1000 # convert to sec
+            slide = kwargs.get(&#39;slide&#39;, 25)  # in ms
+            slide = slide / 1000  # convert to sec
 
             offset = np.arange(window[0], window[-1], slide)
             nwin = offset.size
@@ -2585,8 +2605,8 @@ LFP signal in the recording.</p>
                 stamp = np.random.choice(event_stamp, nsample, False)
 
             for i in np.arange(nwin):
-                data = self.plv(stamp + offset[i], \
-                        nfft=nfft, mode=None, fwin=fwin, window=window)
+                data = self.plv(stamp + offset[i],
+                                nfft=nfft, mode=None, fwin=fwin, window=window)
                 t = data[&#39;t&#39;]
                 fSTA[i, :] = data[&#39;fSTA&#39;]
                 STP[i, :] = data[&#39;STP&#39;]
@@ -2603,25 +2623,25 @@ LFP signal in the recording.</p>
         elif mode is None:
             center = time.searchsorted(event_stamp)
             # Keep windows within data
-            center = np.array([center[i] for i in range(0, len(event_stamp)) \
-                if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
+            center = np.array([center[i] for i in range(0, len(event_stamp))
+                               if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
 
             sta_data = self.event_trig_average(event_stamp, **kwargs)
             STA = sta_data[&#39;ETA&#39;]
 
             fSTA = fft(np.multiply(STA, slep_win), nfft)
 
-            fSTA = np.absolute(fSTA[0: int(nfft/2)+ 1])**2/nfft**2
-            fSTA[1:-1] = 2*fSTA[1:-1]
+            fSTA = np.absolute(fSTA[0: int(nfft / 2) + 1])**2 / nfft**2
+            fSTA[1:-1] = 2 * fSTA[1:-1]
 
-            fLFP = np.array([fft(np.multiply(lfp[x+ win], slep_win), nfft) \
-                    for x in center])
+            fLFP = np.array([fft(np.multiply(lfp[x + win], slep_win), nfft)
+                             for x in center])
 
-            STP = np.absolute(fLFP[:, 0: int(nfft/2)+ 1])**2/nfft**2
-            STP[:, 1:-1] = 2*STP[:, 1:-1]
+            STP = np.absolute(fLFP[:, 0: int(nfft / 2) + 1])**2 / nfft**2
+            STP[:, 1:-1] = 2 * STP[:, 1:-1]
             STP = STP.mean(0)
 
-            SFC = np.divide(fSTA, STP)*100
+            SFC = np.divide(fSTA, STP) * 100
 
             PLV = np.copy(fLFP)
 
@@ -2629,8 +2649,8 @@ LFP signal in the recording.</p>
             PLV = np.divide(PLV, np.absolute(PLV))
             PLV[np.isnan(PLV)] = 0
 
-            PLV = np.absolute(PLV.mean(0))[0: int(nfft/2)+ 1]
-            PLV[1:-1] = 2*PLV[1:-1]
+            PLV = np.absolute(PLV.mean(0))[0: int(nfft / 2) + 1]
+            PLV[1:-1] = 2 * PLV[1:-1]
 
             graph_data[&#39;t&#39;] = sta_data[&#39;t&#39;]
             graph_data[&#39;f&#39;] = f[ind]
@@ -2670,7 +2690,8 @@ LFP signal in the recording.</p>
             try:
                 data_type = spike.get_type()
             except:
-                logging.error(&#39;The data type of the addes object cannot be determined!&#39;)
+                logging.error(
+                    &#39;The data type of the addes object cannot be determined!&#39;)
 
             if data_type == &#39;spike&#39;:
                 event_stamp = spike.get_unit_stamp()
@@ -2680,21 +2701,21 @@ LFP signal in the recording.</p>
         if event_stamp is None:
             logging.error(&#39;No valid event timestamp or spike is provided&#39;)
         else:
-            lfp = self.get_samples()*1000
+            lfp = self.get_samples() * 1000
             Fs = self.get_sampling_rate()
             time = self.get_timestamp()
             center = time.searchsorted(event_stamp, side=&#39;left&#39;)
-            win = np.ceil(window*Fs).astype(int)
+            win = np.ceil(window * Fs).astype(int)
             win = np.arange(win[0], win[1])
 
             # Keep windows within data
-            center = np.array([center[i] for i in range(0, len(event_stamp)) \
-                if center[i]+ win[0] &gt;= 0 and center[i]+ win[-1] &lt;= time.size])
+            center = np.array([center[i] for i in range(0, len(event_stamp))
+                               if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
 
-            eta = reduce(lambda y, x: y+ lfp[x+ win], center)
-            eta = eta/center.size
+            eta = reduce(lambda y, x: y + lfp[x + win], center)
+            eta = eta / center.size
 
-            graph_data[&#39;t&#39;] = win/Fs
+            graph_data[&#39;t&#39;] = win / Fs
             graph_data[&#39;ETA&#39;] = eta
             graph_data[&#39;center&#39;] = center
 
@@ -2893,7 +2914,7 @@ LFP signal in the recording.</p>
         output = {
             &#34;bandpower&#34;: bp,
             &#34;total_power&#34;: tp,
-            &#34;relative_power&#34;: bp/tp}
+            &#34;relative_power&#34;: bp / tp}
         return output
 
     def bandpower_ratio(self, first_band, second_band, win_sec, **kwargs):
@@ -3006,8 +3027,8 @@ LFP signal in the recording.</p>
 
             if path in hdf.f:
                 g = hdf.f[path]
-            elif &#39;/processing/Neural Continuous/LFP/&#39;+ path in hdf.f:
-                path = &#39;/processing/Neural Continuous/LFP/&#39;+ path
+            elif &#39;/processing/Neural Continuous/LFP/&#39; + path in hdf.f:
+                path = &#39;/processing/Neural Continuous/LFP/&#39; + path
                 g = hdf.f[path]
             else:
                 logging.error(&#39;Specified path does not exist!&#39;)
@@ -3019,7 +3040,8 @@ LFP signal in the recording.</p>
 
             self._set_samples(hdf.get_dataset(group=g, name=&#39;data&#39;))
             self._set_timestamp(hdf.get_dataset(group=g, name=&#39;timestamps&#39;))
-            self._set_total_samples(hdf.get_dataset(group=g, name=&#39;num_samples&#39;))
+            self._set_total_samples(
+                hdf.get_dataset(group=g, name=&#39;num_samples&#39;))
 
             hdf.close()
         else:
@@ -3043,7 +3065,6 @@ LFP signal in the recording.</p>
         file_tag, file_extension = os.path.splitext(file_basename)
         file_extension = file_extension[1:]
         set_file = os.path.join(file_directory, file_tag + &#39;.set&#39;)
-        set_file = file_directory + os.sep + file_tag + &#39;.set&#39;
 
         self._set_data_source(file_name)
         self._set_source_format(&#39;Axona&#39;)
@@ -3060,7 +3081,8 @@ LFP signal in the recording.</p>
                     if line == &#39;&#39;:
                         break
                     if line.startswith(&#39;trial_date&#39;):
-                        self._set_date(&#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
+                        self._set_date(
+                            &#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
                     if line.startswith(&#39;trial_time&#39;):
                         self._set_time(line.split()[1])
                     if line.startswith(&#39;experimenter&#39;):
@@ -3074,10 +3096,12 @@ LFP signal in the recording.</p>
                     if line.startswith(&#39;num_chans&#39;):
                         self._set_total_channel(int(&#39;&#39;.join(line.split()[1:])))
                     if line.startswith(&#39;sample_rate&#39;):
-                        self._set_sampling_rate(float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
+                        self._set_sampling_rate(
+                            float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
                     if line.startswith(&#39;bytes_per_sample&#39;):
-                        self._set_bytes_per_sample(int(&#39;&#39;.join(line.split()[1:])))
-                    if line.startswith(&#39;num_&#39;+ file_extension[:3].upper() + &#39;_samples&#39;):
+                        self._set_bytes_per_sample(
+                            int(&#39;&#39;.join(line.split()[1:])))
+                    if line.startswith(&#39;num_&#39; + file_extension[:3].upper() + &#39;_samples&#39;):
                         self._set_total_samples(int(&#39;&#39;.join(line.split()[1:])))
                     if line.startswith(&#34;data_start&#34;):
                         break
@@ -3100,26 +3124,27 @@ LFP signal in the recording.</p>
 
                 eeg_ID = re.findall(r&#39;\d+&#39;, file_extension)
                 self.set_file_tag(1 if not eeg_ID else int(eeg_ID[0]))
-                max_ADC_count = 2**(8*bytes_per_sample-1)-1
-                max_byte_value = 2**(8*bytes_per_sample)
+                max_ADC_count = 2**(8 * bytes_per_sample - 1) - 1
+                max_byte_value = 2**(8 * bytes_per_sample)
 
                 with open(set_file, &#39;r&#39;, encoding=&#39;latin-1&#39;) as f_set:
                     lines = f_set.readlines()
-                    channel_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))\
-                                for line in lines if line.startswith(&#39;EEG_ch_&#39;)])
+                    channel_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))
+                                          for line in lines if line.startswith(&#39;EEG_ch_&#39;)])
                     channel_id = channel_lines[self.get_file_tag()]
                     self.set_channel_id(channel_id)
 
-                    gain_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))\
-                            for line in lines if &#39;gain_ch_&#39; in line])
-                    gain = gain_lines[channel_id-1]
+                    gain_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))
+                                       for line in lines if &#39;gain_ch_&#39; in line])
+                    gain = gain_lines[channel_id - 1]
 
                     for line in lines:
                         if line.startswith(&#39;ADC_fullscale_mv&#39;):
-                            self._set_fullscale_mv(int(re.findall(r&#39;\d+.\d+|d+&#39;, line)[0]))
+                            self._set_fullscale_mv(
+                                int(re.findall(r&#39;\d+.\d+|d+&#39;, line)[0]))
                             break
-                    AD_bit_uvolt = 2*self.get_fullscale_mv()/ \
-                                    (gain*np.power(2, 8*bytes_per_sample))
+                    AD_bit_uvolt = 2 * self.get_fullscale_mv() / \
+                        (gain * np.power(2, 8 * bytes_per_sample))
 
                 record_size = bytes_per_sample
                 sample_le = 256**(np.arange(0, bytes_per_sample, 1))
@@ -3134,17 +3159,20 @@ LFP signal in the recording.</p>
                     lfp_wave = np.zeros([num_samples, ], dtype=np.float64)
                     for k in np.arange(0, bytes_per_sample, 1):
                         byte_offset = k
-                        sample_value = (sample_le[k]* byte_buffer[byte_offset \
-                                    :byte_offset+ len_bytebuffer- end_offset- record_size\
-                                    :record_size])
+                        sample_value = (sample_le[k] * byte_buffer[byte_offset:byte_offset +
+                                                                   len_bytebuffer - end_offset - record_size:record_size])
                         if sample_value.size &lt; num_samples:
-                            sample_value = np.append(sample_value, np.zeros([num_samples-sample_value.size,]))
-                        sample_value = sample_value.astype(np.float64, casting=&#39;unsafe&#39;, copy=False)
+                            sample_value = np.append(sample_value, np.zeros(
+                                [num_samples - sample_value.size, ]))
+                        sample_value = sample_value.astype(
+                            np.float64, casting=&#39;unsafe&#39;, copy=False)
                         np.add(lfp_wave, sample_value, out=lfp_wave)
-                    np.putmask(lfp_wave, lfp_wave &gt; max_ADC_count, lfp_wave- max_byte_value)
+                    np.putmask(lfp_wave, lfp_wave &gt; max_ADC_count,
+                               lfp_wave - max_byte_value)
 
-                    self._set_samples(lfp_wave*AD_bit_uvolt)
-                    self._set_timestamp(np.arange(0, num_samples, 1)/self.get_sampling_rate())
+                    self._set_samples(lfp_wave * AD_bit_uvolt)
+                    self._set_timestamp(
+                        np.arange(0, num_samples, 1) / self.get_sampling_rate())
 
         else:
             logging.error(
@@ -3170,9 +3198,9 @@ LFP signal in the recording.</p>
 
         # Format description for the NLX file:
 
-        resamp_freq = 250 # NeuroChaT subsamples the original recording from 32000 to 250
+        resamp_freq = 250  # NeuroChaT subsamples the original recording from 32000 to 250
 
-        header_offset = 16*1024 # fixed for NLX files
+        header_offset = 16 * 1024  # fixed for NLX files
 
         bytes_per_timestamp = 8
         bytes_chan_no = 4
@@ -3181,8 +3209,8 @@ LFP signal in the recording.</p>
         bytes_per_sample = 2
         samples_per_record = 512
 
-        max_byte_value = np.power(2, bytes_per_sample*8)
-        max_ADC_count = np.power(2, bytes_per_sample*8- 1)-1
+        max_byte_value = np.power(2, bytes_per_sample * 8)
+        max_ADC_count = np.power(2, bytes_per_sample * 8 - 1) - 1
         AD_bit_uvolt = 10**-6
 
         self._set_bytes_per_sample(bytes_per_sample)
@@ -3199,34 +3227,40 @@ LFP signal in the recording.</p>
                 if line == &#39;&#39;:
                     break
                 if &#39;SamplingFrequency&#39; in line:
-                    self._set_sampling_rate(float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))) # We are subsampling from the blocks of 512 samples per record
+                    # We are subsampling from the blocks of 512 samples per record
+                    self._set_sampling_rate(
+                        float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
                 if &#39;RecordSize&#39; in line:
-                    record_size = int(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
+                    record_size = int(
+                        &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
                 if &#39;Time Opened&#39; in line:
                     self._set_date(re.search(r&#39;\d+/\d+/\d+&#39;, line).group())
                     self._set_time(re.search(r&#39;\d+:\d+:\d+&#39;, line).group())
                 if &#39;FileVersion&#39; in line:
                     self._set_file_version(line.split()[1])
                 if &#39;ADMaxValue&#39; in line:
-                    max_ADC_count = float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
+                    max_ADC_count = float(
+                        &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
                 if &#39;ADBitVolts&#39; in line:
-                    AD_bit_uvolt = float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))*(10**6)
+                    AD_bit_uvolt = float(
+                        &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))) * (10**6)
 
-            self._set_fullscale_mv(max_byte_value*AD_bit_uvolt/2) # gain = 1 assumed to keep in similarity to Axona
+            # gain = 1 assumed to keep in similarity to Axona
+            self._set_fullscale_mv(max_byte_value * AD_bit_uvolt / 2)
 
             if not record_size:
-                record_size = bytes_per_timestamp+ \
-                             bytes_chan_no+ \
-                             bytes_sample_freq+ \
-                             bytes_num_valid_samples+ \
-                             bytes_per_sample*samples_per_record
+                record_size = bytes_per_timestamp + \
+                    bytes_chan_no + \
+                    bytes_sample_freq + \
+                    bytes_num_valid_samples + \
+                    bytes_per_sample * samples_per_record
 
             time_offset = 0
-            sample_freq_offset = bytes_per_timestamp+ bytes_chan_no
-            num_valid_samples_offset = sample_freq_offset+ bytes_sample_freq
-            sample_offset = num_valid_samples_offset+ bytes_num_valid_samples
+            sample_freq_offset = bytes_per_timestamp + bytes_chan_no
+            num_valid_samples_offset = sample_freq_offset + bytes_sample_freq
+            sample_offset = num_valid_samples_offset + bytes_num_valid_samples
             f.seek(0, 2)
-            num_samples = int((f.tell()- header_offset)/record_size)
+            num_samples = int((f.tell() - header_offset) / record_size)
 
             f.seek(header_offset, 0)
             time = np.array([])
@@ -3234,23 +3268,26 @@ LFP signal in the recording.</p>
             sample_le = 256**(np.arange(0, bytes_per_sample, 1))
             for _ in np.arange(num_samples):
                 sample_bytes = np.fromfile(f, dtype=&#39;uint8&#39;, count=record_size)
-                block_start = int.from_bytes(sample_bytes[time_offset+ \
-                                np.arange(bytes_per_timestamp)], byteorder=&#39;little&#39;, signed=False)/10**6
-                valid_samples = int.from_bytes(sample_bytes[num_valid_samples_offset+ \
-                                np.arange(bytes_num_valid_samples)], byteorder=&#39;little&#39;, signed=False)
-                sampling_freq = int.from_bytes(sample_bytes[sample_freq_offset+ \
-                                np.arange(bytes_sample_freq)], byteorder=&#39;little&#39;, signed=False)
+                block_start = int.from_bytes(sample_bytes[time_offset +
+                                                          np.arange(bytes_per_timestamp)], byteorder=&#39;little&#39;, signed=False) / 10**6
+                valid_samples = int.from_bytes(sample_bytes[num_valid_samples_offset +
+                                                            np.arange(bytes_num_valid_samples)], byteorder=&#39;little&#39;, signed=False)
+                sampling_freq = int.from_bytes(sample_bytes[sample_freq_offset +
+                                                            np.arange(bytes_sample_freq)], byteorder=&#39;little&#39;, signed=False)
 
-                wave_bytes = sample_bytes[sample_offset+ np.arange(valid_samples* bytes_per_sample)]\
-                                .reshape([valid_samples, bytes_per_sample])
+                wave_bytes = sample_bytes[sample_offset + np.arange(valid_samples * bytes_per_sample)]\
+                    .reshape([valid_samples, bytes_per_sample])
                 block_wave = np.dot(wave_bytes, sample_le)
                 #    for k in np.arange(valid_samples):
                 #        block_wave[k] = int.from_bytes(sample_bytes[sample_offset+ k*bytes_per_sample+ \
                 #                    np.arange(bytes_per_sample)], byteorder=&#39;little&#39;, signed=False)
-                np.putmask(block_wave, block_wave &gt; max_ADC_count, block_wave - max_byte_value)
-                block_wave = block_wave*AD_bit_uvolt
-                block_time = block_start +  np.arange(valid_samples)/ sampling_freq
-                interp_time = np.arange(block_start, block_time[-1], 1/resamp_freq)
+                np.putmask(block_wave, block_wave &gt; max_ADC_count,
+                           block_wave - max_byte_value)
+                block_wave = block_wave * AD_bit_uvolt
+                block_time = block_start + \
+                    np.arange(valid_samples) / sampling_freq
+                interp_time = np.arange(
+                    block_start, block_time[-1], 1 / resamp_freq)
                 interp_wave = np.interp(interp_time, block_time, block_wave)
                 time = np.append(time, interp_time)
                 lfp_wave = np.append(lfp_wave, interp_wave)
@@ -3263,7 +3300,7 @@ LFP signal in the recording.</p>
     def find_artf(self, sd_thresh=3, min_artf_freq=8):
         &#34;&#34;&#34;
         Obtains locations of signal above threshold in windows.
-        
+
         NOTE this function is still a work in progress and may see future changes.
 
         Parameters
@@ -3280,11 +3317,11 @@ LFP signal in the recording.</p>
         std = np.std(samples)
         mean = np.mean(samples)
         over_thresh = np.logical_or(
-            samples &gt;= mean + sd_thresh*std,
-            samples &lt;= mean - sd_thresh*std)
-        # use np.where on the logical or if not using find_true_ranges    
+            samples &gt;= mean + sd_thresh * std,
+            samples &lt;= mean - sd_thresh * std)
+        # use np.where on the logical or if not using find_true_ranges
         _, thr_locs = find_true_ranges(
-            [i for i in range(len(samples))], over_thresh, 
+            [i for i in range(len(samples))], over_thresh,
             min_range=1, return_idxs=True)
         final_thr_locs = []
         if len(thr_locs) == 0:
@@ -3292,10 +3329,10 @@ LFP signal in the recording.</p>
             thr_vals = []
             thr_time = []
         else:
-            for i in range(len(thr_locs)-1):
+            for i in range(len(thr_locs) - 1):
                 # Set based on sampling freq/max freq of interest.
-                if thr_locs[i+1] - thr_locs[i] &lt;= ceil(Fs/min_artf_freq):
-                    for j in range(thr_locs[i], thr_locs[i+1]):
+                if thr_locs[i + 1] - thr_locs[i] &lt;= ceil(Fs / min_artf_freq):
+                    for j in range(thr_locs[i], thr_locs[i + 1]):
                         final_thr_locs.append(j)
                 else:
                     final_thr_locs.append(thr_locs[i])
@@ -3306,7 +3343,7 @@ LFP signal in the recording.</p>
             # print(&#39;changed: &#39;, len(thr_locs))
             thr_vals = self.get_samples()[thr_locs]
             thr_time = self.get_timestamp()[thr_locs]
-        per_removed = len(thr_locs)/len(samples)*100
+        per_removed = len(thr_locs) / len(samples) * 100
         # print(len(thr_locs), len(thr_time))
         return mean, std, thr_locs, thr_vals, thr_time, per_removed</code></pre>
 </details>
@@ -3388,17 +3425,17 @@ A new NSpike() object</p></section>
 
     &#34;&#34;&#34;
 
-    cls= kwargs.get(&#39;cls&#39;, None)
+    cls = kwargs.get(&#39;cls&#39;, None)
     if not inspect.isclass(cls):
         try:
             data_type = spike.get_type()
             if data_type == &#39;spike&#39;:
                 cls = spike.__class__
         except:
-             logging.error(&#39;Data type cannot be determined!&#39;)
+            logging.error(&#39;Data type cannot be determined!&#39;)
     if inspect.isclass(cls):
-         new_spike = self._add_node(cls, spike, &#39;spike&#39;, **kwargs)
-         return new_spike
+        new_spike = self._add_node(cls, spike, &#39;spike&#39;, **kwargs)
+        return new_spike
     else:
         logging.error(&#39;Cannot add the spike data!&#39;)</code></pre>
 </details>
@@ -3516,7 +3553,7 @@ Default [1.5, 40]</p>
     output = {
         &#34;bandpower&#34;: bp,
         &#34;total_power&#34;: tp,
-        &#34;relative_power&#34;: bp/tp}
+        &#34;relative_power&#34;: bp / tp}
     return output</code></pre>
 </details>
 </dd>
@@ -3650,7 +3687,8 @@ event triggered average of the LFP signal</dd>
         try:
             data_type = spike.get_type()
         except:
-            logging.error(&#39;The data type of the addes object cannot be determined!&#39;)
+            logging.error(
+                &#39;The data type of the addes object cannot be determined!&#39;)
 
         if data_type == &#39;spike&#39;:
             event_stamp = spike.get_unit_stamp()
@@ -3660,21 +3698,21 @@ event triggered average of the LFP signal</dd>
     if event_stamp is None:
         logging.error(&#39;No valid event timestamp or spike is provided&#39;)
     else:
-        lfp = self.get_samples()*1000
+        lfp = self.get_samples() * 1000
         Fs = self.get_sampling_rate()
         time = self.get_timestamp()
         center = time.searchsorted(event_stamp, side=&#39;left&#39;)
-        win = np.ceil(window*Fs).astype(int)
+        win = np.ceil(window * Fs).astype(int)
         win = np.arange(win[0], win[1])
 
         # Keep windows within data
-        center = np.array([center[i] for i in range(0, len(event_stamp)) \
-            if center[i]+ win[0] &gt;= 0 and center[i]+ win[-1] &lt;= time.size])
+        center = np.array([center[i] for i in range(0, len(event_stamp))
+                           if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
 
-        eta = reduce(lambda y, x: y+ lfp[x+ win], center)
-        eta = eta/center.size
+        eta = reduce(lambda y, x: y + lfp[x + win], center)
+        eta = eta / center.size
 
-        graph_data[&#39;t&#39;] = win/Fs
+        graph_data[&#39;t&#39;] = win / Fs
         graph_data[&#39;ETA&#39;] = eta
         graph_data[&#39;center&#39;] = center
 
@@ -3702,7 +3740,7 @@ eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of e
 <pre><code class="python">def find_artf(self, sd_thresh=3, min_artf_freq=8):
     &#34;&#34;&#34;
     Obtains locations of signal above threshold in windows.
-    
+
     NOTE this function is still a work in progress and may see future changes.
 
     Parameters
@@ -3719,11 +3757,11 @@ eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of e
     std = np.std(samples)
     mean = np.mean(samples)
     over_thresh = np.logical_or(
-        samples &gt;= mean + sd_thresh*std,
-        samples &lt;= mean - sd_thresh*std)
-    # use np.where on the logical or if not using find_true_ranges    
+        samples &gt;= mean + sd_thresh * std,
+        samples &lt;= mean - sd_thresh * std)
+    # use np.where on the logical or if not using find_true_ranges
     _, thr_locs = find_true_ranges(
-        [i for i in range(len(samples))], over_thresh, 
+        [i for i in range(len(samples))], over_thresh,
         min_range=1, return_idxs=True)
     final_thr_locs = []
     if len(thr_locs) == 0:
@@ -3731,10 +3769,10 @@ eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of e
         thr_vals = []
         thr_time = []
     else:
-        for i in range(len(thr_locs)-1):
+        for i in range(len(thr_locs) - 1):
             # Set based on sampling freq/max freq of interest.
-            if thr_locs[i+1] - thr_locs[i] &lt;= ceil(Fs/min_artf_freq):
-                for j in range(thr_locs[i], thr_locs[i+1]):
+            if thr_locs[i + 1] - thr_locs[i] &lt;= ceil(Fs / min_artf_freq):
+                for j in range(thr_locs[i], thr_locs[i + 1]):
                     final_thr_locs.append(j)
             else:
                 final_thr_locs.append(thr_locs[i])
@@ -3745,7 +3783,7 @@ eg. 250 Hz sampling rate, 40Hz min_artf_freq: locates artf within 9 samples of e
         # print(&#39;changed: &#39;, len(thr_locs))
         thr_vals = self.get_samples()[thr_locs]
         thr_time = self.get_timestamp()[thr_locs]
-    per_removed = len(thr_locs)/len(samples)*100
+    per_removed = len(thr_locs) / len(samples) * 100
     # print(len(thr_locs), len(thr_time))
     return mean, std, thr_locs, thr_vals, thr_time, per_removed</code></pre>
 </details>
@@ -4326,7 +4364,6 @@ filenames</p>
     file_tag, file_extension = os.path.splitext(file_basename)
     file_extension = file_extension[1:]
     set_file = os.path.join(file_directory, file_tag + &#39;.set&#39;)
-    set_file = file_directory + os.sep + file_tag + &#39;.set&#39;
 
     self._set_data_source(file_name)
     self._set_source_format(&#39;Axona&#39;)
@@ -4343,7 +4380,8 @@ filenames</p>
                 if line == &#39;&#39;:
                     break
                 if line.startswith(&#39;trial_date&#39;):
-                    self._set_date(&#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
+                    self._set_date(
+                        &#39; &#39;.join(line.replace(&#39;,&#39;, &#39; &#39;).split()[1:]))
                 if line.startswith(&#39;trial_time&#39;):
                     self._set_time(line.split()[1])
                 if line.startswith(&#39;experimenter&#39;):
@@ -4357,10 +4395,12 @@ filenames</p>
                 if line.startswith(&#39;num_chans&#39;):
                     self._set_total_channel(int(&#39;&#39;.join(line.split()[1:])))
                 if line.startswith(&#39;sample_rate&#39;):
-                    self._set_sampling_rate(float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
+                    self._set_sampling_rate(
+                        float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
                 if line.startswith(&#39;bytes_per_sample&#39;):
-                    self._set_bytes_per_sample(int(&#39;&#39;.join(line.split()[1:])))
-                if line.startswith(&#39;num_&#39;+ file_extension[:3].upper() + &#39;_samples&#39;):
+                    self._set_bytes_per_sample(
+                        int(&#39;&#39;.join(line.split()[1:])))
+                if line.startswith(&#39;num_&#39; + file_extension[:3].upper() + &#39;_samples&#39;):
                     self._set_total_samples(int(&#39;&#39;.join(line.split()[1:])))
                 if line.startswith(&#34;data_start&#34;):
                     break
@@ -4383,26 +4423,27 @@ filenames</p>
 
             eeg_ID = re.findall(r&#39;\d+&#39;, file_extension)
             self.set_file_tag(1 if not eeg_ID else int(eeg_ID[0]))
-            max_ADC_count = 2**(8*bytes_per_sample-1)-1
-            max_byte_value = 2**(8*bytes_per_sample)
+            max_ADC_count = 2**(8 * bytes_per_sample - 1) - 1
+            max_byte_value = 2**(8 * bytes_per_sample)
 
             with open(set_file, &#39;r&#39;, encoding=&#39;latin-1&#39;) as f_set:
                 lines = f_set.readlines()
-                channel_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))\
-                            for line in lines if line.startswith(&#39;EEG_ch_&#39;)])
+                channel_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))
+                                      for line in lines if line.startswith(&#39;EEG_ch_&#39;)])
                 channel_id = channel_lines[self.get_file_tag()]
                 self.set_channel_id(channel_id)
 
-                gain_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))\
-                        for line in lines if &#39;gain_ch_&#39; in line])
-                gain = gain_lines[channel_id-1]
+                gain_lines = dict([tuple(map(int, re.findall(r&#39;\d+.\d+|\d+&#39;, line)[0].split()))
+                                   for line in lines if &#39;gain_ch_&#39; in line])
+                gain = gain_lines[channel_id - 1]
 
                 for line in lines:
                     if line.startswith(&#39;ADC_fullscale_mv&#39;):
-                        self._set_fullscale_mv(int(re.findall(r&#39;\d+.\d+|d+&#39;, line)[0]))
+                        self._set_fullscale_mv(
+                            int(re.findall(r&#39;\d+.\d+|d+&#39;, line)[0]))
                         break
-                AD_bit_uvolt = 2*self.get_fullscale_mv()/ \
-                                (gain*np.power(2, 8*bytes_per_sample))
+                AD_bit_uvolt = 2 * self.get_fullscale_mv() / \
+                    (gain * np.power(2, 8 * bytes_per_sample))
 
             record_size = bytes_per_sample
             sample_le = 256**(np.arange(0, bytes_per_sample, 1))
@@ -4417,17 +4458,20 @@ filenames</p>
                 lfp_wave = np.zeros([num_samples, ], dtype=np.float64)
                 for k in np.arange(0, bytes_per_sample, 1):
                     byte_offset = k
-                    sample_value = (sample_le[k]* byte_buffer[byte_offset \
-                                :byte_offset+ len_bytebuffer- end_offset- record_size\
-                                :record_size])
+                    sample_value = (sample_le[k] * byte_buffer[byte_offset:byte_offset +
+                                                               len_bytebuffer - end_offset - record_size:record_size])
                     if sample_value.size &lt; num_samples:
-                        sample_value = np.append(sample_value, np.zeros([num_samples-sample_value.size,]))
-                    sample_value = sample_value.astype(np.float64, casting=&#39;unsafe&#39;, copy=False)
+                        sample_value = np.append(sample_value, np.zeros(
+                            [num_samples - sample_value.size, ]))
+                    sample_value = sample_value.astype(
+                        np.float64, casting=&#39;unsafe&#39;, copy=False)
                     np.add(lfp_wave, sample_value, out=lfp_wave)
-                np.putmask(lfp_wave, lfp_wave &gt; max_ADC_count, lfp_wave- max_byte_value)
+                np.putmask(lfp_wave, lfp_wave &gt; max_ADC_count,
+                           lfp_wave - max_byte_value)
 
-                self._set_samples(lfp_wave*AD_bit_uvolt)
-                self._set_timestamp(np.arange(0, num_samples, 1)/self.get_sampling_rate())
+                self._set_samples(lfp_wave * AD_bit_uvolt)
+                self._set_timestamp(
+                    np.arange(0, num_samples, 1) / self.get_sampling_rate())
 
     else:
         logging.error(
@@ -4477,8 +4521,8 @@ filenames</p>
 
         if path in hdf.f:
             g = hdf.f[path]
-        elif &#39;/processing/Neural Continuous/LFP/&#39;+ path in hdf.f:
-            path = &#39;/processing/Neural Continuous/LFP/&#39;+ path
+        elif &#39;/processing/Neural Continuous/LFP/&#39; + path in hdf.f:
+            path = &#39;/processing/Neural Continuous/LFP/&#39; + path
             g = hdf.f[path]
         else:
             logging.error(&#39;Specified path does not exist!&#39;)
@@ -4490,7 +4534,8 @@ filenames</p>
 
         self._set_samples(hdf.get_dataset(group=g, name=&#39;data&#39;))
         self._set_timestamp(hdf.get_dataset(group=g, name=&#39;timestamps&#39;))
-        self._set_total_samples(hdf.get_dataset(group=g, name=&#39;num_samples&#39;))
+        self._set_total_samples(
+            hdf.get_dataset(group=g, name=&#39;num_samples&#39;))
 
         hdf.close()
     else:
@@ -4536,9 +4581,9 @@ filenames</p>
 
     # Format description for the NLX file:
 
-    resamp_freq = 250 # NeuroChaT subsamples the original recording from 32000 to 250
+    resamp_freq = 250  # NeuroChaT subsamples the original recording from 32000 to 250
 
-    header_offset = 16*1024 # fixed for NLX files
+    header_offset = 16 * 1024  # fixed for NLX files
 
     bytes_per_timestamp = 8
     bytes_chan_no = 4
@@ -4547,8 +4592,8 @@ filenames</p>
     bytes_per_sample = 2
     samples_per_record = 512
 
-    max_byte_value = np.power(2, bytes_per_sample*8)
-    max_ADC_count = np.power(2, bytes_per_sample*8- 1)-1
+    max_byte_value = np.power(2, bytes_per_sample * 8)
+    max_ADC_count = np.power(2, bytes_per_sample * 8 - 1) - 1
     AD_bit_uvolt = 10**-6
 
     self._set_bytes_per_sample(bytes_per_sample)
@@ -4565,34 +4610,40 @@ filenames</p>
             if line == &#39;&#39;:
                 break
             if &#39;SamplingFrequency&#39; in line:
-                self._set_sampling_rate(float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))) # We are subsampling from the blocks of 512 samples per record
+                # We are subsampling from the blocks of 512 samples per record
+                self._set_sampling_rate(
+                    float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))))
             if &#39;RecordSize&#39; in line:
-                record_size = int(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
+                record_size = int(
+                    &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
             if &#39;Time Opened&#39; in line:
                 self._set_date(re.search(r&#39;\d+/\d+/\d+&#39;, line).group())
                 self._set_time(re.search(r&#39;\d+:\d+:\d+&#39;, line).group())
             if &#39;FileVersion&#39; in line:
                 self._set_file_version(line.split()[1])
             if &#39;ADMaxValue&#39; in line:
-                max_ADC_count = float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
+                max_ADC_count = float(
+                    &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))
             if &#39;ADBitVolts&#39; in line:
-                AD_bit_uvolt = float(&#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line)))*(10**6)
+                AD_bit_uvolt = float(
+                    &#39;&#39;.join(re.findall(r&#39;\d+.\d+|\d+&#39;, line))) * (10**6)
 
-        self._set_fullscale_mv(max_byte_value*AD_bit_uvolt/2) # gain = 1 assumed to keep in similarity to Axona
+        # gain = 1 assumed to keep in similarity to Axona
+        self._set_fullscale_mv(max_byte_value * AD_bit_uvolt / 2)
 
         if not record_size:
-            record_size = bytes_per_timestamp+ \
-                         bytes_chan_no+ \
-                         bytes_sample_freq+ \
-                         bytes_num_valid_samples+ \
-                         bytes_per_sample*samples_per_record
+            record_size = bytes_per_timestamp + \
+                bytes_chan_no + \
+                bytes_sample_freq + \
+                bytes_num_valid_samples + \
+                bytes_per_sample * samples_per_record
 
         time_offset = 0
-        sample_freq_offset = bytes_per_timestamp+ bytes_chan_no
-        num_valid_samples_offset = sample_freq_offset+ bytes_sample_freq
-        sample_offset = num_valid_samples_offset+ bytes_num_valid_samples
+        sample_freq_offset = bytes_per_timestamp + bytes_chan_no
+        num_valid_samples_offset = sample_freq_offset + bytes_sample_freq
+        sample_offset = num_valid_samples_offset + bytes_num_valid_samples
         f.seek(0, 2)
-        num_samples = int((f.tell()- header_offset)/record_size)
+        num_samples = int((f.tell() - header_offset) / record_size)
 
         f.seek(header_offset, 0)
         time = np.array([])
@@ -4600,23 +4651,26 @@ filenames</p>
         sample_le = 256**(np.arange(0, bytes_per_sample, 1))
         for _ in np.arange(num_samples):
             sample_bytes = np.fromfile(f, dtype=&#39;uint8&#39;, count=record_size)
-            block_start = int.from_bytes(sample_bytes[time_offset+ \
-                            np.arange(bytes_per_timestamp)], byteorder=&#39;little&#39;, signed=False)/10**6
-            valid_samples = int.from_bytes(sample_bytes[num_valid_samples_offset+ \
-                            np.arange(bytes_num_valid_samples)], byteorder=&#39;little&#39;, signed=False)
-            sampling_freq = int.from_bytes(sample_bytes[sample_freq_offset+ \
-                            np.arange(bytes_sample_freq)], byteorder=&#39;little&#39;, signed=False)
+            block_start = int.from_bytes(sample_bytes[time_offset +
+                                                      np.arange(bytes_per_timestamp)], byteorder=&#39;little&#39;, signed=False) / 10**6
+            valid_samples = int.from_bytes(sample_bytes[num_valid_samples_offset +
+                                                        np.arange(bytes_num_valid_samples)], byteorder=&#39;little&#39;, signed=False)
+            sampling_freq = int.from_bytes(sample_bytes[sample_freq_offset +
+                                                        np.arange(bytes_sample_freq)], byteorder=&#39;little&#39;, signed=False)
 
-            wave_bytes = sample_bytes[sample_offset+ np.arange(valid_samples* bytes_per_sample)]\
-                            .reshape([valid_samples, bytes_per_sample])
+            wave_bytes = sample_bytes[sample_offset + np.arange(valid_samples * bytes_per_sample)]\
+                .reshape([valid_samples, bytes_per_sample])
             block_wave = np.dot(wave_bytes, sample_le)
             #    for k in np.arange(valid_samples):
             #        block_wave[k] = int.from_bytes(sample_bytes[sample_offset+ k*bytes_per_sample+ \
             #                    np.arange(bytes_per_sample)], byteorder=&#39;little&#39;, signed=False)
-            np.putmask(block_wave, block_wave &gt; max_ADC_count, block_wave - max_byte_value)
-            block_wave = block_wave*AD_bit_uvolt
-            block_time = block_start +  np.arange(valid_samples)/ sampling_freq
-            interp_time = np.arange(block_start, block_time[-1], 1/resamp_freq)
+            np.putmask(block_wave, block_wave &gt; max_ADC_count,
+                       block_wave - max_byte_value)
+            block_wave = block_wave * AD_bit_uvolt
+            block_time = block_start + \
+                np.arange(valid_samples) / sampling_freq
+            interp_time = np.arange(
+                block_start, block_time[-1], 1 / resamp_freq)
             interp_wave = np.interp(interp_time, block_time, block_wave)
             time = np.append(time, interp_time)
             lfp_wave = np.append(lfp_wave, interp_wave)
@@ -4662,7 +4716,6 @@ filenames</p>
     None
 
     &#34;&#34;&#34;
-
 
     if names == &#39;all&#39;:
         for spike in self._spikes:
@@ -4774,19 +4827,19 @@ distribution</dd>
 
         &#34;&#34;&#34;
 
-        _results= oDict()
+        _results = oDict()
         graph_data = oDict()
 
         cs = CircStat()
 
-        lfp = self.get_samples()*1000
+        lfp = self.get_samples() * 1000
         Fs = self.get_sampling_rate()
         time = self.get_timestamp()
 
         # Input parameters
-        bins = int(360/kwargs.get(&#39;binsize&#39;, 5))
-        rbinsize = kwargs.get(&#39;rbinsize&#39;, 2) # raster binsize
-        rbins = int(360/rbinsize)
+        bins = int(360 / kwargs.get(&#39;binsize&#39;, 5))
+        rbinsize = kwargs.get(&#39;rbinsize&#39;, 2)  # raster binsize
+        rbins = int(360 / rbinsize)
         fwin = kwargs.get(&#39;fwin&#39;, [6, 12])
         pratio = kwargs.get(&#39;pratio&#39;, 0.2)
         aratio = kwargs.get(&#39;aratio&#39;, 0.15)
@@ -4797,7 +4850,7 @@ distribution</dd>
         _filter = [5, fmin, fmax, &#39;bandpass&#39;]
         _prefilt = kwargs.get(&#39;filtset&#39;, [10, 1.5, 40, &#39;bandpass&#39;])
 
-        b_lfp = butter_filter(lfp, Fs, *_filter) # band LFP
+        b_lfp = butter_filter(lfp, Fs, *_filter)  # band LFP
         lfp = butter_filter(lfp, Fs, *_prefilt)
 
     # Measure phase
@@ -4811,7 +4864,7 @@ distribution</dd>
         ephase = np.interp(event_stamp, time, phase)
 
         p2p = np.abs(np.max(lfp) - np.min(lfp))
-        xline = 0.5* np.mean(mag) # cross line
+        xline = 0.5 * np.mean(mag)  # cross line
 
         # Detection algo
         # zero cross
@@ -4819,31 +4872,32 @@ distribution</dd>
         mag2 = mag[1:-2]
         mag3 = mag[2:-1]
 
-        xind = np.union1d(find(np.logical_and(mag1 &lt; xline, mag2 &gt; xline)), \
-                find(np.logical_and(np.logical_and(mag1 &lt; xline, mag2 == xline), mag3 &gt; xline)))
+        xind = np.union1d(find(np.logical_and(mag1 &lt; xline, mag2 &gt; xline)),
+                          find(np.logical_and(np.logical_and(mag1 &lt; xline, mag2 == xline), mag3 &gt; xline)))
 
         # Ignore segments &lt;1/fmax
         i = 0
-        rcount = np.empty([0,])
+        rcount = np.empty([0, ])
         bcount = np.empty([0, 0])
 
-        phBins = np.arange(0, 360, 360/bins)
-        rbins = np.arange(0, 360, 360/rbins)
+        phBins = np.arange(0, 360, 360 / bins)
+        rbins = np.arange(0, 360, 360 / rbins)
 
         seg_count = 0
-        while i &lt; len(xind)-1:
-            k = i+1
-            while time[xind[k]]- time[xind[i]] &lt; 1/fmin and k &lt; len(xind)-1:
+        while i &lt; len(xind) - 1:
+            k = i + 1
+            while time[xind[k]] - time[xind[i]] &lt; 1 / fmin and k &lt; len(xind) - 1:
                 k += 1
 #            print(time[xind[i]], time[xind[k]])
             s_lfp = lfp[xind[i]: xind[k]]
-            s_p2p = np.abs(np.max(s_lfp)- np.min(s_lfp))
+            s_p2p = np.abs(np.max(s_lfp) - np.min(s_lfp))
 
-            if s_p2p &gt;= aratio*p2p:
+            if s_p2p &gt;= aratio * p2p:
                 s_psd, f = fft_psd(s_lfp, Fs)
-                if np.sum(s_psd[np.logical_and(f &gt;= fmin, f &lt;= fmax)]) &gt; pratio* np.sum(s_psd):
+                if np.sum(s_psd[np.logical_and(f &gt;= fmin, f &lt;= fmax)]) &gt; pratio * np.sum(s_psd):
                     # Phase distribution
-                    s_phase = ephase[np.logical_and(event_stamp &gt; time[xind[i]], event_stamp &lt;= time[xind[k]])]
+                    s_phase = ephase[np.logical_and(
+                        event_stamp &gt; time[xind[i]], event_stamp &lt;= time[xind[k]])]
 #                    print(s_phase.shape, s_phase.shape)
 
                     if not s_phase.shape[0]:
@@ -4859,7 +4913,8 @@ distribution</dd>
                         else:
                             rcount = np.append(rcount, temp_count)
 
-                        temp_count = np.histogram(s_phase, bins=bins, range=[0, 360])
+                        temp_count = np.histogram(
+                            s_phase, bins=bins, range=[0, 360])
                         temp_count = np.resize(temp_count[0], [1, bins])
                         if not len(bcount):
                             bcount = temp_count
@@ -4876,11 +4931,11 @@ distribution</dd>
 
         cs.calc_stat()
         result = cs.get_result()
-        meanTheta = result[&#39;meanTheta&#39;]*np.pi/180
+        meanTheta = result[&#39;meanTheta&#39;] * np.pi / 180
 
-        _results[&#39;LFP Spike Mean Phase&#39;]= result[&#39;meanTheta&#39;]
-        _results[&#39;LFP Spike Mean Phase Count&#39;]= result[&#39;meanRho&#39;]
-        _results[&#39;LFP Spike Phase Res Vect&#39;]= result[&#39;resultant&#39;]
+        _results[&#39;LFP Spike Mean Phase&#39;] = result[&#39;meanTheta&#39;]
+        _results[&#39;LFP Spike Mean Phase Count&#39;] = result[&#39;meanRho&#39;]
+        _results[&#39;LFP Spike Phase Res Vect&#39;] = result[&#39;resultant&#39;]
 
         graph_data[&#39;meanTheta&#39;] = meanTheta
         graph_data[&#39;phCount&#39;] = phCount
@@ -4950,23 +5005,25 @@ locking</dd>
     &#34;&#34;&#34;
     graph_data = oDict()
 
-    lfp = self.get_samples()*1000
+    lfp = self.get_samples() * 1000
     Fs = self.get_sampling_rate()
     time = self.get_timestamp()
 
     window = np.array(kwargs.get(&#39;window&#39;, [-0.5, 0.5]))
-    win = np.ceil(window*Fs).astype(int)
+    win = np.ceil(window * Fs).astype(int)
     win = np.arange(win[0], win[1])
     slep_win = sg.hann(win.size, False)
 
     nfft = kwargs.get(&#39;nfft&#39;, 1024)
-    mode = kwargs.get(&#39;mode&#39;, None) # None, &#39;bs&#39;, &#39;tr&#39; bs=bootstrp, tr=time-resolved
+    # None, &#39;bs&#39;, &#39;tr&#39; bs=bootstrp, tr=time-resolved
+    mode = kwargs.get(&#39;mode&#39;, None)
     fwin = kwargs.get(&#39;fwin&#39;, [])
 
-    xf = np.arange(0, Fs, Fs/nfft)
-    f = xf[0: int(nfft/2)+ 1]
+    xf = np.arange(0, Fs, Fs / nfft)
+    f = xf[0: int(nfft / 2) + 1]
 
-    ind = np.arange(f.size) if len(fwin) == 0 else find(np.logical_and(f &gt;= fwin[0], f &lt;= fwin[1]))
+    ind = np.arange(f.size) if len(fwin) == 0 else find(
+        np.logical_and(f &gt;= fwin[0], f &lt;= fwin[1]))
 
     if mode == &#39;bs&#39;:
         nsample = kwargs.get(&#39;nsample&#39;, 50)
@@ -4979,8 +5036,8 @@ locking</dd>
         PLV = np.empty([nrep, ind.size])
 
         for i in np.arange(nrep):
-            data = self.plv(np.random.choice(event_stamp, nsample, False), \
-                    window=window, nfft=nfft, mode=None, fwin=fwin)
+            data = self.plv(np.random.choice(event_stamp, nsample, False),
+                            window=window, nfft=nfft, mode=None, fwin=fwin)
             t = data[&#39;t&#39;]
             STA[i, :] = data[&#39;STA&#39;]
             fSTA[i, :] = data[&#39;fSTA&#39;]
@@ -5005,8 +5062,8 @@ locking</dd>
     elif mode == &#39;tr&#39;:
         nsample = kwargs.get(&#39;nsample&#39;, None)
 
-        slide = kwargs.get(&#39;slide&#39;, 25) # in ms
-        slide = slide/1000 # convert to sec
+        slide = kwargs.get(&#39;slide&#39;, 25)  # in ms
+        slide = slide / 1000  # convert to sec
 
         offset = np.arange(window[0], window[-1], slide)
         nwin = offset.size
@@ -5022,8 +5079,8 @@ locking</dd>
             stamp = np.random.choice(event_stamp, nsample, False)
 
         for i in np.arange(nwin):
-            data = self.plv(stamp + offset[i], \
-                    nfft=nfft, mode=None, fwin=fwin, window=window)
+            data = self.plv(stamp + offset[i],
+                            nfft=nfft, mode=None, fwin=fwin, window=window)
             t = data[&#39;t&#39;]
             fSTA[i, :] = data[&#39;fSTA&#39;]
             STP[i, :] = data[&#39;STP&#39;]
@@ -5040,25 +5097,25 @@ locking</dd>
     elif mode is None:
         center = time.searchsorted(event_stamp)
         # Keep windows within data
-        center = np.array([center[i] for i in range(0, len(event_stamp)) \
-            if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
+        center = np.array([center[i] for i in range(0, len(event_stamp))
+                           if center[i] + win[0] &gt;= 0 and center[i] + win[-1] &lt;= time.size])
 
         sta_data = self.event_trig_average(event_stamp, **kwargs)
         STA = sta_data[&#39;ETA&#39;]
 
         fSTA = fft(np.multiply(STA, slep_win), nfft)
 
-        fSTA = np.absolute(fSTA[0: int(nfft/2)+ 1])**2/nfft**2
-        fSTA[1:-1] = 2*fSTA[1:-1]
+        fSTA = np.absolute(fSTA[0: int(nfft / 2) + 1])**2 / nfft**2
+        fSTA[1:-1] = 2 * fSTA[1:-1]
 
-        fLFP = np.array([fft(np.multiply(lfp[x+ win], slep_win), nfft) \
-                for x in center])
+        fLFP = np.array([fft(np.multiply(lfp[x + win], slep_win), nfft)
+                         for x in center])
 
-        STP = np.absolute(fLFP[:, 0: int(nfft/2)+ 1])**2/nfft**2
-        STP[:, 1:-1] = 2*STP[:, 1:-1]
+        STP = np.absolute(fLFP[:, 0: int(nfft / 2) + 1])**2 / nfft**2
+        STP[:, 1:-1] = 2 * STP[:, 1:-1]
         STP = STP.mean(0)
 
-        SFC = np.divide(fSTA, STP)*100
+        SFC = np.divide(fSTA, STP) * 100
 
         PLV = np.copy(fLFP)
 
@@ -5066,8 +5123,8 @@ locking</dd>
         PLV = np.divide(PLV, np.absolute(PLV))
         PLV[np.isnan(PLV)] = 0
 
-        PLV = np.absolute(PLV.mean(0))[0: int(nfft/2)+ 1]
-        PLV[1:-1] = 2*PLV[1:-1]
+        PLV = np.absolute(PLV.mean(0))[0: int(nfft / 2) + 1]
+        PLV[1:-1] = 2 * PLV[1:-1]
 
         graph_data[&#39;t&#39;] = sta_data[&#39;t&#39;]
         graph_data[&#39;f&#39;] = f[ind]
@@ -5343,16 +5400,16 @@ have file tags like 'eeg' or 'eeg8' etc.</p>
             lfp = self.get_samples()
 
         window = kwargs.get(&#39;window&#39;, 1.0)
-        window = sg.get_window(&#39;hann&#39;, int(window*Fs)) if isinstance(window, float)\
-                or isinstance(window, int) else window
+        window = sg.get_window(&#39;hann&#39;, int(window * Fs)) if isinstance(window, float)\
+            or isinstance(window, int) else window
 
-        win_sec = np.ceil(window.size/Fs)
+        win_sec = np.ceil(window.size / Fs)
 
-        noverlap = kwargs.get(&#39;noverlap&#39;, 0.5*win_sec)
-        noverlap = noverlap if noverlap &lt; win_sec else 0.5*win_sec
-        noverlap = np.ceil(noverlap*Fs)
+        noverlap = kwargs.get(&#39;noverlap&#39;, 0.5 * win_sec)
+        noverlap = noverlap if noverlap &lt; win_sec else 0.5 * win_sec
+        noverlap = np.ceil(noverlap * Fs)
 
-        nfft = kwargs.get(&#39;nfft&#39;, 2*Fs)
+        nfft = kwargs.get(&#39;nfft&#39;, 2 * Fs)
         nfft = np.power(2, int(np.ceil(np.log2(nfft))))
 
         ptype = kwargs.get(&#39;ptype&#39;, &#39;psd&#39;)
@@ -5361,7 +5418,7 @@ have file tags like 'eeg' or 'eeg8' etc.</p>
         prefilt = kwargs.get(&#39;prefilt&#39;, True)
         _filter = kwargs.get(&#39;filtset&#39;, [10, 1.5, 40, &#39;bandpass&#39;])
 
-        fmax = kwargs.get(&#39;fmax&#39;, Fs/2)
+        fmax = kwargs.get(&#39;fmax&#39;, Fs / 2)
 
         if prefilt:
             lfp = butter_filter(lfp, Fs, *_filter)
@@ -5369,15 +5426,15 @@ have file tags like 'eeg' or 'eeg8' etc.</p>
         tr = kwargs.get(&#39;tr&#39;, False)
         db = kwargs.get(&#39;db&#39;, False)
         if tr:
-            f, t, Sxx = sg.spectrogram(lfp, fs=Fs, \
-                    window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
-                    detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
+            f, t, Sxx = sg.spectrogram(lfp, fs=Fs,
+                                       window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                                       detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
             graph_data[&#39;t&#39;] = t + self.get_timestamp()[0]
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
-                Sxx = 10*np.log10(Sxx/np.amax(Sxx))
+                Sxx = 10 * np.log10(Sxx / np.amax(Sxx))
                 Sxx = Sxx.flatten()
                 Sxx[find(Sxx &lt; -40)] = -40
                 Sxx = np.reshape(Sxx, [f.size, t.size])
@@ -5386,14 +5443,14 @@ have file tags like 'eeg' or 'eeg8' etc.</p>
 #            graph_data[&#39;Sxx&#39;] = np.array([Sxx[i, :] for i in find(f&lt;= fmax)])
             graph_data[&#39;Sxx&#39;] = Sxx[find(f &lt;= fmax), :]
         else:
-            f, Pxx = sg.welch(lfp, fs=Fs, \
-                    window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft, \
-                    detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
+            f, Pxx = sg.welch(lfp, fs=Fs,
+                              window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                              detrend=&#39;constant&#39;, return_onesided=True, scaling=ptype)
 
             graph_data[&#39;f&#39;] = f[find(f &lt;= fmax)]
 
             if db:
-                Pxx = 10*np.log10(Pxx/Pxx.max())
+                Pxx = 10 * np.log10(Pxx / Pxx.max())
                 Pxx[find(Pxx &lt; -40)] = -40
             graph_data[&#39;Pxx&#39;] = Pxx[find(f &lt;= fmax)]
 
