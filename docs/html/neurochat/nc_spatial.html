@@ -808,7 +808,7 @@ class NSpatial(NAbstract):
         if filename is None:
             filename = self._filename
         else:
-            filename = self._filename
+            self._filename = filename
         loader = getattr(self, &#39;load_spatial_&#39;+ system)
         loader(filename)
         try:
@@ -3867,7 +3867,7 @@ activity of a unit.</p>
         if filename is None:
             filename = self._filename
         else:
-            filename = self._filename
+            self._filename = filename
         loader = getattr(self, &#39;load_spatial_&#39;+ system)
         loader(filename)
         try:
@@ -8421,7 +8421,7 @@ predicted firing rate and the caclulated firing rate.</p>
     if filename is None:
         filename = self._filename
     else:
-        filename = self._filename
+        self._filename = filename
     loader = getattr(self, &#39;load_spatial_&#39;+ system)
     loader(filename)
     try:

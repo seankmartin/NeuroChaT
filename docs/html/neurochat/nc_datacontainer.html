@@ -487,6 +487,7 @@ class NDataContainer():
             re_filter=re_filter, return_absolute=True)
 
         num_found = 0
+        cluster_files = []
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
@@ -526,6 +527,7 @@ class NDataContainer():
                 else:
                     cluster_name = clu_name
 
+                cluster_files.append(cluster_name)
                 logging.info(
                     &#34;Adding tetrode {} with spikes {}, clusters {}, positions {}&#34;.format(
                         tetrode, os.path.basename(spike_name),
@@ -560,7 +562,7 @@ class NDataContainer():
             logging.info(
                 &#34;Wrote list of files considered to {}&#34;.format(out_loc))
             return out_loc
-        return None
+        return cluster_files
 
     def merge(self, indices, force_equal_units=True):
         &#34;&#34;&#34;
@@ -1479,6 +1481,7 @@ instead load it as needed, on the fly</dd>
             re_filter=re_filter, return_absolute=True)
 
         num_found = 0
+        cluster_files = []
         for filename in files:
             filename = filename[:-len(data_extension)]
             for tetrode in tetrode_list:
@@ -1518,6 +1521,7 @@ instead load it as needed, on the fly</dd>
                 else:
                     cluster_name = clu_name
 
+                cluster_files.append(cluster_name)
                 logging.info(
                     &#34;Adding tetrode {} with spikes {}, clusters {}, positions {}&#34;.format(
                         tetrode, os.path.basename(spike_name),
@@ -1552,7 +1556,7 @@ instead load it as needed, on the fly</dd>
             logging.info(
                 &#34;Wrote list of files considered to {}&#34;.format(out_loc))
             return out_loc
-        return None
+        return cluster_files
 
     def merge(self, indices, force_equal_units=True):
         &#34;&#34;&#34;
@@ -2155,6 +2159,7 @@ don't consider any recordings with units outside this range</dd>
         re_filter=re_filter, return_absolute=True)
 
     num_found = 0
+    cluster_files = []
     for filename in files:
         filename = filename[:-len(data_extension)]
         for tetrode in tetrode_list:
@@ -2194,6 +2199,7 @@ don't consider any recordings with units outside this range</dd>
             else:
                 cluster_name = clu_name
 
+            cluster_files.append(cluster_name)
             logging.info(
                 &#34;Adding tetrode {} with spikes {}, clusters {}, positions {}&#34;.format(
                     tetrode, os.path.basename(spike_name),
@@ -2228,7 +2234,7 @@ don't consider any recordings with units outside this range</dd>
         logging.info(
             &#34;Wrote list of files considered to {}&#34;.format(out_loc))
         return out_loc
-    return None</code></pre>
+    return cluster_files</code></pre>
 </details>
 </dd>
 <dt id="neurochat.nc_datacontainer.NDataContainer.add_data"><code class="name flex">
