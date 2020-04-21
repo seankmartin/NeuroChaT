@@ -1376,7 +1376,6 @@ class NLfp(NBase):
         file_tag, file_extension = os.path.splitext(file_basename)
         file_extension = file_extension[1:]
         set_file = os.path.join(file_directory, file_tag + '.set')
-        set_file = file_directory + os.sep + file_tag + '.set'
 
         self._set_data_source(file_name)
         self._set_source_format('Axona')
