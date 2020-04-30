@@ -1396,6 +1396,10 @@ class NLfp(NBase):
                     if line == '':
                         break
                     if line.startswith('trial_date'):
+                        # Blank eeg file
+                        if line.strip() == "trial_date":
+                            self._set_total_samples(0)
+                            return
                         self._set_date(
                             ' '.join(line.replace(',', ' ').split()[1:]))
                     if line.startswith('trial_time'):
