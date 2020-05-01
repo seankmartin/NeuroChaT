@@ -1441,7 +1441,7 @@ class NSpatial(NAbstract):
 
         if filttype is not None:
             smoothMap = smooth_2d(fmap, filttype, filtsize)
-        else :
+        else:
             smoothMap = fmap
         
         if smooth_place:
@@ -2308,7 +2308,6 @@ class NSpatial(NAbstract):
         time = self.get_time()
         lim = kwargs.get('range', [0, time.max()])
 
-        # Sean - Why is zero idx is always thrown away?
         keep_zero_idx = kwargs.get('keep_zero_idx', False)
         
         hist = histogram(
