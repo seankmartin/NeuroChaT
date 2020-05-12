@@ -153,7 +153,7 @@ class UiGetFiles(QtWidgets.QDialog):
         self.remove_button.clicked.connect(self.remove_items)
         self.up_button.clicked.connect(partial(self.move_items, 'up'))
         self.down_button.clicked.connect(partial(self.move_items, 'down'))
-        self.done_button.clicked.connect(self.done)
+        self.done_button.clicked.connect(self.done_merge)
         self.cancel_button.clicked.connect(self.close_dialog)
 
         self.folder_line.setText(os.getcwd())
@@ -371,7 +371,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
         self.file_list.setModel(self.file_model)
 
-    def done(self):
+    def done_merge(self):
         """
         Sets the list of files and closes the widget.
 
@@ -384,7 +384,6 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         self.files = [os.path.join(self.folder_line.text(), self.file_model.item(i).text())
                       for i in range(self.file_model.rowCount())]
         self.close_dialog()
