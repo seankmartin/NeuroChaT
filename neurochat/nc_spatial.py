@@ -1490,6 +1490,7 @@ class NSpatial(NAbstract):
             _results['Spatial Skaggs'] = self.skaggs_info(fmap, tmap)
             _results['Spatial Sparsity'] = self.spatial_sparsity(fmap, tmap)
             _results['Spatial Coherence'] = np.corrcoef(fmap[tmap != 0].flatten(), smoothMap[tmap != 0].flatten())[0, 1]
+            _results['Peak Firing Rate'] = fmap.max()
             _results['Found strong place field'] = (largest_group != 0)
             _results['Place field Centroid x'] = centroid[0]
             _results['Place field Centroid y'] = centroid[1]
@@ -2849,7 +2850,11 @@ class NSpatial(NAbstract):
             maskInd = np.logical_and(distMat > 0.5*meanDist, distMat < 1.5*meanDist)
             rotCorr = np.array([corr_coeff(rot_2d(corrMap, theta)[maskInd], corrMap[maskInd]) for k, theta in enumerate(bins)])
             ramax, rimax, ramin, rimin = extrema(rotCorr)
-            mThetaPk, mThetaTr = (np.diff(bins[rimax]).mean(), np.diff(bins[rimin]).mean()) if rimax.size and rimin.size else (None, None)
+            if rimax.size and rimin.size:
+                mThetaPk, mThetaTr = (
+                    np.diff(bins[rimax]).mean(), np.diff(bins[rimin]).mean())  
+            else: 
+                mThetaPk, mThetaTr = (None, None)
             graph_data['rimax'] = rimax
             graph_data['rimin'] = rimin
             graph_data['anglemax'] = bins[rimax]
