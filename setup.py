@@ -6,15 +6,15 @@ def read(fname):
 
 
 DESCRIPTION = "NeuroChaT: Neuron Characterisation Toolbox"
-LONG_DESCRIPTION = """NeuroChaT is a neuroscience toolbox written in Python.
-"""
+
+LONG_DESCRIPTION = read("README.md")
 
 DISTNAME = 'neurochat'
 MAINTAINER = 'Md Nurul Islam and Sean Martin'
 MAINTAINER_EMAIL = 'martins7@tcd.ie'
 URL = 'https://github.com/seankmartin/NeuroChaT'
-DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT'
-VERSION = '1.0'
+DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT/archive/v1.1.1-alpha.tar.gz'
+VERSION = '1.1.1a0'
 
 INSTALL_REQUIRES = [
     'PyPDF2 >= 1.26.0',
@@ -50,6 +50,7 @@ try:
     from setuptools import setup
     _has_setuptools = True
 except ImportError:
+    print("Setup tools is preferred but not installed")
     from distutils.core import setup
 
 if __name__ == "__main__":
@@ -61,6 +62,7 @@ if __name__ == "__main__":
           maintainer_email=MAINTAINER_EMAIL,
           description=DESCRIPTION,
           long_description=LONG_DESCRIPTION,
+          long_description_content_type="text/markdown",
           license=read('LICENSE'),
           url=URL,
           version=VERSION,
