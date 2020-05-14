@@ -14,7 +14,7 @@ Md Nurul Islam, Sean K. Martin, Shane M. O'Mara, and John P. Aggleton.
 
 **SMOM**: Original conception and statement of software need, project guidance and feedback.
 
-**JPA, SMOM**: Grant-fundraising; analysis and interpretation of data.
+**JPA, SMOM**: Grant-fundraising, analysis and interpretation of data.
 
 ## Acknowledgments
 

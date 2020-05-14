@@ -8,12 +8,13 @@ def read(fname):
 DESCRIPTION = "NeuroChaT: Neuron Characterisation Toolbox"
 
 LONG_DESCRIPTION = read("README.md")
+LONG_DESCRIPTION_CONTENT_TYPE = "text/markdown"
 
 DISTNAME = 'neurochat'
 MAINTAINER = 'Md Nurul Islam and Sean Martin'
 MAINTAINER_EMAIL = 'martins7@tcd.ie'
 URL = 'https://github.com/seankmartin/NeuroChaT'
-DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT/archive/v1.1.1-alpha.tar.gz'
+DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT/archive/v1.1.1a0.tar.gz'
 VERSION = '1.1.1a0'
 
 INSTALL_REQUIRES = [
@@ -46,12 +47,7 @@ CLASSIFIERS = [
     'Operating System :: Windows'
 ]
 
-try:
-    from setuptools import setup
-    _has_setuptools = True
-except ImportError:
-    print("Setup tools is preferred but not installed")
-    from distutils.core import setup
+from setuptools import setup
 
 if __name__ == "__main__":
 
@@ -62,8 +58,7 @@ if __name__ == "__main__":
           maintainer_email=MAINTAINER_EMAIL,
           description=DESCRIPTION,
           long_description=LONG_DESCRIPTION,
-          long_description_content_type="text/markdown",
-          license=read('LICENSE'),
+          long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
           url=URL,
           version=VERSION,
           download_url=DOWNLOAD_URL,
