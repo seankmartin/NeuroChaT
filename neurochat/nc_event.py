@@ -366,7 +366,7 @@ class NEvent(NBase):
                         f.seek(-9, 1)
 
                 if not header_offset:
-                    print('Error: data_start marker not found!')
+                    raise ValueError('data_start marker not found!')
                 else:
                     f.seek(header_offset, 0)
                     byte_buffer = np.fromfile(f, dtype='uint8')

@@ -414,7 +414,7 @@ class NDataContainer():
             cluster_extension : str default .cut
             pos_extension : str default .txt
             lfp_extension : str default .eeg
-            re_filter : str default None 
+            re_filter : str default None
                 regex string for matching filenames
             save_result : bool default True
                 should save the resulting collection to a file
@@ -963,11 +963,10 @@ class NDataContainer():
             self._unit_count = self._count_num_units()
             counts = self._unit_count
         if index >= len(self):
-            print("Error, index {} is out of range {} for {}".format(
+            raise IndexError("index {} is out of range {} for {}".format(
                 index, len(self) - 1, self))
-            raise IndexError
         else:
-            running_sum, running_idx = 0, 0
+            running_sum, running_idx=0, 0
             for count in counts:
                 if index < (running_sum + count):
                     return running_idx, (index - running_sum)
