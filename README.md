@@ -6,7 +6,7 @@ NeuroChaT (RRID:SCR_018020) is an open-source neuron characterisation toolbox. I
 
 Md Nurul Islam, Sean K. Martin, Shane M. O'Mara, and John P. Aggleton.
 
-**MNI**: Original conception and design of the software architecture, primary development of algorithms and subsequent implementation in Python, primary user’s manual development, iterative development of software based on user feedback, originator of NeuroChaT acronym.
+**MNI**: Original conception and design of the software architecture, primary development of algorithms and subsequent implementation in Python, primary user's manual development, iterative development of software based on user feedback, originator of NeuroChaT acronym.
 
 **MNI, SKM**: Developing analysis algorithms, MATLAB/Python script writing and validation, analysis and interpretation of data.
 

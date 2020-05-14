@@ -38,13 +38,15 @@ PACKAGES = [
 
 CLASSIFIERS = [
     'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering :: Mathematics',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
-    'Topic :: Scientific/Engineering :: Mathematics',
+    'Programming Language :: Python :: 3.8',
     'Operating System :: POSIX',
     'Operating System :: Unix',
-    'Operating System :: MacOS',
-    'Operating System :: Windows'
+    'Operating System :: Microsoft :: Windows',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+
 ]
 
 from setuptools import setup
