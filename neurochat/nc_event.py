@@ -600,6 +600,15 @@ class NEvent(NBase):
             _lfp = self._get_instance(NLfp, lfp, 'lfp')
             _lfp.plv(self.get_event_stamp(self.get_tag()), **kwargs)
 
+    def __repr__(self):
+        event_info = []
+        for (a, b, c) in zip(
+                self._timestamp, self._event_train, self._event_names):
+            event_info.append((a, b, c))
+        return (
+            "Neurochat NEvent object with " +
+            "event info {}".format(event_info))
+
 #    def sfc(self, lfp=None, **kwargs):
 #        if lfp is None:
 #            logging.error('LFP data not specified!')
