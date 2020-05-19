@@ -8,6 +8,8 @@ This module implements utility functions and classes for NeuroChaT software
 
 import logging
 import time
+import datetime
+import traceback
 from collections import OrderedDict as oDict
 import os
 from os import listdir
@@ -989,9 +991,17 @@ def log_exception(ex, more_info=""):
 
     """
 
-    template = "{0} because exception of type {1} occurred. Arguments:\n{2!r}"
-    message = template.format(more_info, type(ex).__name__, ex.args)
-    logging.error(message)
+    default_loc = os.path.join(
+        os.path.expanduser("~"), ".nc_saved", "nc_caught.txt")
+    now = datetime.datetime.now()
+    tb = traceback.format_tb(ex.__traceback__)
+    make_dir_if_not_exists(default_loc)
+    with open(default_loc, "a+") as f:
+        f.write("{}: {}".format(now, tb))
+        logging.error("{} with caught exception".format(more_info), exc=ex)
+    # template = "{0} because exception of type {1} occurred. Arguments:\n{2!r}"
+    # message = template.format(more_info, type(ex).__name__, ex.args)
+    # logging.error(message)
 
 
 def window_rms(a, window_size, mode="same"):
