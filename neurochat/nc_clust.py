@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NClust Class for NeuroChaT software
+This module implements NClust Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 """
@@ -19,21 +19,37 @@ from sklearn.decomposition import PCA
 
 class NClust(NBase):
     """
-    This class facilitates clustering-related operations. Although no clustering
-    algorithm is implemented in this class, it can be subclassed to create such
-    algorithms.
+    This class facilitates clustering-related operations.
+
+    Although no clustering algorithm is implemented in this class,
+    it can be subclassed to create such algorithms.
+
+    Many of the functions in this class are delegated to the spike attr.
+
+    Attributes
+    ----------
+    spike : NSpike
+        An object of NSpike() class.
 
     """
 
     def __init__(self, **kwargs):
         """
-        Attributes
+        Create an NClust object.
+
+        Parameters
         ----------
-        spike : NSpike
-            An object of NSpike() class or its subclass
+        **kwargs : Keyword arguments
+            spike: NSpike object,
+                If directly passed an NSpike object, this is stored.
+            Otherwise if spike is not NSpike or spike is not a kwarg,
+            self.spike = NSpike(**kwargs)
+
+        Returns
+        -------
+        None
 
         """
-
         spike = kwargs.get('spike', None)
         self.wavetime = []
         self.UPSAMPLED = False
@@ -48,7 +64,7 @@ class NClust(NBase):
 
     def get_unit_tags(self):
         """
-        Returns tags of the spiking waveforms from clustering
+        Return tags of the spiking waveforms from clustering.
 
         Parameters
         ----------
@@ -59,29 +75,28 @@ class NClust(NBase):
         None
 
         """
-
         return self.spike.get_unit_tags()
 
     def set_unit_tags(self, new_tags=None):
         """
-        Returns tags of the spiking waveforms from clustering
+        Return tags of the spiking waveforms from clustering.
 
         Parameters
         ----------
         new_tags : ndarray
-            Array that contains the tags for spike-waveforms based on the cluster number
+            Array that contains the tags for spike-waveforms
+            which is based on the cluster number.
 
         Returns
         -------
         None
 
         """
-
         self.spike.set_unit_tags(new_tags)
 
     def get_unit_list(self):
         """
-        Returns the list of units in a spike dataset
+        Return the list of units in a spike dataset.
 
         Parameters
         ----------
@@ -93,12 +108,11 @@ class NClust(NBase):
             List of units
 
         """
-
         return self.spike.get_unit_list()
 
     def _set_unit_list(self):
         """
-        Sets the unit list
+        Set the unit list.
 
         Delegates to NSpike._set_unit_list()
 
@@ -115,12 +129,11 @@ class NClust(NBase):
         nc_spike.NSPike()._set_unit_list
 
         """
-
         self.spike._set_unit_list()
 
     def get_timestamp(self, unit_no=None):
         """
-        Returns the timestamps of the spike-waveforms of specified unit
+        Return the timestamps of the spike-waveforms of specified unit.
 
         Parameters
         ----------
@@ -133,12 +146,11 @@ class NClust(NBase):
             Timestamps of the spiking waveforms
 
         """
-
         self.spike.get_timestamp(unit_no=unit_no)
 
     def get_unit_spikes_count(self, unit_no=None):
         """
-        Returns the total number of spikes in a specified unit
+        Return the total number of spikes in a specified unit.
 
         Parameters
         ----------
@@ -151,45 +163,47 @@ class NClust(NBase):
             Total number of spikes in the unit
 
         """
-
         return self.spike.get_unit_spikes_count(unit_no=unit_no)
 
     def get_waveform(self):
         """
-        Returns the waveforms in the spike dataset
+        Return the waveforms in the spike dataset.
 
         Parameters
         ----------
-        None        
+        None
 
         Returns
         -------
         dict
-            Each key represents one channel of the electrode group, each value
-            represents the waveforms of the spikes in a matrix form (no_samples x no_spikes)
+            Each key represents one channel of the electrode group.
+            Each value represents the waveforms of the spikes
+            in a matrix form (no_samples x no_spikes)
 
         """
         return self.spike.get_waveform()
 
     def _set_waveform(self, spike_waves=[]):
         """
-        Sets the waveforms of the spike dataset
+        Set the waveforms of the spike dataset.
 
         Parameters
         ----------
         spike_waves : dict
-            Spike waveforms
+            Each key represents one channel of the electrode group.
+            Each value represents the waveforms of the spikes
+            in a matrix form (no_samples x no_spikes)
 
         Returns
         -------
-        None        
+        None
 
         """
         self.spike._set_waveform(spike_waves=spike_waves)
 
     def get_unit_waves(self, unit_no=None):
         """
-        Returns spike waveforms of a specific unit
+        Return spike waveforms of a specific unit.
 
         Parameters
         ----------
@@ -199,7 +213,7 @@ class NClust(NBase):
         Returns
         -------
         dict
-            Spike wavefoorms in each channel of the electrode group 
+            Spike waveforms in each channel of the electrode group
 
         """
         return self.spike.get_unit_waves(unit_no=unit_no)
@@ -209,24 +223,29 @@ class NClust(NBase):
 
     def load(self, filename=None, system=None):
         """
-        Loads spike dataset from the file
+        Load spike dataset from the file.
 
         Parameters
         ----------
         filename: str
             Name of the spike file
+        system : str
+            Name of the recording format or system.
 
         Returns
         -------
-        system
-            Data format or recording system
+        None
+
+        See Also
+        --------
+        nc_spike.NSpike().load()
 
         """
         self.spike.load(filename=filename, system=system)
 
     def add_spike(self, spike=None, **kwargs):
         """
-        Adds new spike node to current NSpike() object
+        Add new spike node to current NSpike() object.
 
         Parameters
         ----------
@@ -239,18 +258,19 @@ class NClust(NBase):
             A new NSpike() object
 
         """
-
         return self.spike.add_spike(spike=spike, **kwargs)
 
     def load_spike(self, names=None):
         """
-        Loads datasets of the spike nodes. Name of each node is used for obtaining the
-        filenames.
+        Load datasets of the spike nodes.
+
+        The name of each node is used for obtaining the filenames.
 
         Parameters
         ----------
         names : list of str
-            Names of the nodes to load. If None, current NSpike() object is loaded
+            Names of the nodes to load.
+            If None, current NSpike() object is loaded
 
         Returns
         -------
@@ -261,7 +281,7 @@ class NClust(NBase):
 
     def wave_property(self):
         """
-        Calculates different waveform properties for currently set unit
+        Calculate different waveform properties for currently set unit.
 
         Delegates to NSpike().wave_property()
 
@@ -279,12 +299,11 @@ class NClust(NBase):
         NSpike().wave_property()
 
         """
-
         return self.spike.wave_property()
 
     def isi(self, bins='auto', bound=None, density=False):
         """
-        Calculates the ISI histogram of the spike train
+        Calculate the ISI histogram of the spike train.
 
         Delegates to NSpike().isi()
 
@@ -292,7 +311,6 @@ class NClust(NBase):
         ----------
         bins : str or int
             Number of ISI histogram bins. If 'auto', NumPy default is used
-
         bound : int
             Length of the ISI histogram in msec
         density : bool
@@ -308,17 +326,16 @@ class NClust(NBase):
         NSpike().isi()
 
         """
-
         return self.spike.isi(bins=bins, bound=bound, density=density)
 
     def isi_corr(self, **kwargs):
         """
-        Analysis of ISI autocorrelation histogram
+        Analysis of ISI autocorrelation histogram.
 
         Delegates to NSpike().isi_auto_corr()
 
         Parameters
-        ----------            
+        ----------
         **kwargs
             Keyword arguments
 
@@ -332,12 +349,11 @@ class NClust(NBase):
         nc_spike.NSpike().isi_corr
 
         """
-
         return self.spike.isi_corr(**kwargs)
 
     def psth(self, event_stamp, **kwargs):
         """
-        Calculates peri-stimulus time histogram (PSTH)
+        Calculate peri-stimulus time histogram (PSTH).
 
         Delegates to NSpike().psth()
 
@@ -356,15 +372,14 @@ class NClust(NBase):
 
         See also
         --------
-        NSpike().psth()
+        nc_spike.NSpike().psth()
 
         """
-
         return self.spike.psth(event_stamp, **kwargs)
 
     def burst(self, burst_thresh=5, ibi_thresh=50):
         """
-        Burst analysis of spik-train
+        Burst analysis of spike-train.
 
         Delegates to NSpike().burst()
 
@@ -385,12 +400,11 @@ class NClust(NBase):
         nc_spike.NSpike().burst
 
         """
-
         self.spike.burst(burst_thresh=burst_thresh, ibi_thresh=ibi_thresh)
 
     def get_total_spikes(self):
         """
-        Returns total number of spikes in the recording
+        Return total number of spikes in the recording.
 
         Parameters
         ----------
@@ -402,12 +416,11 @@ class NClust(NBase):
             Total number of spikes
 
         """
-
         return self.spike.get_total_spikes()
 
     def get_total_channels(self):
         """
-        Returns total number of electrode channels in the spike data file
+        Return total number of electrode channels in the spike data file.
 
         Parameters
         ----------
@@ -419,12 +432,11 @@ class NClust(NBase):
             Total number of electrode channels
 
         """
-
         return self.spike.get_total_channels()
 
     def get_channel_ids(self):
         """
-        Returns the identities of individual channels
+        Return the identities of individual channels.
 
         Parameters
         ----------
@@ -433,15 +445,14 @@ class NClust(NBase):
         Returns
         -------
         list
-            Identities of individual channels 
+            Identities of individual channels
 
         """
-
         return self.spike.get_channel_ids()
 
     def get_timebase(self):
         """
-        Returns the timebase for spike event timestamps
+        Return the timebase for spike event timestamps.
 
         Parameters
         ----------
@@ -453,12 +464,11 @@ class NClust(NBase):
             Timebase for spike event timestamps
 
         """
-
         return self.spike.get_timebase()
 
     def get_sampling_rate(self):
         """
-        Returns the sampling rate of spike waveforms
+        Return the sampling rate of spike waveforms.
 
         Parameters
         ----------
@@ -470,12 +480,11 @@ class NClust(NBase):
             Sampling rate for spike waveforms
 
         """
-
         return self.spike.get_sampling_rate()
 
     def get_samples_per_spike(self):
         """
-        Returns the number of bytes to represent each timestamp in the binary file
+        Return the number of bytes to represent each timestamp.
 
         Parameters
         ----------
@@ -491,7 +500,7 @@ class NClust(NBase):
 
     def get_wave_timestamp(self):
         """
-        Returns the temporal resolution to  represent samples of spike-waves.
+        Return the temporal resolution to represent samples of spike-waves.
 
         Parameters
         ----------
@@ -503,15 +512,14 @@ class NClust(NBase):
             Number of bytes to represent timestamps
 
         """
-
-        # resturn as microsecond
+        # return as microsecond
         # fs downsampled so that the time is given in microsecond
         fs = self.spike.get_sampling_rate() / 10**6
         return 1 / fs
 
     def save_to_hdf5(self):
         """
-        Stores NSpike() object to HDF5 file
+        Store NSpike() object to HDF5 file.
 
         Delegates to NSPike().save_to_hdf5()
 
@@ -528,16 +536,15 @@ class NClust(NBase):
         nc_hdf.Nhdf().save_spike()
 
         """
-
         self.spike.save_to_hdf5()
 
     def get_feat(self, npc=2):
         """
-        Returns the spike-waveform features.
+        Return the spike-waveform features.
 
         Parameters
         ----------
-        nc : int
+        npc : int
             Number of principle components in each channel.
 
         Returns
@@ -546,15 +553,13 @@ class NClust(NBase):
             Matrix of size (number_spike X number_features)
 
         """
-
         if not self.NULL_CHAN_REMOVED:
             self.remove_null_chan()
         if not self.ALLIGNED:
             self.align_wave_peak()
 
-        trough, trough_loc = self.get_min_wave_chan()  # trough only in max_channel
+        trough, trough_loc = self.get_min_wave_chan()
         peak, peak_chan, peak_loc = self.get_max_wave_chan()
-#        amp = np.abs(peak-trough)
         pc = self.get_wave_pc(npc=npc)
         shape = (self.get_total_spikes(), 1)
         feat = np.concatenate(
@@ -562,10 +567,9 @@ class NClust(NBase):
 
         return feat
 
-        # for all units
     def get_feat_by_unit(self, unit_no=None):
         """
-        Returns the spike-waveform features for a paricular unit.
+        Return the spike-waveform features for a particular unit.
 
         Parameters
         ----------
@@ -578,7 +582,6 @@ class NClust(NBase):
             Matrix of size (number_spike X number_features)
 
         """
-
         if unit_no in self.get_unit_list():
             feat = self.get_feat()
             return feat[self.get_unit_tags() == unit_no, :]
@@ -587,20 +590,22 @@ class NClust(NBase):
 
     def get_wave_peaks(self):
         """
-        Returns the peaks of the spike-waveforms.
+        Return the peaks of the spike-waveforms.
 
         Parameters
         ----------
-        None        
+        None
 
         Returns
         -------
-        peak : ndarray
-            Spike waveform peaks in all the electrode channels (num_waves X num_channels)
-        peak_loc : ndarray
-            Index of peak locations
-        """
+        (peak, peak_loc) : (ndarray, ndarray)
+            peak:
+                Spike waveform peaks in all the electrode channels
+                Shape is (num_waves X num_channels)
+            peak_loc :
+                Index of peak locations
 
+        """
         wave = self.get_waveform()
         peak = np.zeros((self.get_total_spikes(), len(wave.keys())))
         peak_loc = np.zeros(
@@ -613,7 +618,7 @@ class NClust(NBase):
 
     def get_max_wave_chan(self):
         """
-        Returns the maximum of waveform peaks among the electrode groups.
+        Return the maximum of waveform peaks among the electrode groups.
 
         Parameters
         ----------
@@ -621,6 +626,7 @@ class NClust(NBase):
 
         Returns
         -------
+        (max_wave_val, max_wave_chan, peak_loc) : (ndarray, ndarray, ndarray)
         max_wave_val : ndarray
             Maximum value of the peaks of the waveforms
         max_wave_chan : ndarray
@@ -629,12 +635,12 @@ class NClust(NBase):
             Peak location in the channel with strongest waveform
 
         """
-
-        # Peak value at the highest channel, the highest channel, and the index of the peak
         peak, peak_loc = self.get_wave_peaks()
         max_wave_chan = np.argmax(peak, axis=1)
         max_wave_val = np.amax(peak, axis=1)
-        return max_wave_val, max_wave_chan, peak_loc[np.arange(len(peak_loc)), max_wave_chan]
+        return (
+            max_wave_val, max_wave_chan,
+            peak_loc[np.arange(len(peak_loc)), max_wave_chan])
 
     def align_wave_peak(self, reach=300, factor=2):
         """
@@ -652,19 +658,20 @@ class NClust(NBase):
         None
 
         """
-
         if not self.UPSAMPLED:
             self.resample_wave(factor=factor)
         if not self.ALLIGNED:
             # maximum 300microsecond allowed for shift
             shift = round(reach / self.get_wave_timestamp())
-            # NC waves are stroed in waves['ch1'], waves['ch2'] etc. ways
+            # NC waves are stored in waves['ch1'], waves['ch2'] etc. ways
             wave = self.get_waveform()
             maxInd = shift + self.get_max_wave_chan()[2]
             shift_ind = int(np.median(maxInd)) - maxInd
             shift_ind[np.abs(shift_ind) > shift] = 0
-            stacked_chan = np.empty((self.get_total_spikes(
-            ), self.get_samples_per_spike(), self.get_total_channels()))
+            stacked_chan = np.empty((
+                self.get_total_spikes(),
+                self.get_samples_per_spike(),
+                self.get_total_channels()))
             keys = []
             i = 0
             for key, val in wave.items():
@@ -672,23 +679,22 @@ class NClust(NBase):
                 keys.append(key)
                 i += 1
 
-            # Shows error in Jupyter, check again
             stacked_chan = np.lib.pad(
                 stacked_chan, [(0, 0), (shift, shift), (0, 0)], 'edge')
 
-            stacked_chan = np.array([np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[
-                                    shift: shift + self.get_samples_per_spike()] for i in np.arange(shift_ind.size)])
+            stacked_chan = np.array([
+                np.roll(stacked_chan[i, :, :], shift_ind[i], axis=0)[
+                    shift: shift + self.get_samples_per_spike()]
+                for i in np.arange(shift_ind.size)])
 
             for i, key in enumerate(keys):
                 wave[key] = stacked_chan[:, :, i]
             self._set_waveform(wave)
             self.ALLIGNED = True
 
-#        stacked_chan = np.roll(stacked_chan, tuple(shift_ind), axis=tuple(np.ones(shift_ind.size)))
-
     def get_wave_min(self):
         """
-        Returns the minimum values of the spike-waveforms.
+        Return the minimum values of the spike-waveforms.
 
         Parameters
         ----------
@@ -696,13 +702,13 @@ class NClust(NBase):
 
         Returns
         -------
-        min_w : ndarray
-            Minimum value of the  wavefforms
-        min_loc : ndarray
-            Index of minimum value
+        (min_w, min_loc) : (ndarray, ndarray)
+            min_w : ndarray
+                Minimum value of the waveforms
+            min_loc : ndarray
+                Index of minimum value
 
         """
-
         wave = self.get_waveform()
         min_w = np.zeros((self.get_total_spikes(), len(wave.keys())))
         min_loc = np.zeros((self.get_total_spikes(), len(wave.keys())))
@@ -714,7 +720,7 @@ class NClust(NBase):
 
     def get_min_wave_chan(self):
         """
-        Returns the maximum of waveform peaks among the electrode groups.
+        Return the maximum of waveform peaks among the electrode groups.
 
         Parameters
         ----------
@@ -722,22 +728,22 @@ class NClust(NBase):
 
         Returns
         -------
-        ndarray
-            Minimum value of the waveform at channels with maximum peak value
-        ndarray
-            Index of minimum values
+        (min_val, min_index) : (ndarray, ndarray)
+            min_val : ndarray
+                Minimum value of the waveform at channels with peak value
+            min_index : ndarray
+                Index of minimum values
 
         """
-        # Peak value at the highest channel, the highest channel, and the index of the peak
         max_wave_chan = self.get_max_wave_chan()[1]
         trough, trough_loc = self.get_wave_min()
-        return trough[np.arange(len(max_wave_chan)), max_wave_chan], \
-            trough_loc[np.arange(len(max_wave_chan)), max_wave_chan]
-        # use get_max_channel to determine
+        return (
+            trough[np.arange(len(max_wave_chan)), max_wave_chan],
+            trough_loc[np.arange(len(max_wave_chan)), max_wave_chan])
 
     def get_wave_pc(self, npc=2):
         """
-        Returns the Principle Components of the waveforms
+        Return the Principle Components of the waveforms.
 
         Parameters
         ----------
@@ -747,7 +753,8 @@ class NClust(NBase):
         Returns
         -------
         pc : ndarray
-            Principle components (num_waves X npc*num_channels)        
+            Principle components (num_waves X npc*num_channels)
+
         """
         wave = self.get_waveform()
         pc = np.array([])
@@ -769,7 +776,7 @@ class NClust(NBase):
 
     def get_wavetime(self):
         """
-        Returns the timestamps of the waveforms, not the spiking-event timestamp
+        Return the timestamps of the waveforms, not the spiking-event.
 
         Parameters
         ----------
@@ -780,15 +787,15 @@ class NClust(NBase):
             Timestamps of the spike-waveforms
 
         """
-
-        # calculate the wavetime from the sampling rate and number of sample, returns in microsecond
+        # calculate the wavetime from the sampling rate and number of sample
+        # returns in microsecond
         nsamp = self.spike.get_samples_per_spike()
         timestamp = self.get_wave_timestamp()
         return np.arange(0, (nsamp) * timestamp, timestamp)
 
     def resample_wavetime(self, factor=2):
         """
-        Resamples the timestamps of spike-waveforms
+        Resample the timestamps of spike-waveforms.
 
         Parameters
         ----------
@@ -800,16 +807,14 @@ class NClust(NBase):
             Resampled timestamps
 
         """
-
         wavetime = self.get_wavetime()
         timestamp = self.get_wave_timestamp()
 
         return np.arange(0, wavetime[-1], timestamp / factor)
-        # return resampled time
 
     def resample_wave(self, factor=2):
         """
-        Resamples spike waveforms
+        Resample spike waveforms using spline interpolation.
 
         Parameters
         ----------
@@ -824,7 +829,7 @@ class NClust(NBase):
             Upsampled wave timestamps
 
         """
-        # resample wave using spline interpolation using the resampled_time,return wave
+        # resample wave using spline interpolation using the resampled_time
         if not self.UPSAMPLED:
             wavetime = self.get_wavetime()
             uptime = self.resample_wavetime(factor=factor)
@@ -842,11 +847,15 @@ class NClust(NBase):
 
         else:
             logging.warning(
-                'You can upsample only once. Please reload data from source file for changing sampling factor!')
+                'You can upsample only once. ' +
+                'Please reload data from source file ' +
+                'for changing sampling factor!')
 
     def get_wave_energy(self):
         """
-        Energy of the spike waveforms, measured as the summation of the square of samples
+        Energy of the spike waveforms.
+
+        This is measured as the summation of the square of samples.
 
         Parameters
         ----------
@@ -856,17 +865,18 @@ class NClust(NBase):
         -------
         energy : ndarray
             Energy of spikes (num_spike X num_channels)
+
         """
         wave = self.get_waveform()
         energy = np.zeros((self.get_total_spikes(), len(wave.keys())))
         for i, key in enumerate(wave.keys()):
-            energy[:, i] = np.sum(np.square(wave[key]), 1) / \
-                10**6  # taken the enrgy in mV2
+            # taken the energy in mV2
+            energy[:, i] = (np.sum(np.square(wave[key]), 1) / 10**6)
         return energy
 
     def get_max_energy_chan(self):
         """
-        Returns the maximum energy of the spike waveforms
+        Return the maximum energy of the spike waveforms.
 
         Parameters
         ----------
@@ -876,14 +886,14 @@ class NClust(NBase):
         -------
         ndarray
             Maximum energy of the spikes
-        """
 
+        """
         energy = self.get_wave_energy()
         return np.argmax(energy, axis=1)
 
     def remove_null_chan(self):
         """
-        Removes the channel from the electrode group that has no spike in it
+        Remove the channel from the electrode group that has no spike in it.
 
         Parameters
         ----------
@@ -895,7 +905,8 @@ class NClust(NBase):
             Channel number that has been removed
 
         """
-
+        # simply detect in which channel everything is zero,
+        # which means it's a reference channel or nothing is recorded here
         wave = self.get_waveform()
         off_chan = []
         for key, w in wave.items():
@@ -908,26 +919,30 @@ class NClust(NBase):
             self.NULL_CHAN_REMOVED = True
 
         return off_chan
-        # simply detect in which channel everything is zero, which means it's a reference channel or nothing is recorded here
 
     def cluster_separation(self, unit_no=0):
         """
-        Quantitatively measures the separation of a specific unit from other clusters
+        Measure the separation of a specific unit from other clusters.
+
+        This is performed quantitatively using the following:
+        1. Bhattacharyya coefficient
+        2. Hellinger distance
 
         Parameters
         ----------
         unit_no : int
-            Unit of interest. If '0', pairwise comparison of all units are returned
+            Unit of interest.
+            If '0', pairwise comparison of all units are returned.
 
         Returns
         -------
+        (bc, dh) : (ndarray, ndarray)
         bc : ndarray
             Bhattacharyya coefficient
         dh : ndarray
             Hellinger distance
 
         """
-
         # if unit_no==0 all units, matrix output for pairwise comparison,
         # else maximum BC for the specified unit
         feat = self.get_feat()
@@ -964,8 +979,14 @@ class NClust(NBase):
 
     def cluster_similarity(self, nclust=None, unit_1=None, unit_2=None):
         """
-        Quantitatively measures the similarity or distance of cluster of one unit
-        in a spike dataset to cluster of another unit in another dataset
+        Measure the similarity or distance of units in a cluster.
+
+        This is performed on one unit
+        in a spike dataset to cluster of another unit in another dataset.
+
+        This is performed quantitatively using the following:
+        1. Bhattacharyya coefficient
+        2. Hellinger distance
 
         Parameters
         ----------
@@ -974,20 +995,20 @@ class NClust(NBase):
         unit_1 : int
             Unit of current Nclust object
         unit_2 : int
-            Unit of another NClust object  under comparison
+            Unit of another NClust object under comparison
 
         Returns
         -------
-
+        (bc, dh) : (ndarray, ndarray)
         bc : ndarray
             Bhattacharyya coefficient
         dh : ndarray
             Hellinger distance
 
         """
-
         if isinstance(nclust, NClust):
-            if unit_1 in self.get_unit_list() and unit_2 in nclust.get_unit_list():
+            if ((unit_1 in self.get_unit_list()) and
+                    (unit_2 in nclust.get_unit_list())):
                 X1 = self.get_feat_by_unit(unit_no=unit_1)
                 X2 = nclust.get_feat_by_unit(unit_no=unit_2)
                 bc = bhatt(X1, X2)[0]
