@@ -1,1 +1,1 @@
-#initialization file for neurochat
+"""The NeuroChaT package."""
