@@ -944,6 +944,8 @@ class NClust(NBase):
                     bc[c1, c2] = bhatt(X1, X2)[0]
                     dh[c1, c2] = hellinger(X1, X2)
                     unit_list = self.get_unit_list()
+            return bc, dh
+
         else:
             bc = np.zeros(n_units)
             dh = np.zeros(n_units)
