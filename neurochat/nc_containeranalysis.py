@@ -2,6 +2,7 @@
 This module contains analysis functions for NDataContainer objects.
 
 @author: Sean Martin; martins7 at tcd dot ie
+
 """
 import gc
 import logging

@@ -3,6 +3,7 @@
 This module implements NClust Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 import logging
 

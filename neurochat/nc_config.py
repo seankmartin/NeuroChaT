@@ -3,6 +3,7 @@
 This module implements Configuration Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 
 import os.path
@@ -414,7 +415,7 @@ class Configuration(object):
         Parameters
         ----------
         graphic_format : str
-            Format of output graphic export. 
+            Format of output graphic export.
             Options are 'PDF' or 'Postscript'.
 
         Returns
