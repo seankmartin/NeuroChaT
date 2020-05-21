@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-This module implements a container for the Ndata class to simplify multi experiment analyses.
+This module implements a container for the Ndata class to simplify multi
+experiment analyses.
 
 @author: Sean Martin; martins7 at tcd dot ie
+
 """
 
 from enum import Enum
@@ -38,6 +40,7 @@ class NDataContainer():
     Class for storing multiple file locations for ndata objects.
 
     Additionally the ndata objects themselves can be stored.
+
     """
 
     def __init__(

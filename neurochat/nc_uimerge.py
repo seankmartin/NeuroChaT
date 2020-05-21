@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 This module implements UiMerge Class for NeuroChaT that provides the graphical
-interface and functionalities for merging and accumulating the output graphics of NeuroChaT 
+interface and functionalities for merging and accumulating the output graphics
+of NeuroChaT.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -24,12 +25,9 @@ import pandas as pd
 
 
 class UiMerge(QtWidgets.QDialog):
-    """
-    This class invokes a graphical user interface where the user can upload
-    a list of PDF or Postscript files in Excel format or can use a filepicker 
-    to manually pick the files to merge in a file or accumulate in a folder.
-
-    """
+    """This class invokes a graphical user interface where the user can upload
+    a list of PDF or Postscript files in Excel format or can use a filepicker
+    to manually pick the files to merge in a file or accumulate in a folder."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -45,7 +43,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def setup_ui(self):
         """
-        Sets up the GUI elements
+        Sets up the GUI elements.
 
         Parameters
         ----------
@@ -100,7 +98,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def set_default(self):
         """
-        Sets up the defaults of the GUI
+        Sets up the defaults of the GUI.
 
         Parameters
         ----------
@@ -119,7 +117,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def _behaviour_ui(self):
         """
-        Sets up the behaviour of the GUI elements
+        Sets up the behaviour of the GUI elements.
 
         Parameters
         ----------
@@ -169,8 +167,8 @@ class UiMerge(QtWidgets.QDialog):
 
     def browse_excel_merge(self):
         """
-        Opens a dialogue for selecting the Excel list of PDF/Postscript files and reads the
-        file information.
+        Opens a dialogue for selecting the Excel list of PDF/Postscript files
+        and reads the file information.
 
         Parameters
         ----------
@@ -201,8 +199,8 @@ class UiMerge(QtWidgets.QDialog):
 
     def select_files_merge(self):
         """
-        Invokes the UiGetFiles class for manual selection of the PDF or Postscript
-        files for merging or accumulating.
+        Invokes the UiGetFiles class for manual selection of the PDF or
+        Postscript files for merging or accumulating.
 
         Parameters
         ----------
@@ -219,8 +217,8 @@ class UiMerge(QtWidgets.QDialog):
 
     def save_in_merge(self):
         """
-        Opens a dialogue for selecting the file or folder where the PDF/Postscript files
-        qill be merged or accumulated.
+        Opens a dialogue for selecting the file or folder where the
+        PDF/Postscript files qill be merged or accumulated.
 
         Parameters
         ----------

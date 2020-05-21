@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module implements Nhdf Class for NeuroChaT software
+This module implements Nhdf Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -17,9 +17,11 @@ import h5py
 
 class Nhdf(object):
     """
-    The Nhdf class manages the import and export of various NeuroChaT dataset to
-    a HDF5 file dataset. It also creates and manages the nomenclature for storage
-    paths within the file.
+    The Nhdf class manages the import and export of various NeuroChaT dataset
+    to a HDF5 file dataset.
+
+    It also creates and manages the nomenclature for storage paths
+    within the file.
 
     """
 
@@ -34,7 +36,7 @@ class Nhdf(object):
 
     def get_type(self):
         """
-        Returns the type of object. For Nhdf, this is always `hdf` type
+        Returns the type of object. For Nhdf, this is always `hdf` type.
 
         Parameters
         ----------
@@ -49,7 +51,7 @@ class Nhdf(object):
 
     def get_filename(self):
         """
-        Returns the full file of the HDF5 dataset
+        Returns the full file of the HDF5 dataset.
 
         Parameters
         ----------
@@ -65,7 +67,7 @@ class Nhdf(object):
 
     def set_filename(self, filename=None):
         """
-        Sets the full file of the HDF5 dataset
+        Sets the full file of the HDF5 dataset.
 
         Parameters
         ----------
@@ -87,7 +89,7 @@ class Nhdf(object):
 
     def get_file_object(self):
         """
-        Returns the file object that is opened using h5py
+        Returns the file object that is opened using h5py.
 
         Parameters
         ----------
@@ -107,7 +109,7 @@ class Nhdf(object):
 
     def file(self):
         """
-        Opens the file, and returns the file object
+        Opens the file, and returns the file object.
 
         Parameters
         ----------
@@ -130,7 +132,7 @@ class Nhdf(object):
 
     def close(self):
         """
-        Closes the h5py file object
+        Closes the h5py file object.
 
         Parameters
         ----------
@@ -148,7 +150,7 @@ class Nhdf(object):
 
     def initialize(self):
         """
-        Initializes the basic groups for the HDF5 file
+        Initializes the basic groups for the HDF5 file.
 
         Parameters
         ----------
@@ -166,7 +168,7 @@ class Nhdf(object):
 
     def get_groups_in_path(self, path=''):
         """
-        Returns the names of groups or datasets in a path
+        Returns the names of groups or datasets in a path.
 
         Parameters
         ----------
@@ -190,7 +192,8 @@ class Nhdf(object):
     @staticmethod
     def resolve_hdfname(data=None):
         """
-        Resolves and returns the name of the HDF5 file from the filenames of the NeuroChaT data
+        Resolves and returns the name of the HDF5 file from the filenames of
+        the NeuroChaT data.
 
         Parameters
         ----------
@@ -231,7 +234,7 @@ class Nhdf(object):
 
     def resolve_datapath(self, data=None):
         """
-        Resolves and returns path of the dataset from NeuroChaT data objects
+        Resolves and returns path of the dataset from NeuroChaT data objects.
 
         Parameters
         ----------
@@ -266,7 +269,7 @@ class Nhdf(object):
     def get_file_tag(data=None):
         """
         Resolves and returns the file tag or extension to name the group of the
-        neural data in the HDF5 file
+        neural data in the HDF5 file.
 
         Parameters
         ----------
@@ -345,7 +348,7 @@ class Nhdf(object):
 
     def save_dataset(self, path=None, name=None, data=None, create_group=True):
         """
-        Stores a dataset to a specific path
+        Stores a dataset to a specific path.
 
         Parameters
         ----------
@@ -392,7 +395,7 @@ class Nhdf(object):
 
     def get_dataset(self, group=None, path='', name=''):
         """
-        Stores a dataset to a specific path
+        Stores a dataset to a specific path.
 
         Parameters
         ----------
@@ -440,8 +443,8 @@ class Nhdf(object):
 
     def save_dict_recursive(self, path=None, name=None, data=None, create_group=True):
         """
-        Stores a dictionary dataset to a specific path. If the dictionary is nested,
-        it creates a group for each of the outermost keys.
+        Stores a dictionary dataset to a specific path. If the dictionary is
+        nested, it creates a group for each of the outermost keys.
 
         Parameters
         ----------
@@ -474,7 +477,7 @@ class Nhdf(object):
 
     def save_attributes(self, path=None, attr=None):
         """
-        Stores an attribute to a group or dataset
+        Stores an attribute to a group or dataset.
 
         Parameters
         ----------
@@ -501,8 +504,8 @@ class Nhdf(object):
 
     def save_object(self, obj=None):
         """
-        Stores a NeuroChaT dataset to the HDF5 file. It resolves the name first and
-        then stores the data in the storage path
+        Stores a NeuroChaT dataset to the HDF5 file. It resolves the name first
+        and then stores the data in the storage path.
 
         Parameters
         ----------
@@ -528,7 +531,7 @@ class Nhdf(object):
 
     def save_spatial(self, spatial=None):
         """
-        Stores NSpatial() dataset to the HDF5 file
+        Stores NSpatial() dataset to the HDF5 file.
 
         Parameters
         ----------
@@ -590,7 +593,7 @@ class Nhdf(object):
 
     def save_lfp(self, lfp=None):
         """
-        Stores NLfp() dataset to the HDF5 file
+        Stores NLfp() dataset to the HDF5 file.
 
         Parameters
         ----------
@@ -624,7 +627,7 @@ class Nhdf(object):
 
     def save_spike(self, spike=None):
         """
-        Stores NSpike() dataset to the HDF5 file
+        Stores NSpike() dataset to the HDF5 file.
 
         Parameters
         ----------
@@ -681,7 +684,7 @@ class Nhdf(object):
 
     def save_cluster(self, clust=None):
         """
-        Stores NClust() dataset to the HDF5 file
+        Stores NClust() dataset to the HDF5 file.
 
         Parameters
         ----------

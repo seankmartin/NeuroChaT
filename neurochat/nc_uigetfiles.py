@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-This module implements UiGetFiles Class for NeuroChaT that provides the graphical
-interface and functionalities for manually selecting files.
+This module implements UiGetFiles Class for NeuroChaT that provides the
+graphical interface and functionalities for manually selecting files.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -22,7 +22,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def __init__(self, parent=None, filters=['.pdf', '.ps']):
         """
-        Instantiate the UiGetFiles class. 
+        Instantiate the UiGetFiles class.
 
         Parameters
         ----------
@@ -53,10 +53,7 @@ class UiGetFiles(QtWidgets.QDialog):
         self.file_icon = self.style().standardIcon(QtWidgets.QStyle.SP_FileIcon)
 
     def setup_ui(self):
-        """
-        Sets up the elements of UiGetFiles class
-
-        """
+        """Sets up the elements of UiGetFiles class."""
 
         self.setObjectName(xlt_from_utf8("getFilesWindow"))
         self.setEnabled(True)
@@ -138,10 +135,7 @@ class UiGetFiles(QtWidgets.QDialog):
         self.setLayout(main_layout)
 
     def behaviour_ui(self):
-        """
-        Sets up the behaviour of UiGetFiles class
-
-        """
+        """Sets up the behaviour of UiGetFiles class."""
 
         self.filter_box.currentIndexChanged[str].connect(self.filter_changed)
         self.folder_line.textEdited[str].connect(self.line_edited)
@@ -161,7 +155,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def filter_changed(self, value):
         """
-        Called if the filter changed to update for the new selection
+        Called if the filter changed to update for the new selection.
 
         Parameters
         ----------
@@ -179,7 +173,8 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def line_edited(self, value):
         """
-        Called if the directory text box in the widget is changed to update the list of new subdirectories
+        Called if the directory text box in the widget is changed to update the
+        list of new subdirectories.
 
         Parameters
         ----------
@@ -200,7 +195,8 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def dir_changed(self, value):
         """
-        Called if the subdirectoy combo-box in the widget is changed to update the list of new subdirectories
+        Called if the subdirectoy combo-box in the widget is changed to update
+        the list of new subdirectories.
 
         Parameters
         ----------
@@ -222,7 +218,8 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def update_list(self, directory):
         """
-        Updates the list of folders and sets the item model for the scrollable list 
+        Updates the list of folders and sets the item model for the scrollable
+        list.
 
         Parameters
         ----------
@@ -251,7 +248,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def hierarchy_changed(self):
         """
-        Called if the directory hierarchy is changed
+        Called if the directory hierarchy is changed.
 
         Parameters
         ----------
@@ -269,7 +266,8 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def item_activated(self, qind):
         """
-        Called if any of the model item in the list of folders and files is double-clicked
+        Called if any of the model item in the list of folders and files is
+        double-clicked.
 
         Parameters
         ----------
@@ -291,8 +289,8 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def add_items(self):
         """
-        Called if the add button is clicked. Adds selected model item to the right side
-        selected file box if that passes the filter
+        Called if the add button is clicked. Adds selected model item to the
+        right side selected file box if that passes the filter.
 
         Parameters
         ----------

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module implements utility functions and classes for NeuroChaT software
+This module implements utility functions and classes for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -28,8 +28,11 @@ from scipy.fftpack import fft
 
 class NLog(logging.Handler):
     """
-    Class for handling log information (messages, errors and warnings) for NeuroChaT.
-    It formats the incoming message in HTML and sends it to the log interface of NeuroChaT.
+    Class for handling log information (messages, errors and warnings) for
+    NeuroChaT.
+
+    It formats the incoming message in HTML and sends it to the log
+    interface of NeuroChaT.
 
     """
 
@@ -39,7 +42,8 @@ class NLog(logging.Handler):
 
     def setup(self):
         """
-        Removes all the logging handlers and sets up a new logger with HTML formatting.
+        Removes all the logging handlers and sets up a new logger with HTML
+        formatting.
 
         Parameters
         ----------
@@ -64,7 +68,7 @@ class NLog(logging.Handler):
 
     def emit(self, record):
         """
-        Formats the incoming record and 
+        Formats the incoming record and.
 
         Parameters
         ----------
@@ -86,10 +90,7 @@ class NLog(logging.Handler):
 
 
 class Singleton(object):
-    """
-    Creates a Singleton object created from a subclass of this class
-
-    """
+    """Creates a Singleton object created from a subclass of this class."""
 
     def __new__(cls, *arg, **kwarg):
         if not hasattr(cls, '_instance'):
@@ -99,11 +100,12 @@ class Singleton(object):
 
 def bhatt(X1, X2):
     """
-    Calculates Bhattacharyya coefficient and Bhattacharyya distance between two distributions
+    Calculates Bhattacharyya coefficient and Bhattacharyya distance between two
+    distributions.
 
     Parameters
     ----------
-    X1, X2 : ndarray 
+    X1, X2 : ndarray
         Distributions under consideration
 
     Returns
@@ -143,7 +145,7 @@ def butter_filter(x, Fs, *args):
 
     Parameters
     ----------
-    x : ndarray 
+    x : ndarray
         Data or signal to filter
     Fs : Sampling frequency
     *kwargs
@@ -214,11 +216,12 @@ def butter_filter(x, Fs, *args):
 
 def chop_edges(x, xlen, ylen):
     """
-    Chope the edges of a firing rate map if they are not visited at ll or with zero firing rate
+    Chope the edges of a firing rate map if they are not visited at ll or with
+    zero firing rate.
 
     Parameters
     ----------
-    x : ndarray 
+    x : ndarray
         Matrix of firing rate
     xlen : int
         Maximum length of the x-axis
@@ -314,7 +317,7 @@ def corr_coeff(x1, x2):
 
 def extrema(x, mincap=None, maxcap=None):
     """
-    Finds the extrema in a numeric array or a signal
+    Finds the extrema in a numeric array or a signal.
 
     Parameters
     ----------
@@ -487,7 +490,7 @@ def find2d(X, n=None):
 
 def find_chunk(x):
     """
-    Finds size and indeices of chunks of non-zero segments in an array
+    Finds size and indeices of chunks of non-zero segments in an array.
 
     Parameters
     ----------
@@ -529,13 +532,13 @@ def hellinger(X1, X2):
 
     Parameters
     ----------
-    X1, X2 : ndarray 
+    X1, X2 : ndarray
         Distributions under consideration
 
     Returns
     -------
     d : float
-        Calculated Hellinger distance    
+        Calculated Hellinger distance
 
     """
 
@@ -548,11 +551,11 @@ def hellinger(X1, X2):
 
 def histogram(x, bins):
     """
-    Calculates the histogram count of input array
+    Calculates the histogram count of input array.
 
     Parameters
     ----------
-    x : ndarray 
+    x : ndarray
         Array whose histogram needs to be calculated
     bins
         Number of histogram bins
@@ -575,7 +578,7 @@ def histogram(x, bins):
 
 def histogram2d(y, x, ybins, xbins):
     """
-    Calculates the joint histogram count of two arrays
+    Calculates the joint histogram count of two arrays.
 
     Parameters
     ----------
@@ -660,7 +663,8 @@ def linfit(X, Y, getPartial=False):
 def nxl_write(
         file_name, data_frame, sheet_name='Sheet1', startRow=0, startColumn=0):
     """
-    Write Pandas DataFrame to excel file. It is a wrapper for Pandas.ExcelWriter()
+    Write Pandas DataFrame to excel file. It is a wrapper for
+    Pandas.ExcelWriter()
 
     Parameters
     ----------
@@ -673,11 +677,11 @@ def nxl_write(
     startRow : int
         Which row in the file the data writing should start
     startColumn : int
-        Which column in the file the data writing should start        
+        Which column in the file the data writing should start
 
     Returns
     -------
-    None    
+    None
 
     """
     # Create a Pandas Excel writer using XlsxWriter as the engine.
@@ -690,8 +694,8 @@ def nxl_write(
 
 def residual_stat(y, y_fit, p):
     """
-    Calculates the goodness of fit and other residual statistics between observed
-    and fitted values from a model
+    Calculates the goodness of fit and other residual statistics between
+    observed and fitted values from a model.
 
     Parameters
     ----------
@@ -726,7 +730,7 @@ def residual_stat(y, y_fit, p):
 
 def rot_2d(x, theta):
     """
-    Rotates a firing map by a specified angle
+    Rotates a firing map by a specified angle.
 
     Parameters
     ----------
@@ -749,13 +753,13 @@ def rot_2d(x, theta):
 
 def angle_between_points(a, b, c):
     """
-    Returns the angle between the lines ab and bc, <abc
+    Returns the angle between the lines ab and bc, <abc.
 
     Parameters
     ----------
     a : ndarray
         The first point
-    b : ndarray 
+    b : ndarray
         The second point
     c : the last point
 
@@ -785,7 +789,8 @@ def angle_between_points(a, b, c):
 
 def centre_of_mass(co_ords, weights, axis=0):
     """
-    Calculates the co-ordinate centre of mass for a system of particles with co ords and weights
+    Calculates the co-ordinate centre of mass for a system of particles with co
+    ords and weights.
 
     Parameters
     ----------
@@ -800,6 +805,7 @@ def centre_of_mass(co_ords, weights, axis=0):
     -------
     ndarray
         Co-ordinate of the centre of mass
+
     """
     shape = co_ords.shape
     if axis == 0:
@@ -902,7 +908,7 @@ def smooth_2d(x, filttype='b', filtsize=5):
 def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     """
     Returns a list of ranges where truth values occur and the corresponding
-    values from arr, arr is assumed to be a sorted list
+    values from arr, arr is assumed to be a sorted list.
 
     Parameters
     ----------
@@ -910,13 +916,14 @@ def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
         list of values to get ranges from, equal in length to truth_arr
     truth_arr : ndarray
         list of truth values to make the ranges
-    min_range : int or float 
+    min_range : int or float
         the minimum length of range
 
     Returns
     -------
     list
         A list of tuples, ranges in arr where truth values are truth_arr
+
     """
 
     in_range = False
@@ -943,17 +950,18 @@ def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
 
 def find_peaks(data, **kwargs):
     """
-    Returns the peaks in the data based on gradient calculations
+    Returns the peaks in the data based on gradient calculations.
 
     Parameters
     ----------
     kwargs
-        start : int 
+        start : int
             Where to start looking for peaks in the data, default 0
         end : int
             Where to stop looking for peaks in the data, default data.size - 1
         thresh : float
             Don't consider any peaks with a value below this, default 0
+
     """
 
     data = np.array(data)
@@ -976,13 +984,13 @@ def find_peaks(data, **kwargs):
 
 def log_exception(ex, more_info=""):
     """
-    Log an expection and additional info
+    Log an expection and additional info.
 
     Parameters
     ----------
     ex : Exception
         The python exception that occured
-    more_info : 
+    more_info :
         Additional string to log
 
     Returns
@@ -1006,11 +1014,11 @@ def log_exception(ex, more_info=""):
 
 def window_rms(a, window_size, mode="same"):
     """
-    Calculate the rms envelope, similar to matlab.  
+    Calculate the rms envelope, similar to matlab.
 
-    mode determines how many points are output
-    mode valid will have no border effects
-    mode same will produce a value for each input
+    mode determines how many points are output mode valid will have no
+    border effects mode same will produce a value for each input
+
     """
     a2 = np.power(a, 2)
     window = np.ones(window_size) / float(window_size)
@@ -1018,9 +1026,7 @@ def window_rms(a, window_size, mode="same"):
 
 
 def distinct_window_rms(a, N):
-    """
-    Calculate the rms of a in windows of N data points.
-    """
+    """Calculate the rms of a in windows of N data points."""
     a = np.array(a)
     a = np.square(a) / float(N)
     rms_array = []
@@ -1056,6 +1062,7 @@ def get_axona_colours(index=None):
     -------
     list :
         A list of colours as rgb tuples with values in 0 to 1
+
     """
 
     if len(get_axona_colours.colorcells) == 0:
@@ -1102,7 +1109,7 @@ def get_axona_colours(index=None):
 
 def has_ext(filename, ext, case_sensitive_ext=False):
     """
-    Check if the filename ends in the extension
+    Check if the filename ends in the extension.
 
     Parameters
     ----------
@@ -1155,6 +1162,7 @@ def get_all_files_in_dir(
     Returns
     -------
     List : A list of filenames
+
     """
     if not isdir(in_dir):
         print("Non existant directory " + str(in_dir))
@@ -1210,7 +1218,7 @@ def get_all_files_in_dir(
 
 
 def make_dir_if_not_exists(location):
-    """Makes directory structure for given location"""
+    """Makes directory structure for given location."""
     os.makedirs(os.path.dirname(location), exist_ok=True)
 
 

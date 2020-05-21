@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NData Class for NeuroChaT software
+This module implements NData Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 import logging
 from collections import OrderedDict as oDict
@@ -19,10 +20,10 @@ from neurochat.nc_lfp import NLfp
 class NData():
     """
     The NData object is composed of data objects (NSpike(), NSpatial(), NLfp(),
-    and Nhdf()) and is built upon the composite structural object pattern. 
+    and Nhdf()) and is built upon the composite structural object pattern.
 
-    This data class is the main data element in NeuroChaT which delegates the 
-    analysis and other operations to respective objects.
+    This data class is the main data element in NeuroChaT which
+    delegates the analysis and other operations to respective objects.
 
     """
 
@@ -66,6 +67,7 @@ class NData():
         -------
         NData
             subsampled version of initial ndata object
+
         """
         ndata = NData()
         if self.lfp.get_duration() != 0:
@@ -82,7 +84,7 @@ class NData():
 
     def get_type(self):
         """
-        Returns the type of object. For NData, this is always `data` type
+        Returns the type of object. For NData, this is always `data` type.
 
         Parameters
         ----------
@@ -97,7 +99,7 @@ class NData():
 
     def get_results(self, spaces_to_underscores=False):
         """
-        Returns the parametric results of the analyses
+        Returns the parametric results of the analyses.
 
         Parameters
         ----------
@@ -116,7 +118,7 @@ class NData():
 
     def update_results(self, results):
         """
-        Adds new parametric results of the analyses
+        Adds new parametric results of the analyses.
 
         Parameters
         ----------
@@ -133,7 +135,7 @@ class NData():
 
     def reset_results(self):
         """
-        Reset the NData results to an empty OrderedDict
+        Reset the NData results to an empty OrderedDict.
 
         Parameters
         ----------
@@ -152,7 +154,7 @@ class NData():
 
     def get_data_format(self):
         """
-        Returns the recording system or data format
+        Returns the recording system or data format.
 
         Parameters
         ----------
@@ -167,7 +169,7 @@ class NData():
 
     def set_data_format(self, data_format=None):
         """
-        Returns the parametric results of the analyses
+        Returns the parametric results of the analyses.
 
         Parameters
         ----------
@@ -189,8 +191,8 @@ class NData():
 
     def load(self):
         """
-        Loads the data from the filenames in each constituing objects, i.e, 
-        spatial,  spike and LFP 
+        Loads the data from the filenames in each constituing objects, i.e,
+        spatial,  spike and LFP.
 
         Parameters
         ----------
@@ -207,7 +209,7 @@ class NData():
 
     def save_to_hdf5(self):
         """
-        Stores the spatial, spike and LFP datasets to HDF5 file 
+        Stores the spatial, spike and LFP datasets to HDF5 file.
 
         Parameters
         ----------
@@ -239,7 +241,7 @@ class NData():
 
     def set_unit_no(self, unit_no):
         """
-        Sets the unit number of the spike dataset to analyse
+        Sets the unit number of the spike dataset to analyse.
 
         Parameters
         ----------
@@ -256,7 +258,7 @@ class NData():
 
     def set_spike_name(self, name='C0'):
         """
-        Sets the name of the spike dataset
+        Sets the name of the spike dataset.
 
         Parameters
         ----------
@@ -273,7 +275,7 @@ class NData():
 
     def set_spike_file(self, filename):
         """
-        Sets the filename of the spike dataset
+        Sets the filename of the spike dataset.
 
         Parameters
         ----------
@@ -290,7 +292,7 @@ class NData():
 
     def get_spike_file(self):
         """
-        Gets the filename of the spike dataset
+        Gets the filename of the spike dataset.
 
         Parameters
         ----------
@@ -300,17 +302,18 @@ class NData():
         -------
         str
             Filename of the spike dataset
+
         """
 
         return self.spike.get_filename()
 
     def load_spike(self):
         """
-        Loads spike dataset from the file to NSpike() object
+        Loads spike dataset from the file to NSpike() object.
 
         Parameters
         ----------
-        None        
+        None
         Returns
         -------
         None
@@ -321,7 +324,7 @@ class NData():
 
     def set_spatial_file(self, filename):
         """
-        Sets the filename of the spatial dataset
+        Sets the filename of the spatial dataset.
 
         Parameters
         ----------
@@ -337,7 +340,7 @@ class NData():
 
     def get_spatial_file(self):
         """
-        Gets the filename of the spatial dataset
+        Gets the filename of the spatial dataset.
 
         Parameters
         ----------
@@ -353,7 +356,7 @@ class NData():
 
     def set_spatial_name(self, name):
         """
-        Sets the name of the spatial dataset
+        Sets the name of the spatial dataset.
 
         Parameters
         ----------
@@ -370,7 +373,7 @@ class NData():
 
     def load_spatial(self):
         """
-        Loads spatial dataset from the file to NSpatial() object
+        Loads spatial dataset from the file to NSpatial() object.
 
         Parameters
         ----------
@@ -386,7 +389,7 @@ class NData():
 
     def set_lfp_file(self, filename):
         """
-        Sets the filename of the LFP dataset
+        Sets the filename of the LFP dataset.
 
         Parameters
         ----------
@@ -402,7 +405,7 @@ class NData():
 
     def get_lfp_file(self):
         """
-        Gets the filename of the LFP dataset
+        Gets the filename of the LFP dataset.
 
         Parameters
         ----------
@@ -412,13 +415,14 @@ class NData():
         -------
         str
             Filename of the LFP dataset
+
         """
 
         return self.lfp.get_filename()
 
     def set_lfp_name(self, name):
         """
-        Sets the name of the NLfp() object
+        Sets the name of the NLfp() object.
 
         Parameters
         ----------
@@ -435,7 +439,7 @@ class NData():
 
     def load_lfp(self):
         """
-        Loads LFP dataset to NLfp() object
+        Loads LFP dataset to NLfp() object.
 
         Parameters
         ----------
@@ -452,13 +456,13 @@ class NData():
     # Forwarding to analysis
     def wave_property(self):
         """
-        Analysis of wavefor characteristics of the spikes of a unit
+        Analysis of wavefor characteristics of the spikes of a unit.
 
         Delegates to NSpike().wave_property()
 
         Parameters
         ----------
-        None        
+        None
 
         Returns
         -------
@@ -479,7 +483,7 @@ class NData():
     def isi(self, bins='auto', bound=None, density=False,
             refractory_threshold=2):
         """
-        Analysis of ISI histogram
+        Analysis of ISI histogram.
 
         Delegates to NSpike().isi()
 
@@ -512,7 +516,7 @@ class NData():
 
     def isi_auto_corr(self, spike=None, **kwargs):
         """
-        Analysis of ISI autocrrelation histogram
+        Analysis of ISI autocrrelation histogram.
 
         Delegates to NSpike().isi_corr()
 
@@ -541,7 +545,7 @@ class NData():
 
     def burst(self, burst_thresh=5, ibi_thresh=50):
         """
-        Burst analysis of spik-train
+        Burst analysis of spik-train.
 
         Delegates to NSpike().burst()
 
@@ -568,7 +572,8 @@ class NData():
 
     def theta_index(self, **kwargs):
         """
-        Calculates theta-modulation of spike-train ISI autocorrelation histogram.
+        Calculates theta-modulation of spike-train ISI autocorrelation
+        histogram.
 
         Delegates to NSpike().theta_index()
 
@@ -635,6 +640,7 @@ class NData():
         See also
         --------
         nc_lfp.NLfp.bandpower_ratio()
+
         """
 
         self.lfp.bandpower_ratio(
@@ -643,7 +649,7 @@ class NData():
 
     def spectrum(self, **kwargs):
         """
-        Analyses frequency spectrum of the LFP signal
+        Analyses frequency spectrum of the LFP signal.
 
         Delegates to NLfp().spectrum()
 
@@ -669,7 +675,7 @@ class NData():
 
     def phase_dist(self, **kwargs):
         """
-        Analysis of spike to LFP phase distribution
+        Analysis of spike to LFP phase distribution.
 
         Delegates to NLfp().phase_dist()
 
@@ -696,7 +702,7 @@ class NData():
 
     def phase_at_spikes(self, **kwargs):
         """
-        Analysis of spike to LFP phase distribution
+        Analysis of spike to LFP phase distribution.
 
         Delegates to NLfp().phase_dist()
 
@@ -749,7 +755,8 @@ class NData():
 
     def plv(self, **kwargs):
         """
-        Calculates phase-locking value of the spike train to underlying LFP signal.
+        Calculates phase-locking value of the spike train to underlying LFP
+        signal.
 
         Delegates to NLfp().plv()
 
@@ -801,7 +808,7 @@ class NData():
 
     def event_trig_average(self, **kwargs):
         """
-        Averaging event-triggered LFP signals
+        Averaging event-triggered LFP signals.
 
         Delegates to NLfp().event_trig_average()
 
@@ -828,7 +835,7 @@ class NData():
 
     def spike_lfp_causality(self, **kwargs):
         """
-        Analyses spike to underlying LFP causality
+        Analyses spike to underlying LFP causality.
 
         Delegates to NLfp().spike_lfp_causality()
 
@@ -856,7 +863,7 @@ class NData():
 
     def speed(self, **kwargs):
         """
-        Analysis of unit correlation with running speed
+        Analysis of unit correlation with running speed.
 
         Delegates to NSpatial().speed()
 
@@ -883,7 +890,8 @@ class NData():
 
     def angular_velocity(self, **kwargs):
         """
-        Analysis of unit correlation to angular head velocity (AHV) of the animal
+        Analysis of unit correlation to angular head velocity (AHV) of the
+        animal.
 
         Delegates to NSpatial().angular_velocity()
 
@@ -911,7 +919,7 @@ class NData():
 
     def place(self, **kwargs):
         """
-        Analysis of place cell firing characteristics
+        Analysis of place cell firing characteristics.
 
         Delegates to NSpatial().place()
 
@@ -939,7 +947,7 @@ class NData():
     # Created by Sean Martin: 13/02/2019
     def place_field_centroid_zscore(self, **kwargs):
         """
-        Calculates a very simple centroid of place field
+        Calculates a very simple centroid of place field.
 
         Delegates to NSpatial().place_field()
 
@@ -967,7 +975,7 @@ class NData():
 
     def loc_time_lapse(self, **kwargs):
         """
-        Time-lapse firing proeprties of the unit with respect to location
+        Time-lapse firing proeprties of the unit with respect to location.
 
         Delegates to NSpatial().loc_time_lapse()
 
@@ -993,8 +1001,9 @@ class NData():
 
     def loc_shuffle(self, **kwargs):
         """
-        Shuffling analysis of the unit to  see if the locational firing specifity
-        is by chance or actually correlated to the location of the animal
+        Shuffling analysis of the unit to  see if the locational firing
+        specifity is by chance or actually correlated to the location of the
+        animal.
 
         Delegates to NSpatial().loc_shuffle()
 
@@ -1021,9 +1030,9 @@ class NData():
 
     def loc_shift(self, shift_ind=np.arange(-10, 11), **kwargs):
         """
-        Analysis of firing specificity of the unit with respect to animal's location
-        to oberve whether it represents past location of the animal or anicipates a
-        future location.
+        Analysis of firing specificity of the unit with respect to animal's
+        location to oberve whether it represents past location of the animal or
+        anicipates a future location.
 
         Delegates to NSpatial().loc_shift()
 
@@ -1056,7 +1065,7 @@ class NData():
     def loc_auto_corr(self, **kwargs):
         """
         Calculates the two-dimensional correlation of firing map which is the
-        map of the firing rate of the animal with respect to its location
+        map of the firing rate of the animal with respect to its location.
 
         Delegates to NSpatial().loc_auto_corr()
 
@@ -1082,8 +1091,8 @@ class NData():
 
     def loc_rot_corr(self, **kwargs):
         """
-        Calculates the rotational correlation of the locational firing rate of the animal with
-        respect to location, also called firing map
+        Calculates the rotational correlation of the locational firing rate of
+        the animal with respect to location, also called firing map.
 
         Delegates to NSpatial().loc_rot_corr()
 
@@ -1110,8 +1119,8 @@ class NData():
 
     def hd_rate(self, **kwargs):
         """
-        Analysis of the firing characteristics of a unit with respect to animal's
-        head-direction
+        Analysis of the firing characteristics of a unit with respect to
+        animal's head-direction.
 
         Delegates to NSpatial().hd_rate()
 
@@ -1138,8 +1147,9 @@ class NData():
 
     def hd_rate_ccw(self, **kwargs):
         """
-        Analysis of the firing characteristics of a unit with respect to animal's
-        head-direction split into clockwise and counterclockwised directions
+        Analysis of the firing characteristics of a unit with respect to
+        animal's head-direction split into clockwise and counterclockwised
+        directions.
 
         Delegates to NSpatial().hd_rate_ccw()
 
@@ -1166,8 +1176,8 @@ class NData():
 
     def hd_time_lapse(self):
         """
-        Time-lapse firing proeprties of the unit with respect to the head-direction
-        of the animal
+        Time-lapse firing proeprties of the unit with respect to the head-
+        direction of the animal.
 
         Delegates to NSpatial().hd_time_lapse()
 
@@ -1193,8 +1203,9 @@ class NData():
 
     def hd_shuffle(self, **kwargs):
         """
-        Shuffling analysis of the unit to see if the head-directional firing specifity
-        is by chance or actually correlated to the head-direction of the animal
+        Shuffling analysis of the unit to see if the head-directional firing
+        specifity is by chance or actually correlated to the head-direction of
+        the animal.
 
         Delegates to NSpatial().hd_shuffle()
 
@@ -1221,9 +1232,9 @@ class NData():
 
     def hd_shift(self, shift_ind=np.arange(-10, 11), **kwargs):
         """
-        Analysis of firing specificity of the unit with respect to animal's head
-        direction to oberve whether it represents past direction or anicipates a
-        future direction.
+        Analysis of firing specificity of the unit with respect to animal's
+        head direction to oberve whether it represents past direction or
+        anicipates a future direction.
 
         Delegates to NSpatial().hd_shift()
 
@@ -1256,7 +1267,7 @@ class NData():
     def border(self, **kwargs):
         """
         Analysis of the firing characteristic of a unit with respect to the
-        environmental border
+        environmental border.
 
         Delegates to NSpatial().border()
 
@@ -1283,8 +1294,9 @@ class NData():
 
     def gradient(self, **kwargs):
         """
-        Analysis of gradient cell, a unit whose firing rate gradually increases 
-        as the animal traverses from the border to the cneter of the environment
+        Analysis of gradient cell, a unit whose firing rate gradually increases
+        as the animal traverses from the border to the cneter of the
+        environment.
 
         Delegates to NSpatial().gradient()
 
@@ -1312,7 +1324,7 @@ class NData():
     def grid(self, **kwargs):
         """
         Analysis of Grid cells characterised by formation of grid-like pattern
-        of high activity in the firing-rate map
+        of high activity in the firing-rate map.
 
         Delegates to NSpatial().grid()
 
@@ -1340,8 +1352,8 @@ class NData():
     def multiple_regression(self, **kwargs):
         """
         Multiple-rgression analysis where firing rate for each variable, namely
-        location, head-direction, speed, AHV, and distance from border, are used
-        to regress the instantaneous firing rate of the unit.
+        location, head-direction, speed, AHV, and distance from border, are
+        used to regress the instantaneous firing rate of the unit.
 
         Delegates to NSpatial().multiple_regression()
 
@@ -1368,9 +1380,9 @@ class NData():
 
     def interdependence(self, **kwargs):
         """
-        Interdependence analysis where firing rate of each variable is predicted
-        from another variable and the distributive ratio is measured between the
-        predicted firing rate and the caclulated firing rate.
+        Interdependence analysis where firing rate of each variable is
+        predicted from another variable and the distributive ratio is measured
+        between the predicted firing rate and the caclulated firing rate.
 
         Delegates to NSpatial().interdependence()
 

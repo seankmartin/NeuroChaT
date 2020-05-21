@@ -636,7 +636,9 @@ class NEvent(NBase):
         """
         Return a user friendly (time, name, tag) string.
 
-        Only returns the first and last 10 events if more than 20 events.
+        Only returns the first and last 10 events if more than 20
+        events.
+
         """
         output_str = ""
         if len(self._timestamp) == 0:

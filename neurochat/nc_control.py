@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NeuroChaT Class for the NeuroChaT software
+This module implements NeuroChaT Class for the NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 
 import os.path
@@ -33,10 +34,12 @@ from matplotlib.backends.backend_pdf import PdfPages
 class NeuroChaT(QtCore.QThread):
     """
     The NeuroChaT object is the controller object in NeuroChaT and works as the
-    backend to the NeuroChaT graphical user interface. It reads data, parameter
-    and analysis specifications from the Configuration class and executes accordingly.
-    It also interafces the GUI to the rest of the NeuroChaT elements.
-    
+    backend to the NeuroChaT graphical user interface.
+
+    It reads data, parameter and analysis specifications from the
+    Configuration class and executes accordingly. It also interafces the
+    GUI to the rest of the NeuroChaT elements.
+
     """
     
     finished = QtCore.pyqtSignal()
@@ -64,17 +67,17 @@ class NeuroChaT(QtCore.QThread):
         
     def reset(self):
         """
-        Reset NeuroChaT's internal attributes and prepares it for another set of
-        analysis or new session.
-        
+        Reset NeuroChaT's internal attributes and prepares it for another set
+        of analysis or new session.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         """
         
         self.__count = 0
@@ -91,19 +94,20 @@ class NeuroChaT(QtCore.QThread):
 
     def get_output_files(self):
         """
-        Returns a DataFrame of output graphic files and HDF5 files after the completion of the analysis.
-        Index are the unit IDs of the analysed units.
-        
+        Returns a DataFrame of output graphic files and HDF5 files after the
+        completion of the analysis. Index are the unit IDs of the analysed
+        units.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         op_files : pandas.DataFrame
             Column 1 contains the name of the output graphic files. Column 2 gives the
             the name of the NWB files
-        
+
         """
         
         op_files = {'Graphics Files': self.graphic_files,
@@ -117,16 +121,16 @@ class NeuroChaT(QtCore.QThread):
     def update_results(self, _results):
         """
         Updates the results with new analysis results.
-        
+
         Parameters
         ----------
         _results : OrderedDict
             Dictionary of the new results
-        
+
         Returns
         -------
         None
-        
+
         """
         
         self.results.append(_results.copy()) # without copy, list contains a reference to the original dictionary, and old results are replaced by the new one
@@ -134,16 +138,16 @@ class NeuroChaT(QtCore.QThread):
     def get_results(self):
         """
         Returns the parametric results of the analyses.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         results : OrderedDict
             Parametric results of the analysis
-            
+
         """
         try:
             keys = []
@@ -159,17 +163,18 @@ class NeuroChaT(QtCore.QThread):
 
     def open_pdf(self, filename=None):
         """
-        Opens the PDF file object using PdfPages from matplotlib.backends.backend_pdf
-        
+        Opens the PDF file object using PdfPages from
+        matplotlib.backends.backend_pdf.
+
         Parameters
         ----------
         filename : str
             Filename of the PDF output
-        
+
         Returns
         -------
         None
-            
+
         """
         
         if filename is not None:
@@ -196,15 +201,15 @@ class NeuroChaT(QtCore.QThread):
     def close_pdf(self):
         """
         closes the PDF file object.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-            
+
         """
         
         if self._pdf_file is not None:
@@ -215,19 +220,19 @@ class NeuroChaT(QtCore.QThread):
 
     def close_fig(self, fig):
         """
-        Closes a matplotlib.fiure.Figure() object after saving it to the output PDF.
-        A a tuple or list of such figures are provided, each of them saved and closed
-        accordingly.
-        
+        Closes a matplotlib.fiure.Figure() object after saving it to the output
+        PDF. A a tuple or list of such figures are provided, each of them saved
+        and closed accordingly.
+
         Parameters
         ----------
-        fig 
+        fig
            matplotlib.fiure.Figure() or a list or tuple of them.
-        
+
         Returns
         -------
         None
-            
+
         """
         
         if isinstance(fig, (tuple, list)):
@@ -255,15 +260,15 @@ class NeuroChaT(QtCore.QThread):
         """
         After calling start(), the NeuroChaT thread calls this function. It
         verifies the input specifications and calls the mode() method.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-            
+
         """
 
     
@@ -314,19 +319,20 @@ class NeuroChaT(QtCore.QThread):
 
     def mode(self):
         """
-        Reads the specifications and analyzes data according to the mode that is set
-        in the Configuration file. This is the principle method in NeuroChaT that
-        sets the input and output data files and calls the execute() method for 
-        running the analyses after it sets the data and filenames to NData() object.
-        
+        Reads the specifications and analyzes data according to the mode that
+        is set in the Configuration file. This is the principle method in
+        NeuroChaT that sets the input and output data files and calls the
+        execute() method for running the analyses after it sets the data and
+        filenames to NData() object.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-            
+
         """
         
         info = {'spat': [], 'spike': [], 'unit': [], 'lfp': [], 'nwb': [], 'graphics': [], 'cellid': []}
@@ -441,19 +447,20 @@ class NeuroChaT(QtCore.QThread):
 
     def execute(self, name=None):
         """
-        Checks the selection of each analyses, and executes if they are selected.
-        It also exports the plot data from individual analyses to the hdf file and 
-        figures to the graphics file that are set in the mode() method.
-        
+        Checks the selection of each analyses, and executes if they are
+        selected. It also exports the plot data from individual analyses to the
+        hdf file and figures to the graphics file that are set in the mode()
+        method.
+
         Parameters
         ----------
         name : str
             Name of the unit or the unique unit ID
-        
+
         Returns
         -------
         None
-            
+
         """
         
         try:
@@ -971,16 +978,16 @@ class NeuroChaT(QtCore.QThread):
     def open_hdf_file(self, filename=None):
         """
         Sets the filename and opens the file object for the HDF5 file.
-        
+
         Parameters
         ----------
         filename : str
             Filename of the HDF5 object
-        
+
         Returns
         -------
         None
-            
+
         """
         if not filename:
             filename = self.config.get_nwb_file()
@@ -990,28 +997,28 @@ class NeuroChaT(QtCore.QThread):
     def close_hdf_file(self):
         """
         Closes the HDF5 file object.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-            
+
         """
         
         self.hdf.close()
         
     def get_hdf_groups(self, path=''):
         """
-        Returns the names of groups or datasets in a path 
-        
+        Returns the names of groups or datasets in a path.
+
         Parameters
         ----------
         path : str
             path to HDF5 file group
-        
+
         Returns
         -------
         list
@@ -1023,13 +1030,13 @@ class NeuroChaT(QtCore.QThread):
     
     def exist_hdf_path(self, path=''):
         """
-        Check and returns if an HDF5 file path exists
-        
+        Check and returns if an HDF5 file path exists.
+
         Parameters
         ----------
         path : str
             path to HDF5 file group
-        
+
         Returns
         -------
         exists : bool
@@ -1044,15 +1051,15 @@ class NeuroChaT(QtCore.QThread):
         
     def plot_data_to_hdf(self, name=None, graph_data=None):
         """
-        Stores plot data to the HDF5 file in the '/analysis/' path
-        
+        Stores plot data to the HDF5 file in the '/analysis/' path.
+
         Parameters
         ----------
         name : str
             Unit ID which is also the name of the group in the  '/analysis/' path
         graph_data : dict
             Dictionary of data that are plotted
-        
+
         Returns
         -------
         None
@@ -1065,12 +1072,12 @@ class NeuroChaT(QtCore.QThread):
     def set_neuro_data(self, ndata):
         """
         Sets a new NData() object or its subclass object.
-        
+
         Parameters
         ----------
         ndata : NData
             Object of NData class or its subclass.
-        
+
         Returns
         -------
         None
@@ -1087,11 +1094,11 @@ class NeuroChaT(QtCore.QThread):
     def get_neuro_data(self):
         """
         Returns the NData() object from this class.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         NData
@@ -1103,12 +1110,12 @@ class NeuroChaT(QtCore.QThread):
     def set_configuration(self, config):
         """
         Sets a new Configuration() object or its subclass object.
-        
+
         Parameters
         ----------
         config : Configuration
             Object of Configuration class or its subclass.
-        
+
         Returns
         -------
         None
@@ -1125,11 +1132,11 @@ class NeuroChaT(QtCore.QThread):
     def get_configuration(self):
         """
         Returns the Configuration() object from this class.
-        
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         Configuration
@@ -1150,14 +1157,15 @@ class NeuroChaT(QtCore.QThread):
 
     def convert_to_nwb(self, excel_file=None):
         """
-        Takes a list of datasets in Excel file and converts them into NWB file format. This 
-        method currently supports Axona and Neuralynx data formats.
-        
+        Takes a list of datasets in Excel file and converts them into NWB file
+        format. This method currently supports Axona and Neuralynx data
+        formats.
+
         Parameters
         ----------
         excel_file : str
             Name of the excel file that contains data specifications
-        
+
         Returns
         -------
         None
@@ -1212,14 +1220,14 @@ class NeuroChaT(QtCore.QThread):
     def verify_units(self, excel_file=None):
         """
         Takes a list of datasets and verify the specifications of the units.
-        The verification tool is useful for prescreening of units before the 
-        batch-mode analysis using 'Listed Units' mode of NeuroChaT
-        
+        The verification tool is useful for prescreening of units before the
+        batch-mode analysis using 'Listed Units' mode of NeuroChaT.
+
         Parameters
         ----------
         excel_file : str
             Name of the excel file that contains data specifications
-        
+
         Returns
         -------
         None
@@ -1263,17 +1271,19 @@ class NeuroChaT(QtCore.QThread):
     
     def angle_calculation(self, excel_file=None, should_plot=True):
         """
-        Takes a list of unit specifications and finds the angle between the place field centroids
-        The results of the analysis are written back to the input Excel file.
-    
+        Takes a list of unit specifications and finds the angle between the
+        place field centroids The results of the analysis are written back to
+        the input Excel file.
+
         Parameters
         ----------
         excel_file : str
             Name of the excel file that contains data specifications
-    
+
         Returns
         -------
         None
+
         """
         params= self.get_params_by_analysis('loc_rate')
 
@@ -1355,14 +1365,15 @@ class NeuroChaT(QtCore.QThread):
 
     def cluster_evaluate(self, excel_file=None):
         """
-        Takes a list of unit specifications and evaluates the quality of the clustering.
-        The results of the analysis are written back to the input Excel file.
-        
+        Takes a list of unit specifications and evaluates the quality of the
+        clustering. The results of the analysis are written back to the input
+        Excel file.
+
         Parameters
         ----------
         excel_file : str
             Name of the excel file that contains data specifications
-        
+
         Returns
         -------
         None
@@ -1407,14 +1418,14 @@ class NeuroChaT(QtCore.QThread):
 
     def cluster_similarity(self, excel_file=None):
         """
-        Takes a list of specifications for pairwise comparison of units. The results
-        are written back to the input Excel file.
-        
+        Takes a list of specifications for pairwise comparison of units. The
+        results are written back to the input Excel file.
+
         Parameters
         ----------
         excel_file : str
             Name of the excel file that contains unit specifications
-        
+
         Returns
         -------
         None

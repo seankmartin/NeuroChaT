@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module implements utility functions and classes for NeuroChaT software
+This module implements utility functions and classes for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -16,10 +16,8 @@ except AttributeError:
 
 
 class ScrollableWidget(QtWidgets.QWidget):
-    """
-    Subclassed from PyQt5.QtWidgets.QWidget, this class creates a scrollable widget.
-
-    """
+    """Subclassed from PyQt5.QtWidgets.QWidget, this class creates a scrollable
+    widget."""
 
     def __init__(self):
         super().__init__()
@@ -34,7 +32,7 @@ class ScrollableWidget(QtWidgets.QWidget):
 
     def setContents(self, cont_layout):
         """
-        Sets the contents of the scrollable widget
+        Sets the contents of the scrollable widget.
 
         Parameters
         ----------
@@ -50,19 +48,16 @@ class ScrollableWidget(QtWidgets.QWidget):
 
 
 class NLogBox(QtWidgets.QTextEdit):
-    """
-    Subclassed from PyQt5.QtWidgets.QTextEdit, this class creates a formatted 
-    text-editable log-box for NeuroChaT
-
-    """
+    """Subclassed from PyQt5.QtWidgets.QTextEdit, this class creates a
+    formatted text-editable log-box for NeuroChaT."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
     def insert_log(self, msg):
         """
-        Formats further the HTML 'msg' to categorally add color to the log-texts
-        and displays it in the log-box or in any log-handler.
+        Formats further the HTML 'msg' to categorally add color to the log-
+        texts and displays it in the log-box or in any log-handler.
 
         Parameters
         ----------
@@ -88,7 +83,7 @@ class NLogBox(QtWidgets.QTextEdit):
 
     def get_text(self):
         """
-        Returned the texts of log-box in plain text format     
+        Returned the texts of log-box in plain text format.
 
         Parameters
         ----------
@@ -106,13 +101,14 @@ class NLogBox(QtWidgets.QTextEdit):
 
 class NOut(QtCore.QObject):
     """
-    Subclassed from PyQt5.QtCore.QObject, it implements the Qt signalling mechanism
-    so that when a text is written using NOut() object, it emits a text to the 
-    output to an output console or file or where the emitted signal is connected to. 
+    Subclassed from PyQt5.QtCore.QObject, it implements the Qt signalling
+    mechanism so that when a text is written using NOut() object, it emits a
+    text to the output to an output console or file or where the emitted signal
+    is connected to.
 
-    In NeuroChaT, the sys.stdout.write is replaced with NOut().write, which means
-    print('some text') will print to GUI log box in GUI and to the standard output
-    console when used in API.
+    In NeuroChaT, the sys.stdout.write is replaced with NOut().write,
+    which means print('some text') will print to GUI log box in GUI and
+    to the standard output console when used in API.
 
     """
 
@@ -123,7 +119,7 @@ class NOut(QtCore.QObject):
 
     def write(self, text):
         """
-        Emits the texts as Qt signal
+        Emits the texts as Qt signal.
 
         Parameters
         ----------
@@ -140,11 +136,8 @@ class NOut(QtCore.QObject):
 
 
 class PandasModel(QtCore.QAbstractTableModel):
-    """
-    Class to populate a QT table view with a pandas dataframe and implements methods
-    that are to be overriden
-
-    """
+    """Class to populate a QT table view with a pandas dataframe and implements
+    methods that are to be overriden."""
 
     def __init__(self, data, parent=None):
         super().__init__(parent)
@@ -152,7 +145,7 @@ class PandasModel(QtCore.QAbstractTableModel):
 
     def rowCount(self, parent=None):
         """
-        Overrides the rowCount() methods
+        Overrides the rowCount() methods.
 
         Parameters
         ----------
@@ -170,7 +163,7 @@ class PandasModel(QtCore.QAbstractTableModel):
 
     def columnCount(self, parent=None):
         """
-        Overrides the columnCount() methods
+        Overrides the columnCount() methods.
 
         Parameters
         ----------
@@ -241,7 +234,7 @@ class PandasModel(QtCore.QAbstractTableModel):
 
 def add_log_box(obj_name):
     """
-    Returns a NLogBox() object
+    Returns a NLogBox() object.
 
     Parameters
     ----------
@@ -263,7 +256,7 @@ def add_log_box(obj_name):
 
 def add_radio_button(parent=None, position=None, obj_name='', text=None):
     """
-    Returns a QtWidgets.QRadioButton() object
+    Returns a QtWidgets.QRadioButton() object.
 
     Parameters
     ----------
@@ -296,7 +289,7 @@ def add_radio_button(parent=None, position=None, obj_name='', text=None):
 
 def add_push_button(parent=None, position=None, obj_name='', text=None):
     """
-    Returns a QtWidgets.QPushButton() object
+    Returns a QtWidgets.QPushButton() object.
 
     Parameters
     ----------
@@ -329,7 +322,7 @@ def add_push_button(parent=None, position=None, obj_name='', text=None):
 
 def add_check_box(parent=None, position=None, obj_name='', text=None):
     """
-    Returns a QtWidgets.QCheckBox() object
+    Returns a QtWidgets.QCheckBox() object.
 
     Parameters
     ----------
@@ -362,7 +355,7 @@ def add_check_box(parent=None, position=None, obj_name='', text=None):
 
 def add_combo_box(parent=None, position=None, obj_name=''):
     """
-    Returns a QtWidgets.QComboBox() object
+    Returns a QtWidgets.QComboBox() object.
 
     Parameters
     ----------
@@ -391,7 +384,7 @@ def add_combo_box(parent=None, position=None, obj_name=''):
 
 def add_label(parent=None, position=None, obj_name='', text=None):
     """
-    Returns a QtWidgets.QLabel() object
+    Returns a QtWidgets.QLabel() object.
 
     Parameters
     ----------
@@ -424,7 +417,7 @@ def add_label(parent=None, position=None, obj_name='', text=None):
 
 def add_line_edit(parent=None, position=None, obj_name='', text=None):
     """
-    Returns a QtWidgets.QLineEdit() object
+    Returns a QtWidgets.QLineEdit() object.
 
     Parameters
     ----------
@@ -457,7 +450,7 @@ def add_line_edit(parent=None, position=None, obj_name='', text=None):
 
 def add_group_box(parent=None, position=None, obj_name='', title=None):
     """
-    Returns a QtWidgets.QGroupBox() object
+    Returns a QtWidgets.QGroupBox() object.
 
     Parameters
     ----------
@@ -490,7 +483,7 @@ def add_group_box(parent=None, position=None, obj_name='', title=None):
 
 def add_widget(parent=None, position=None, obj_name=''):
     """
-    Returns a QtWidgets.QWidget() object
+    Returns a QtWidgets.QWidget() object.
 
     Parameters
     ----------
@@ -519,7 +512,7 @@ def add_widget(parent=None, position=None, obj_name=''):
 
 def add_spin_box(parent=None, position=None, obj_name='', min_val=0, max_val=128):
     """
-    Returns a QtWidgets.QSpinBox() object
+    Returns a QtWidgets.QSpinBox() object.
 
     Parameters
     ----------
@@ -555,7 +548,7 @@ def add_spin_box(parent=None, position=None, obj_name='', min_val=0, max_val=128
 
 def add_double_spin_box(parent=None, position=None, min_val=0, max_val=1, obj_name=""):
     """
-    Returns a QtWidgets.QDoubleSpinBox() object
+    Returns a QtWidgets.QDoubleSpinBox() object.
 
     Parameters
     ----------

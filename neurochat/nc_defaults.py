@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 This module implements contains the default values of input parameters as used
-by the Configuration Class for NeuroChaT software. The parameter are defined as
+by the Configuration Class for NeuroChaT software. The parameter are defined
+as.
+
 {key, {key, value}} pairs where the 1st key represent the analyse for which parameter
 are set. The second {key, value} pairs represent the names of the parameters
 and their values.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 ANALYSES = {'wave_property': True,
             'isi': True,

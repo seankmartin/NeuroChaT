@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NSpike Class for NeuroChaT software
+This module implements NSpike Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 
 import os
@@ -29,10 +30,12 @@ from scipy.optimize import curve_fit
 
 class NSpike(NBase):
     """
-    This data class is the placeholder for the dataset that contains information
-    about the neural spikes. It decodes data from different formats and analyses
-    single units in the recording.
-     
+    This data class is the placeholder for the dataset that contains
+    information about the neural spikes.
+
+    It decodes data from different formats and analyses single units in
+    the recording.
+
     """
      
     def __init__(self, **kwargs):
@@ -52,12 +55,12 @@ class NSpike(NBase):
         
     def get_type(self):
         """
-        Returns the type of object. For NSpike, this is always `spike` type
-        
+        Returns the type of object. For NSpike, this is always `spike` type.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
@@ -69,12 +72,12 @@ class NSpike(NBase):
     def get_unit_tags(self):
         
         """
-        Returns the unit number or tags of the clustered units
-        
+        Returns the unit number or tags of the clustered units.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list ot ndarray
@@ -86,13 +89,13 @@ class NSpike(NBase):
     def set_unit_tags(self, new_tags):
         
         """
-        Sets the number or tags of the clustered units
-        
+        Sets the number or tags of the clustered units.
+
         Parameters
         ----------
         new_tags : list or ndarray
-            Tags for each spiking wave 
-        
+            Tags for each spiking wave
+
         Returns
         -------
         None
@@ -107,12 +110,12 @@ class NSpike(NBase):
 
     def get_unit_list(self):
         """
-        Gets the list of the units
-        
+        Gets the list of the units.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list
@@ -124,12 +127,12 @@ class NSpike(NBase):
     
     def _set_unit_list(self):
         """
-        Sets the list of units from the list of unit tags
-        
+        Sets the list of units from the list of unit tags.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
@@ -142,13 +145,13 @@ class NSpike(NBase):
 
     def set_unit_no(self, unit_no=None, spike_name=None):
         """
-        Sets the unit number of the spike dataset to analyse
-        
+        Sets the unit number of the spike dataset to analyse.
+
         Parameters
         ----------
         unit_no : int
             Unit or cell number to analyse
-        
+
         Returns
         -------
         None
@@ -172,12 +175,12 @@ class NSpike(NBase):
 
     def get_unit_no(self, spike_name=None):
         """
-        Gets currently set unit number of the spike dataset to analyse
-        
+        Gets currently set unit number of the spike dataset to analyse.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         int
@@ -195,16 +198,17 @@ class NSpike(NBase):
 
     def get_timestamp(self, unit_no=None):
         """
-        Returns the timestamps of the spike-waveforms of spefied unit
-        
+        Returns the timestamps of the spike-waveforms of spefied unit.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         ndarray
             Timestamps of the spiking waveforms
+
         """
         
         if unit_no is None:
@@ -217,13 +221,13 @@ class NSpike(NBase):
 
     def _set_timestamp(self, timestamp=None):
         """
-        Sets the timestamps for all spiking waveforms in the recording
-        
+        Sets the timestamps for all spiking waveforms in the recording.
+
         Parameters
         ----------
         timestamp : list or ndarray
             Timestamps of all spiking waveforms
-            
+
         Returns
         -------
         None
@@ -235,12 +239,12 @@ class NSpike(NBase):
 
     def get_unit_stamp(self):
         """
-        Gets the timestamps for currently set unit to analyse
-        
+        Gets the timestamps for currently set unit to analyse.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         list or ndarray
@@ -252,12 +256,12 @@ class NSpike(NBase):
 
     def _set_unit_stamp(self):
         """
-        Sets timestamps of the unit currently set to analyse
-        
+        Sets timestamps of the unit currently set to analyse.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         int
@@ -269,13 +273,13 @@ class NSpike(NBase):
 
     def get_unit_spikes_count(self, unit_no=None):
         """
-        Returns the number of spikes in a unit
-        
+        Returns the number of spikes in a unit.
+
         Parameters
         ----------
         unit_no : int
             Units whose spike count is returned
-        
+
         Returns
         -------
         int
@@ -290,12 +294,12 @@ class NSpike(NBase):
 
     def get_waveform(self):
         """
-        Returns spike-waveforms
-        
+        Returns spike-waveforms.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         OrderedDict
@@ -307,13 +311,13 @@ class NSpike(NBase):
 
     def _set_waveform(self, spike_waves=[]):
         """
-        Sets spike waveform to the NSpike() object
-        
+        Sets spike waveform to the NSpike() object.
+
         Parameters
         ----------
         spike_waves : OrderedDict
             Spike waveforms where each key represents one channel
-        
+
         Returns
         -------
         None
@@ -325,13 +329,13 @@ class NSpike(NBase):
 
     def get_unit_waves(self, unit_no=None):
         """
-        Returns spike waveform of a specified unit
-        
+        Returns spike waveform of a specified unit.
+
         Parameters
         ----------
         unit_no : int
             Unit whose waveforms are to be returned
-        
+
         Returns
         -------
         OrderedDict
@@ -356,11 +360,12 @@ class NSpike(NBase):
         ----------
         ranges : list
             A list of tuples indicating time ranges to get stamps in
-        
+
         Returns
         -------
         list
             The timestamps
+
         """
         stamps = self.get_unit_stamp()
         new_stamps = [
@@ -372,16 +377,17 @@ class NSpike(NBase):
     def subsample(self, sample_range=None):
         """
         Extract a time range from the spikes.
-        
+
         Parameters
         ----------
         sample_range : tuple
             the time in seconds to extract from the spikes
-        
+
         Returns
         -------
         NSpike
             subsampled version of initial spike object
+
         """
         if sample_range is None:
             return self
@@ -403,23 +409,23 @@ class NSpike(NBase):
 
     def load(self, filename=None, system=None):
         """
-        Loads spike datasets
-        
+        Loads spike datasets.
+
         Parameters
         ----------
         filename : str
             Name of the spike datafile
         system : str
             Recording system or format of the spike data file
-        
+
         Returns
         -------
         None
-        
+
         See also
         --------
         load_spike_axona(), load_spike_NLX(), load_spike_NWB()
-            
+
         """
         
         if system is None:
@@ -435,13 +441,13 @@ class NSpike(NBase):
 
     def add_spike(self, spike=None, **kwargs):
         """
-        Adds new spike node to current NSpike() object
-        
+        Adds new spike node to current NSpike() object.
+
         Parameters
         ----------
         spike : NSpike
             NSPike object. If None, new object is created
-        
+
         Returns
         -------
         `:obj:NSpike`
@@ -454,14 +460,14 @@ class NSpike(NBase):
 
     def load_spike(self, names=None):
         """
-        Loads datasets of the spike nodes. Name of each node is used for obtaining the
-        filenames
-        
+        Loads datasets of the spike nodes. Name of each node is used for
+        obtaining the filenames.
+
         Parameters
         ----------
         names : list of str
             Names of the nodes to load. If None, current NSpike() object is loaded
-        
+
         Returns
         -------
         None
@@ -481,13 +487,13 @@ class NSpike(NBase):
 
     def add_lfp(self, lfp=None, **kwargs):
         """
-        Adds new LFP node to current NSpike() object
-        
+        Adds new LFP node to current NSpike() object.
+
         Parameters
         ----------
         lfp : NLfp
             NLfp object. If None, new object is created
-        
+
         Returns
         -------
         `:obj:Nlfp`
@@ -511,14 +517,14 @@ class NSpike(NBase):
 
     def load_lfp(self, names='all'):
         """
-        Loads datasets of the LFP nodes. Name of each node is used for obtaining the
-        filenames
-        
+        Loads datasets of the LFP nodes. Name of each node is used for
+        obtaining the filenames.
+
         Parameters
         ----------
         names : list of str
             Names of the nodes to load. If `all`, all LFP nodes are loaded
-        
+
         Returns
         -------
         None
@@ -536,12 +542,12 @@ class NSpike(NBase):
 
     def wave_property(self):
         """
-        Claulates different waveform properties for currently set unit
-        
+        Claulates different waveform properties for currently set unit.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         dict
@@ -634,13 +640,13 @@ class NSpike(NBase):
     def isi(self, bins='auto', bound=None, density=False, 
             refractory_threshold=2):
         """
-        Calulates the ISI histogram of the spike train
-        
+        Calulates the ISI histogram of the spike train.
+
         Parameters
         ----------
         bins : str or int
             Number of ISI histogram bins. If 'auto', NumPy default is used
-            
+
         bound : int
             Length of the ISI histogram in msec
         density : bool
@@ -652,7 +658,7 @@ class NSpike(NBase):
         -------
         dict
             Graphical data of the analysis
-    
+
         """
         graph_data = oDict()
         _results = oDict()
@@ -680,20 +686,20 @@ class NSpike(NBase):
     def isi_corr(self, spike=None, **kwargs):
         """
         Calculates the correlation of ISI histogram.
-        
+
         Parameters
         ----------
         spike : NSpike()
             If specified, it calulates cross-correlation.
-            
+
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         """
         
         graph_data = oDict()
@@ -723,20 +729,20 @@ class NSpike(NBase):
     def psth(self, event_stamp, **kwargs):
         """
         Calculates peri-stimulus time histogram (PSTH)
-        
+
         Parameters
         ----------
         event_stamp : ndarray
             Event timestamps
-            
+
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         """
         
         graph_data = oDict()
@@ -763,20 +769,20 @@ class NSpike(NBase):
 
     def burst(self, burst_thresh=5, ibi_thresh=50):
         """
-        Analysis of bursting properties of the spiking train
-        
+        Analysis of bursting properties of the spiking train.
+
         Parameters
         ----------
         burst_thresh : int
             Minimum ISI between consecutive spikes in a burst
-            
+
         ibi_thresh : int
             Minimum inter-burst interval between two bursting groups of spikes
- 
+
         Returns
         -------
         None
-    
+
         """
 
         _results = oDict()
@@ -843,18 +849,18 @@ class NSpike(NBase):
 
     def theta_index(self, **kwargs):
         """
-        Analysis of theta-modulation of a unit
-        
+        Analysis of theta-modulation of a unit.
+
         Parameters
         ----------
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         """
         
         p_0 = kwargs.get('start', [6, 0.1, 0.05])
@@ -928,13 +934,13 @@ class NSpike(NBase):
 
     def theta_skip_index(self, **kwargs):
         """
-        Analysis of theta-skipping of a unit
-        
+        Analysis of theta-skipping of a unit.
+
         Parameters
         ----------
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
@@ -1009,22 +1015,22 @@ class NSpike(NBase):
 
     def phase_dist(self, lfp = None, **kwargs):
         """
-        Analysis of spike to LFP phase distribution
-        
+        Analysis of spike to LFP phase distribution.
+
         Delegates to NLfp().phase_dist()
-        
+
         Parameters
         ----------
         lfp : NLfp
             LFP object which contains the LFP data
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         See also
         --------
         nc_lfp.NLfp().phase_dist()
@@ -1042,21 +1048,21 @@ class NSpike(NBase):
     def plv(self, lfp=None, **kwargs):
         """
         Calculates phase-locking value of spike train to underlying LFP signal.
-        
+
         Delegates to NLfp().plv()
-        
+
         Parameters
         ----------
         lfp : NLfp
             LFP object which contains the LFP data
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         See also
         --------
         nc_lfp.NLfp().plv()
@@ -1073,20 +1079,20 @@ class NSpike(NBase):
             
     def spike_lfp_causality(self, lfp=None, **kwargs):
         """
-        Analyses spike to underlying LFP causality
-        
+        Analyses spike to underlying LFP causality.
+
         Delegates to NLfp().spike_lfp_causality()
-        
+
         Parameters
         ----------
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         See also
         --------
         nc_lfp.NLfp().spike_lfp_causality()
@@ -1103,16 +1109,17 @@ class NSpike(NBase):
 
     def _set_total_spikes(self, spike_count=1):
         """
-        Sets the total number of spikes as part of storing the recording information
-                
+        Sets the total number of spikes as part of storing the recording
+        information.
+
         Parameters
         ----------
         spike_count : int
             Total number of spikes
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         
@@ -1121,16 +1128,17 @@ class NSpike(NBase):
         
     def _set_total_channels(self, tot_channels=1):
         """
-        Sets the value of number of channels as part of storing the recording information
-                
+        Sets the value of number of channels as part of storing the recording
+        information.
+
         Parameters
         ----------
         tot_channels : int
             Total number of channels
- 
+
         Returns
         -------
-        None    
+        None
 
         """
 
@@ -1138,16 +1146,17 @@ class NSpike(NBase):
         
     def _set_channel_ids(self, channel_ids):
         """
-        Sets identity of the channels as part of storing the recording information
-                
+        Sets identity of the channels as part of storing the recording
+        information.
+
         Parameters
         ----------
         channel_ids : int
             Total number of channels
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         
@@ -1155,77 +1164,82 @@ class NSpike(NBase):
         
     def _set_timestamp_bytes(self, bytes_per_timestamp):
         """
-        Sets `bytes per timestamp` value as part of storing the recording information
-                
+        Sets `bytes per timestamp` value as part of storing the recording
+        information.
+
         Parameters
         ----------
         bytes_per_timestamp : int
             Total number of bytes to represent timestamp in the binary file
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         self._record_info['Bytes per timestamp'] = bytes_per_timestamp
         
     def _set_timebase(self, timebase=1):
         """
-        Sets timbase for spike event timestamps as part of storing the recording information
-                
+        Sets timbase for spike event timestamps as part of storing the
+        recording information.
+
         Parameters
         ----------
         timebase : int
             Timebase for the spike event timestamps
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         self._record_info['Timebase'] = timebase
         
     def _set_sampling_rate(self, sampling_rate=1):
         """
-        Sets the sampling rate of the spike waveform as part of storing the recording information
-                
+        Sets the sampling rate of the spike waveform as part of storing the
+        recording information.
+
         Parameters
         ----------
         sampling_rate : int
             Sampling rate of the spike waveforms
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         self._record_info['Sampling rate'] = sampling_rate
         
     def _set_bytes_per_sample(self, bytes_per_sample=1):
         """
-        Sets `bytes per sample` value as part of storing the recording information
-                
+        Sets `bytes per sample` value as part of storing the recording
+        information.
+
         Parameters
         ----------
         bytes_per_sample : int
             Total number of bytes to represent each waveform sample in the binary file
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         self._record_info['Bytes per sample'] = bytes_per_sample
         
     def _set_samples_per_spike(self, samples_per_spike=1):
         """
-        Sets `samples per spike` value as part of storing the recording information
-                
+        Sets `samples per spike` value as part of storing the recording
+        information.
+
         Parameters
         ----------
         samples_per_spike : int
             Total number of samples to represent a spike waveform
- 
+
         Returns
         -------
         None
@@ -1236,28 +1250,29 @@ class NSpike(NBase):
         
     def _set_fullscale_mv(self, adc_fullscale_mv=1):
         """
-        Sets fullscale value of ADC value in mV as part of storing the recording information
-                
+        Sets fullscale value of ADC value in mV as part of storing the
+        recording information.
+
         Parameters
         ----------
         adc_fullscale_mv : int
             Fullscale voltage of ADC signal in mV
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         self._record_info['ADC Fullscale mv'] = adc_fullscale_mv
 
     def get_total_spikes(self):
         """
-        Returns total number of spikes in the recording
-                
+        Returns total number of spikes in the recording.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1269,12 +1284,12 @@ class NSpike(NBase):
     
     def get_total_channels(self):
         """
-        Returns total number of electrode channels in the spike data file
-                
+        Returns total number of electrode channels in the spike data file.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1286,16 +1301,16 @@ class NSpike(NBase):
     
     def get_channel_ids(self):
         """
-        Returns the identities of individual channels
-                
+        Returns the identities of individual channels.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         list
-            Identities of individual channels 
+            Identities of individual channels
 
         """
         
@@ -1303,12 +1318,13 @@ class NSpike(NBase):
     
     def get_timestamp_bytes(self):
         """
-        Returns the number of bytes to represent each timestamp in the binary file
-                
+        Returns the number of bytes to represent each timestamp in the binary
+        file.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1319,12 +1335,12 @@ class NSpike(NBase):
     
     def get_timebase(self):
         """
-        Returns the timebase for spike event timestamps
-                
+        Returns the timebase for spike event timestamps.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1336,12 +1352,12 @@ class NSpike(NBase):
     
     def get_sampling_rate(self):
         """
-        Returns the sampling rate of spike waveforms
-                
+        Returns the sampling rate of spike waveforms.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1352,12 +1368,12 @@ class NSpike(NBase):
     
     def get_bytes_per_sample(self):
         """
-        Returns the number of bytes to represent each spike waveform sample
-                
+        Returns the number of bytes to represent each spike waveform sample.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1369,12 +1385,13 @@ class NSpike(NBase):
     
     def get_samples_per_spike(self):
         """
-        Returns the number of bytes to represent each timestamp in the binary file
-                
+        Returns the number of bytes to represent each timestamp in the binary
+        file.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1386,12 +1403,12 @@ class NSpike(NBase):
     
     def get_fullscale_mv(self):
         """
-        Returns the fullscale value of the ADC in mV
-                
+        Returns the fullscale value of the ADC in mV.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -1403,23 +1420,23 @@ class NSpike(NBase):
 
     def save_to_hdf5(self, file_name=None, system=None):
         """
-        Stores NSpike() object to HDF5 file
-        
+        Stores NSpike() object to HDF5 file.
+
         Parameters
         ----------
         file_name : str
             Full file directory for the spike data
         system : str
             Recoring system or data format
-        
+
         Returns
         -------
         None
-        
+
         Also see
         --------
         nc_hdf.Nhdf().save_spike()
-        
+
         """
         hdf = Nhdf()
         if file_name and system:
@@ -1435,17 +1452,17 @@ class NSpike(NBase):
 
     def load_spike_NWB(self, file_name):
         """
-        Decodes spike data from NWB (HDF5) file format
-        
+        Decodes spike data from NWB (HDF5) file format.
+
         Parameters
         ----------
         file_name : str
             Full file directory for the spike data
-        
+
         Returns
         -------
         None
-        
+
         """
         
         file_name, path = file_name.split('+')
@@ -1512,17 +1529,17 @@ class NSpike(NBase):
     
     def load_spike_Axona(self, file_name):
         """
-        Decodes spike data from Axona file format
-        
+        Decodes spike data from Axona file format.
+
         Parameters
         ----------
         file_name : str
             Full file directory for the spike data
-        
+
         Returns
         -------
         None
-        
+
         """
         file_directory, file_basename = os.path.split(file_name)
         file_tag, tet_no = os.path.splitext(file_basename)
@@ -1679,17 +1696,17 @@ class NSpike(NBase):
 
     def load_spike_Neuralynx(self, file_name):
         """
-        Decodes spike data from Neuralynx file format
-        
+        Decodes spike data from Neuralynx file format.
+
         Parameters
         ----------
         file_name : str
             Full file directory for the spike data
-        
+
         Returns
         -------
         None
-        
+
         """
         self._set_data_source(file_name)
         self._set_source_format('Neuralynx')

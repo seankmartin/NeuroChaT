@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NLfp Class for NeuroChaT software
+This module implements NLfp Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 import os
 
@@ -35,9 +36,11 @@ from scipy.fftpack import fft
 
 class NLfp(NBase):
     """
-    This data class is the placeholder for the dataset that contains information
-    about the neural LFP signal. It decodes data from different formats and analyses
-    LFP signal in the recording.
+    This data class is the placeholder for the dataset that contains
+    information about the neural LFP signal.
+
+    It decodes data from different formats and analyses LFP signal in
+    the recording.
 
     """
 
@@ -53,7 +56,7 @@ class NLfp(NBase):
 
     def get_type(self):
         """
-        Returns the type of object. For NLfp, this is always `lfp` type
+        Returns the type of object. For NLfp, this is always `lfp` type.
 
         Parameters
         ----------
@@ -70,7 +73,7 @@ class NLfp(NBase):
 
     def set_channel_id(self, channel_id=''):
         """
-        Sets the electrode channels ID
+        Sets the electrode channels ID.
 
         Parameters
         ----------
@@ -86,7 +89,7 @@ class NLfp(NBase):
 
     def get_channel_id(self):
         """
-        Returns the electrode channels ID
+        Returns the electrode channels ID.
 
         Parameters
         ----------
@@ -103,8 +106,8 @@ class NLfp(NBase):
 
     def set_file_tag(self, file_tag):
         """
-        Sets the file tag or extension for the LFP dataset. For example, Axona recordings usually
-        have file tags like 'eeg' or 'eeg8' etc.
+        Sets the file tag or extension for the LFP dataset. For example, Axona
+        recordings usually have file tags like 'eeg' or 'eeg8' etc.
 
         Parameters
         ----------
@@ -121,8 +124,8 @@ class NLfp(NBase):
 
     def get_file_tag(self):
         """
-        Returns the file tag or extension for the LFP dataset. For example, Axona recordings usually
-        have file tags like 'eeg' or 'eeg8' etc.
+        Returns the file tag or extension for the LFP dataset. For example,
+        Axona recordings usually have file tags like 'eeg' or 'eeg8' etc.
 
         Parameters
         ----------
@@ -132,13 +135,14 @@ class NLfp(NBase):
         -------
         str
             File tag or extension for the LFP dataset
+
         """
 
         return self._file_tag
 
     def get_timestamp(self):
         """
-        Returns the timestamps of the LFP waveform
+        Returns the timestamps of the LFP waveform.
 
         Parameters
         ----------
@@ -155,7 +159,7 @@ class NLfp(NBase):
 
     def _set_timestamp(self, timestamp=None):
         """
-        Sets the timestamps for LFP samples
+        Sets the timestamps for LFP samples.
 
         Parameters
         ----------
@@ -173,7 +177,7 @@ class NLfp(NBase):
 
     def get_samples(self):
         """
-        Returns LFP waveform samples
+        Returns LFP waveform samples.
 
         Parameters
         ----------
@@ -190,7 +194,7 @@ class NLfp(NBase):
 
     def _set_samples(self, samples=[]):
         """
-        Sets LFP samples
+        Sets LFP samples.
 
         Parameters
         ----------
@@ -207,7 +211,8 @@ class NLfp(NBase):
 
     def _set_total_samples(self, tot_samples=0):
         """
-        Sets the number of LFP samples as part of storing the recording information
+        Sets the number of LFP samples as part of storing the recording
+        information.
 
         Parameters
         ----------
@@ -224,7 +229,8 @@ class NLfp(NBase):
 
     def _set_total_channel(self, tot_channels):
         """
-        Sets the value of number of channels as part of storing the recording information
+        Sets the value of number of channels as part of storing the recording
+        information.
 
         Parameters
         ----------
@@ -241,7 +247,8 @@ class NLfp(NBase):
 
     def _set_timestamp_bytes(self, bytes_per_timestamp):
         """
-        Sets `bytes per timestamp` value as part of storing the recording information
+        Sets `bytes per timestamp` value as part of storing the recording
+        information.
 
         Parameters
         ----------
@@ -258,7 +265,8 @@ class NLfp(NBase):
 
     def _set_sampling_rate(self, sampling_rate):
         """
-        Sets the sampling rate of the LFP signal as part of storing the recording information
+        Sets the sampling rate of the LFP signal as part of storing the
+        recording information.
 
         Parameters
         ----------
@@ -275,7 +283,8 @@ class NLfp(NBase):
 
     def _set_bytes_per_sample(self, bytes_per_sample):
         """
-        Sets `bytes per sample` value as part of storing the recording information
+        Sets `bytes per sample` value as part of storing the recording
+        information.
 
         Parameters
         ----------
@@ -292,7 +301,8 @@ class NLfp(NBase):
 
     def _set_fullscale_mv(self, adc_fullscale_mv):
         """
-        Sets fullscale value of ADC value in mV as part of storing the recording information
+        Sets fullscale value of ADC value in mV as part of storing the
+        recording information.
 
         Parameters
         ----------
@@ -309,7 +319,7 @@ class NLfp(NBase):
 
     def get_total_samples(self):
         """
-        Returns total number of LFP samples
+        Returns total number of LFP samples.
 
         Parameters
         ----------
@@ -325,7 +335,7 @@ class NLfp(NBase):
 
     def get_total_channel(self):
         """
-        Returns total number of electrode channels in the LFP data file
+        Returns total number of electrode channels in the LFP data file.
 
         Parameters
         ----------
@@ -335,13 +345,15 @@ class NLfp(NBase):
         -------
         int
             Total number of electrode channels
+
         """
 
         return self._record_info['No of channels']
 
     def get_timestamp_bytes(self):
         """
-        Returns the number of bytes to represent each timestamp in the binary file
+        Returns the number of bytes to represent each timestamp in the binary
+        file.
 
         Parameters
         ----------
@@ -358,7 +370,7 @@ class NLfp(NBase):
 
     def get_sampling_rate(self):
         """
-        Returns the sampling rate of spike waveforms
+        Returns the sampling rate of spike waveforms.
 
         Parameters
         ----------
@@ -375,7 +387,7 @@ class NLfp(NBase):
 
     def get_bytes_per_sample(self):
         """
-        Returns the number of bytes to represent each LFP waveform sample
+        Returns the number of bytes to represent each LFP waveform sample.
 
         Parameters
         ----------
@@ -392,7 +404,7 @@ class NLfp(NBase):
 
     def get_fullscale_mv(self):
         """
-        Returns the fullscale value of the ADC in mV
+        Returns the fullscale value of the ADC in mV.
 
         Parameters
         ----------
@@ -409,7 +421,7 @@ class NLfp(NBase):
 
     def get_recording_time(self):
         """
-        Returns the recording time in seconds
+        Returns the recording time in seconds.
 
         Parameters
         ----------
@@ -419,13 +431,14 @@ class NLfp(NBase):
         -------
         int
             Recording time in seconds
+
         """
 
         return self.get_total_samples() / (self.get_sampling_rate())
 
     def load(self, filename=None, system=None):
         """
-        Loads LFP datasets
+        Loads LFP datasets.
 
         Parameters
         ----------
@@ -456,7 +469,7 @@ class NLfp(NBase):
 
     def add_spike(self, spike=None, **kwargs):
         """
-        Adds new spike node to current NLfp() object
+        Adds new spike node to current NLfp() object.
 
         Parameters
         ----------
@@ -486,8 +499,8 @@ class NLfp(NBase):
 
     def load_spike(self, names='all'):
         """
-        Loads datasets of the spike nodes. Name of each node is used for obtaining the
-        filenames
+        Loads datasets of the spike nodes. Name of each node is used for
+        obtaining the filenames.
 
         Parameters
         ----------
@@ -511,7 +524,7 @@ class NLfp(NBase):
 
     def add_lfp(self, lfp=None, **kwargs):
         """
-        Adds new LFP node to current NLfp() object
+        Adds new LFP node to current NLfp() object.
 
         Parameters
         ----------
@@ -531,8 +544,8 @@ class NLfp(NBase):
 
     def load_lfp(self, names=None):
         """
-        Loads datasets of the LFP nodes. Name of each node is used for obtaining the
-        filenames
+        Loads datasets of the LFP nodes. Name of each node is used for
+        obtaining the filenames.
 
         Parameters
         ----------
@@ -542,6 +555,7 @@ class NLfp(NBase):
         Returns
         -------
         None
+
         """
 
         if names is None:
@@ -557,7 +571,7 @@ class NLfp(NBase):
 
     def spectrum(self, **kwargs):
         """
-        Analyses frequency spectrum of the LFP signal
+        Analyses frequency spectrum of the LFP signal.
 
         Parameters
         ----------
@@ -639,7 +653,7 @@ class NLfp(NBase):
 
     def phase_dist(self, event_stamp, **kwargs):
         """
-        Analysis of spike to LFP phase distribution
+        Analysis of spike to LFP phase distribution.
 
         Parameters
         ----------
@@ -791,6 +805,7 @@ class NLfp(NBase):
         -------
             (array)
             Phase values for each position
+
         """
         lfp = self.get_samples() * 1000
         Fs = self.get_sampling_rate()
@@ -819,7 +834,8 @@ class NLfp(NBase):
 
     def plv(self, event_stamp, **kwargs):
         """
-        Calculates phase-locking value of the spike train to underlying LFP signal.
+        Calculates phase-locking value of the spike train to underlying LFP
+        signal.
 
         When 'mode'= None in the inpput kwargs, it calculates the PLV and SFC over
         the entire spike-train.
@@ -979,7 +995,7 @@ class NLfp(NBase):
 
     def event_trig_average(self, event_stamp=None, **kwargs):
         """
-        Averaging event-triggered LFP signals
+        Averaging event-triggered LFP signals.
 
         Parameters
         ----------
@@ -1072,6 +1088,7 @@ class NLfp(NBase):
         -------
         NLfp
             subsampled version of initial lfp object
+
         """
         in_range = sample_range
         sample_rate = self.get_sampling_rate()
@@ -1097,7 +1114,7 @@ class NLfp(NBase):
 
     def sharp_wave_ripples(self, in_range=None, **kwargs):
         """
-        Detect SWR events in the lfp, optionally in a given range
+        Detect SWR events in the lfp, optionally in a given range.
 
         Parameters
         ----------
@@ -1151,7 +1168,8 @@ class NLfp(NBase):
             "swr times": peaks, "lfp sample rate": sample_rate}
 
     def bandpower(self, band, **kwargs):
-        """Compute the average power of the signal x in a specific frequency band.
+        """
+        Compute the average power of the signal x in a specific frequency band.
 
         Modified from excellent article at
         https://raphaelvallat.com/bandpower.html
@@ -1178,6 +1196,7 @@ class NLfp(NBase):
         ------
         bp : Dict
             "bandpower", "total_power" and "relative_power".
+
         """
         from scipy.signal import welch
         from scipy.integrate import simps
@@ -1259,6 +1278,7 @@ class NLfp(NBase):
         See also
         --------
         nc_lfp.NLfp().bandpower()
+
         """
 
         _results = oDict()
@@ -1287,7 +1307,7 @@ class NLfp(NBase):
 
     def save_to_hdf5(self, file_name=None, system=None):
         """
-        Stores NLfp() object to HDF5 file
+        Stores NLfp() object to HDF5 file.
 
         Parameters
         ----------
@@ -1320,7 +1340,7 @@ class NLfp(NBase):
 
     def load_lfp_NWB(self, file_name):
         """
-        Decodes LFP data from NWB (HDF5) file format
+        Decodes LFP data from NWB (HDF5) file format.
 
         Parameters
         ----------
@@ -1364,7 +1384,7 @@ class NLfp(NBase):
 
     def load_lfp_Axona(self, file_name):
         """
-        Decodes LFP data from Axona file format
+        Decodes LFP data from Axona file format.
 
         Parameters
         ----------
@@ -1499,7 +1519,7 @@ class NLfp(NBase):
 
     def load_lfp_Neuralynx(self, file_name):
         """
-        Decodes LFP data from Neuralynx file format
+        Decodes LFP data from Neuralynx file format.
 
         Parameters
         ----------

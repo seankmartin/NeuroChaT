@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NSpatial Class for NeuroChaT software
+This module implements NSpatial Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 
 import os
@@ -38,10 +39,12 @@ from sklearn.linear_model import LinearRegression
 
 class NSpatial(NAbstract):
     """
-    This data class is the placeholder for the dataset that contains information
-    about the spatial behaviour of the animal. It decodes data from different 
-    formats and analyses the correlation of spatial information with the spiking
-    activity of a unit.
+    This data class is the placeholder for the dataset that contains
+    information about the spatial behaviour of the animal.
+
+    It decodes data from different formats and analyses the correlation
+    of spatial information with the spiking activity of a unit.
+
     """    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -66,12 +69,13 @@ class NSpatial(NAbstract):
         
     def get_type(self):
         """
-        Returns the type of object. For NSpatial, this is always `spatial` type
-        
+        Returns the type of object. For NSpatial, this is always `spatial`
+        type.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         str
@@ -87,16 +91,17 @@ class NSpatial(NAbstract):
         NOTE for now, the duration will be longer than sample time.
         Duration is actually from 0 to max recording length.
         This is to easier match ndata which assumes recordings start at 0.
-        
+
         Parameters
         ----------
         sample_range : tuple
             the time in seconds to extract from the positions.
-        
+
         Returns
         -------
         NSpike
             subsampled version of initial spatial object
+
         """
         if sample_range is None:
             return self
@@ -117,8 +122,9 @@ class NSpatial(NAbstract):
 
     def set_pixel_size(self, pixel_size):
         """
-        Sets the size of pixel size by which the entire foraged arena is tessellated
-        
+        Sets the size of pixel size by which the entire foraged arena is
+        tessellated.
+
         Parameters
         ----------
         pixel_size : int
@@ -133,15 +139,15 @@ class NSpatial(NAbstract):
         
     def _set_time(self, time):
         """
-        Sets the time for all the spatial samples. It also resets the `timestamp`
-        or the the temporal resolution of the spatial samples and recalculates
-        the sampling rate.
-        
+        Sets the time for all the spatial samples. It also resets the
+        `timestamp` or the the temporal resolution of the spatial samples and
+        recalculates the sampling rate.
+
         Parameters
         ----------
         time : list or ndarray
             Timestamps of all spatial samples
-            
+
         Returns
         -------
         None
@@ -156,15 +162,15 @@ class NSpatial(NAbstract):
     def _set_timestamp(self, timestamp=None):
         """
         Sets the timestamps for the spatial information. Here, it is defined as
-        the temporal resolution of the spatial samples, not the happening time of
-        each sample. This way it is different from NLfp and NSpike timestamp 
-        definition
-        
+        the temporal resolution of the spatial samples, not the happening time
+        of each sample. This way it is different from NLfp and NSpike timestamp
+        definition.
+
         Parameters
         ----------
         timestamp : list or ndarray
             Timestamps of all spiking waveforms
-            
+
         Returns
         -------
         None
@@ -179,16 +185,16 @@ class NSpatial(NAbstract):
             
     def _set_sampling_rate(self, sampling_rate=None):
         """
-        Sets the sampling rate of the spatial information
-                
+        Sets the sampling rate of the spatial information.
+
         Parameters
         ----------
         sampling_rate : int
             Sampling rate of the spatial information
- 
+
         Returns
         -------
-        None    
+        None
 
         """
         
@@ -199,13 +205,13 @@ class NSpatial(NAbstract):
 
     def _set_pos_x(self, pos_x):
         """
-        Sets the X-coordinate of the location of the animal
-                
+        Sets the X-coordinate of the location of the animal.
+
         Parameters
         ----------
         pos_x : ndarray
             X-ccordinate of the location of the animal
- 
+
         Returns
         -------
         None
@@ -216,13 +222,13 @@ class NSpatial(NAbstract):
         
     def _set_pos_y(self, pos_y):
         """
-        Sets the Y-coordinate of the location of the animal
-                
+        Sets the Y-coordinate of the location of the animal.
+
         Parameters
         ----------
         pos_y : ndarray
             Y-ccordinate of the location of the animal
- 
+
         Returns
         -------
         None
@@ -233,13 +239,13 @@ class NSpatial(NAbstract):
         
     def _set_direction(self, direction):
         """
-        Sets the head-direction of the animal
-                
+        Sets the head-direction of the animal.
+
         Parameters
         ----------
         direction : ndarray
             Head-direction of the animal
- 
+
         Returns
         -------
         None
@@ -249,13 +255,13 @@ class NSpatial(NAbstract):
         
     def _set_speed(self, speed):
         """
-        Sets the speed of the animal
-                
+        Sets the speed of the animal.
+
         Parameters
         ----------
         speed : ndarray
             Speed of the animal
- 
+
         Returns
         -------
         None
@@ -265,13 +271,13 @@ class NSpatial(NAbstract):
         
     def set_ang_vel(self, ang_vel):
         """
-        Sets the angular head velocity (AHV) of the animal
-                
+        Sets the angular head velocity (AHV) of the animal.
+
         Parameters
         ----------
         ang_vel : ndarray
             Angular head velocity (AHV) of the animal
- 
+
         Returns
         -------
         None
@@ -282,13 +288,13 @@ class NSpatial(NAbstract):
         
     def set_border(self, border):
         """
-        Sets the distance of the animal from the arena border
-                
+        Sets the distance of the animal from the arena border.
+
         Parameters
         ----------
         border : ndarray
             Distance of the animal from the arena border
- 
+
         Returns
         -------
         None
@@ -302,12 +308,12 @@ class NSpatial(NAbstract):
 
     def get_total_samples(self):
         """
-        Returns the number of spatial samples
-                
+        Returns the number of spatial samples.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -318,12 +324,12 @@ class NSpatial(NAbstract):
     
     def get_sampling_rate(self):
         """
-        Returns the sampling rate of the spatial samples
-                
+        Returns the sampling rate of the spatial samples.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -335,12 +341,12 @@ class NSpatial(NAbstract):
     
     def get_duration(self):
         """
-        Returns the duration of the experiment
-                
+        Returns the duration of the experiment.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         float
@@ -354,12 +360,12 @@ class NSpatial(NAbstract):
     
     def get_pixel_size(self):
         """
-        Returns the pixel size of the recorded arena
-                
+        Returns the pixel size of the recorded arena.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -370,12 +376,12 @@ class NSpatial(NAbstract):
     
     def get_time(self):
         """
-        Returns the time of individual spatial samples
-                
+        Returns the time of individual spatial samples.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -387,12 +393,12 @@ class NSpatial(NAbstract):
     
     def get_timestamp(self):
         """
-        Returns the temporal resolution of spatial samples
-                
+        Returns the temporal resolution of spatial samples.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         int
@@ -404,12 +410,12 @@ class NSpatial(NAbstract):
     
     def get_pos_x(self):
         """
-        Returns the X-ccordinates of animal's location
-                
+        Returns the X-ccordinates of animal's location.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         ndarray
@@ -421,12 +427,12 @@ class NSpatial(NAbstract):
     
     def get_pos_y(self):
         """
-        Returns the Y-ccordinates of animal's location
-                
+        Returns the Y-ccordinates of animal's location.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         ndarray
@@ -438,12 +444,12 @@ class NSpatial(NAbstract):
     
     def get_direction(self):
         """
-        Returns head direction of the animal
-                
+        Returns head direction of the animal.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         ndarray
@@ -455,12 +461,12 @@ class NSpatial(NAbstract):
     
     def get_speed(self):
         """
-        Returns speed of the animal
-                
+        Returns speed of the animal.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         ndarray
@@ -471,12 +477,12 @@ class NSpatial(NAbstract):
     
     def get_ang_vel(self):
         """
-        Returns angular head velocity of the animal
-                
+        Returns angular head velocity of the animal.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         ndarray
@@ -488,12 +494,12 @@ class NSpatial(NAbstract):
     
     def get_border(self):
         """
-        Returns animal's distance from the border
-                
+        Returns animal's distance from the border.
+
         Parameters
         ----------
         None
- 
+
         Returns
         -------
         ndarray
@@ -505,8 +511,8 @@ class NSpatial(NAbstract):
 
     def set_spike(self, spike, **kwargs):
         """
-        Adds the NSpike object to NSpatial object 
-                
+        Adds the NSpike object to NSpatial object.
+
         Parameters
         ----------
         spike : NSpike
@@ -514,7 +520,7 @@ class NSpatial(NAbstract):
             is provided, a new NSpike() object is created.
         **kwargs
             Keyword argumemts for creating the new NSpike instance
- 
+
         Returns
         -------
         None
@@ -531,8 +537,8 @@ class NSpatial(NAbstract):
 
     def set_lfp(self, lfp, **kwargs):
         """
-        Adds the NLfp object to NSpatial object 
-                
+        Adds the NLfp object to NSpatial object.
+
         Parameters
         ----------
         lfp : NLfp
@@ -540,7 +546,7 @@ class NSpatial(NAbstract):
             is provided, a new NLfp() object is created.
         **kwargs
             Keyword argumemts for creating the new NLfp instance
- 
+
         Returns
         -------
         None
@@ -556,13 +562,13 @@ class NSpatial(NAbstract):
 
     def set_spike_name(self, name=None):
         """
-        Sets the name of the spike dataset
-        
+        Sets the name of the spike dataset.
+
         Parameters
         ----------
         name : str
             Name of the spike dataset
-        
+
         Returns
         -------
         None
@@ -574,16 +580,17 @@ class NSpatial(NAbstract):
             
     def set_spike_filename(self, filename=None):
         """
-        Sets file name of the spike dataset
-        
+        Sets file name of the spike dataset.
+
         Parameters
         ----------
         name : str
             Full file directory of the spike dataset
-        
+
         Returns
         -------
         None
+
         """
         
         if filename is not None:
@@ -591,13 +598,13 @@ class NSpatial(NAbstract):
 
     def set_lfp_name(self, name=None):
         """
-        Sets the name of the lfp dataset
-        
+        Sets the name of the lfp dataset.
+
         Parameters
         ----------
         name : str
             Name of the lfp dataset
-        
+
         Returns
         -------
         None
@@ -608,32 +615,33 @@ class NSpatial(NAbstract):
         
     def set_lfp_filename(self, filename=None):
         """
-        Sets file name of the lfp dataset
-        
+        Sets file name of the lfp dataset.
+
         Parameters
         ----------
         name : str
             Full file directory of the lfp dataset
-        
+
         Returns
         -------
         None
+
         """
         self.lfp.set_filename(filename)
 
     def set_event(self, event, **kwargs):
         """
-        Sets the NEvent() object to NSpatial().         
-        
+        Sets the NEvent() object to NSpatial().
+
         Parameters
         ----------
         event
             NEvent or its childclass or NEvent() object
-        
+
         Returns
         -------
         NEvent()
-        
+
         """
         
         if event is isinstance(event, NEvent):
@@ -645,34 +653,34 @@ class NSpatial(NAbstract):
 
     def set_event_name(self, name=None):
         """
-        Sets the name of the event object.         
-        
+        Sets the name of the event object.
+
         Parameters
         ----------
         name : str
             Name of the vent dataset
-        
+
         Returns
         -------
         None
-        
+
         """
         
         self.event.set_name(name)
         
     def set_event_filename(self, filename=None):
         """
-        Sets the filename for the event
-        
+        Sets the filename for the event.
+
         Parameters
         ----------
         filename : str
             Full file of the event dataset
-        
+
         Returns
         -------
         None
-        
+
         """
         
         self.event.set_filename(filename)
@@ -680,16 +688,16 @@ class NSpatial(NAbstract):
     def set_system(self, system=None):
         """
         Sets the data format or recording system.
-        
+
         Parameters
         ----------
         system : str
             Data format or recording system
-        
+
         Returns
         -------
         None
-        
+
         """
         
         if system is not None:
@@ -702,32 +710,32 @@ class NSpatial(NAbstract):
 
     def load_spike(self):
         """
-        Loads the composing spike object         
-        
+        Loads the composing spike object.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
         
         self.spike.load()
         
     def load_lfp(self):
         """
-        Loads the composite lfp object         
-        
+        Loads the composite lfp object.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
 
         
@@ -735,16 +743,16 @@ class NSpatial(NAbstract):
 
     def save_to_hdf5(self, file_name=None, system=None):
         """
-        Save spatial dataset to HDF5 file         
-        
+        Save spatial dataset to HDF5 file.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
 
         hdf = Nhdf()
@@ -761,16 +769,16 @@ class NSpatial(NAbstract):
 
     def load(self, filename=None, system=None):
         """
-        Loads the spatial object         
-        
+        Loads the spatial object.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
 
         if system is None:
@@ -793,16 +801,16 @@ class NSpatial(NAbstract):
 
     def load_spatial_Axona(self, file_name):
         """
-        Loads Axona format spatial data to the NSpatial() object
-        
+        Loads Axona format spatial data to the NSpatial() object.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
 
         try:
@@ -829,16 +837,16 @@ class NSpatial(NAbstract):
 
     def load_spatial_NWB(self, file_name):
         """
-        Loads HDF5 format spatial data to the NSpatial() object
-        
+        Loads HDF5 format spatial data to the NSpatial() object.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
         file_name, path = file_name.split('+')
         if os.path.exists(file_name):
@@ -896,16 +904,16 @@ class NSpatial(NAbstract):
             
     def load_spatial_Neuralynx(self, file_name):
         """
-        Loads Neuralynx format spatial data to the NSpatial() object
-        
+        Loads Neuralynx format spatial data to the NSpatial() object.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
 
         self._set_data_source(file_name)
@@ -993,36 +1001,37 @@ class NSpatial(NAbstract):
 
     def smooth_speed(self):
         """
-        Smoothes the speed data using a moving-average box filter
-        
+        Smoothes the speed data using a moving-average box filter.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
         
         self._set_speed(smooth_1d(self.get_speed(), 'b', 5))
         
     def smooth_direction(self):
         """
-        Smoothes the angular head direction data using a moving circular average
-        
+        Smoothes the angular head direction data using a moving circular
+        average.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         See also
         --------
         nc_circular.CircStat().circ_smooth()
-        
+
         """
         
         cs = CircStat()
@@ -1031,18 +1040,18 @@ class NSpatial(NAbstract):
 
     def calc_ang_vel(self, npoint=5):
         """
-        Calculates the angular head velocity of the animal from the direction data
-        Each sample is the slope of a fitted line of five directional data centred
-        around current sample.
-        
+        Calculates the angular head velocity of the animal from the direction
+        data Each sample is the slope of a fitted line of five directional data
+        centred around current sample.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        None        
-        
+        None
+
         """
         
         theta = self.get_direction()
@@ -1067,14 +1076,14 @@ class NSpatial(NAbstract):
 
     def calc_border(self, **kwargs):
         """
-        Identifies the border of the recording arena from the trace of the foraging of the
-        animal in the arena
-        
+        Identifies the border of the recording arena from the trace of the
+        foraging of the animal in the arena.
+
         Parameters
         ----------
         **kwargs
             Keyword arguments
-        
+
         Returns
         -------
         border_dist : ndarray
@@ -1086,7 +1095,7 @@ class NSpatial(NAbstract):
         dist_mat : ndarray
             A matrix of distance of each pixel of the arena from the identified
             border
-        
+
         """
         
         # define edges
@@ -1181,21 +1190,21 @@ class NSpatial(NAbstract):
     @staticmethod
     def skaggs_info(firing_rate, visit_time):
         """
-        Calculates the Skaggs information content of the spatial firing
-        
+        Calculates the Skaggs information content of the spatial firing.
+
         Parameters
         ----------
         firing_rate : ndarray
             Firing rate of the unit at each pixelated location or binned information,
-            i.e., binned speed or head-direction            
+            i.e., binned speed or head-direction
         visit_time : ndarray
             Amount of time animal spent in each pixel or bin
-        
+
         Returns
         -------
         float
             Skaggs information content
-        
+
         """
         
         firing_rate[np.isnan(firing_rate)] = 0
@@ -1208,20 +1217,20 @@ class NSpatial(NAbstract):
     @staticmethod
     def spatial_sparsity(firing_rate, visit_time):
         """
-        Calculates the spatial sparsity of the spatial firing
-        
+        Calculates the spatial sparsity of the spatial firing.
+
         Parameters
         ----------
         firing_rate : ndarray
-            Firing rate of the unit at each pixelated location  
+            Firing rate of the unit at each pixelated location
         visit_time : ndarray
             Amount of time animal spent in each pixel
-        
+
         Returns
         -------
         float
             Spatial sparsity
-        
+
         """
         
         firing_rate[np.isnan(firing_rate)] = 0
@@ -1233,21 +1242,22 @@ class NSpatial(NAbstract):
     def speed(self, ftimes, **kwargs):
         """
         Calculates the firing rate of the unit at different binned speeds.
-        
+
         The spike rate vs speed is fitted with a linear equation and goodness of fit
         is measured
-        
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
 
         _results = oDict()
@@ -1289,23 +1299,25 @@ class NSpatial(NAbstract):
 
     def angular_velocity(self, ftimes, **kwargs):
         """
-        Calculates the firing rate of the unit at different binned angular head velocity.
-        
+        Calculates the firing rate of the unit at different binned angular head
+        velocity.
+
         The spike rate vs speed is fitted with a linear equation individually
         for the negative and positive angular velocities, and goodness of fit
         is measured
-        
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
         
         _results = oDict()
@@ -1359,24 +1371,26 @@ class NSpatial(NAbstract):
     def place(self, ftimes, **kwargs):
         """
         Calculates the two-dimensional firing rate of the unit with respect to
-        the location of the animal in the environment. This is called Firing map.
-        
+        the location of the animal in the environment. This is called Firing
+        map.
+
         Specificity indices are measured to assess the quality of location-specific firing of the unit.
-        
+
         This method also plot the events of spike occurring superimposed on the
         trace of the animal in the arena, commonly known as Spike Plot.
-        
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
         
         _results = oDict()
@@ -1522,21 +1536,22 @@ class NSpatial(NAbstract):
     # Created by Sean Martin: 13/02/2019
     def place_field_centroid_zscore(self, ftimes, **kwargs):
         """
-        A naive method to find the centroid of the place field using the 
-        z-score of the normal distribution to remove outliers, 
-        and then averaging remaining locations' co-ordinates.
-                
+        A naive method to find the centroid of the place field using the
+        z-score of the normal distribution to remove outliers, and then
+        averaging remaining locations' co-ordinates.
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         ndarray
             The centroid of the place field
+
         """
 
         _results = oDict()
@@ -1563,7 +1578,8 @@ class NSpatial(NAbstract):
 
     def non_moving_periods(self, **kwargs):
         """
-        Returns a number of tuples indicating ranges where the subject is not moving
+        Returns a number of tuples indicating ranges where the subject is not
+        moving.
 
         kwargs
         ------
@@ -1573,6 +1589,7 @@ class NSpatial(NAbstract):
             the minimum amount of time that the subject should not be moving for
         moving_thresh : float
             any speed above this thresh is considered to be movement
+
         """
         should_smooth = kwargs.get("should_smooth", False)
         min_range = kwargs.get("min_range", 150)
@@ -1586,7 +1603,7 @@ class NSpatial(NAbstract):
             self.get_time(), not_moving, min_range)
 
     def get_non_moving_times(self, **kwargs):
-        """ Returns the times where the subject is not moving"""
+        """Returns the times where the subject is not moving."""
         ranges = self.non_moving_periods(**kwargs)
         time_data = [
             val for val in self.get_time()
@@ -1596,25 +1613,26 @@ class NSpatial(NAbstract):
 
     def loc_time_lapse(self, ftimes, **kwargs):
         """
-        Calculates the firing rate map and idnetifies the location of the spiking events
-        at certain intervals. This method is useful in observing the evolution of
-        unit-activity as the animal traverses the environment.
-        
+        Calculates the firing rate map and idnetifies the location of the
+        spiking events at certain intervals. This method is useful in observing
+        the evolution of unit-activity as the animal traverses the environment.
+
         Following intervals ar used:
             0-1min, 0-2min, 0-4min, 0-8min, 0-16min or 0-end depending on the recording duration
             0-1min, 1-2min, 2-4min, 4-8min, 8-16min or 16-end depending on the recording duration
-                
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
         
         graph_data = oDict()
@@ -1685,26 +1703,27 @@ class NSpatial(NAbstract):
 
     def hd_rate(self, ftimes, **kwargs):
         """
-        Calculates the firing rate of the unit with respect to the head-direciton
-        of the animal in the environment. This is calle Tuning curve.
-        
+        Calculates the firing rate of the unit with respect to the head-
+        direciton of the animal in the environment. This is calle Tuning curve.
+
         Precited firing map from the locational firing is also calculated and
         distributive ratio is measured along with the Skaggs information.
-        
+
         Spike-plot similar to locational firing is developed but in the circular bins
         which shows the direction of the animal's head at each spike's occurring time.
-                                
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
         
         _results = oDict()
@@ -1805,20 +1824,21 @@ class NSpatial(NAbstract):
 
     def hd_rate_ccw(self, ftimes, **kwargs):
         """
-        Calculates the tuning curve but split into clock-wise vs counterclockwise
-        head-directional movement.
-                                
+        Calculates the tuning curve but split into clock-wise vs
+        counterclockwise head-directional movement.
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
         
         _results = oDict()
@@ -1887,25 +1907,26 @@ class NSpatial(NAbstract):
 
     def hd_time_lapse(self, ftimes):
         """
-        Calculates the tuning curve and idnetifies the location of the spiking events
-        at certain intervals. This method is useful in observing the evolution of
-        unit-activity as the animal traverses the environment.
-        
+        Calculates the tuning curve and idnetifies the location of the spiking
+        events at certain intervals. This method is useful in observing the
+        evolution of unit-activity as the animal traverses the environment.
+
         Following intervals ar used:
             0-1min, 0-2min, 0-4min, 0-8min, 0-16min or 0-end depending on the recording duration
             0-1min, 1-2min, 2-4min, 4-8min, 8-16min or 16-end depending on the recording duration
-                
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
         
         #### Breaking down the spike plot for firing evolution
@@ -1960,16 +1981,17 @@ class NSpatial(NAbstract):
 
     def hd_shuffle(self, ftimes, **kwargs):
         """
-        Shuffling analysis of the unit to see if the head-directional firing specifity
-        is by chance or actually correlated to the head-direction of the animal
-        
+        Shuffling analysis of the unit to see if the head-directional firing
+        specifity is by chance or actually correlated to the head-direction of
+        the animal.
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
@@ -2021,22 +2043,22 @@ class NSpatial(NAbstract):
 
     def hd_shift(self, ftimes, shift_ind=np.arange(-10, 11)):
         """
-        Analysis of firing specificity of the unit with respect to animal's head
-        direction to oberve whether it represents past direction or anicipates a
-        future direction.
-                
+        Analysis of firing specificity of the unit with respect to animal's
+        head direction to oberve whether it represents past direction or
+        anicipates a future direction.
+
         Parameters
         ----------
         shift_ind : ndarray
             Index of spatial resolution shift for the spike event time. Shift -1
             implies shift to the past by 1 spatial time resolution, and +2 implies
             shift to the future by 2 spatial time resoultion.
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         """
         
         _results = oDict()
@@ -2092,9 +2114,9 @@ class NSpatial(NAbstract):
     @staticmethod
     def place_field(pmap, thresh=0.2, required_neighbours=9):
         """
-        Calculates a mapping over the captured arena.
-        For each bin in the place map, it is assigned to an integer group.
-        These groups denote which neighbouring area the bin belongs to.
+        Calculates a mapping over the captured arena. For each bin in the place
+        map, it is assigned to an integer group. These groups denote which
+        neighbouring area the bin belongs to.
 
         Parameters
         ----------
@@ -2104,16 +2126,18 @@ class NSpatial(NAbstract):
             The fraction of the peak firing that a bin must exceed
         required_neighbours : int
             The number of adjacent bins that must be together to form a field
+
         """
 
         def alongColumn(pfield, ptag, J, I):
             """
-            Iterates along the columns of the ptags to find vertical neighbours
+            Iterates along the columns of the ptags to find vertical
+            neighbours.
 
             Parameters
             ----------
             pfield : ndarray
-                The place field map, consisting of 
+                The place field map, consisting of
                 1 for groups satisying rules and 0 otherwise
             ptag : ndarray
                 The place field map, grouped into tags of neighbouring areas
@@ -2121,6 +2145,7 @@ class NSpatial(NAbstract):
                 The vertical index to start searching at
             I : int
                 The horizontal index to start searching at
+
             """
 
             Ji = J
@@ -2148,12 +2173,13 @@ class NSpatial(NAbstract):
 
         def alongRows(pfield, ptag, J, I):
             """
-            Iterates along the columns of the ptags, finds horizontal neighbours
+            Iterates along the columns of the ptags, finds horizontal
+            neighbours.
 
             Parameters
             ----------
             pfield : ndarray
-                The place field map, consisting of 
+                The place field map, consisting of
                 1 for groups satisying rules and 0 otherwise
             ptag : ndarray
                 The place field map, grouped into tags of neighbouring areas
@@ -2161,6 +2187,7 @@ class NSpatial(NAbstract):
                 The vertical index to start searching at
             I : int
                 The horizontal index to start searching at
+
             """
 
             Ii = I
@@ -2256,8 +2283,8 @@ class NSpatial(NAbstract):
     @staticmethod
     def place_field_centroid(pfield, fmap, group_num, **kwargs):
         """
-        Calculate the centroid of a place field
-    
+        Calculate the centroid of a place field.
+
         Parameters
         ----------
         pfield : ndarray
@@ -2268,11 +2295,12 @@ class NSpatial(NAbstract):
             The group to get the centroid for
         **kwargs :
             Keyword arguments
-    
+
         Returns
         -------
         ndarray
             A list of co-ordinates for each place field group
+
         """
         # For each group, get the list of co-ordinates from the pfield
         co_ords = np.array(np.where(pfield == group_num))
@@ -2283,17 +2311,17 @@ class NSpatial(NAbstract):
     def get_event_loc(self, ftimes, **kwargs):
         """
         Calculates location of the event from its timestamps.
-                                
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking or any other events
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
-        ndarray        
+        ndarray
             Index of the events in spatial-timestamps
         [ Two item list containing
             ndarray
@@ -2302,7 +2330,8 @@ class NSpatial(NAbstract):
                 y-ccordinates of the event location
         ]
         ndarray
-            direction of the animal at the time of the event            
+            direction of the animal at the time of the event
+
         """
         
         
@@ -2326,16 +2355,17 @@ class NSpatial(NAbstract):
 
     def loc_shuffle(self, ftimes, **kwargs):
         """
-        Shuffling analysis of the unit to see if the locational firing specifity
-        is by chance or actually correlated to the location of the animal
-        
+        Shuffling analysis of the unit to see if the locational firing
+        specifity is by chance or actually correlated to the location of the
+        animal.
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
@@ -2402,10 +2432,10 @@ class NSpatial(NAbstract):
 
     def loc_shift(self, ftimes, shift_ind=np.arange(-10, 11), **kwargs):
         """
-        Analysis of firing specificity of the unit with respect to animal's location
-        to oberve whether it represents past location of the animal or anicipates a
-        future location.
-        
+        Analysis of firing specificity of the unit with respect to animal's
+        location to oberve whether it represents past location of the animal or
+        anicipates a future location.
+
         Parameters
         ----------
         ftimes : ndarray
@@ -2416,7 +2446,7 @@ class NSpatial(NAbstract):
             shift to the future by 2 spatial time resoultion.
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
@@ -2484,15 +2514,15 @@ class NSpatial(NAbstract):
     def loc_auto_corr(self, ftimes, **kwargs):
         """
         Calculates the two-dimensional correlation of firing map which is the
-        map of the firing rate of the animal with respect to its location
-        
+        map of the firing rate of the animal with respect to its location.
+
         Parameters
         ----------
         ftimes : ndarray
-            Timestamps of the spiking activity of a unit        
+            Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
@@ -2547,21 +2577,21 @@ class NSpatial(NAbstract):
 
     def loc_rot_corr(self, ftimes, **kwargs):
         """
-        Calculates the rotational correlation of the locational firing rate of the animal with
-        respect to location, also called firing map    
-        
+        Calculates the rotational correlation of the locational firing rate of
+        the animal with respect to location, also called firing map.
+
         Parameters
         ----------
         ftimes : ndarray
-            Timestamps of the spiking activity of a unit        
+            Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         """    
         
         graph_data = {}
@@ -2585,20 +2615,20 @@ class NSpatial(NAbstract):
     def border(self, ftimes, **kwargs):        
         """
         Analysis of the firing characteristic of a unit with respect to the
-        environmental border
-                
+        environmental border.
+
         Parameters
         ----------
         ftimes : ndarray
-            Timestamps of the spiking activity of a unit        
+            Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         """
                 
         _results = oDict()
@@ -2717,20 +2747,22 @@ class NSpatial(NAbstract):
 
     def gradient(self, ftimes, **kwargs):
         """
-        Analysis of gradient cell, a unit whose firing rate gradually increases 
-        as the animal traverses from the border to the cneter of the environment
-        
+        Analysis of gradient cell, a unit whose firing rate gradually increases
+        as the animal traverses from the border to the cneter of the
+        environment.
+
         Parameters
         ----------
         ftimes : ndarray
-            Timestamps of the spiking activity of a unit        
+            Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
+
         """
         
         _results = oDict()
@@ -2791,20 +2823,20 @@ class NSpatial(NAbstract):
     def grid(self, ftimes, **kwargs):        
         """
         Analysis of Grid cells characterised by formation of grid-like pattern
-        of high activity in the firing-rate map        
-        
+        of high activity in the firing-rate map.
+
         Parameters
         ----------
         ftimes : ndarray
-            Timestamps of the spiking activity of a unit   
+            Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
             Graphical data of the analysis
-    
+
         """
         
         _results = oDict()
@@ -2888,16 +2920,16 @@ class NSpatial(NAbstract):
     def multiple_regression(self, ftimes, **kwargs):        
         """
         Multiple-rgression analysis where firing rate for each variable, namely
-        location, head-direction, speed, AHV, and distance from border, are used
-        to regress the instantaneous firing rate of the unit.
-                
+        location, head-direction, speed, AHV, and distance from border, are
+        used to regress the instantaneous firing rate of the unit.
+
         Parameters
         ----------
         ftimes : ndarray
-            Timestamps of the spiking activity of a unit   
+            Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         dict
@@ -2984,21 +3016,21 @@ class NSpatial(NAbstract):
 
     def interdependence(self, ftimes, **kwargs):
         """
-        Interdependence analysis where firing rate of each variable is predicted
-        from another variable and the distributive ratio is measured between the
-        predicted firing rate and the caclulated firing rate.
-        
+        Interdependence analysis where firing rate of each variable is
+        predicted from another variable and the distributive ratio is measured
+        between the predicted firing rate and the caclulated firing rate.
+
         Parameters
         ----------
         ftimes : ndarray
             Timestamps of the spiking activity of a unit
         **kwargs
             Keyword arguments
- 
+
         Returns
         -------
         None
-        
+
         """        
 
         _results = oDict()

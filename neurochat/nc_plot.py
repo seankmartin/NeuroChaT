@@ -3,6 +3,7 @@
 This module implements plotting functions for NeuroChaT analyses.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 
 import itertools
@@ -26,11 +27,16 @@ RED = '#d62728'
 
 
 def scatterplot_matrix(_data, names=[], **kwargs):
-    """Plots a scatterplot matrix of subplots.  Each row of "_data" is plotted
-    against other rows, resulting in a nrows by nrows grid of subplots with the
-    diagonal subplots labeled with "names".  Additional keyword arguments are
-    passed on to matplotlib's "plot" command. Returns the matplotlib figure
-    object containg the subplot grid."""
+    """
+    Plots a scatterplot matrix of subplots.
+
+    Each row of "_data" is plotted against other rows, resulting in a
+    nrows by nrows grid of subplots with the diagonal subplots labeled
+    with "names".  Additional keyword arguments are passed on to
+    matplotlib's "plot" command. Returns the matplotlib figure object
+    containg the subplot grid.
+
+    """
     numvars, _ = _data.shape
     fig, axs = plt.subplots(nrows=numvars, ncols=numvars, figsize=(8, 8))
     fig.subplots_adjust(hspace=0.05, wspace=0.05)
@@ -69,7 +75,7 @@ def scatterplot_matrix(_data, names=[], **kwargs):
 
 def set_backend(backend):
     """
-    Sets the  backend of Matplotlib
+    Sets the  backend of Matplotlib.
 
     Parameters
     ----------
@@ -92,7 +98,7 @@ def set_backend(backend):
 
 def wave_property(wave_data, plots=[2, 2]):
     """
-    Plots mean +/-std of waveforms in electrode groups
+    Plots mean +/-std of waveforms in electrode groups.
 
     Parameters
     ----------
@@ -136,6 +142,7 @@ def largest_waveform(wave_data, ax=None):
     -------
     matplotlib.pyplot.Figure
         The figure plotted to, or None if an axes is provided
+
     """
     ax, fig = _make_ax_if_none(ax)
 
@@ -150,8 +157,8 @@ def largest_waveform(wave_data, ax=None):
 
 def isi(isi_data, axes=[None, None, None], **kwargs):
     """
-    Plots Interspike interval histogram and scatter plots of interval-before
-    vs interval-after.
+    Plots Interspike interval histogram and scatter plots of interval-before vs
+    interval-after.
 
     Parameters
     ----------
@@ -297,7 +304,7 @@ def isi_corr(isi_corr_data, ax=None, **kwargs):
 
 def theta_cell(plot_data, ax=None, **kwargs):
     """
-    Plots theta-modulated cell and theta-skipping cell analysis data
+    Plots theta-modulated cell and theta-skipping cell analysis data.
 
     Parameters
     ----------
@@ -319,7 +326,7 @@ def theta_cell(plot_data, ax=None, **kwargs):
 
 def lfp_spectrum(plot_data, ax=None, color=None, style="Solid"):
     """
-    Plots LFP spectrum analysis data
+    Plots LFP spectrum analysis data.
 
     Parameters
     ----------
@@ -368,7 +375,7 @@ def lfp_spectrum(plot_data, ax=None, color=None, style="Solid"):
 
 def lfp_spectrum_tr(plot_data, ax=None):
     """
-    Plots time-resolved LFP spectrum analysis data
+    Plots time-resolved LFP spectrum analysis data.
 
     Parameters
     ----------
@@ -615,7 +622,7 @@ def plv_bs(plv_data):
 
 def spike_phase(phase_data):
     """
-    Plots the analysis replay_data of spike-LFP phase locking
+    Plots the analysis replay_data of spike-LFP phase locking.
 
     Parameters
     ----------
@@ -688,7 +695,7 @@ def spike_phase(phase_data):
 
 def speed(speed_data):
     """
-    Plots the speed of the animal vs spike rate
+    Plots the speed of the animal vs spike rate.
 
     Parameters
     ----------
@@ -720,7 +727,7 @@ def speed(speed_data):
 
 def angular_velocity(angVel_data):
     """
-    Plots the angular head velocity of the animal vs spike rate
+    Plots the angular head velocity of the animal vs spike rate.
 
     Parameters
     ----------
@@ -854,7 +861,8 @@ def hd_rate_pred(hd_data, ax=None, **kwargs):
 
 def hd_spike(hd_data, ax=None):
     """
-    Plots the head-direction of the animal at the time of spiking-events in polar scatter plot.
+    Plots the head-direction of the animal at the time of spiking-events in
+    polar scatter plot.
 
     Parameters
     ----------
@@ -884,7 +892,7 @@ def hd_spike(hd_data, ax=None):
 
 def hd_firing(hd_data):
     """
-    Plots the analysis of head directional correlation to spike-rate
+    Plots the analysis of head directional correlation to spike-rate.
 
     Parameters
     ----------
@@ -910,8 +918,8 @@ def hd_firing(hd_data):
 
 def hd_rate_ccw(hd_data):
     """
-    Plots the analysis replay_data of head directional correlation to spike-rate
-    but split into counterclockwise and clockwise head-movements.
+    Plots the analysis replay_data of head directional correlation to spike-
+    rate but split into counterclockwise and clockwise head-movements.
 
     Parameters
     ----------
@@ -943,7 +951,7 @@ def hd_rate_ccw(hd_data):
 
 def hd_shuffle(hd_shuffle_data):
     """
-    Plots the analysis outcome of head directional shuffling analysis
+    Plots the analysis outcome of head directional shuffling analysis.
 
     Parameters
     ----------
@@ -990,7 +998,7 @@ def hd_shuffle(hd_shuffle_data):
 
 def hd_spike_time_lapse(hd_data):
     """
-    Plots the analysis outcome of head directional time-lapse analysis
+    Plots the analysis outcome of head directional time-lapse analysis.
 
     Parameters
     ----------
@@ -1029,7 +1037,7 @@ def hd_spike_time_lapse(hd_data):
 
 def hd_rate_time_lapse(hd_data):
     """
-    Plots the analysis outcome of head directional time-lapse analysis
+    Plots the analysis outcome of head directional time-lapse analysis.
 
     Parameters
     ----------
@@ -1076,7 +1084,7 @@ def _nice_lapse_key(key):
 
 def hd_time_shift(hd_shift_data):
     """
-    Plots the analysis outcome of head directional time-shift analysis
+    Plots the analysis outcome of head directional time-shift analysis.
 
     Parameters
     ----------
@@ -1091,6 +1099,7 @@ def hd_time_shift(hd_shift_data):
         Peak firing rate of head directional firing in shifted time of spiking events
     fig3 : matplotlib.pyplot.Figure
         Skaggs information content of head directional firing in shifted time of spiking events
+
     """
 
     fig1 = plt.figure()
@@ -1126,7 +1135,8 @@ def hd_time_shift(hd_shift_data):
 
 def loc_spike(place_data, ax=None, **kwargs):
     """
-    Plots the location of spiking-events (spike-plot) along with the trace of animal in the enviroment.
+    Plots the location of spiking-events (spike-plot) along with the trace of
+    animal in the enviroment.
 
     Parameters
     ----------
@@ -1168,7 +1178,7 @@ def loc_spike(place_data, ax=None, **kwargs):
 
 def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     """
-    Plots location vs spike rate
+    Plots location vs spike rate.
 
     Parameters
     ----------
@@ -1278,7 +1288,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
 
 def loc_firing(place_data, **kwargs):
     """
-    Plots the analysis replay_data of locational correlation to spike-rate
+    Plots the analysis replay_data of locational correlation to spike-rate.
 
     Parameters
     ----------
@@ -1309,8 +1319,8 @@ def loc_firing(place_data, **kwargs):
 
 def loc_firing_and_place(place_data, smooth=True, **kwargs):
     """
-    Plots the analysis of locational correlation to spike-rate
-    with a place map
+    Plots the analysis of locational correlation to spike-rate with a place
+    map.
 
     Parameters
     ----------
@@ -1427,7 +1437,7 @@ def loc_place_centroid(place_data, centroid):
 
 def loc_spike_time_lapse(place_data):
     """
-    Plots the analysis outcome of locational time-lapse analysis
+    Plots the analysis outcome of locational time-lapse analysis.
 
     Parameters
     ----------
@@ -1466,7 +1476,7 @@ def loc_spike_time_lapse(place_data):
 
 def loc_rate_time_lapse(place_data):
     """
-    Plots the analysis outcome of locational time-lapse analysis
+    Plots the analysis outcome of locational time-lapse analysis.
 
     Parameters
     ----------
@@ -1506,7 +1516,7 @@ def loc_rate_time_lapse(place_data):
 
 def loc_shuffle(loc_shuffle_data):
     """
-    Plots the analysis outcome of locational shuffling analysis
+    Plots the analysis outcome of locational shuffling analysis.
 
     Parameters
     ----------
@@ -1567,7 +1577,7 @@ def loc_shuffle(loc_shuffle_data):
 
 def loc_time_shift(loc_shift_data):
     """
-    Plots the analysis outcome of locational time-shift analysis
+    Plots the analysis outcome of locational time-shift analysis.
 
     Parameters
     ----------
@@ -1629,7 +1639,7 @@ def loc_time_shift(loc_shift_data):
 
 def loc_auto_corr(locAuto_data):
     """
-    Plots the analysis outcome of locational firing rate autocorrelation
+    Plots the analysis outcome of locational firing rate autocorrelation.
 
     Parameters
     ----------
@@ -1674,7 +1684,8 @@ def loc_auto_corr(locAuto_data):
 
 def rot_corr(plot_data):
     """
-    Plots the analysis outcome of rotational correlation of spatial autocorrelation map.
+    Plots the analysis outcome of rotational correlation of spatial
+    autocorrelation map.
 
     Parameters
     ----------
@@ -1704,7 +1715,7 @@ def rot_corr(plot_data):
 
 def dist_rate(dist_data):
     """
-    Plots the firing rate vs distance from border
+    Plots the firing rate vs distance from border.
 
     Parameters
     ----------
@@ -1736,7 +1747,7 @@ def dist_rate(dist_data):
 
 def stair_plot(dist_data):
     """
-    Plots the stairs of mean distance vs firing-rate bands
+    Plots the stairs of mean distance vs firing-rate bands.
 
     Parameters
     ----------
@@ -1770,7 +1781,7 @@ def stair_plot(dist_data):
 
 def border(border_data):
     """
-    Plots the analysis replay_data from border analysis
+    Plots the analysis replay_data from border analysis.
 
     Parameters
     ----------
@@ -1826,7 +1837,7 @@ def border(border_data):
 
 def gradient(gradient_data):
     """
-    Plots the replay_data from gradient cell analysis
+    Plots the replay_data from gradient cell analysis.
 
     Parameters
     ----------
@@ -1862,7 +1873,7 @@ def gradient(gradient_data):
 
 def grid(grid_data):
     """
-    Plots the replay_data from grid analysis
+    Plots the replay_data from grid analysis.
 
     Parameters
     ----------
@@ -1923,7 +1934,7 @@ def grid(grid_data):
 
 def spike_raster(events, xlim=None, colors=[0, 0, 0], ax=None, **kwargs):
     """
-    Plots the spike raster for a number of units
+    Plots the spike raster for a number of units.
 
     Parameters
     ----------
@@ -1942,6 +1953,7 @@ def spike_raster(events, xlim=None, colors=[0, 0, 0], ax=None, **kwargs):
     -------
     fig : matplotlib.pyplot.Figure
         The spike raster
+
     """
     linewidths = kwargs.get("linewidths", 0.1)
     linelengths = kwargs.get("linelengths", 0.5)
@@ -1983,7 +1995,7 @@ def spike_raster(events, xlim=None, colors=[0, 0, 0], ax=None, **kwargs):
 
 def plot_angle_between_points(points, xlim, ylim, ax=None):
     """
-    Plots the angle between three points
+    Plots the angle between three points.
 
     Parameters
     ----------
@@ -2000,6 +2012,7 @@ def plot_angle_between_points(points, xlim, ylim, ax=None):
     -------
     fig : matplotlib.pyplot.Figure
         The angle between the points
+
     """
 
     ax, fig = _make_ax_if_none(ax)
@@ -2040,8 +2053,8 @@ def _get_angle_plot(
         line1, line2, offset=1, color=None,
         origin=[0, 0], len_x_axis=1, len_y_axis=1):
     """
-    Internal helper function to get an arc between two lines
-    Can be displayed as a patch
+    Internal helper function to get an arc between two lines Can be displayed
+    as a patch.
 
     Parameters
     ----------
@@ -2064,6 +2077,7 @@ def _get_angle_plot(
     -------
     matplotlib.patches.Arc
         The arc which represents the angle between the lines
+
     """
 
     l1xy = line1.get_xydata()
@@ -2094,7 +2108,7 @@ def _get_angle_plot(
 
 def _make_ax_if_none(ax, **kwargs):
     """
-    Makes a figure and gets the axis from this if no ax exists
+    Makes a figure and gets the axis from this if no ax exists.
 
     Parameters
     ----------
@@ -2106,6 +2120,7 @@ def _make_ax_if_none(ax, **kwargs):
     ax, fig
         The created figure and axis if ax is None, else
         the input ax and None
+
     """
 
     fig = None
