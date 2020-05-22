@@ -1568,7 +1568,7 @@ class NSpike(NBase):
                 if line.startswith('trial_time'):
                     self._set_time(line.split()[1])
                 if line.startswith('experimenter'):
-                    self._set_experiemnter(' '.join(line.split()[1:]))
+                    self._set_experimenter(' '.join(line.split()[1:]))
                 if line.startswith('comments'):
                     self._set_comments(' '.join(line.split()[1:]))
                 if line.startswith('duration'):

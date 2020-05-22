@@ -300,7 +300,7 @@ class NAbstract(object):
 
         self._record_info['Time'] = time
 
-    def _set_experiemnter(self, experimenter=''):
+    def _set_experimenter(self, experimenter=''):
         """
         Sets the name of the experimenter.
 
