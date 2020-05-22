@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-This module implements two classes NAbstract and NBase those are inherited by
-other data classes for detailed implementation. Methods and attributes those
-are likely to be common in other data types in NeuroChaT are implemented in
-these classes.
+This module implements two classes NAbstract and NBase.
+
+Those are inherited by other data classes for detailed implementation.
+Methods and attributes that are likely to be common in other data types in
+NeuroChaT are implemented in the NAbstract and NBase classes.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -15,8 +16,13 @@ from collections import OrderedDict as oDict
 
 
 class NAbstract(object):
-    """Nabstract is the abstract class which includes number of attirbutes and
-    methods commonly used by most other data types."""
+    """
+    NAbstract includes a number of attributes and methods common in NC.
+
+    NAbstract is the abstract class which includes a number of attributes and
+    methods commonly used by most other data types.
+
+    """
 
     def __init__(self, **kwargs):
         """
@@ -25,10 +31,14 @@ class NAbstract(object):
         Parameters
         ---------
         **kwargs
-            Keyword arguments
+            Keyword arguments, directly supported are:
+            filename, system, and name
+
+        Returns
+        -------
+        None
 
         """
-
         self._filename = kwargs.get('filename', '')
         self._system = kwargs.get('system', 'Axona')
         self._name = kwargs.get('name', 'c0')
@@ -47,7 +57,9 @@ class NAbstract(object):
 
     def get_type(self):
         """
-        Returns the type of data class, e.g., instance of Nabstract will return
+        Return the type of data class.
+
+        For example, an instance of Nabstract will return
         'abstract' as the type of the class.
 
         Parameters
@@ -63,7 +75,7 @@ class NAbstract(object):
 
     def set_filename(self, filename=None):
         """
-        Sets the file name of the data object.
+        Set the file name of the data object.
 
         Parameters
         ----------
@@ -75,13 +87,12 @@ class NAbstract(object):
         None
 
         """
-
         if filename is not None:
             self._filename = filename
 
     def get_filename(self):
         """
-        Returns the filename of the data class.
+        Return the filename of the data class.
 
         Parameters
         ----------
@@ -96,7 +107,7 @@ class NAbstract(object):
 
     def set_system(self, system=None):
         """
-        Sets the name of the recording system or the format of the data file.
+        Set the name of the recording system or the format of the data file.
 
         Parameters
         ----------
@@ -108,13 +119,12 @@ class NAbstract(object):
         None
 
         """
-
         if system is not None:
             self._system = system
 
     def get_system(self):
         """
-        Returns the name of the recording system or data format.
+        Return the name of the recording system or data format.
 
         Parameters
         ----------
@@ -125,12 +135,11 @@ class NAbstract(object):
         str
 
         """
-
         return self._system
 
     def set_name(self, name=''):
         """
-        Sets a name for the class instance.
+        Set a name for the class instance.
 
         Parameters
         ----------
@@ -141,12 +150,11 @@ class NAbstract(object):
         None
 
         """
-
         self._name = name
 
     def get_name(self):
         """
-        Gets the name of the object.
+        Get the name of the object.
 
         Parameters
         ----------
@@ -157,12 +165,11 @@ class NAbstract(object):
         str
 
         """
-
         return self._name
 
     def set_description(self, description=''):
         """
-        Sets the general description about the data by the user.
+        Set the general description about the data by the user.
 
         Parameters
         ----------
@@ -173,24 +180,25 @@ class NAbstract(object):
         None
 
         """
-
         self._description = description
 
     def save_to_hdf5(self, parent_dir):
-        """Implemented in subclasses."""
+        """Only implemented in subclasses."""
         pass  # implement for each type
 
     def load(self):
-        """Implemented in subclasses."""
+        """Only implemented in subclasses."""
         pass
 
     @classmethod
     def _new_instance(cls, obj=None, **kwargs):
         """
-        Creates a new instance from the class `cls`. If `obj` is None, a new
-        instance of `cls` is returned.  If the `obj` is an instance of `cls`,
-        the same is returned. If `obj` itself is a class, it supersedes the
-        `cls` and returns an object of `obj` class.
+        Create a new instance from the class `cls`.
+
+        If `obj` is None, a new instance of `cls` is returned.
+        If the `obj` is an instance of `cls`, the same is returned.
+        If `obj` itself is a class, it supersedes the `cls` and
+        returns an object of `obj` class.
 
         Parameters
         ----------
@@ -204,7 +212,6 @@ class NAbstract(object):
             New node of specified Class instance
 
         """
-
         if obj is None:
             new_obj = cls(**kwargs)
         elif isinstance(obj, cls):
@@ -217,23 +224,23 @@ class NAbstract(object):
 
     def get_results(self):
         """
-        Returns the analysis results.
+        Return the analysis results.
 
         Returns
         -------
         OrderedDict
 
         """
-
         return self._results
 
     def update_result(self, new_result={}):
         """
-        Updates the results.
+        Update the results.
 
         Parameters
         ----------
-        description : str
+        new_result : dict
+            The dictionary to update the current results dict with.
 
         Returns
         -------
@@ -244,17 +251,15 @@ class NAbstract(object):
         get_results
 
         """
-
         self._results.update(new_result)
 
     def reset_results(self):
-        """Resets the results to an empty OrderedDict."""
-
+        """Reset the results to an empty OrderedDict."""
         self._results = oDict()
 
     def _set_file_version(self, version=''):
         """
-        Sets th file version as decoded from the native formats.
+        Set the file version as decoded from the native formats.
 
         Parameters
         ----------
@@ -265,12 +270,11 @@ class NAbstract(object):
         None
 
         """
-
         self._record_info['File version'] = version
 
     def _set_date(self, date_str=''):
         """
-        Sets the date of the experiment.
+        Set the date of the experiment.
 
         Parameters
         ----------
@@ -281,12 +285,11 @@ class NAbstract(object):
         None
 
         """
-
         self._record_info['Date'] = date_str
 
     def _set_time(self, time=''):
         """
-        Sets the time of the experiment.
+        Set the time of the experiment.
 
         Parameters
         ----------
@@ -297,12 +300,11 @@ class NAbstract(object):
         None
 
         """
-
         self._record_info['Time'] = time
 
     def _set_experimenter(self, experimenter=''):
         """
-        Sets the name of the experimenter.
+        Set the name of the experimenter.
 
         Parameters
         ----------
@@ -313,12 +315,11 @@ class NAbstract(object):
         None
 
         """
-
         self._record_info['Experimenter'] = experimenter
 
     def _set_comments(self, comments=''):
         """
-        Sets comments or notes of the experimenter.
+        Set comments or notes of the experiment.
 
         Parameters
         ----------
@@ -329,28 +330,26 @@ class NAbstract(object):
         None
 
         """
-
         self._record_info['Comments'] = comments
 
     def _set_duration(self, duration=''):
         """
-        Sets the duration of the experiment.
+        Set the duration of the experiment.
 
         Parameters
         ----------
-        duration : str
+        duration : float
 
         Returns
         -------
         None
 
         """
-
         self._record_info['Duration'] = duration
 
     def _set_source_format(self, system='Axona'):
         """
-        Sets the recording format or the source-format of the data.
+        Set the recording format or the source-format of the data.
 
         Parameters
         ----------
@@ -361,12 +360,11 @@ class NAbstract(object):
         None
 
         """
-
         self._record_info['Format'] = system
 
     def _set_data_source(self, filename=None):
         """
-        Sets the source of the original data file.
+        Set the source of the original data file.
 
         Parameters
         ----------
@@ -381,7 +379,7 @@ class NAbstract(object):
 
     def get_file_version(self):
         """
-        Gets the version of the data file.
+        Get the version of the data file.
 
         Parameters
         ----------
@@ -396,7 +394,7 @@ class NAbstract(object):
 
     def get_date(self):
         """
-        Gets the recording date.
+        Get the recording date.
 
         Parameters
         ----------
@@ -407,12 +405,11 @@ class NAbstract(object):
         str
 
         """
-
         return self._record_info['Date']
 
     def get_time(self):
         """
-        Gets the time of the experiment.
+        Get the time of the experiment.
 
         Parameters
         ----------
@@ -423,12 +420,11 @@ class NAbstract(object):
         str
 
         """
-
         return self._record_info['Time']
 
     def get_experimenter(self):
         """
-        Gets the name of the experimenter.
+        Get the name of the experimenter.
 
         Parameters
         ----------
@@ -439,12 +435,11 @@ class NAbstract(object):
         str
 
         """
-
         return self._record_info['Experimenter']
 
     def get_comments(self):
         """
-        Gets the comments or notes about the experiment.
+        Get the comments or notes about the experiment.
 
         Parameters
         ----------
@@ -455,12 +450,11 @@ class NAbstract(object):
         str
 
         """
-
         return self._record_info['Comments']
 
     def get_duration(self):
         """
-        Gets the duration of the experiment.
+        Get the duration of the experiment.
 
         Parameters
         ----------
@@ -475,7 +469,7 @@ class NAbstract(object):
 
     def get_source_format(self):
         """
-        Gets the recording system or native data format.
+        Get the recording system or native data format.
 
         Parameters
         ----------
@@ -486,12 +480,11 @@ class NAbstract(object):
         str
 
         """
-
         return self._record_info['Format']
 
     def get_data_source(self):
         """
-        Gets the source of the data.
+        Get the source of the data.
 
         Parameters
         ----------
@@ -502,29 +495,28 @@ class NAbstract(object):
         str
 
         """
-
         return self._record_info['Source']
 
     def set_record_info(self, new_info={}):
         """
-        Sets the recording information.
+        Set the recording information.
 
         Parameters
         ----------
-        None
+        new_info: dict
+            The new recording information dictionary.
+            The existing information is updated with this information.
 
         Returns
         -------
-        dict
-            Sets one of the recording information in `(name, value)` pair
+        None
 
         """
-
         self._record_info.update(new_info)
 
     def get_record_info(self, record_name=None):
         """
-        Gets the comments or notes about the experiment.
+        Get the comments or notes about the experiment.
 
         Parameters
         ----------
@@ -532,7 +524,9 @@ class NAbstract(object):
 
         Returns
         -------
-        str
+        dict or str
+            dict is record_name is None.
+            str if record_name is a key in _record_info.
 
         """
         if record_name is None:
@@ -542,8 +536,14 @@ class NAbstract(object):
 
 
 class NBase(NAbstract):
-    """Derived from NAbstract class, NBase implements additional
-    functionalities for managing multiple spike or LFP datasets."""
+    """
+    NBase adds managing multiple spike or LFP datasets to NAbstract.
+
+    NBase is derived from NAbstract class.
+    And it implements additional functionalities for
+    managing multiple spike or LFP datasets to NAbstract.
+
+    """
 
     def __init__(self, **kwargs):
         """
@@ -578,7 +578,7 @@ class NBase(NAbstract):
 
     def add_node(self, node, node_type=None, **kwargs):
         """
-        Adds a new dataset, called node to the spike and LFP dataset arrays.
+        Add a new dataset, called node, to the spike and LFP dataset arrays.
 
         Parameters
         ----------
@@ -587,14 +587,13 @@ class NBase(NAbstract):
         node_type : str
             Type of the dataset described in each class attributes
         **kwargs
-            Keywrod arguments
+            Keyword arguments
 
         Returns
         -------
         None
 
         """
-
         name = node.get_name()
         _replace = kwargs.get('replace', False)
 
@@ -612,9 +611,11 @@ class NBase(NAbstract):
         if _replace:
             i = self.del_node(node)
         elif name in node_names:
-            logging.warning(node_type + ' with name {0} already exists, '.format(name) +
-                            'cannot add another one.\r\n' +
-                            'Try renaming or set replace True')
+            logging.warning(
+                node_type +
+                ' with name {0} already exists, '.format(name) +
+                'cannot add another one.\r\n' +
+                'Try renaming or set replace True')
         else:
             i = len(nodes)
 
@@ -623,7 +624,7 @@ class NBase(NAbstract):
 
     def del_node(self, node):
         """
-        Deletes a node that represents spike or LFP dataset.
+        Delete a node that represents spike or LFP dataset.
 
         Parameters
         ----------
@@ -649,7 +650,7 @@ class NBase(NAbstract):
 
     def get_node(self, node_names, node_type='spike'):
         """
-        Gets the nodes by name and dataset type.
+        Get the nodes by name and dataset type.
 
         Parameters
         ----------
@@ -664,7 +665,6 @@ class NBase(NAbstract):
             List of the data nodes
 
         """
-
         nodes = []
         not_nodes = []
         if node_type == 'spike':
@@ -682,7 +682,7 @@ class NBase(NAbstract):
 
     def get_spike(self, names=None):
         """
-        Gets the spike nodes by name.
+        Get the spike nodes by name.
 
         Parameters
         ----------
@@ -692,10 +692,10 @@ class NBase(NAbstract):
         Returns
         -------
         list
-            List of the spike nodes. Returns all the spike nodes if `names` is None
+            List of the spike nodes.
+            Returns all the spike nodes if `names` is None.
 
         """
-
         if names is None:
             spikes = self._spikes
         else:
@@ -704,7 +704,7 @@ class NBase(NAbstract):
 
     def get_lfp(self, names=None):
         """
-        Gets the lfp nodes by name.
+        Get the lfp nodes by name.
 
         Parameters
         ----------
@@ -717,7 +717,6 @@ class NBase(NAbstract):
             List of the lfp nodes. Returns all the lfp nodes if `names` is None
 
         """
-
         if names is None:
             lfp = self._lfp
         else:
@@ -726,7 +725,7 @@ class NBase(NAbstract):
 
     def del_spike(self, spike):
         """
-        Deletes a node that represents spike dataset.
+        Delete a node that represents a spike dataset.
 
         Parameters
         ----------
@@ -739,7 +738,6 @@ class NBase(NAbstract):
             Index of the deleted node
 
         """
-
         if isinstance(spike, str):
             name = spike
             spike = self.get_spike(name)
@@ -749,7 +747,7 @@ class NBase(NAbstract):
 
     def del_lfp(self, lfp):
         """
-        Deletes a node that represents LFP dataset.
+        Delete a node that represents LFP dataset.
 
         Parameters
         ----------
@@ -762,7 +760,6 @@ class NBase(NAbstract):
             Index of the deleted node
 
         """
-
         i = 0
         if isinstance(lfp, str):
             name = lfp
@@ -773,7 +770,7 @@ class NBase(NAbstract):
 
     def get_spike_names(self):
         """
-        Gets the names of all the spike nodes.
+        Get the names of all the spike nodes.
 
         Parameters
         ----------
@@ -785,12 +782,11 @@ class NBase(NAbstract):
             Names of the spike nodes
 
         """
-
         return self._spikes_by_name.keys()
 
     def get_lfp_names(self):
         """
-        Gets the name of all the lfp nodes.
+        Get the name of all the lfp nodes.
 
         Parameters
         ----------
@@ -802,13 +798,13 @@ class NBase(NAbstract):
             Names of the LFP nodes
 
         """
-
         return self._lfp_by_name.keys()
 
     def change_names(self, old_names, new_names, node_type='spike'):
         """
-        Changes the names of nodes. `old_names` should have the same length as
-        that of `new_length`
+        Change the names of nodes.
+
+        `old_names` should have the same length as that of `new_length`
 
         Parameters
         ----------
@@ -824,7 +820,6 @@ class NBase(NAbstract):
         None
 
         """
-
         if len(new_names) != len(old_names):
             logging.error('Input names are not equal in numbers!')
         elif len(set(new_names)) < len(old_names):
@@ -846,7 +841,7 @@ class NBase(NAbstract):
 
     def set_spike_names(self, names):
         """
-        Sets the names of the spike nodes. Old names are replaced.
+        Set the names of the spike nodes. Old names are replaced.
 
         Parameters
         ----------
@@ -858,12 +853,11 @@ class NBase(NAbstract):
         None
 
         """
-
         self.change_names(self.get_spike_names(), names, 'lfp')
 
     def set_lfp_names(self, names):
         """
-        Sets the names of the lfp nodes. Old names are replaced.
+        Set the names of the lfp nodes. Old names are replaced.
 
         Parameters
         ----------
@@ -875,13 +869,13 @@ class NBase(NAbstract):
         None
 
         """
-
         self.change_names(self.get_lfp_names(), names, 'lfp')
 
     def set_node_file_names(self, node_names, filenames, node_type='spike'):
         """
-        Sets the filenames for each data node. `node_names` must be of equal
-        length to `filenames`
+        Set the filenames for each data node.
+
+        `node_names` must be of equal length to `filenames`
 
         Parameters
         ----------
@@ -897,7 +891,6 @@ class NBase(NAbstract):
         None
 
         """
-
         if len(node_names) != len(filenames):
             logging.error('No. of names does not match with no. of filenames')
         elif len(set(node_names)) != len(node_names):
@@ -909,8 +902,9 @@ class NBase(NAbstract):
 
     def set_spike_file_names(self, spike_names, filenames):
         """
-        Sets the filenames for each data node. `spike_names` must be of equal
-        length to `filenames`
+        Set the filenames for each data node.
+
+        `spike_names` must be of equal length to `filenames`
 
         Parameters
         ----------
@@ -924,13 +918,13 @@ class NBase(NAbstract):
         None
 
         """
-
         self.set_node_file_names(spike_names, filenames, 'spike')
 
     def set_lfp_file_names(self, lfp_names, filenames):
         """
-        Sets the filenames for each LFP data node. `lfp_names` must be of equal
-        length to `filenames`
+        Set the filenames for each LFP data node.
+
+        `lfp_names` must be of equal length to `filenames`
 
         Parameters
         ----------
@@ -944,12 +938,11 @@ class NBase(NAbstract):
         None
 
         """
-
         self.set_node_file_names(lfp_names, filenames, 'lfp')
 
     def count_spike(self):
         """
-        Counts the number of spike nodes.
+        Count the number of spike nodes.
 
         Parameters
         ----------
@@ -965,7 +958,7 @@ class NBase(NAbstract):
 
     def count_lfp(self):
         """
-        Counts the number of lfp nodes.
+        Count the number of lfp nodes.
 
         Parameters
         ----------
@@ -981,15 +974,17 @@ class NBase(NAbstract):
 
     def _add_node(self, cls, node, node_type, **kwargs):
         """
-        Add a node of instance of class `cls` from `node` in the list of
-        `node_type`. Existing nodes can be replaced by input `replace= True`
+        Add a node instance of class `cls` from `node` in list of `node_type`.
+
+        Existing nodes can be replaced by input `replace= True`
 
         Parameters
         ----------
         cls
             Class of node to be added
         node
-            Either an object of `cls`or or a Class. If None, new instance of `cls`
+            Either an object of `cls` or a Class.
+            If None, a new instance of `cls`
             is added to the node list and returned
         node_type : str
             Type of the data node
@@ -997,7 +992,6 @@ class NBase(NAbstract):
 
         Returns
         -------
-
             Newly added data node
 
         See also
@@ -1005,7 +999,6 @@ class NBase(NAbstract):
         add_node
 
         """
-
         new_node = self._new_instance(node, **kwargs)
         self.add_node(new_node, node_type,
                       replace=kwargs.get('replace', False))
@@ -1014,22 +1007,20 @@ class NBase(NAbstract):
 
     def _get_instance(self, cls, node, node_type):
         """
-        Create a node of instance of class `cls` from `node` in the list of
-        `node_type`
+        Create node instance of class `cls` from `node` in list of `node_type`.
 
         Parameters
         ----------
         cls
             Class of node to be added
         node
-            Either an object of `cls`or or a Class. If None, new instance of `cls`
-            is returned
+            Either an object of `cls`or or a Class. 
+            If None, new instance of `cls` is returned.
         node_type : str
             Type of the data node
 
         Returns
         -------
-
             Newly added data node
 
         See also
