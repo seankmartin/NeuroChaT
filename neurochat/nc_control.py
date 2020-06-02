@@ -34,32 +34,29 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 class NeuroChaT(QtCore.QThread):
     """
-    The NeuroChaT object is the controller object in NeuroChaT and works as the
-    backend to the NeuroChaT graphical user interface.
+    The NeuroChaT class is the controller class in NeuroChaT software.
 
+    The NeuroChaT class is the backend to the NeuroChaT GUI.
     It reads data, parameter and analysis specifications from the
-    Configuration class and executes accordingly. It also interafces the
-    GUI to the rest of the NeuroChaT elements.
+    Configuration class and executes accordingly.
+    It also interfaces the GUI to the rest of the NeuroChaT elements.
 
+    Attributes
+    ----------
+    ndata : NData
+        NData object to store neural data.
+    config : Configuration
+        Configuration object
+    log : NLog
+        Central logger object
+    hdf : Nhdf
+        Nhdf object
     """
 
     finished = QtCore.pyqtSignal()
 
     def __init__(self, config=Configuration(), data=NData(), parent=None):
-        """
-        Attributes
-        ----------
-        ndata : NData
-            NData oject
-        config : Configuration
-            Configuration object
-        log : NLog
-            Central logger object
-        hdf : Nhdf
-            A Nhdf object
-
-        """
-
+        """See NeuroChaT class description."""
         super().__init__(parent)
         self.ndata = data
         self.config = config
@@ -69,8 +66,9 @@ class NeuroChaT(QtCore.QThread):
 
     def reset(self):
         """
-        Reset NeuroChaT's internal attributes and prepares it for another set
-        of analysis or new session.
+        Reset NeuroChaT's internal attributes.
+
+        This prepares it for another set of analysis or a new session.
 
         Parameters
         ----------
@@ -81,7 +79,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         self.__count = 0
         self.nwb_files = []
         self.graphic_files = []
@@ -96,9 +93,10 @@ class NeuroChaT(QtCore.QThread):
 
     def get_output_files(self):
         """
-        Returns a DataFrame of output graphic files and HDF5 files after the
-        completion of the analysis. Index are the unit IDs of the analysed
-        units.
+        Return a DataFrame of output graphic files and HDF5 files.
+
+        This should be called after thecompletion of the analysis.
+        Index are the unit IDs of the analysed units.
 
         Parameters
         ----------
@@ -107,11 +105,10 @@ class NeuroChaT(QtCore.QThread):
         Returns
         -------
         op_files : pandas.DataFrame
-            Column 1 contains the name of the output graphic files. Column 2 gives the
-            the name of the NWB files
+            Column 1 contains the name of the output graphic files.
+            Column 2 gives the name of the NWB files
 
         """
-
         op_files = {'Graphics Files': self.graphic_files,
                     'NWB Files': self.nwb_files}
         op_files = pd.DataFrame.from_dict(op_files)
@@ -122,7 +119,7 @@ class NeuroChaT(QtCore.QThread):
 
     def update_results(self, _results):
         """
-        Updates the results with new analysis results.
+        Update the results with new analysis results.
 
         Parameters
         ----------
@@ -134,13 +131,13 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
-        # without copy, list contains a reference to the original dictionary, and old results are replaced by the new one
+        # without copy, list contains a reference to the original dictionary
+        # and old results are replaced by the new one
         self.results.append(_results.copy())
 
     def get_results(self):
         """
-        Returns the parametric results of the analyses.
+        Return the parametric results of the analyses.
 
         Parameters
         ----------
@@ -150,7 +147,6 @@ class NeuroChaT(QtCore.QThread):
         -------
         results : OrderedDict
             Parametric results of the analysis
-
         """
         try:
             keys = []
@@ -166,8 +162,9 @@ class NeuroChaT(QtCore.QThread):
 
     def open_pdf(self, filename=None):
         """
-        Opens the PDF file object using PdfPages from
-        matplotlib.backends.backend_pdf.
+        Open the PDF file object using PdfPages.
+
+        PdfPages is from matplotlib.backends.backend_pdf.
 
         Parameters
         ----------
@@ -179,7 +176,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         if filename is not None:
             words = filename.split(os.sep)
             directory = os.sep.join(words[:-1])
@@ -203,7 +199,7 @@ class NeuroChaT(QtCore.QThread):
 
     def close_pdf(self):
         """
-        closes the PDF file object.
+        Close the PDF file object.
 
         Parameters
         ----------
@@ -214,7 +210,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         if self._pdf_file is not None:
             self.pdf.close()
             logging.info('Output graphics saved to ' + self._pdf_file)
@@ -223,21 +218,22 @@ class NeuroChaT(QtCore.QThread):
 
     def close_fig(self, fig):
         """
-        Closes a matplotlib.fiure.Figure() object after saving it to the output
-        PDF. A a tuple or list of such figures are provided, each of them saved
-        and closed accordingly.
+        Close a matplotlib.figure.Figure() object after saving it.
+
+        These figures are saved to the output PDF stored on this object.
+        If a tuple or list of such figures are provided
+        each of them are saved and closed accordingly.
 
         Parameters
         ----------
         fig
-           matplotlib.fiure.Figure() or a list or tuple of them.
+           matplotlib.figure.Figure() or a list or tuple of them.
 
         Returns
         -------
         None
 
         """
-
         if isinstance(fig, (tuple, list)):
             for f in fig:
                 if isinstance(f, matplotlib.figure.Figure):
@@ -263,8 +259,9 @@ class NeuroChaT(QtCore.QThread):
 
     def run(self):
         """
-        After calling start(), the NeuroChaT thread calls this function. It
-        verifies the input specifications and calls the mode() method.
+        After calling start(), the NeuroChaT thread calls this function.
+
+        It verifies the input specifications and calls the mode() method.
 
         Parameters
         ----------
@@ -275,7 +272,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         self.reset()
         verified = True
         # Deduce the configuration
@@ -323,11 +319,14 @@ class NeuroChaT(QtCore.QThread):
 
     def mode(self):
         """
-        Reads the specifications and analyzes data according to the mode that
-        is set in the Configuration file. This is the principle method in
-        NeuroChaT that sets the input and output data files and calls the
-        execute() method for running the analyses after it sets the data and
-        filenames to NData() object.
+        Read data and perform analysis based on the mode set in config.
+
+        This is the principle method in NeuroChaT.
+        The method reads the specifications and analyzes data according to the
+        mode that is set in the Configuration file.
+
+        This sets the input and output data files and sets the NData() object.
+        After this, it calls the execute() method for running the analyses.
 
         Parameters
         ----------
@@ -338,10 +337,10 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         info = {'spat': [], 'spike': [], 'unit': [],
                 'lfp': [], 'nwb': [], 'graphics': [], 'cellid': []}
         mode_id = self.get_analysis_mode()[1]
+
         # All the cells in the same tetrode will use the same lfp channel
         if mode_id == 0 or mode_id == 1:
             spatial_file = self.get_spatial_file()
@@ -351,8 +350,9 @@ class NeuroChaT(QtCore.QThread):
             self.ndata.set_spike_file(spike_file)
             self.ndata.load_spike()
 
-            units = [
-                self.get_unit_no()] if mode_id == 0 else self.ndata.get_unit_list()
+            units = (
+                [self.get_unit_no()]
+                if mode_id == 0 else self.ndata.get_unit_list())
             if not units:
                 logging.error('No unit found in analysis')
             else:
@@ -362,6 +362,7 @@ class NeuroChaT(QtCore.QThread):
                     info['unit'].append(unit_no)
                     info['lfp'].append(lfp_file)
 
+        # Read files from an excel list
         elif mode_id == 2:
             excel_file = self.get_excel_file()
             if os.path.exists(excel_file):
@@ -428,7 +429,8 @@ class NeuroChaT(QtCore.QThread):
                 ax.set_axis_off()
                 self.close_fig(fig)
 
-                # Set and open hdf5 file for saving graph data within self.execute()
+                # Set and open hdf5 file for saving graph data
+                # within self.execute()
                 self.hdf.set_filename(nwb_name)
                 if '/analysis/' + cell_id in self.hdf.f:
                     del self.hdf.f['/analysis/' + cell_id]
@@ -440,7 +442,8 @@ class NeuroChaT(QtCore.QThread):
 
                 self.update_results(_results)
                 self.hdf.save_dict_recursive(
-                    path='/analysis/' + cell_id + '/', name='results', data=_results)
+                    path='/analysis/' + cell_id + '/',
+                    name='results', data=_results)
 
                 self.hdf.close()
                 self.ndata.save_to_hdf5()  # Saving data to hdf file
@@ -455,8 +458,9 @@ class NeuroChaT(QtCore.QThread):
 
     def execute(self, name=None):
         """
-        Checks the selection of each analyses, and executes if they are
-        selected. It also exports the plot data from individual analyses to the
+        Execute each analysis that is selected in the configuration.
+
+        This also exports the plot data from individual analyses to the
         hdf file and figures to the graphics file that are set in the mode()
         method.
 
@@ -470,7 +474,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         try:
             logging.info('Calculating environmental border...')
             self.set_border(self.calc_border())
@@ -483,7 +486,7 @@ class NeuroChaT(QtCore.QThread):
             try:
                 graph_data = self.wave_property()  # gd = graph_data
                 fig = nc_plot.wave_property(
-                    graph_data, [int(self.get_total_channels()/2), 2])
+                    graph_data, [int(self.get_total_channels() / 2), 2])
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/waveProperty/', graph_data=graph_data)
@@ -496,7 +499,7 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('isi')
                 graph_data = self.isi(
-                    bins=int(params['isi_length']/params['isi_bin']),
+                    bins=int(params['isi_length'] / params['isi_bin']),
                     bound=[0, params['isi_length']],
                     refractory_threshold=params['isi_refractory'])
                 fig = nc_plot.isi(graph_data)
@@ -514,15 +517,21 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('isi_corr')
 
-                graph_data = self.isi_corr(bins=params['isi_corr_bin_long'],
-                                           bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
+                graph_data = self.isi_corr(
+                    bins=params['isi_corr_bin_long'],
+                    bound=[
+                        -params['isi_corr_len_long'],
+                        params['isi_corr_len_long']])
                 fig = nc_plot.isi_corr(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/isiCorrLong/', graph_data=graph_data)
                 # Autocorr 10ms
-                graph_data = self.isi_corr(bins=params['isi_corr_bin_short'],
-                                           bound=[-params['isi_corr_len_short'], params['isi_corr_len_short']])
+                graph_data = self.isi_corr(
+                    bins=params['isi_corr_bin_short'],
+                    bound=[
+                        -params['isi_corr_len_short'],
+                        params['isi_corr_len_short']])
                 fig = nc_plot.isi_corr(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -536,13 +545,21 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('theta_cell')
 
-                graph_data = self.theta_index(start=[params['theta_cell_freq_start'], params['theta_cell_tau1_start'], params['theta_cell_tau2_start']],
-                                              lower=[
-                                                  params['theta_cell_freq_min'], 0, 0],
-                                              upper=[
-                                                  params['theta_cell_freq_max'], params['theta_cell_tau1_max'], params['theta_cell_tau2_max']],
-                                              bins=params['isi_corr_bin_long'],
-                                              bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
+                graph_data = self.theta_index(
+                    start=[
+                        params['theta_cell_freq_start'],
+                        params['theta_cell_tau1_start'],
+                        params['theta_cell_tau2_start']],
+                    lower=[
+                        params['theta_cell_freq_min'], 0, 0],
+                    upper=[
+                        params['theta_cell_freq_max'],
+                        params['theta_cell_tau1_max'],
+                        params['theta_cell_tau2_max']],
+                    bins=params['isi_corr_bin_long'],
+                    bound=[
+                        -params['isi_corr_len_long'],
+                        params['isi_corr_len_long']])
                 fig = nc_plot.theta_cell(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -555,13 +572,21 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('theta_cell')
 
-                graph_data = self.theta_skip_index(start=[params['theta_cell_freq_start'], params['theta_cell_tau1_start'], params['theta_cell_tau2_start']],
-                                                   lower=[
-                                                       params['theta_cell_freq_min'], 0, 0],
-                                                   upper=[
-                                                       params['theta_cell_freq_max'], params['theta_cell_tau1_max'], params['theta_cell_tau2_max']],
-                                                   bins=params['isi_corr_bin_long'],
-                                                   bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
+                graph_data = self.theta_skip_index(
+                    start=[
+                        params['theta_cell_freq_start'],
+                        params['theta_cell_tau1_start'],
+                        params['theta_cell_tau2_start']],
+                    lower=[
+                        params['theta_cell_freq_min'], 0, 0],
+                    upper=[
+                        params['theta_cell_freq_max'],
+                        params['theta_cell_tau1_max'],
+                        params['theta_cell_tau2_max']],
+                    bins=params['isi_corr_bin_long'],
+                    bound=[
+                        -params['isi_corr_len_long'],
+                        params['isi_corr_len_long']])
                 fig = nc_plot.theta_cell(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -575,8 +600,9 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('burst')
 
-                self.burst(burst_thresh=params['burst_thresh'],
-                           ibi_thresh=params['ibi_thresh'])
+                self.burst(
+                    burst_thresh=params['burst_thresh'],
+                    ibi_thresh=params['ibi_thresh'])
             except:
                 logging.error('Error in analysing bursting property')
 
@@ -586,8 +612,10 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('speed')
 
-                graph_data = self.speed(range=[params['speed_min'], params['speed_max']],
-                                        binsize=params['speed_bin'], update=True)
+                graph_data = self.speed(
+                    range=[params['speed_min'], params['speed_max']],
+                    binsize=params['speed_bin'],
+                    update=True)
                 fig = nc_plot.speed(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -601,8 +629,10 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('ang_vel')
 
-                graph_data = self.angular_velocity(range=[params['ang_vel_min'], params['ang_vel_max']],
-                                                   binsize=params['ang_vel_bin'], cutoff=params['ang_vel_cutoff'], update=True)
+                graph_data = self.angular_velocity(
+                    range=[params['ang_vel_min'], params['ang_vel_max']],
+                    binsize=params['ang_vel_bin'],
+                    cutoff=params['ang_vel_cutoff'], update=True)
                 fig = nc_plot.angular_velocity(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -616,19 +646,22 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('hd_rate')
 
-                hdData = self.hd_rate(binsize=params['hd_bin'],
-                                      filter=['b', params['hd_rate_kern_len']],
-                                      pixel=params['loc_pixel_size'], update=True)
+                hdData = self.hd_rate(
+                    binsize=params['hd_bin'],
+                    filter=['b', params['hd_rate_kern_len']],
+                    pixel=params['loc_pixel_size'],
+                    update=True)
                 fig = nc_plot.hd_firing(hdData)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/hd_rate/', graph_data=hdData)
 
-                hdData = self.hd_rate_ccw(binsize=params['hd_bin'],
-                                          filter=[
-                                              'b', params['hd_rate_kern_len']],
-                                          thresh=params['hd_ang_vel_cutoff'],
-                                          pixel=params['loc_pixel_size'], update=True)
+                hdData = self.hd_rate_ccw(
+                    binsize=params['hd_bin'],
+                    filter=['b', params['hd_rate_kern_len']],
+                    thresh=params['hd_ang_vel_cutoff'],
+                    pixel=params['loc_pixel_size'],
+                    update=True)
                 fig = nc_plot.hd_rate_ccw(hdData)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -643,8 +676,10 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('hd_shuffle')
 
-                graph_data = self.hd_shuffle(bins=params['hd_shuffle_bins'],
-                                             nshuff=params['hd_shuffle_total'], limit=params['hd_shuffle_limit'])
+                graph_data = self.hd_shuffle(
+                    bins=params['hd_shuffle_bins'],
+                    nshuff=params['hd_shuffle_total'],
+                    limit=params['hd_shuffle_limit'])
                 fig = nc_plot.hd_shuffle(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -673,10 +708,11 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('hd_time_shift')
 
-                hdData = self.hd_shift(shift_ind=np.arange(params['hd_shift_min'],
-                                                           params['hd_shift_max'] +
-                                                           params['hd_shift_step'],
-                                                           params['hd_shift_step']))
+                hdData = self.hd_shift(
+                    shift_ind=np.arange(params['hd_shift_min'],
+                                        params['hd_shift_max'] +
+                                        params['hd_shift_step'],
+                                        params['hd_shift_step']))
                 fig = nc_plot.hd_time_shift(hdData)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -725,18 +761,19 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     filttype = 'b'
 
-                place_data = self.loc_shuffle(bins=params['loc_shuffle_nbins'],
-                                              nshuff=params['loc_shuffle_total'],
-                                              limit=params['loc_shuffle_limit'],
-                                              pixel=params['loc_pixel_size'],
-                                              chop_bound=params['loc_chop_bound'],
-                                              filter=[
-                                                  filttype, params['loc_rate_kern_len']],
-                                              brAdjust=True, update=False)
+                place_data = self.loc_shuffle(
+                    bins=params['loc_shuffle_nbins'],
+                    nshuff=params['loc_shuffle_total'],
+                    limit=params['loc_shuffle_limit'],
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['loc_rate_kern_len']],
+                    brAdjust=True, update=False)
                 fig = nc_plot.loc_shuffle(place_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/loc_shuffle/', graph_data=place_data)
+
             except:
                 logging.error('Error in locational shiffling analysis')
 
@@ -750,11 +787,11 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     filttype = 'b'
 
-                graph_data = self.loc_time_lapse(pixel=params['loc_pixel_size'],
-                                                 chop_bound=params['loc_chop_bound'],
-                                                 filter=[
-                                                     filttype, params['loc_rate_kern_len']],
-                                                 brAdjust=True)
+                graph_data = self.loc_time_lapse(
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['loc_rate_kern_len']],
+                    brAdjust=True)
 
                 fig = nc_plot.loc_spike_time_lapse(graph_data)
                 self.close_fig(fig)
@@ -763,6 +800,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/loc_time_lapse/', graph_data=graph_data)
+
             except:
                 logging.error('Error in locational time-lapse analysis')
 
@@ -776,19 +814,21 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     filttype = 'b'
 
-                plot_data = self.loc_shift(shift_ind=np.arange(params['loc_shift_min'],
-                                                               params['loc_shift_max'] +
-                                                               params['loc_shift_step'],
-                                                               params['loc_shift_step']),
-                                           pixel=params['loc_pixel_size'],
-                                           chop_bound=params['loc_chop_bound'],
-                                           filter=[
-                                               filttype, params['loc_rate_kern_len']],
-                                           brAdjust=True, update=False)
+                plot_data = self.loc_shift(
+                    shift_ind=np.arange(params['loc_shift_min'],
+                                        params['loc_shift_max'] +
+                                        params['loc_shift_step'],
+                                        params['loc_shift_step']),
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[
+                        filttype, params['loc_rate_kern_len']],
+                    brAdjust=True, update=False)
                 fig = nc_plot.loc_time_shift(plot_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/loc_time_shift/', graph_data=plot_data)
+
             except:
                 logging.error('Error in locational time-shift analysis')
 
@@ -803,22 +843,22 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     filttype = 'b'
 
-                plot_data = self.loc_auto_corr(pixel=params['loc_pixel_size'],
-                                               chop_bound=params['loc_chop_bound'],
-                                               filter=[
-                                                   filttype, params['spatial_corr_kern_len']],
-                                               minPixel=params['spatial_corr_min_obs'], brAdjust=True)
+                plot_data = self.loc_auto_corr(
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['spatial_corr_kern_len']],
+                    minPixel=params['spatial_corr_min_obs'], brAdjust=True)
                 fig = nc_plot.loc_auto_corr(plot_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/spatial_corr/', graph_data=plot_data)
 
-                plot_data = self.loc_rot_corr(binsize=params['rot_corr_bin'],
-                                              pixel=params['loc_pixel_size'],
-                                              chop_bound=params['loc_chop_bound'],
-                                              filter=[
-                                                  filttype, params['spatial_corr_kern_len']],
-                                              minPixel=params['spatial_corr_min_obs'], brAdjust=True)
+                plot_data = self.loc_rot_corr(
+                    binsize=params['rot_corr_bin'],
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['spatial_corr_kern_len']],
+                    minPixel=params['spatial_corr_min_obs'], brAdjust=True)
                 fig = nc_plot.rot_corr(plot_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -837,14 +877,14 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     filttype = 'b'
 
-                graph_data = self.grid(angtol=params['grid_ang_tol'],
-                                       binsize=params['grid_ang_bin'],
-                                       pixel=params['loc_pixel_size'],
-                                       chop_bound=params['loc_chop_bound'],
-                                       filter=[
-                                           filttype, params['spatial_corr_kern_len']],
-                                       minPixel=params['spatial_corr_min_obs'],
-                                       brAdjust=True)  # Add other paramaters
+                graph_data = self.grid(
+                    angtol=params['grid_ang_tol'],
+                    binsize=params['grid_ang_bin'],
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['spatial_corr_kern_len']],
+                    minPixel=params['spatial_corr_min_obs'],
+                    brAdjust=True)  # Add other paramaters
                 fig = nc_plot.grid(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -863,19 +903,20 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     filttype = 'b'
 
-                graph_data = self.border(update=True, thresh=params['border_firing_thresh'],
-                                         cbinsize=params['border_ang_bin'],
-                                         nstep=params['border_stair_steps'],
-                                         pixel=params['loc_pixel_size'],
-                                         chop_bound=params['loc_chop_bound'],
-                                         filter=[
-                                             filttype, params['loc_rate_kern_len']],
-                                         brAdjust=True)
+                graph_data = self.border(
+                    update=True, thresh=params['border_firing_thresh'],
+                    cbinsize=params['border_ang_bin'],
+                    nstep=params['border_stair_steps'],
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['loc_rate_kern_len']],
+                    brAdjust=True)
 
                 fig = nc_plot.border(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/border/', graph_data=graph_data)
+
             except:
                 logging.error('Error in border cell analysis')
 
@@ -889,18 +930,19 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     filttype = 'b'
 
-                graph_data = self.gradient(alim=params['grad_asymp_lim'],
-                                           blim=params['grad_displace_lim'],
-                                           clim=params['grad_growth_rate_lim'],
-                                           pixel=params['loc_pixel_size'],
-                                           chop_bound=params['loc_chop_bound'],
-                                           filter=[
-                                               filttype, params['loc_rate_kern_len']],
-                                           brAdjust=True)
+                graph_data = self.gradient(
+                    alim=params['grad_asymp_lim'],
+                    blim=params['grad_displace_lim'],
+                    clim=params['grad_growth_rate_lim'],
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['loc_rate_kern_len']],
+                    brAdjust=True)
                 fig = nc_plot.gradient(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/gradient/', graph_data=graph_data)
+
             except:
                 logging.error('Error in gradient cell analysis')
 
@@ -909,14 +951,16 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('multiple_regression')
 
-                graph_data = self.multiple_regression(nrep=params['mra_nrep'],
-                                                      episode=params['mra_episode'],
-                                                      subsampInterv=params['mra_interval'])
+                graph_data = self.multiple_regression(
+                    nrep=params['mra_nrep'],
+                    episode=params['mra_episode'],
+                    subsampInterv=params['mra_interval'])
 
                 fig = nc_plot.multiple_regression(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/multiple_regression/', graph_data=graph_data)
+
             except Exception as ex:
                 log_exception(
                     ex, "in multiple-regression analysis")
@@ -925,8 +969,9 @@ class NeuroChaT(QtCore.QThread):
             # No plot
             logging.info('Assessing dependence of variables to...')
             try:
-                self.interdependence(pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40],
-                                     abinsize=10, angvelrange=[-500, 500])
+                self.interdependence(
+                    pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40],
+                    abinsize=10, angvelrange=[-500, 500])
             except:
                 logging.error('Error in interdependence analysis')
 
@@ -934,29 +979,31 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('lfp_spectrum')
 
-                graph_data = self.spectrum(window=params['lfp_pwelch_seg_size'],
-                                           noverlap=params['lfp_pwelch_overlap'],
-                                           nfft=params['lfp_pwelch_nfft'],
-                                           ptype='psd', prefilt=True,
-                                           filtset=[params['lfp_prefilt_order'],
-                                                    params['lfp_prefilt_lowcut'],
-                                                    params['lfp_prefilt_highcut'], 'bandpass'],
-                                           fmax=params['lfp_pwelch_freq_max'],
-                                           db=False, tr=False)
+                graph_data = self.spectrum(
+                    window=params['lfp_pwelch_seg_size'],
+                    noverlap=params['lfp_pwelch_overlap'],
+                    nfft=params['lfp_pwelch_nfft'],
+                    ptype='psd', prefilt=True,
+                    filtset=[params['lfp_prefilt_order'],
+                             params['lfp_prefilt_lowcut'],
+                             params['lfp_prefilt_highcut'], 'bandpass'],
+                    fmax=params['lfp_pwelch_freq_max'],
+                    db=False, tr=False)
                 fig = nc_plot.lfp_spectrum(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/lfp_spectrum/', graph_data=graph_data)
 
-                graph_data = self.spectrum(window=params['lfp_stft_seg_size'],
-                                           noverlap=params['lfp_stft_overlap'],
-                                           nfft=params['lfp_stft_nfft'],
-                                           ptype='psd', prefilt=True,
-                                           filtset=[params['lfp_prefilt_order'],
-                                                    params['lfp_prefilt_lowcut'],
-                                                    params['lfp_prefilt_highcut'], 'bandpass'],
-                                           fmax=params['lfp_stft_freq_max'],
-                                           db=True, tr=True)
+                graph_data = self.spectrum(
+                    window=params['lfp_stft_seg_size'],
+                    noverlap=params['lfp_stft_overlap'],
+                    nfft=params['lfp_stft_nfft'],
+                    ptype='psd', prefilt=True,
+                    filtset=[params['lfp_prefilt_order'],
+                             params['lfp_prefilt_lowcut'],
+                             params['lfp_prefilt_highcut'], 'bandpass'],
+                    fmax=params['lfp_stft_freq_max'],
+                    db=True, tr=True)
                 fig = nc_plot.lfp_spectrum_tr(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -965,6 +1012,7 @@ class NeuroChaT(QtCore.QThread):
                 # These ranges are from Muessig et al. 2019
                 # Coordinated Emergence of Hippocampal Replay and
                 # Theta Sequences during Post - natal Development
+                # TODO add parameters for this
                 self.bandpower_ratio(
                     [5, 11], [1.5, 4], 1.6, band_total=True,
                     first_name="Theta", second_name="Delta")
@@ -977,15 +1025,16 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('spike_phase')
 
-                graph_data = self.phase_dist(binsize=params['phase_bin'],
-                                             rbinsize=params['phase_raster_bin'],
-                                             fwin=[params['phase_freq_min'],
-                                                   params['phase_freq_max']],
-                                             pratio=params['phase_power_thresh'],
-                                             aratio=params['phase_amp_thresh'],
-                                             filtset=[params['lfp_prefilt_order'],
-                                                      params['lfp_prefilt_lowcut'],
-                                                      params['lfp_prefilt_highcut'], 'bandpass'])
+                graph_data = self.phase_dist(
+                    binsize=params['phase_bin'],
+                    rbinsize=params['phase_raster_bin'],
+                    fwin=[params['phase_freq_min'],
+                          params['phase_freq_max']],
+                    pratio=params['phase_power_thresh'],
+                    aratio=params['phase_amp_thresh'],
+                    filtset=[params['lfp_prefilt_order'],
+                             params['lfp_prefilt_lowcut'],
+                             params['lfp_prefilt_highcut'], 'bandpass'])
                 fig = nc_plot.spike_phase(graph_data)
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
@@ -1001,13 +1050,16 @@ class NeuroChaT(QtCore.QThread):
             try:
                 params = self.get_params_by_analysis('phase_lock')
 
-                reparam = {'window': [params['phase_loc_win_low'], params['phase_loc_win_up']],
-                           'nfft': params['phase_loc_nfft'],
-                           'fwin': [2, params['phase_loc_freq_max']],
-                           'nsample': 2000,
-                           'slide': 25,
-                           'nrep': 500,
-                           'mode': 'tr'}
+                reparam = {
+                    'window': [
+                        params['phase_loc_win_low'],
+                        params['phase_loc_win_up']],
+                    'nfft': params['phase_loc_nfft'],
+                    'fwin': [2, params['phase_loc_freq_max']],
+                    'nsample': 2000,
+                    'slide': 25,
+                    'nrep': 500,
+                    'mode': 'tr'}
 
                 graph_data = self.plv(**reparam)
                 fig = nc_plot.plv_tr(graph_data)
@@ -1028,6 +1080,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/phase_lock/', graph_data=graph_data)
+
             except:
                 logging.error('Error in spike-phase locking analysis')
 
@@ -1037,7 +1090,7 @@ class NeuroChaT(QtCore.QThread):
 
     def open_hdf_file(self, filename=None):
         """
-        Sets the filename and opens the file object for the HDF5 file.
+        Set the filename and open the file object for the HDF5 file.
 
         Parameters
         ----------
@@ -1056,7 +1109,7 @@ class NeuroChaT(QtCore.QThread):
 
     def close_hdf_file(self):
         """
-        Closes the HDF5 file object.
+        Close the HDF5 file object.
 
         Parameters
         ----------
@@ -1067,12 +1120,11 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         self.hdf.close()
 
     def get_hdf_groups(self, path=''):
         """
-        Returns the names of groups or datasets in a path.
+        Return the names of groups or datasets in a path.
 
         Parameters
         ----------
@@ -1085,12 +1137,11 @@ class NeuroChaT(QtCore.QThread):
             Names of the groups or datasets in the path
 
         """
-
         return self.hdf.get_groups_in_path(path=path)
 
     def exist_hdf_path(self, path=''):
         """
-        Check and returns if an HDF5 file path exists.
+        Check and return if an HDF5 file path exists.
 
         Parameters
         ----------
@@ -1103,7 +1154,6 @@ class NeuroChaT(QtCore.QThread):
             True if the path exists
 
         """
-
         exists = False
         if path in self.hdf.f:
             exists = True
@@ -1111,12 +1161,12 @@ class NeuroChaT(QtCore.QThread):
 
     def plot_data_to_hdf(self, name=None, graph_data=None):
         """
-        Stores plot data to the HDF5 file in the '/analysis/' path.
+        Store plot data to the HDF5 file in the '/analysis/' path.
 
         Parameters
         ----------
         name : str
-            Unit ID which is also the name of the group in the  '/analysis/' path
+            Unit ID which is the name of the group in the '/analysis/' path
         graph_data : dict
             Dictionary of data that are plotted
 
@@ -1125,13 +1175,12 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         self.hdf.save_dict_recursive(path='/analysis/',
                                      name=name, data=graph_data)
 
     def set_neuro_data(self, ndata):
         """
-        Sets a new NData() object or its subclass object.
+        Set a new NData() object or its subclass object.
 
         Parameters
         ----------
@@ -1143,7 +1192,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         if inspect.isclass(ndata):
             ndata = ndata()
         if isinstance(ndata, NData):
@@ -1153,7 +1201,7 @@ class NeuroChaT(QtCore.QThread):
 
     def get_neuro_data(self):
         """
-        Returns the NData() object from this class.
+        Return the NData() object from this class.
 
         Parameters
         ----------
@@ -1169,7 +1217,7 @@ class NeuroChaT(QtCore.QThread):
 
     def set_configuration(self, config):
         """
-        Sets a new Configuration() object or its subclass object.
+        Set a new Configuration() object or its subclass object.
 
         Parameters
         ----------
@@ -1181,7 +1229,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         if inspect.isclass(config):
             config = config()
         if isinstance(config, Configuration):
@@ -1191,7 +1238,7 @@ class NeuroChaT(QtCore.QThread):
 
     def get_configuration(self):
         """
-        Returns the Configuration() object from this class.
+        Return the Configuration() object from this class.
 
         Parameters
         ----------
@@ -1203,11 +1250,10 @@ class NeuroChaT(QtCore.QThread):
             NeuroChaT's config attribute
 
         """
-
         return self.config
 
-    # Forwarding to configuration class
     def __getattr__(self, arg):
+        """Forward __getattr__ to configuration class."""
         if hasattr(self.config, arg):
             return getattr(self.config, arg)
         elif hasattr(self.ndata, arg):
@@ -1218,9 +1264,9 @@ class NeuroChaT(QtCore.QThread):
 
     def convert_to_nwb(self, excel_file=None):
         """
-        Takes a list of datasets in Excel file and converts them into NWB file
-        format. This method currently supports Axona and Neuralynx data
-        formats.
+        Take a list of datasets in Excel file and converts them into NWB.
+
+        This method currently supports Axona and Neuralynx data formats.
 
         Parameters
         ----------
@@ -1232,10 +1278,10 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         if self.get_data_format() == 'NWB':
             logging.error(
-                'NWB files do not need to be converted! Check file format option again!')
+                'NWB files do not need to be converted!' +
+                'Check file format option again!')
         info = {'spat': [], 'spike': [], 'lfp': []}
         export_info = oDict({'dir': [], 'nwb': [], 'spike': [], 'lfp': []})
         if os.path.exists(excel_file):
@@ -1286,7 +1332,8 @@ class NeuroChaT(QtCore.QThread):
 
     def verify_units(self, excel_file=None):
         """
-        Takes a list of datasets and verify the specifications of the units.
+        Take a list of datasets and verify the specifications of the units.
+
         The verification tool is useful for prescreening of units before the
         batch-mode analysis using 'Listed Units' mode of NeuroChaT.
 
@@ -1300,7 +1347,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         info = {'spike': [], 'unit': []}
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
@@ -1340,9 +1386,11 @@ class NeuroChaT(QtCore.QThread):
 
     def angle_calculation(self, excel_file=None, should_plot=True):
         """
-        Takes a list of unit specifications and finds the angle between the
-        place field centroids The results of the analysis are written back to
-        the input Excel file.
+        Find the angle between place field centroids from an excel file.
+
+        This takes an input excel file which lists unit specifications
+        and finds the angle between the place field centroids.
+        The results of the analysis are written back to the input Excel file.
 
         Parameters
         ----------
@@ -1369,7 +1417,8 @@ class NeuroChaT(QtCore.QThread):
         n_units = len(collection)
         if (n_units % 3 != 0):
             logging.error(
-                "angle_calculation: Can't compute the angle for a number of units not divisible by 3, given " + str(n_units))
+                "angle_calculation: Can't compute the angle for a number of"
+                + " units not divisible by 3, given " + str(n_units))
             return
 
         excel_info = excel_info.assign(CentroidX=pd.Series(np.zeros(n_units)))
@@ -1435,9 +1484,9 @@ class NeuroChaT(QtCore.QThread):
 
     def cluster_evaluate(self, excel_file=None):
         """
-        Takes a list of unit specifications and evaluates the quality of the
-        clustering. The results of the analysis are written back to the input
-        Excel file.
+        Take a list of unit specifications and evaluates clustering quality.
+
+        The results of the analysis are written back to the input Excel file.
 
         Parameters
         ----------
@@ -1449,7 +1498,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-
         info = {'spike': [], 'unit': []}
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
@@ -1489,8 +1537,9 @@ class NeuroChaT(QtCore.QThread):
 
     def cluster_similarity(self, excel_file=None):
         """
-        Takes a list of specifications for pairwise comparison of units. The
-        results are written back to the input Excel file.
+        Take a list of specifications for pairwise comparison of units.
+
+        The results are written back to the input Excel file.
 
         Parameters
         ----------
@@ -1502,7 +1551,6 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        # test on Pawel's data
         nclust_1 = NClust()
         nclust_2 = NClust()
         info = {'spike_1': [], 'unit_1': [], 'spike_2': [], 'unit_2': []}
@@ -1512,7 +1560,7 @@ class NeuroChaT(QtCore.QThread):
                 spike_file = row[1] + os.sep + row[2]
                 unit_1 = int(row[3])
                 if self.get_data_format() == 'NWB':
-                        # excel list: directory| spike group| unit_no
+                    # excel list: directory| spike group| unit_no
                     hdf_name = row[1] + os.sep + row[2] + '.hdf5'
                     spike_file = hdf_name + '/processing/Shank' + '/' + row[3]
                 info['spike_1'].append(spike_file)
@@ -1521,7 +1569,7 @@ class NeuroChaT(QtCore.QThread):
                 spike_file = row[4] + os.sep + row[5]
                 unit_2 = int(row[6])
                 if self.get_data_format() == 'NWB':
-                        # excel list: directory| spike group| unit_no
+                    # excel list: directory| spike group| unit_no
                     hdf_name = row[4] + os.sep + row[5] + '.hdf5'
                     spike_file = hdf_name + '/processing/Shank' + '/' + row[6]
                 info['spike_2'].append(spike_file)
@@ -1540,11 +1588,14 @@ class NeuroChaT(QtCore.QThread):
                         'Evaluating unit similarity row: ' + str(i + 1))
                     if os.path.exists(info['spike_1']) and os.path.exists(info['spike_2']):
                         nclust_1.load(
-                            filename=info['spike_1'], system=self.get_data_format())
+                            filename=info['spike_1'],
+                            system=self.get_data_format())
                         nclust_2.load(
-                            filename=info['spike_2'], system=self.get_data_format())
-                        bc, dh = nclust_1.cluster_similarity(nclust=nclust_2,
-                                                             unit_1=info['unit_1'][i], unit_2=info['unit_2'][i])
+                            filename=info['spike_2'],
+                            system=self.get_data_format())
+                        bc, dh = nclust_1.cluster_similarity(
+                            nclust=nclust_2,
+                            unit_1=info['unit_1'][i], unit_2=info['unit_2'][i])
                         excel_info.loc[i, 'BC'] = bc
                         excel_info.loc[i, 'Dh'] = dh
             excel_info.to_excel(excel_file, index=False)
@@ -1557,6 +1608,7 @@ class NeuroChaT(QtCore.QThread):
         Plot png images of place cell figures, looping over a directory.
 
         Currently only works for axona files, but can be extended.
+        Extension performed by supporting more formats in NDataContainer.
 
         Parameters
         ----------
@@ -1564,6 +1616,10 @@ class NeuroChaT(QtCore.QThread):
             The directory to get files from.
         dpi : int
             The desired dpi of the pngs.
+
+        Returns
+        -------
+        None
 
         """
         try:
