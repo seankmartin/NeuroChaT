@@ -19,8 +19,8 @@ class NAbstract(object):
     """
     NAbstract includes a number of attributes and methods common in NC.
 
-    NAbstract is the abstract class which includes a number of attributes and
-    methods commonly used by most other data types.
+    NAbstract is the abstract class which includes a number of
+    attributes and methods commonly used by most other data types.
 
     """
 
@@ -539,9 +539,9 @@ class NBase(NAbstract):
     """
     NBase adds managing multiple spike or LFP datasets to NAbstract.
 
-    NBase is derived from NAbstract class.
-    And it implements additional functionalities for
-    managing multiple spike or LFP datasets to NAbstract.
+    NBase is derived from NAbstract class. And it implements additional
+    functionalities for managing multiple spike or LFP datasets to
+    NAbstract.
 
     """
 
@@ -1014,7 +1014,7 @@ class NBase(NAbstract):
         cls
             Class of node to be added
         node
-            Either an object of `cls`or or a Class. 
+            Either an object of `cls`or or a Class.
             If None, new instance of `cls` is returned.
         node_type : str
             Type of the data node
