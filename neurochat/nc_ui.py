@@ -574,8 +574,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         excel_file = QtCore.QDir.toNativeSeparators(
             QtWidgets.QFileDialog.getSaveFileName(
-                self, 'Export analysis results to...', 
-                os.getcwd() + os.sep + 'nc_results.xlsx', 
+                self, 'Export analysis results to...',
+                os.getcwd() + os.sep + 'nc_results.xlsx',
                 "Excel Files (*.xlsx .*xls)")[0]
         )
         if not excel_file:
@@ -601,8 +601,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         excel_file = QtCore.QDir.toNativeSeparators(
             QtWidgets.QFileDialog.getSaveFileName(
-                self, 'Export information to...', 
-                os.getcwd() + os.sep + 'nc_graphicInfo.xlsx', 
+                self, 'Export information to...',
+                os.getcwd() + os.sep + 'nc_graphicInfo.xlsx',
                 "Excel Files (*.xlsx .*xls)")[0]
         )
         if not excel_file:

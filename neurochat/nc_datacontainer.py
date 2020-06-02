@@ -969,7 +969,7 @@ class NDataContainer():
             raise IndexError("index {} is out of range {} for {}".format(
                 index, len(self) - 1, self))
         else:
-            running_sum, running_idx=0, 0
+            running_sum, running_idx = 0, 0
             for count in counts:
                 if index < (running_sum + count):
                     return running_idx, (index - running_sum)

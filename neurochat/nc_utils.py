@@ -129,7 +129,7 @@ def bhatt(X1, X2):
             d = 0.125 * dmu@(dmu.T) + 0.5 * np.log(nalg.det(C) /
                                                    np.sqrt(nalg.det(C1) * nalg.det(C2)))
         except:
-            d = 0.125 * dmu@(dmu.T) + 0.5 * np.log(np.abs(nalg.det(C@
+            d = 0.125 * dmu@(dmu.T) + 0.5 * np.log(np.abs(nalg.det(C @
                                                                    nalg.inv(scipy.linalg.sqrtm(C1@C2)))))
         bc = np.exp(-1 * d)
 

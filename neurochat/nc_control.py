@@ -31,6 +31,7 @@ import matplotlib.figure
 
 from matplotlib.backends.backend_pdf import PdfPages
 
+
 class NeuroChaT(QtCore.QThread):
     """
     The NeuroChaT object is the controller object in NeuroChaT and works as the
@@ -41,8 +42,9 @@ class NeuroChaT(QtCore.QThread):
     GUI to the rest of the NeuroChaT elements.
 
     """
-    
+
     finished = QtCore.pyqtSignal()
+
     def __init__(self, config=Configuration(), data=NData(), parent=None):
         """
         Attributes
@@ -55,16 +57,16 @@ class NeuroChaT(QtCore.QThread):
             Central logger object
         hdf : Nhdf
             A Nhdf object
-            
+
         """
-        
+
         super().__init__(parent)
         self.ndata = data
         self.config = config
         self.log = NLog()
         self.hdf = Nhdf()
         self.reset()
-        
+
     def reset(self):
         """
         Reset NeuroChaT's internal attributes and prepares it for another set
@@ -79,7 +81,7 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         self.__count = 0
         self.nwb_files = []
         self.graphic_files = []
@@ -87,7 +89,7 @@ class NeuroChaT(QtCore.QThread):
         self.results = []
         self.save_to_file = False
         self._pdf_file = None
-        
+
         if not self.get_graphic_format():
             self.set_graphic_format('PDF')
         nc_plot.set_backend(self.get_graphic_format())
@@ -109,7 +111,7 @@ class NeuroChaT(QtCore.QThread):
             the name of the NWB files
 
         """
-        
+
         op_files = {'Graphics Files': self.graphic_files,
                     'NWB Files': self.nwb_files}
         op_files = pd.DataFrame.from_dict(op_files)
@@ -132,9 +134,10 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
-        self.results.append(_results.copy()) # without copy, list contains a reference to the original dictionary, and old results are replaced by the new one
-        
+
+        # without copy, list contains a reference to the original dictionary, and old results are replaced by the new one
+        self.results.append(_results.copy())
+
     def get_results(self):
         """
         Returns the parametric results of the analyses.
@@ -158,7 +161,7 @@ class NeuroChaT(QtCore.QThread):
         except Exception as ex:
             log_exception(
                 ex, "Error in getting results")
-        
+
         return results
 
     def open_pdf(self, filename=None):
@@ -176,12 +179,12 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         if filename is not None:
             words = filename.split(os.sep)
             directory = os.sep.join(words[:-1])
             if os.path.exists(directory):
-                self._pdf_file = filename # Current PDF file being handled
+                self._pdf_file = filename  # Current PDF file being handled
                 try:
                     self.pdf = PdfPages(self._pdf_file)
                     self.save_to_file = True
@@ -211,10 +214,10 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         if self._pdf_file is not None:
             self.pdf.close()
-            logging.info('Output graphics saved to '+ self._pdf_file)
+            logging.info('Output graphics saved to ' + self._pdf_file)
         else:
             logging.warning('No PDF file for graphic output!')
 
@@ -234,7 +237,7 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         if isinstance(fig, (tuple, list)):
             for f in fig:
                 if isinstance(f, matplotlib.figure.Figure):
@@ -242,7 +245,8 @@ class NeuroChaT(QtCore.QThread):
                         try:
                             self.pdf.savefig(f, dpi=400)
                         except PermissionError:
-                            logging.error("Please close pdf before saving output to it")
+                            logging.error(
+                                "Please close pdf before saving output to it")
                     plt.close(f)
                 else:
                     logging.error('Invalid matplotlib.figure instance')
@@ -251,7 +255,8 @@ class NeuroChaT(QtCore.QThread):
                 try:
                     self.pdf.savefig(fig)
                 except PermissionError:
-                    logging.error("Please close pdf before saving output to it")
+                    logging.error(
+                        "Please close pdf before saving output to it")
             plt.close(fig)
         else:
             logging.error('Invalid matplotlib.figure instance')
@@ -271,7 +276,6 @@ class NeuroChaT(QtCore.QThread):
 
         """
 
-    
         self.reset()
         verified = True
         # Deduce the configuration
@@ -295,11 +299,11 @@ class NeuroChaT(QtCore.QThread):
                 else:
                     logging.error('No analysis method has been selected')
         else:
-            # Could take this to mode, 
+            # Could take this to mode,
             # but replication would occur for each data format
             mode_id = self.get_analysis_mode()[1]
             if (mode_id == 0 or mode_id == 1) and \
-                (self.get_data_format() == 'Axona' or self.get_data_format() == 'Neuralynx'):
+                    (self.get_data_format() == 'Axona' or self.get_data_format() == 'Neuralynx'):
                 if not os.path.isfile(self.get_spike_file()):
                     verified = False
                     logging.error('Spike file does not exist')
@@ -334,11 +338,12 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
-        info = {'spat': [], 'spike': [], 'unit': [], 'lfp': [], 'nwb': [], 'graphics': [], 'cellid': []}
+
+        info = {'spat': [], 'spike': [], 'unit': [],
+                'lfp': [], 'nwb': [], 'graphics': [], 'cellid': []}
         mode_id = self.get_analysis_mode()[1]
         # All the cells in the same tetrode will use the same lfp channel
-        if mode_id == 0 or mode_id == 1: 
+        if mode_id == 0 or mode_id == 1:
             spatial_file = self.get_spatial_file()
             spike_file = self.get_spike_file()
             lfp_file = self.get_lfp_file()
@@ -346,7 +351,8 @@ class NeuroChaT(QtCore.QThread):
             self.ndata.set_spike_file(spike_file)
             self.ndata.load_spike()
 
-            units = [self.get_unit_no()] if mode_id == 0 else self.ndata.get_unit_list()
+            units = [
+                self.get_unit_no()] if mode_id == 0 else self.ndata.get_unit_list()
             if not units:
                 logging.error('No unit found in analysis')
             else:
@@ -371,15 +377,15 @@ class NeuroChaT(QtCore.QThread):
                         lfp_file = remove_extension(spike_file) + lfp_id
 
                     elif self.get_data_format() == 'Neuralynx':
-                        spatial_file = row[1] + os.sep+ row[2]+ '.nvt'
-                        lfp_file = row[1]+ os.sep+ lfp_id+ '.ncs'
+                        spatial_file = row[1] + os.sep + row[2] + '.nvt'
+                        lfp_file = row[1] + os.sep + lfp_id + '.ncs'
 
                     elif self.get_data_format() == 'NWB':
                         # excel list: directory| hdf5 file name w/o extension| spike group| unit_no| lfp group
-                        hdf_name = row[1] + os.sep+ row[2]+ '.hdf5'
-                        spike_file = hdf_name+ '/processing/Shank/' + row[3]
-                        spatial_file = hdf_name+ '+/processing/Behavioural/Position'
-                        lfp_file = hdf_name+ '+/processing/Neural Continuous/LFP/' + lfp_id
+                        hdf_name = row[1] + os.sep + row[2] + '.hdf5'
+                        spike_file = hdf_name + '/processing/Shank/' + row[3]
+                        spatial_file = hdf_name + '+/processing/Behavioural/Position'
+                        lfp_file = hdf_name + '+/processing/Neural Continuous/LFP/' + lfp_id
 
                     info['spat'].append(spatial_file)
                     info['spike'].append(spike_file)
@@ -397,11 +403,12 @@ class NeuroChaT(QtCore.QThread):
 
                 self.ndata.reset_results()
 
-                cell_id = self.hdf.resolve_analysis_path(spike=self.ndata.spike, lfp=self.ndata.lfp)
+                cell_id = self.hdf.resolve_analysis_path(
+                    spike=self.ndata.spike, lfp=self.ndata.lfp)
                 nwb_name = self.hdf.resolve_hdfname(data=self.ndata.spike)
                 pdf_name = (
                     remove_extension(nwb_name, keep_dot=False) +
-                    '_' + cell_id+ '.' + self.get_graphic_format())
+                    '_' + cell_id + '.' + self.get_graphic_format())
 
                 info['nwb'].append(nwb_name)
                 info['cellid'].append(cell_id)
@@ -411,11 +418,11 @@ class NeuroChaT(QtCore.QThread):
 
                 fig = plt.figure()
                 ax = fig.add_subplot(111)
-                ax.text(0.1, 0.6, 'Cell ID = '+ cell_id+ '\n'+ \
-                        'HDF5 file = '+ nwb_name.split(os.sep)[-1]+ '\n'+ \
-                        'Graphics file = '+ pdf_name.split(os.sep)[-1], \
-                        horizontalalignment='left', \
-                        verticalalignment='center',\
+                ax.text(0.1, 0.6, 'Cell ID = ' + cell_id + '\n' +
+                        'HDF5 file = ' + nwb_name.split(os.sep)[-1] + '\n' +
+                        'Graphics file = ' + pdf_name.split(os.sep)[-1],
+                        horizontalalignment='left',
+                        verticalalignment='center',
                         transform=ax.transAxes,
                         clip_on=True)
                 ax.set_axis_off()
@@ -423,8 +430,8 @@ class NeuroChaT(QtCore.QThread):
 
                 # Set and open hdf5 file for saving graph data within self.execute()
                 self.hdf.set_filename(nwb_name)
-                if '/analysis/'+ cell_id in self.hdf.f:
-                    del self.hdf.f['/analysis/'+ cell_id]
+                if '/analysis/' + cell_id in self.hdf.f:
+                    del self.hdf.f['/analysis/' + cell_id]
                 self.execute(name=cell_id)
 
                 self.close_pdf()
@@ -432,15 +439,16 @@ class NeuroChaT(QtCore.QThread):
                 _results = self.ndata.get_results()
 
                 self.update_results(_results)
-                self.hdf.save_dict_recursive(path='/analysis/'+ cell_id+ '/', name='results', data=_results)
+                self.hdf.save_dict_recursive(
+                    path='/analysis/' + cell_id + '/', name='results', data=_results)
 
                 self.hdf.close()
-                self.ndata.save_to_hdf5() # Saving data to hdf file
+                self.ndata.save_to_hdf5()  # Saving data to hdf file
 
                 self.__count += 1
                 logging.info('Units already analyzed = ' + str(self.__count))
 
-        logging.info('Total cell analyzed: '+ str(self.__count))
+        logging.info('Total cell analyzed: ' + str(self.__count))
         self.cellid = info['cellid']
         self.nwb_files = info['nwb']
         self.graphic_files = info['graphics']
@@ -462,7 +470,7 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         try:
             logging.info('Calculating environmental border...')
             self.set_border(self.calc_border())
@@ -473,10 +481,12 @@ class NeuroChaT(QtCore.QThread):
         if self.get_analysis('wave_property'):
             logging.info('Assessing waveform properties...')
             try:
-                graph_data = self.wave_property() # gd = graph_data
-                fig = nc_plot.wave_property(graph_data, [int(self.get_total_channels()/2), 2])
+                graph_data = self.wave_property()  # gd = graph_data
+                fig = nc_plot.wave_property(
+                    graph_data, [int(self.get_total_channels()/2), 2])
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/waveProperty/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/waveProperty/', graph_data=graph_data)
             except:
                 logging.error('Error in assessing waveform property')
 
@@ -484,143 +494,161 @@ class NeuroChaT(QtCore.QThread):
             # ISI analysis
             logging.info('Calculating inter-spike interval distribution...')
             try:
-                params= self.get_params_by_analysis('isi')
+                params = self.get_params_by_analysis('isi')
                 graph_data = self.isi(
                     bins=int(params['isi_length']/params['isi_bin']),
                     bound=[0, params['isi_length']],
                     refractory_threshold=params['isi_refractory'])
                 fig = nc_plot.isi(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/isi/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/isi/', graph_data=graph_data)
             except Exception as ex:
                 log_exception(
                     ex, 'Error in assessing interspike interval distribution')
 
         if self.get_analysis('isi_corr'):
-            ##Autocorr 1000ms
-            logging.info('Calculating inter-spike interval autocorrelation histogram...')
+            # Autocorr 1000ms
+            logging.info(
+                'Calculating inter-spike interval autocorrelation histogram...')
             try:
-                params= self.get_params_by_analysis('isi_corr')
+                params = self.get_params_by_analysis('isi_corr')
 
-                graph_data = self.isi_corr(bins=params['isi_corr_bin_long'], \
-                                        bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
+                graph_data = self.isi_corr(bins=params['isi_corr_bin_long'],
+                                           bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
                 fig = nc_plot.isi_corr(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/isiCorrLong/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/isiCorrLong/', graph_data=graph_data)
                 # Autocorr 10ms
-                graph_data = self.isi_corr(bins=params['isi_corr_bin_short'], \
-                                        bound=[-params['isi_corr_len_short'], params['isi_corr_len_short']])
+                graph_data = self.isi_corr(bins=params['isi_corr_bin_short'],
+                                           bound=[-params['isi_corr_len_short'], params['isi_corr_len_short']])
                 fig = nc_plot.isi_corr(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/isiCorrShort/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/isiCorrShort/', graph_data=graph_data)
             except:
                 logging.error('Error in assessing ISI autocorrelation')
 
         if self.get_analysis('theta_cell'):
-            ## Theta-Index analysis
+            # Theta-Index analysis
             logging.info('Estimating theta-modulation index...')
             try:
-                params= self.get_params_by_analysis('theta_cell')
+                params = self.get_params_by_analysis('theta_cell')
 
-                graph_data = self.theta_index(start=[params['theta_cell_freq_start'], params['theta_cell_tau1_start'], params['theta_cell_tau2_start']], \
-                               lower=[params['theta_cell_freq_min'], 0, 0], \
-                               upper=[params['theta_cell_freq_max'], params['theta_cell_tau1_max'], params['theta_cell_tau2_max']], \
-                               bins=params['isi_corr_bin_long'], \
-                               bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
+                graph_data = self.theta_index(start=[params['theta_cell_freq_start'], params['theta_cell_tau1_start'], params['theta_cell_tau2_start']],
+                                              lower=[
+                                                  params['theta_cell_freq_min'], 0, 0],
+                                              upper=[
+                                                  params['theta_cell_freq_max'], params['theta_cell_tau1_max'], params['theta_cell_tau2_max']],
+                                              bins=params['isi_corr_bin_long'],
+                                              bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
                 fig = nc_plot.theta_cell(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/theta_cell/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/theta_cell/', graph_data=graph_data)
             except:
                 logging.error('Error in theta-index analysis')
 
         if self.get_analysis('theta_skip_cell'):
             logging.info('Estimating theta-skipping index...')
             try:
-                params= self.get_params_by_analysis('theta_cell')
+                params = self.get_params_by_analysis('theta_cell')
 
-                graph_data = self.theta_skip_index(start=[params['theta_cell_freq_start'], params['theta_cell_tau1_start'], params['theta_cell_tau2_start']], \
-                               lower=[params['theta_cell_freq_min'], 0, 0], \
-                               upper=[params['theta_cell_freq_max'], params['theta_cell_tau1_max'], params['theta_cell_tau2_max']], \
-                               bins=params['isi_corr_bin_long'], \
-                               bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
+                graph_data = self.theta_skip_index(start=[params['theta_cell_freq_start'], params['theta_cell_tau1_start'], params['theta_cell_tau2_start']],
+                                                   lower=[
+                                                       params['theta_cell_freq_min'], 0, 0],
+                                                   upper=[
+                                                       params['theta_cell_freq_max'], params['theta_cell_tau1_max'], params['theta_cell_tau2_max']],
+                                                   bins=params['isi_corr_bin_long'],
+                                                   bound=[-params['isi_corr_len_long'], params['isi_corr_len_long']])
                 fig = nc_plot.theta_cell(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/theta_skip_cell/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/theta_skip_cell/', graph_data=graph_data)
             except:
                 logging.error('Error in theta-skipping cell index analysis')
 
         if self.get_analysis('burst'):
-            ### Burst analysis
+            # Burst analysis
             logging.info('Analyzing bursting property...')
             try:
-                params= self.get_params_by_analysis('burst')
+                params = self.get_params_by_analysis('burst')
 
-                self.burst(burst_thresh=params['burst_thresh'],\
+                self.burst(burst_thresh=params['burst_thresh'],
                            ibi_thresh=params['ibi_thresh'])
             except:
                 logging.error('Error in analysing bursting property')
 
         if self.get_analysis('speed'):
-            ## Speed analysis
+            # Speed analysis
             logging.info('Calculating spike-rate vs running speed...')
             try:
-                params= self.get_params_by_analysis('speed')
+                params = self.get_params_by_analysis('speed')
 
-                graph_data = self.speed(range=[params['speed_min'], params['speed_max']], \
-                                      binsize=params['speed_bin'], update=True)
+                graph_data = self.speed(range=[params['speed_min'], params['speed_max']],
+                                        binsize=params['speed_bin'], update=True)
                 fig = nc_plot.speed(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/speed/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/speed/', graph_data=graph_data)
             except:
                 logging.error('Error in analysis of spike rate vs speed')
 
         if self.get_analysis('ang_vel'):
-            ## Angular velocity analysis
+            # Angular velocity analysis
             logging.info('Calculating spike-rate vs angular head velocity...')
             try:
-                params= self.get_params_by_analysis('ang_vel')
+                params = self.get_params_by_analysis('ang_vel')
 
-                graph_data = self.angular_velocity(range=[params['ang_vel_min'], params['ang_vel_max']], \
-                                    binsize=params['ang_vel_bin'], cutoff=params['ang_vel_cutoff'], update=True)
+                graph_data = self.angular_velocity(range=[params['ang_vel_min'], params['ang_vel_max']],
+                                                   binsize=params['ang_vel_bin'], cutoff=params['ang_vel_cutoff'], update=True)
                 fig = nc_plot.angular_velocity(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/ang_vel/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/ang_vel/', graph_data=graph_data)
             except:
-                logging.error('Error in analysis of spike rate vs angular velocity')
+                logging.error(
+                    'Error in analysis of spike rate vs angular velocity')
 
         if self.get_analysis('hd_rate'):
             logging.info('Assessing head-directional tuning...')
             try:
-                params= self.get_params_by_analysis('hd_rate')
+                params = self.get_params_by_analysis('hd_rate')
 
-                hdData = self.hd_rate(binsize=params['hd_bin'], \
-                        filter=['b', params['hd_rate_kern_len']],\
-                        pixel=params['loc_pixel_size'], update=True)
+                hdData = self.hd_rate(binsize=params['hd_bin'],
+                                      filter=['b', params['hd_rate_kern_len']],
+                                      pixel=params['loc_pixel_size'], update=True)
                 fig = nc_plot.hd_firing(hdData)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/hd_rate/', graph_data=hdData)
+                self.plot_data_to_hdf(
+                    name=name + '/hd_rate/', graph_data=hdData)
 
-                hdData = self.hd_rate_ccw(binsize=params['hd_bin'], \
-                        filter=['b', params['hd_rate_kern_len']],\
-                        thresh=params['hd_ang_vel_cutoff'],\
-                        pixel=params['loc_pixel_size'], update=True)
+                hdData = self.hd_rate_ccw(binsize=params['hd_bin'],
+                                          filter=[
+                                              'b', params['hd_rate_kern_len']],
+                                          thresh=params['hd_ang_vel_cutoff'],
+                                          pixel=params['loc_pixel_size'], update=True)
                 fig = nc_plot.hd_rate_ccw(hdData)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/hd_rate_CCW/', graph_data=hdData)
+                self.plot_data_to_hdf(
+                    name=name + '/hd_rate_CCW/', graph_data=hdData)
 
             except:
-                logging.error('Error in analysis of spike rate vs head direction')
+                logging.error(
+                    'Error in analysis of spike rate vs head direction')
 
         if self.get_analysis('hd_shuffle'):
             logging.info('Shuffling analysis of head-directional tuning...')
             try:
-                params= self.get_params_by_analysis('hd_shuffle')
+                params = self.get_params_by_analysis('hd_shuffle')
 
-                graph_data = self.hd_shuffle(bins=params['hd_shuffle_bins'], \
-                                          nshuff=params['hd_shuffle_total'], limit=params['hd_shuffle_limit'])
+                graph_data = self.hd_shuffle(bins=params['hd_shuffle_bins'],
+                                             nshuff=params['hd_shuffle_total'], limit=params['hd_shuffle_limit'])
                 fig = nc_plot.hd_shuffle(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/hd_shuffle/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/hd_shuffle/', graph_data=graph_data)
             except:
                 logging.error('Error in head directional shuffling analysis')
 
@@ -634,7 +662,8 @@ class NeuroChaT(QtCore.QThread):
 
                 fig = nc_plot.hd_rate_time_lapse(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/hd_time_lapse/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/hd_time_lapse/', graph_data=graph_data)
 
             except:
                 logging.error('Error in locational time-lapse analysis')
@@ -642,21 +671,23 @@ class NeuroChaT(QtCore.QThread):
         if self.get_analysis('hd_time_shift'):
             logging.info('Time-shift analysis of head-directional tuning...')
             try:
-                params= self.get_params_by_analysis('hd_time_shift')
+                params = self.get_params_by_analysis('hd_time_shift')
 
-                hdData = self.hd_shift(shift_ind=np.arange(params['hd_shift_min'], \
-                                                        params['hd_shift_max']+ params['hd_shift_step'], \
-                                                        params['hd_shift_step']))
+                hdData = self.hd_shift(shift_ind=np.arange(params['hd_shift_min'],
+                                                           params['hd_shift_max'] +
+                                                           params['hd_shift_step'],
+                                                           params['hd_shift_step']))
                 fig = nc_plot.hd_time_shift(hdData)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/hd_time_shift/', graph_data=hdData)
+                self.plot_data_to_hdf(
+                    name=name + '/hd_time_shift/', graph_data=hdData)
             except:
                 logging.error('Error in head directional time-shift analysis')
 
         if self.get_analysis('loc_rate'):
             logging.info('Assessing of locational tuning...')
             try:
-                params= self.get_params_by_analysis('loc_rate')
+                params = self.get_params_by_analysis('loc_rate')
 
                 if params['loc_rate_filter'] == 'Gaussian':
                     filttype = 'g'
@@ -664,21 +695,22 @@ class NeuroChaT(QtCore.QThread):
                     filttype = 'b'
 
                 place_data = self.ndata.place(
-                              pixel=params['loc_pixel_size'],
-                              chop_bound=params['loc_chop_bound'],
-                              filter=[filttype, params['loc_rate_kern_len']],
-                              fieldThresh=params['loc_field_thresh'],
-                              smoothPlace=params['loc_field_smooth'],
-                              brAdjust=True, update=True)
+                    pixel=params['loc_pixel_size'],
+                    chop_bound=params['loc_chop_bound'],
+                    filter=[filttype, params['loc_rate_kern_len']],
+                    fieldThresh=params['loc_field_thresh'],
+                    smoothPlace=params['loc_field_smooth'],
+                    brAdjust=True, update=True)
                 fig1 = nc_plot.loc_firing(
                     place_data, colormap=params['loc_colormap'],
-                    style = params['loc_style'])
+                    style=params['loc_style'])
                 self.close_fig(fig1)
                 fig2 = nc_plot.loc_firing_and_place(
                     place_data, colormap=params['loc_colormap'],
-                    style = params['loc_style'])
+                    style=params['loc_style'])
                 self.close_fig(fig2)
-                self.plot_data_to_hdf(name=name+ '/loc_rate/', graph_data=place_data)
+                self.plot_data_to_hdf(
+                    name=name + '/loc_rate/', graph_data=place_data)
 
             except:
                 logging.error('Error in analysis of locational firing rate')
@@ -686,99 +718,111 @@ class NeuroChaT(QtCore.QThread):
         if self.get_analysis('loc_shuffle'):
             logging.info('Shuffling analysis of locational tuning...')
             try:
-                params= self.get_params_by_analysis('loc_shuffle')
+                params = self.get_params_by_analysis('loc_shuffle')
 
                 if params['loc_rate_filter'] == 'Gaussian':
                     filttype = 'g'
                 else:
                     filttype = 'b'
 
-                place_data = self.loc_shuffle(bins=params['loc_shuffle_nbins'], \
-                                          nshuff=params['loc_shuffle_total'], \
-                                          limit=params['loc_shuffle_limit'], \
-                                          pixel=params['loc_pixel_size'], \
-                                          chop_bound=params['loc_chop_bound'], \
-                                          filter=[filttype, params['loc_rate_kern_len']],\
-                                          brAdjust=True, update=False)
+                place_data = self.loc_shuffle(bins=params['loc_shuffle_nbins'],
+                                              nshuff=params['loc_shuffle_total'],
+                                              limit=params['loc_shuffle_limit'],
+                                              pixel=params['loc_pixel_size'],
+                                              chop_bound=params['loc_chop_bound'],
+                                              filter=[
+                                                  filttype, params['loc_rate_kern_len']],
+                                              brAdjust=True, update=False)
                 fig = nc_plot.loc_shuffle(place_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/loc_shuffle/', graph_data=place_data)
+                self.plot_data_to_hdf(
+                    name=name + '/loc_shuffle/', graph_data=place_data)
             except:
                 logging.error('Error in locational shiffling analysis')
 
         if self.get_analysis('loc_time_lapse'):
             logging.info('Time-lapse analysis of locational tuning...')
             try:
-                params= self.get_params_by_analysis('loc_time_lapse')
+                params = self.get_params_by_analysis('loc_time_lapse')
 
                 if params['loc_rate_filter'] == 'Gaussian':
                     filttype = 'g'
                 else:
                     filttype = 'b'
 
-                graph_data = self.loc_time_lapse(pixel=params['loc_pixel_size'], \
-                              chop_bound=params['loc_chop_bound'],\
-                              filter=[filttype, params['loc_rate_kern_len']],\
-                              brAdjust=True)
+                graph_data = self.loc_time_lapse(pixel=params['loc_pixel_size'],
+                                                 chop_bound=params['loc_chop_bound'],
+                                                 filter=[
+                                                     filttype, params['loc_rate_kern_len']],
+                                                 brAdjust=True)
 
                 fig = nc_plot.loc_spike_time_lapse(graph_data)
                 self.close_fig(fig)
 
                 fig = nc_plot.loc_rate_time_lapse(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/loc_time_lapse/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/loc_time_lapse/', graph_data=graph_data)
             except:
                 logging.error('Error in locational time-lapse analysis')
 
         if self.get_analysis('loc_time_shift'):
             logging.info('Time-shift analysis of locational tuning...')
             try:
-                params= self.get_params_by_analysis('loc_time_shift')
+                params = self.get_params_by_analysis('loc_time_shift')
 
                 if params['loc_rate_filter'] == 'Gaussian':
                     filttype = 'g'
                 else:
                     filttype = 'b'
 
-                plot_data = self.loc_shift(shift_ind=np.arange(params['loc_shift_min'], \
-                                        params['loc_shift_max']+ params['loc_shift_step'], \
-                                        params['loc_shift_step']), \
-                                        pixel=params['loc_pixel_size'], \
-                                        chop_bound=params['loc_chop_bound'], \
-                                        filter=[filttype, params['loc_rate_kern_len']],\
-                                        brAdjust=True, update=False)
+                plot_data = self.loc_shift(shift_ind=np.arange(params['loc_shift_min'],
+                                                               params['loc_shift_max'] +
+                                                               params['loc_shift_step'],
+                                                               params['loc_shift_step']),
+                                           pixel=params['loc_pixel_size'],
+                                           chop_bound=params['loc_chop_bound'],
+                                           filter=[
+                                               filttype, params['loc_rate_kern_len']],
+                                           brAdjust=True, update=False)
                 fig = nc_plot.loc_time_shift(plot_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/loc_time_shift/', graph_data=plot_data)
+                self.plot_data_to_hdf(
+                    name=name + '/loc_time_shift/', graph_data=plot_data)
             except:
                 logging.error('Error in locational time-shift analysis')
 
         if self.get_analysis('spatial_corr'):
-            logging.info('Spatial and rotational correlation of locational tuning...')
+            logging.info(
+                'Spatial and rotational correlation of locational tuning...')
             try:
-                params= self.get_params_by_analysis('spatial_corr')
+                params = self.get_params_by_analysis('spatial_corr')
 
                 if params['spatial_corr_filter'] == 'Gaussian':
                     filttype = 'g'
                 else:
                     filttype = 'b'
 
-                plot_data = self.loc_auto_corr(pixel=params['loc_pixel_size'], \
-                              chop_bound=params['loc_chop_bound'],\
-                              filter=[filttype, params['spatial_corr_kern_len']],\
-                              minPixel=params['spatial_corr_min_obs'], brAdjust=True)
+                plot_data = self.loc_auto_corr(pixel=params['loc_pixel_size'],
+                                               chop_bound=params['loc_chop_bound'],
+                                               filter=[
+                                                   filttype, params['spatial_corr_kern_len']],
+                                               minPixel=params['spatial_corr_min_obs'], brAdjust=True)
                 fig = nc_plot.loc_auto_corr(plot_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/spatial_corr/', graph_data=plot_data)
+                self.plot_data_to_hdf(
+                    name=name + '/spatial_corr/', graph_data=plot_data)
 
-                plot_data = self.loc_rot_corr(binsize=params['rot_corr_bin'], \
-                                          pixel=params['loc_pixel_size'], \
-                                          chop_bound=params['loc_chop_bound'],\
-                                          filter=[filttype, params['spatial_corr_kern_len']],\
-                                          minPixel=params['spatial_corr_min_obs'], brAdjust=True)
+                plot_data = self.loc_rot_corr(binsize=params['rot_corr_bin'],
+                                              pixel=params['loc_pixel_size'],
+                                              chop_bound=params['loc_chop_bound'],
+                                              filter=[
+                                                  filttype, params['spatial_corr_kern_len']],
+                                              minPixel=params['spatial_corr_min_obs'], brAdjust=True)
                 fig = nc_plot.rot_corr(plot_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/spatial_corr/', graph_data=plot_data)
+                self.plot_data_to_hdf(
+                    name=name + '/spatial_corr/', graph_data=plot_data)
 
             except:
                 logging.error('Error in assessing spatial autocorrelation')
@@ -786,23 +830,25 @@ class NeuroChaT(QtCore.QThread):
         if self.get_analysis('grid'):
             logging.info('Assessing gridness...')
             try:
-                params= self.get_params_by_analysis('grid')
+                params = self.get_params_by_analysis('grid')
 
                 if params['spatial_corr_filter'] == 'Gaussian':
                     filttype = 'g'
                 else:
                     filttype = 'b'
 
-                graph_data = self.grid(angtol=params['grid_ang_tol'],\
-                                     binsize=params['grid_ang_bin'], \
-                                     pixel=params['loc_pixel_size'], \
-                                     chop_bound=params['loc_chop_bound'],\
-                                     filter=[filttype, params['spatial_corr_kern_len']],\
-                                     minPixel=params['spatial_corr_min_obs'], \
-                                     brAdjust=True) # Add other paramaters
+                graph_data = self.grid(angtol=params['grid_ang_tol'],
+                                       binsize=params['grid_ang_bin'],
+                                       pixel=params['loc_pixel_size'],
+                                       chop_bound=params['loc_chop_bound'],
+                                       filter=[
+                                           filttype, params['spatial_corr_kern_len']],
+                                       minPixel=params['spatial_corr_min_obs'],
+                                       brAdjust=True)  # Add other paramaters
                 fig = nc_plot.grid(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/grid/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/grid/', graph_data=graph_data)
 
             except:
                 logging.error('Error in grid cell analysis')
@@ -810,62 +856,67 @@ class NeuroChaT(QtCore.QThread):
         if self.get_analysis('border'):
             logging.info('Estimating tuning to border...')
             try:
-                params= self.get_params_by_analysis('border')
+                params = self.get_params_by_analysis('border')
 
                 if params['loc_rate_filter'] == 'Gaussian':
                     filttype = 'g'
                 else:
                     filttype = 'b'
 
-                graph_data = self.border(update=True, thresh=params['border_firing_thresh'], \
-                                       cbinsize=params['border_ang_bin'], \
-                                       nstep=params['border_stair_steps'], \
-                                       pixel=params['loc_pixel_size'], \
-                                       chop_bound=params['loc_chop_bound'],\
-                                       filter=[filttype, params['loc_rate_kern_len']],\
-                                       brAdjust=True)
+                graph_data = self.border(update=True, thresh=params['border_firing_thresh'],
+                                         cbinsize=params['border_ang_bin'],
+                                         nstep=params['border_stair_steps'],
+                                         pixel=params['loc_pixel_size'],
+                                         chop_bound=params['loc_chop_bound'],
+                                         filter=[
+                                             filttype, params['loc_rate_kern_len']],
+                                         brAdjust=True)
 
                 fig = nc_plot.border(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/border/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/border/', graph_data=graph_data)
             except:
                 logging.error('Error in border cell analysis')
 
         if self.get_analysis('gradient'):
             logging.info('Calculating gradient-cell properties...')
             try:
-                params= self.get_params_by_analysis('gradient')
+                params = self.get_params_by_analysis('gradient')
 
                 if params['loc_rate_filter'] == 'Gaussian':
                     filttype = 'g'
                 else:
                     filttype = 'b'
 
-                graph_data = self.gradient(alim=params['grad_asymp_lim'], \
-                                         blim=params['grad_displace_lim'], \
-                                         clim=params['grad_growth_rate_lim'], \
-                                         pixel=params['loc_pixel_size'], \
-                                         chop_bound=params['loc_chop_bound'],\
-                                         filter=[filttype, params['loc_rate_kern_len']],\
-                                         brAdjust=True)
+                graph_data = self.gradient(alim=params['grad_asymp_lim'],
+                                           blim=params['grad_displace_lim'],
+                                           clim=params['grad_growth_rate_lim'],
+                                           pixel=params['loc_pixel_size'],
+                                           chop_bound=params['loc_chop_bound'],
+                                           filter=[
+                                               filttype, params['loc_rate_kern_len']],
+                                           brAdjust=True)
                 fig = nc_plot.gradient(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/gradient/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/gradient/', graph_data=graph_data)
             except:
                 logging.error('Error in gradient cell analysis')
 
         if self.get_analysis('multiple_regression'):
             logging.info('Multiple-regression analysis...')
             try:
-                params= self.get_params_by_analysis('multiple_regression')
+                params = self.get_params_by_analysis('multiple_regression')
 
-                graph_data = self.multiple_regression(nrep=params['mra_nrep'], \
-                                    episode=params['mra_episode'], \
-                                    subsampInterv=params['mra_interval'])
+                graph_data = self.multiple_regression(nrep=params['mra_nrep'],
+                                                      episode=params['mra_episode'],
+                                                      subsampInterv=params['mra_interval'])
 
                 fig = nc_plot.multiple_regression(graph_data)
-                self.close_fig(fig)                
-                self.plot_data_to_hdf(name=name+ '/multiple_regression/', graph_data=graph_data)
+                self.close_fig(fig)
+                self.plot_data_to_hdf(
+                    name=name + '/multiple_regression/', graph_data=graph_data)
             except Exception as ex:
                 log_exception(
                     ex, "in multiple-regression analysis")
@@ -874,41 +925,43 @@ class NeuroChaT(QtCore.QThread):
             # No plot
             logging.info('Assessing dependence of variables to...')
             try:
-                self.interdependence(pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40], \
-                                    abinsize=10, angvelrange=[-500, 500])
+                self.interdependence(pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40],
+                                     abinsize=10, angvelrange=[-500, 500])
             except:
                 logging.error('Error in interdependence analysis')
 
         if self.get_analysis('lfp_spectrum'):
             try:
-                params= self.get_params_by_analysis('lfp_spectrum')
+                params = self.get_params_by_analysis('lfp_spectrum')
 
-                graph_data = self.spectrum(window=params['lfp_pwelch_seg_size'],\
-                                         noverlap=params['lfp_pwelch_overlap'], \
-                                         nfft=params['lfp_pwelch_nfft'],\
-                                         ptype='psd', prefilt=True, \
-                                         filtset=[params['lfp_prefilt_order'], \
-                                                   params['lfp_prefilt_lowcut'], \
-                                                   params['lfp_prefilt_highcut'], 'bandpass'], \
-                                         fmax=params['lfp_pwelch_freq_max'],\
-                                         db=False, tr=False)
+                graph_data = self.spectrum(window=params['lfp_pwelch_seg_size'],
+                                           noverlap=params['lfp_pwelch_overlap'],
+                                           nfft=params['lfp_pwelch_nfft'],
+                                           ptype='psd', prefilt=True,
+                                           filtset=[params['lfp_prefilt_order'],
+                                                    params['lfp_prefilt_lowcut'],
+                                                    params['lfp_prefilt_highcut'], 'bandpass'],
+                                           fmax=params['lfp_pwelch_freq_max'],
+                                           db=False, tr=False)
                 fig = nc_plot.lfp_spectrum(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/lfp_spectrum/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/lfp_spectrum/', graph_data=graph_data)
 
-                graph_data = self.spectrum(window=params['lfp_stft_seg_size'],\
-                                         noverlap=params['lfp_stft_overlap'],\
-                                         nfft=params['lfp_stft_nfft'],\
-                                         ptype='psd', prefilt=True,\
-                                         filtset=[params['lfp_prefilt_order'], \
-                                                   params['lfp_prefilt_lowcut'], \
-                                                   params['lfp_prefilt_highcut'], 'bandpass'], \
-                                         fmax=params['lfp_stft_freq_max'],\
-                                         db=True, tr=True)
+                graph_data = self.spectrum(window=params['lfp_stft_seg_size'],
+                                           noverlap=params['lfp_stft_overlap'],
+                                           nfft=params['lfp_stft_nfft'],
+                                           ptype='psd', prefilt=True,
+                                           filtset=[params['lfp_prefilt_order'],
+                                                    params['lfp_prefilt_lowcut'],
+                                                    params['lfp_prefilt_highcut'], 'bandpass'],
+                                           fmax=params['lfp_stft_freq_max'],
+                                           db=True, tr=True)
                 fig = nc_plot.lfp_spectrum_tr(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/lfp_spectrum_TR/', graph_data=graph_data)
-                
+                self.plot_data_to_hdf(
+                    name=name + '/lfp_spectrum_TR/', graph_data=graph_data)
+
                 # These ranges are from Muessig et al. 2019
                 # Coordinated Emergence of Hippocampal Replay and
                 # Theta Sequences during Post - natal Development
@@ -919,33 +972,36 @@ class NeuroChaT(QtCore.QThread):
                 logging.error('Error in analyzing lfp spectrum')
 
         if self.get_analysis('spike_phase'):
-            ### Analysis of Phase distribution
+            # Analysis of Phase distribution
             logging.info('Analysing distribution of spike-phase in lfp...')
             try:
-                params= self.get_params_by_analysis('spike_phase')
+                params = self.get_params_by_analysis('spike_phase')
 
-                graph_data = self.phase_dist(binsize=params['phase_bin'], \
-                                           rbinsize=params['phase_raster_bin'],\
-                                           fwin=[params['phase_freq_min'], params['phase_freq_max']],\
-                                           pratio=params['phase_power_thresh'],\
-                                           aratio=params['phase_amp_thresh'],
-                                           filtset=[params['lfp_prefilt_order'],
-                                                    params['lfp_prefilt_lowcut'],
-                                                    params['lfp_prefilt_highcut'], 'bandpass'])
+                graph_data = self.phase_dist(binsize=params['phase_bin'],
+                                             rbinsize=params['phase_raster_bin'],
+                                             fwin=[params['phase_freq_min'],
+                                                   params['phase_freq_max']],
+                                             pratio=params['phase_power_thresh'],
+                                             aratio=params['phase_amp_thresh'],
+                                             filtset=[params['lfp_prefilt_order'],
+                                                      params['lfp_prefilt_lowcut'],
+                                                      params['lfp_prefilt_highcut'], 'bandpass'])
                 fig = nc_plot.spike_phase(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/spike_phase/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/spike_phase/', graph_data=graph_data)
 
             except:
                 logging.error('Error in assessing spike-phase distribution')
 
         if self.get_analysis('phase_lock'):
             # PLV with mode = None (all events or spikes)
-            logging.info('Analysis of Phase-locking value and spike-filed coherence...')
+            logging.info(
+                'Analysis of Phase-locking value and spike-filed coherence...')
             try:
-                params= self.get_params_by_analysis('phase_lock')
+                params = self.get_params_by_analysis('phase_lock')
 
-                reparam = {'window' : [params['phase_loc_win_low'], params['phase_loc_win_up']],
+                reparam = {'window': [params['phase_loc_win_low'], params['phase_loc_win_up']],
                            'nfft': params['phase_loc_nfft'],
                            'fwin': [2, params['phase_loc_freq_max']],
                            'nsample': 2000,
@@ -956,24 +1012,28 @@ class NeuroChaT(QtCore.QThread):
                 graph_data = self.plv(**reparam)
                 fig = nc_plot.plv_tr(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/phase_lock_TR/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/phase_lock_TR/', graph_data=graph_data)
 
                 reparam.update({'mode': 'bs', 'nsample': 100})
                 graph_data = self.plv(**reparam)
                 fig = nc_plot.plv_bs(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/phase_lock_BS/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/phase_lock_BS/', graph_data=graph_data)
 
                 reparam.update({'mode': None})
                 graph_data = self.plv(**reparam)
                 fig = nc_plot.plv(graph_data)
                 self.close_fig(fig)
-                self.plot_data_to_hdf(name=name+ '/phase_lock/', graph_data=graph_data)
+                self.plot_data_to_hdf(
+                    name=name + '/phase_lock/', graph_data=graph_data)
             except:
                 logging.error('Error in spike-phase locking analysis')
 
             if self.get_analysis('lfp_spike_causality'):
-                logging.warning('Unit-LFP analysis has not been implemented yet!')
+                logging.warning(
+                    'Unit-LFP analysis has not been implemented yet!')
 
     def open_hdf_file(self, filename=None):
         """
@@ -991,9 +1051,9 @@ class NeuroChaT(QtCore.QThread):
         """
         if not filename:
             filename = self.config.get_nwb_file()
-            
+
         self.hdf.set_filename(filename=filename)
-    
+
     def close_hdf_file(self):
         """
         Closes the HDF5 file object.
@@ -1007,9 +1067,9 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         self.hdf.close()
-        
+
     def get_hdf_groups(self, path=''):
         """
         Returns the names of groups or datasets in a path.
@@ -1025,9 +1085,9 @@ class NeuroChaT(QtCore.QThread):
             Names of the groups or datasets in the path
 
         """
-        
+
         return self.hdf.get_groups_in_path(path=path)
-    
+
     def exist_hdf_path(self, path=''):
         """
         Check and returns if an HDF5 file path exists.
@@ -1043,12 +1103,12 @@ class NeuroChaT(QtCore.QThread):
             True if the path exists
 
         """
-        
+
         exists = False
         if path in self.hdf.f:
             exists = True
         return exists
-        
+
     def plot_data_to_hdf(self, name=None, graph_data=None):
         """
         Stores plot data to the HDF5 file in the '/analysis/' path.
@@ -1065,9 +1125,9 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
-        self.hdf.save_dict_recursive(path='/analysis/', \
-             name=name, data=graph_data)
+
+        self.hdf.save_dict_recursive(path='/analysis/',
+                                     name=name, data=graph_data)
 
     def set_neuro_data(self, ndata):
         """
@@ -1083,14 +1143,14 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         if inspect.isclass(ndata):
             ndata = ndata()
         if isinstance(ndata, NData):
             self.ndata = ndata
         else:
             logging.warning('Inappropriate NeuroData object or class')
-            
+
     def get_neuro_data(self):
         """
         Returns the NData() object from this class.
@@ -1121,7 +1181,7 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         if inspect.isclass(config):
             config = config()
         if isinstance(config, Configuration):
@@ -1143,9 +1203,9 @@ class NeuroChaT(QtCore.QThread):
             NeuroChaT's config attribute
 
         """
-        
+
         return self.config
-    
+
     # Forwarding to configuration class
     def __getattr__(self, arg):
         if hasattr(self.config, arg):
@@ -1153,7 +1213,8 @@ class NeuroChaT(QtCore.QThread):
         elif hasattr(self.ndata, arg):
             return getattr(self.ndata, arg)
         else:
-            logging.warning('No '+ arg+ ' method or attribute in NeuroChaT class')
+            logging.warning(
+                'No ' + arg + ' method or attribute in NeuroChaT class')
 
     def convert_to_nwb(self, excel_file=None):
         """
@@ -1171,24 +1232,25 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         if self.get_data_format() == 'NWB':
-            logging.error('NWB files do not need to be converted! Check file format option again!')
+            logging.error(
+                'NWB files do not need to be converted! Check file format option again!')
         info = {'spat': [], 'spike': [], 'lfp': []}
         export_info = oDict({'dir': [], 'nwb': [], 'spike': [], 'lfp': []})
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
             for row in excel_info.itertuples():
-                spike_file = row[1]+ os.sep+ row[3]
+                spike_file = row[1] + os.sep + row[3]
                 lfp_id = row[4]
 
                 if self.get_data_format() == 'Axona':
-                    spatial_file = row[1]+ os.sep+ row[2]+ '.txt'
+                    spatial_file = row[1] + os.sep + row[2] + '.txt'
                     lfp_file = remove_extension(spike_file) + lfp_id
 
                 elif self.get_data_format() == 'Neuralynx':
-                    spatial_file = row[1] + os.sep+ row[2]+ '.nvt'
-                    lfp_file = row[1]+ os.sep+ lfp_id+ '.ncs'
+                    spatial_file = row[1] + os.sep + row[2] + '.nvt'
+                    lfp_file = row[1] + os.sep + lfp_id + '.ncs'
 
                 info['spat'].append(spatial_file)
                 info['spike'].append(spike_file)
@@ -1197,7 +1259,7 @@ class NeuroChaT(QtCore.QThread):
         if info['spike']:
             for i, spike_file in enumerate(info['spike']):
 
-                logging.info('Converting file groups: '+ str(i+ 1))
+                logging.info('Converting file groups: ' + str(i + 1))
                 self.ndata.set_spatial_file(info['spat'][i])
                 self.ndata.set_spike_file(info['spike'][i])
                 self.ndata.set_lfp_file(info['lfp'][i])
@@ -1205,13 +1267,18 @@ class NeuroChaT(QtCore.QThread):
                 self.ndata.save_to_hdf5()
 
                 f_name = self.hdf.resolve_hdfname(data=self.ndata.spike)
-                export_info['dir'].append(os.sep.join(f_name.split(os.sep)[:-1]))
-                export_info['nwb'].append(f_name.split(os.sep)[-1].split('.')[0])
+                export_info['dir'].append(
+                    os.sep.join(f_name.split(os.sep)[:-1]))
+                export_info['nwb'].append(
+                    f_name.split(os.sep)[-1].split('.')[0])
 
-                export_info['spike'].append(self.hdf.get_file_tag(self.ndata.spike))
-                export_info['lfp'].append(self.hdf.get_file_tag(self.ndata.lfp))
+                export_info['spike'].append(
+                    self.hdf.get_file_tag(self.ndata.spike))
+                export_info['lfp'].append(
+                    self.hdf.get_file_tag(self.ndata.lfp))
 
-        export_info = pd.DataFrame(export_info, columns=['dir', 'nwb', 'spike', 'lfp'])
+        export_info = pd.DataFrame(export_info, columns=[
+                                   'dir', 'nwb', 'spike', 'lfp'])
         words = excel_file.split(os.sep)
         name = 'NWB_list_' + words[-1]
         export_info.to_excel(os.path.join(os.sep.join(words[:-1]), name))
@@ -1233,28 +1300,30 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         info = {'spike': [], 'unit': []}
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
             for row in excel_info.itertuples():
-                spike_file = row[1]+ os.sep+ row[3]
+                spike_file = row[1] + os.sep + row[3]
                 unit_no = int(row[4])
                 if self.get_data_format() == 'NWB':
-                # excel list: directory| spike group| unit_no
-                    hdf_name = row[1] + os.sep+ row[3]+ '.hdf5'
-                    spike_file = hdf_name+ '/processing/Shank'+ '/'+ row[4]
+                    # excel list: directory| spike group| unit_no
+                    hdf_name = row[1] + os.sep + row[3] + '.hdf5'
+                    spike_file = hdf_name + '/processing/Shank' + '/' + row[4]
                 info['spike'].append(spike_file)
                 info['unit'].append(unit_no)
             n_units = excel_info.shape[0]
 
-            excel_info = excel_info.assign(fileExists=pd.Series(np.zeros(n_units, dtype=bool)))
-            excel_info = excel_info.assign(unitExists=pd.Series(np.zeros(n_units, dtype=bool)))
+            excel_info = excel_info.assign(
+                fileExists=pd.Series(np.zeros(n_units, dtype=bool)))
+            excel_info = excel_info.assign(
+                unitExists=pd.Series(np.zeros(n_units, dtype=bool)))
 
             if info['spike']:
                 for i, spike_file in enumerate(info['spike']):
 
-                    logging.info('Verifying unit: '+ str(i+ 1))
+                    logging.info('Verifying unit: ' + str(i + 1))
                     if os.path.exists(spike_file):
                         excel_info.loc[i, 'fileExists'] = True
                         self.ndata.set_spike_file(spike_file)
@@ -1268,7 +1337,7 @@ class NeuroChaT(QtCore.QThread):
             logging.info('Verification process completed!')
         else:
             logging.error('Excel  file does not exist!')
-    
+
     def angle_calculation(self, excel_file=None, should_plot=True):
         """
         Takes a list of unit specifications and finds the angle between the
@@ -1285,7 +1354,7 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        params= self.get_params_by_analysis('loc_rate')
+        params = self.get_params_by_analysis('loc_rate')
 
         if params['loc_rate_filter'] == 'Gaussian':
             filttype = 'g'
@@ -1298,8 +1367,9 @@ class NeuroChaT(QtCore.QThread):
             return
 
         n_units = len(collection)
-        if (n_units % 3 != 0) :
-            logging.error("angle_calculation: Can't compute the angle for a number of units not divisible by 3, given " + str(n_units))
+        if (n_units % 3 != 0):
+            logging.error(
+                "angle_calculation: Can't compute the angle for a number of units not divisible by 3, given " + str(n_units))
             return
 
         excel_info = excel_info.assign(CentroidX=pd.Series(np.zeros(n_units)))
@@ -1310,7 +1380,7 @@ class NeuroChaT(QtCore.QThread):
             StrongPlaceField=pd.Series(np.zeros(n_units)))
         excel_info = excel_info.assign(
             Skaggs=pd.Series(np.zeros(n_units)))
-        
+
         centroids = []
         figs = []
         for i, data in enumerate(collection):
@@ -1333,7 +1403,7 @@ class NeuroChaT(QtCore.QThread):
                 fig = nc_plot.loc_firing_and_place(place_data)
                 figs.append(fig)
 
-            if (i + 1) % 3 == 0: #then spit out the angle
+            if (i + 1) % 3 == 0:  # then spit out the angle
                 first_centroid = centroids[0]
                 second_centroid = centroids[1]
                 angle = angle_between_points(
@@ -1341,12 +1411,12 @@ class NeuroChaT(QtCore.QThread):
                 excel_info.loc[i, "AngleInDegrees"] = angle
                 if should_plot:
                     fig = nc_plot.plot_angle_between_points(
-                        centroids, 
-                        place_data['xedges'].max(), 
+                        centroids,
+                        place_data['xedges'].max(),
                         place_data['yedges'].max())
                     figs.append(fig)
                 centroids = []
-        
+
         if should_plot:
             self.close_fig(figs)
 
@@ -1357,8 +1427,8 @@ class NeuroChaT(QtCore.QThread):
             excel_info.to_excel(output_file, index=False)
         except PermissionError:
             logging.warning(
-                "Please close the excel file to" 
-                + " write the result back to it at" 
+                "Please close the excel file to"
+                + " write the result back to it at"
                 + " {}".format(output_file))
 
         logging.info('Angle calculation completed! Value was {}'.format(angle))
@@ -1379,17 +1449,17 @@ class NeuroChaT(QtCore.QThread):
         None
 
         """
-        
+
         info = {'spike': [], 'unit': []}
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
             for row in excel_info.itertuples():
-                spike_file = row[1]+ os.sep+ row[2]
+                spike_file = row[1] + os.sep + row[2]
                 unit_no = int(row[3])
                 if self.get_data_format() == 'NWB':
-                # excel list: directory| spike group| unit_no
-                    hdf_name = row[1] + os.sep+ row[2]+ '.hdf5'
-                    spike_file = hdf_name+ '/processing/Shank'+ '/'+ row[3]
+                    # excel list: directory| spike group| unit_no
+                    hdf_name = row[1] + os.sep + row[2] + '.hdf5'
+                    spike_file = hdf_name + '/processing/Shank' + '/' + row[3]
                 info['spike'].append(spike_file)
                 info['unit'].append(unit_no)
             n_units = excel_info.shape[0]
@@ -1400,7 +1470,7 @@ class NeuroChaT(QtCore.QThread):
             if info['spike']:
                 for i, spike_file in enumerate(info['spike']):
 
-                    logging.info('Evaluating unit: '+ str(i+ 1))
+                    logging.info('Evaluating unit: ' + str(i + 1))
                     if os.path.exists(spike_file):
                         self.ndata.set_spike_file(spike_file)
                         self.ndata.load_spike()
@@ -1408,7 +1478,8 @@ class NeuroChaT(QtCore.QThread):
 
                         if info['unit'][i] in units:
                             nclust = NClust(spike=self.ndata.spike)
-                            bc, dh = nclust.cluster_separation(unit_no=info['unit'][i])
+                            bc, dh = nclust.cluster_separation(
+                                unit_no=info['unit'][i])
                             excel_info.loc[i, 'BC'] = np.max(bc)
                             excel_info.loc[i, 'Dh'] = np.min(dh)
             excel_info.to_excel(excel_file, index=False)
@@ -1438,37 +1509,42 @@ class NeuroChaT(QtCore.QThread):
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
             for row in excel_info.itertuples():
-                spike_file = row[1]+ os.sep+ row[2]
+                spike_file = row[1] + os.sep + row[2]
                 unit_1 = int(row[3])
                 if self.get_data_format() == 'NWB':
                         # excel list: directory| spike group| unit_no
-                    hdf_name = row[1] + os.sep+ row[2]+ '.hdf5'
-                    spike_file = hdf_name+ '/processing/Shank'+ '/'+ row[3]
+                    hdf_name = row[1] + os.sep + row[2] + '.hdf5'
+                    spike_file = hdf_name + '/processing/Shank' + '/' + row[3]
                 info['spike_1'].append(spike_file)
                 info['unit_1'].append(unit_1)
 
-                spike_file = row[4]+ os.sep+ row[5]
+                spike_file = row[4] + os.sep + row[5]
                 unit_2 = int(row[6])
                 if self.get_data_format() == 'NWB':
                         # excel list: directory| spike group| unit_no
-                    hdf_name = row[4] + os.sep+ row[5]+ '.hdf5'
-                    spike_file = hdf_name+ '/processing/Shank'+ '/'+ row[6]
+                    hdf_name = row[4] + os.sep + row[5] + '.hdf5'
+                    spike_file = hdf_name + '/processing/Shank' + '/' + row[6]
                 info['spike_2'].append(spike_file)
                 info['unit_2'].append(unit_2)
 
             n_comparison = excel_info.shape[0]
 
-            excel_info = excel_info.assign(BC=pd.Series(np.zeros(n_comparison)))
-            excel_info = excel_info.assign(Dh=pd.Series(np.zeros(n_comparison)))
+            excel_info = excel_info.assign(
+                BC=pd.Series(np.zeros(n_comparison)))
+            excel_info = excel_info.assign(
+                Dh=pd.Series(np.zeros(n_comparison)))
 
             if info['spike_1']:
                 for i in np.arange(n_comparison):
-                    logging.info('Evaluating unit similarity row: '+ str(i+ 1))
+                    logging.info(
+                        'Evaluating unit similarity row: ' + str(i + 1))
                     if os.path.exists(info['spike_1']) and os.path.exists(info['spike_2']):
-                        nclust_1.load(filename=info['spike_1'], system=self.get_data_format())
-                        nclust_2.load(filename=info['spike_2'], system=self.get_data_format())
-                        bc, dh = nclust_1.cluster_similarity(nclust=nclust_2, \
-                                unit_1=info['unit_1'][i], unit_2=info['unit_2'][i])
+                        nclust_1.load(
+                            filename=info['spike_1'], system=self.get_data_format())
+                        nclust_2.load(
+                            filename=info['spike_2'], system=self.get_data_format())
+                        bc, dh = nclust_1.cluster_similarity(nclust=nclust_2,
+                                                             unit_1=info['unit_1'][i], unit_2=info['unit_2'][i])
                         excel_info.loc[i, 'BC'] = bc
                         excel_info.loc[i, 'Dh'] = dh
             excel_info.to_excel(excel_file, index=False)
@@ -1493,10 +1569,11 @@ class NeuroChaT(QtCore.QThread):
         try:
             container = NDataContainer(load_on_fly=True)
             container.add_axona_files_from_dir(
-                directory, tetrode_list = [i for i in range(1, 17)])
+                directory, tetrode_list=[i for i in range(1, 17)])
             nca.place_cell_summary(
-                container, dpi=dpi, 
+                container, dpi=dpi,
                 filter_place_cells=False, filter_low_freq=False)
         except Exception as ex:
-            log_exception(ex, "In walking a directory for place cell summaries")
-        return 
+            log_exception(
+                ex, "In walking a directory for place cell summaries")
+        return
