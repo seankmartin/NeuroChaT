@@ -235,6 +235,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.view_help_act.triggered.connect(self.view_help)
         # self.tutorial_act.triggered.connect(self.tutorial)
         self.about_nc_act.triggered.connect(self.about_nc)
+        self.view_api_act.triggered.connect(self.view_api)
 
         self.verify_units_act.triggered.connect(self.verify_units)
         self.evaluate_act.triggered.connect(self.cluster_evaluate)
@@ -319,11 +320,13 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             "Select a folder to analyse units for place cells")
 
         self.view_help_act = self.help_menu.addAction(
-            "NeuroChaT documentation")
+            "NeuroChaT user interface guide")
         self.view_help_act.setShortcut(QtGui.QKeySequence("F1"))
         # self.tutorial_act = self.help_menu.addAction("NeuroChaT tutorial")
         # self.help_menu.addSeparator()
         self.about_nc_act = self.help_menu.addAction("About NeuroChaT")
+        self.view_api_act = self.help_menu.addAction(
+            "NeuroChaT API documentation")
 
     def selectGraphicFormatUi(self):
         """Sets up the graphic format selection panel in NeuroChaT GUI."""
@@ -1016,6 +1019,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             self._control.set_lfp_file(lfp_file)
 
     def view_help(self):
+        url = r"https://github.com/shanemomara/omaraneurolab/blob/master/NeuroChaT/docs/NeuroChaT%20User%20Guide.pdf"
+        webbrowser.open_new(url)
+
+    def view_api(self):
         script_dir = os.path.dirname(__file__)
         rel_path = "../docs/index.html"
         url = os.path.join(script_dir, rel_path)
