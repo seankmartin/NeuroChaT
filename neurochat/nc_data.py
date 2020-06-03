@@ -99,11 +99,14 @@ class NData():
 
     def get_results(self, spaces_to_underscores=False):
         """
-        Returns the parametric results of the analyses.
+        Return the parametric results of the analyses.
 
         Parameters
         ----------
-        None
+        spaces_to_underscores: bool
+            If True, any keys in the results dicts with spaces
+            will be converted to keys with underscores
+            this is useful for compatibility with R, as an example.
 
         Returns
         -------
@@ -111,8 +114,9 @@ class NData():
 
         """
         if spaces_to_underscores:
-            results = {x.replace(' ', '_'): v
-                       for x, v in self._results.items()}
+            results = oDict()
+            for x, v in self._results.items():
+                results[x.replace(' ', '_')] = v
             return results
         return self._results
 
