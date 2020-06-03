@@ -1035,6 +1035,7 @@ class NDataContainer():
                     running_idx += 1
 
     def __iter__(self):
+        """Iterate over all units in the container."""
         return NDataContainerIterator(self)
 
     # def merge(self, indices, force_equal_units=True):
