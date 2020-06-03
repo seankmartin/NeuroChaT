@@ -84,7 +84,7 @@ class Nhdf(object):
             self._filename = filename
         try:
             self.file()
-        except:
+        except BaseException:
             logging.error('Invalid file!')
 
     def get_file_object(self):
@@ -125,7 +125,7 @@ class Nhdf(object):
         try:
             self.f = h5py.File(self._filename, 'a')
             self.initialize()
-        except:
+        except BaseException:
             logging.error('Cannot open ' + self._filename)
 
         return self.f
@@ -208,7 +208,7 @@ class Nhdf(object):
         """
         try:
             data_type = data.get_type()
-        except:
+        except BaseException:
             logging.error('The type of the data cannot be extracted!')
 
         hdf_name = None
@@ -248,10 +248,11 @@ class Nhdf(object):
 
         """
 
-        # No resolution for NWB file, this function will not be called if the system == 'NWB'
+        # No resolution for NWB file, this function will not be called if the
+        # system == 'NWB'
         try:
             data_type = data.get_type()
-        except:
+        except BaseException:
             logging.error('The type of the data cannot be extracted!')
         path = None
         tag = self.get_file_tag(data)
@@ -284,7 +285,7 @@ class Nhdf(object):
         """
         try:
             data_type = data.get_type()
-        except:
+        except BaseException:
             logging.error('The type of the data cannot be extracted!')
         # data is one of NSpike or Nlfp instance
         tag = None
@@ -324,7 +325,7 @@ class Nhdf(object):
         # Each input is an object
         try:
             data_type = spike.get_type()
-        except:
+        except BaseException:
             logging.error('The type of the data cannot be extracted!')
 
         path = ''
@@ -338,7 +339,7 @@ class Nhdf(object):
 
         try:
             data_type = lfp.get_type()
-        except:
+        except BaseException:
             logging.error('The type of the data cannot be extracted!')
 
         if data_type == 'lfp':
@@ -383,11 +384,11 @@ class Nhdf(object):
                 data = [np.nan if item is None else item for item in data]
                 try:
                     data = np.array(data)
-                except:
+                except BaseException:
                     pass
             try:
                 g.create_dataset(name=name, data=data)
-            except:
+            except BaseException:
                 logging.error('Error in creating ' +
                               name + ' dataset to hdf5 file')
         else:
@@ -441,7 +442,8 @@ class Nhdf(object):
 #            for node in g.keys():
 #                del self.f[path+ '/'+ node]
 
-    def save_dict_recursive(self, path=None, name=None, data=None, create_group=True):
+    def save_dict_recursive(self, path=None, name=None,
+                            data=None, create_group=True):
         """
         Stores a dictionary dataset to a specific path. If the dictionary is
         nested, it creates a group for each of the outermost keys.
@@ -519,14 +521,14 @@ class Nhdf(object):
         """
         try:
             obj_type = obj.get_type()
-        except:
+        except BaseException:
             logging.error(
                 'Cannot get object! It is not of one of the neurochat data types!')
 
         try:
             fun = getattr(self, 'save_' + obj_type)
             fun(obj)
-        except:
+        except BaseException:
             logging.error('Failed to save the dataset!')
 
     def save_spatial(self, spatial=None):
@@ -699,6 +701,7 @@ class Nhdf(object):
 
         # Nclust is a NSpike derivative (inherited from NSpike) to add clustering facilities to the NSpike data
         # But we will consider putting it within NSpike itself
-        # This will store data to Shank's Clustering and Feature Extraction group
+        # This will store data to Shank's Clustering and Feature Extraction
+        # group
 
         logging.warning('save_cluster() method is not implemented yet!')

@@ -69,7 +69,8 @@ class NLfp(NBase):
         """
         return self.__type
 
-    # For multi-unit analysis, {'SpikeName': cell_no} pairs should be used as function input
+    # For multi-unit analysis, {'SpikeName': cell_no} pairs should be used as
+    # function input
 
     def set_channel_id(self, channel_id=''):
         """
@@ -489,7 +490,7 @@ class NLfp(NBase):
                 data_type = spike.get_type()
                 if data_type == 'spike':
                     cls = spike.__class__
-            except:
+            except BaseException:
                 logging.error('Data type cannot be determined!')
         if inspect.isclass(cls):
             new_spike = self._add_node(cls, spike, 'spike', **kwargs)
@@ -729,7 +730,8 @@ class NLfp(NBase):
         seg_count = 0
         while i < len(xind) - 1:
             k = i + 1
-            while time[xind[k]] - time[xind[i]] < 1 / fmin and k < len(xind) - 1:
+            while time[xind[k]] - time[xind[i]] < 1 / \
+                    fmin and k < len(xind) - 1:
                 k += 1
 #            print(time[xind[i]], time[xind[k]])
             s_lfp = lfp[xind[i]: xind[k]]
@@ -737,7 +739,8 @@ class NLfp(NBase):
 
             if s_p2p >= aratio * p2p:
                 s_psd, f = fft_psd(s_lfp, Fs)
-                if np.sum(s_psd[np.logical_and(f >= fmin, f <= fmax)]) > pratio * np.sum(s_psd):
+                if np.sum(s_psd[np.logical_and(f >= fmin, f <= fmax)]
+                          ) > pratio * np.sum(s_psd):
                     # Phase distribution
                     s_phase = ephase[np.logical_and(
                         event_stamp > time[xind[i]], event_stamp <= time[xind[k]])]
@@ -1020,7 +1023,7 @@ class NLfp(NBase):
 
             try:
                 data_type = spike.get_type()
-            except:
+            except BaseException:
                 logging.error(
                     'The data type of the addes object cannot be determined!')
 
@@ -1234,7 +1237,8 @@ class NLfp(NBase):
         # Find index of band in frequency vector
         idx_band = np.logical_and(freqs >= low, freqs <= high)
 
-        # Integral approximation of the spectrum using parabola (Simpson's rule)
+        # Integral approximation of the spectrum using parabola (Simpson's
+        # rule)
         bp = simps(psd[idx_band], dx=freq_res)
 
         if band_total:
@@ -1410,7 +1414,7 @@ class NLfp(NBase):
                     line = f.readline()
                     try:
                         line = line.decode('latin-1')
-                    except:
+                    except BaseException:
                         break
 
                     if line == '':
@@ -1440,7 +1444,8 @@ class NLfp(NBase):
                     if line.startswith('bytes_per_sample'):
                         self._set_bytes_per_sample(
                             int(''.join(line.split()[1:])))
-                    if line.startswith('num_' + file_extension[:3].upper() + '_samples'):
+                    if line.startswith(
+                            'num_' + file_extension[:3].upper() + '_samples'):
                         self._set_total_samples(int(''.join(line.split()[1:])))
                     if line.startswith("data_start"):
                         break
@@ -1453,7 +1458,7 @@ class NLfp(NBase):
                 while True:
                     try:
                         buff = f.read(10).decode('UTF-8')
-                    except:
+                    except BaseException:
                         break
                     if buff == 'data_start':
                         header_offset = f.tell()
@@ -1560,13 +1565,14 @@ class NLfp(NBase):
                 line = f.readline()
                 try:
                     line = line.decode('UTF-8')
-                except:
+                except BaseException:
                     break
 
                 if line == '':
                     break
                 if 'SamplingFrequency' in line:
-                    # We are subsampling from the blocks of 512 samples per record
+                    # We are subsampling from the blocks of 512 samples per
+                    # record
                     self._set_sampling_rate(
                         float(''.join(re.findall(r'\d+.\d+|\d+', line))))
                 if 'RecordSize' in line:
@@ -1619,7 +1625,8 @@ class NLfp(NBase):
                 block_wave = np.dot(wave_bytes, sample_le)
                 #    for k in np.arange(valid_samples):
                 #        block_wave[k] = int.from_bytes(sample_bytes[sample_offset+ k*bytes_per_sample+ \
-                #                    np.arange(bytes_per_sample)], byteorder='little', signed=False)
+                # np.arange(bytes_per_sample)], byteorder='little',
+                # signed=False)
                 np.putmask(block_wave, block_wave > max_ADC_count,
                            block_wave - max_byte_value)
                 block_wave = block_wave * AD_bit_uvolt

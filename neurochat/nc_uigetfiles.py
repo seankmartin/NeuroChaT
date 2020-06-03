@@ -241,7 +241,8 @@ class UiGetFiles(QtWidgets.QDialog):
                     self.dir_model.appendRow(item)
 
             for f in dir_content:
-                if os.path.isfile(os.path.join(directory, f)) and f.endswith(self.filter_box.currentText()):
+                if os.path.isfile(os.path.join(directory, f)) and f.endswith(
+                        self.filter_box.currentText()):
                     item = QtGui.QStandardItem(self.file_icon, f)
                     item.setEditable(False)
                     self.dir_model.appendRow(item)
@@ -283,7 +284,8 @@ class UiGetFiles(QtWidgets.QDialog):
         data = self.dir_model.itemFromIndex(qind).text()
         directory = os.path.join(self.folder_line.text(), data)
         if os.path.isdir(directory):
-            # setText() does not invoke textEdited(), manually calling line_eidted()
+            # setText() does not invoke textEdited(), manually calling
+            # line_eidted()
             self.folder_line.setText(directory)
             self.line_edited(directory)
 
@@ -333,7 +335,8 @@ class UiGetFiles(QtWidgets.QDialog):
         qind = self.file_list.selectedIndexes()
         rows = [i.row() for i in qind][::-1]
         for r in rows:
-            # Rows change after each removal, so the one in the highest index are not deleted
+            # Rows change after each removal, so the one in the highest index
+            # are not deleted
             self.file_model.removeRow(r)
         self.file_list.setModel(self.file_model)
 

@@ -382,7 +382,8 @@ class NeuroChaT(QtCore.QThread):
                         lfp_file = row[1] + os.sep + lfp_id + '.ncs'
 
                     elif self.get_data_format() == 'NWB':
-                        # excel list: directory| hdf5 file name w/o extension| spike group| unit_no| lfp group
+                        # excel list: directory| hdf5 file name w/o extension|
+                        # spike group| unit_no| lfp group
                         hdf_name = row[1] + os.sep + row[2] + '.hdf5'
                         spike_file = hdf_name + '/processing/Shank/' + row[3]
                         spatial_file = hdf_name + '+/processing/Behavioural/Position'
@@ -478,7 +479,7 @@ class NeuroChaT(QtCore.QThread):
             logging.info('Calculating environmental border...')
             self.set_border(self.calc_border())
 
-        except:
+        except BaseException:
             logging.warning('Border calculation was not properly completed!')
 
         if self.get_analysis('wave_property'):
@@ -490,7 +491,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/waveProperty/', graph_data=graph_data)
-            except:
+            except BaseException:
                 logging.error('Error in assessing waveform property')
 
         if self.get_analysis('isi'):
@@ -536,7 +537,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/isiCorrShort/', graph_data=graph_data)
-            except:
+            except BaseException:
                 logging.error('Error in assessing ISI autocorrelation')
 
         if self.get_analysis('theta_cell'):
@@ -564,7 +565,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/theta_cell/', graph_data=graph_data)
-            except:
+            except BaseException:
                 logging.error('Error in theta-index analysis')
 
         if self.get_analysis('theta_skip_cell'):
@@ -591,7 +592,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/theta_skip_cell/', graph_data=graph_data)
-            except:
+            except BaseException:
                 logging.error('Error in theta-skipping cell index analysis')
 
         if self.get_analysis('burst'):
@@ -603,7 +604,7 @@ class NeuroChaT(QtCore.QThread):
                 self.burst(
                     burst_thresh=params['burst_thresh'],
                     ibi_thresh=params['ibi_thresh'])
-            except:
+            except BaseException:
                 logging.error('Error in analysing bursting property')
 
         if self.get_analysis('speed'):
@@ -620,7 +621,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/speed/', graph_data=graph_data)
-            except:
+            except BaseException:
                 logging.error('Error in analysis of spike rate vs speed')
 
         if self.get_analysis('ang_vel'):
@@ -637,7 +638,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/ang_vel/', graph_data=graph_data)
-            except:
+            except BaseException:
                 logging.error(
                     'Error in analysis of spike rate vs angular velocity')
 
@@ -667,7 +668,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/hd_rate_CCW/', graph_data=hdData)
 
-            except:
+            except BaseException:
                 logging.error(
                     'Error in analysis of spike rate vs head direction')
 
@@ -684,7 +685,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/hd_shuffle/', graph_data=graph_data)
-            except:
+            except BaseException:
                 logging.error('Error in head directional shuffling analysis')
 
         if self.get_analysis('hd_time_lapse'):
@@ -700,7 +701,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/hd_time_lapse/', graph_data=graph_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in locational time-lapse analysis')
 
         if self.get_analysis('hd_time_shift'):
@@ -717,7 +718,7 @@ class NeuroChaT(QtCore.QThread):
                 self.close_fig(fig)
                 self.plot_data_to_hdf(
                     name=name + '/hd_time_shift/', graph_data=hdData)
-            except:
+            except BaseException:
                 logging.error('Error in head directional time-shift analysis')
 
         if self.get_analysis('loc_rate'):
@@ -748,7 +749,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/loc_rate/', graph_data=place_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in analysis of locational firing rate')
 
         if self.get_analysis('loc_shuffle'):
@@ -774,7 +775,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/loc_shuffle/', graph_data=place_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in locational shiffling analysis')
 
         if self.get_analysis('loc_time_lapse'):
@@ -801,7 +802,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/loc_time_lapse/', graph_data=graph_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in locational time-lapse analysis')
 
         if self.get_analysis('loc_time_shift'):
@@ -829,7 +830,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/loc_time_shift/', graph_data=plot_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in locational time-shift analysis')
 
         if self.get_analysis('spatial_corr'):
@@ -864,7 +865,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/spatial_corr/', graph_data=plot_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in assessing spatial autocorrelation')
 
         if self.get_analysis('grid'):
@@ -890,7 +891,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/grid/', graph_data=graph_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in grid cell analysis')
 
         if self.get_analysis('border'):
@@ -917,7 +918,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/border/', graph_data=graph_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in border cell analysis')
 
         if self.get_analysis('gradient'):
@@ -943,7 +944,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/gradient/', graph_data=graph_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in gradient cell analysis')
 
         if self.get_analysis('multiple_regression'):
@@ -972,7 +973,7 @@ class NeuroChaT(QtCore.QThread):
                 self.interdependence(
                     pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40],
                     abinsize=10, angvelrange=[-500, 500])
-            except:
+            except BaseException:
                 logging.error('Error in interdependence analysis')
 
         if self.get_analysis('lfp_spectrum'):
@@ -1016,7 +1017,7 @@ class NeuroChaT(QtCore.QThread):
                 self.bandpower_ratio(
                     [5, 11], [1.5, 4], 1.6, band_total=True,
                     first_name="Theta", second_name="Delta")
-            except:
+            except BaseException:
                 logging.error('Error in analyzing lfp spectrum')
 
         if self.get_analysis('spike_phase'):
@@ -1040,7 +1041,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/spike_phase/', graph_data=graph_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in assessing spike-phase distribution')
 
         if self.get_analysis('phase_lock'):
@@ -1081,7 +1082,7 @@ class NeuroChaT(QtCore.QThread):
                 self.plot_data_to_hdf(
                     name=name + '/phase_lock/', graph_data=graph_data)
 
-            except:
+            except BaseException:
                 logging.error('Error in spike-phase locking analysis')
 
             if self.get_analysis('lfp_spike_causality'):
@@ -1586,7 +1587,8 @@ class NeuroChaT(QtCore.QThread):
                 for i in np.arange(n_comparison):
                     logging.info(
                         'Evaluating unit similarity row: ' + str(i + 1))
-                    if os.path.exists(info['spike_1']) and os.path.exists(info['spike_2']):
+                    if os.path.exists(info['spike_1']) and os.path.exists(
+                            info['spike_2']):
                         nclust_1.load(
                             filename=info['spike_1'],
                             system=self.get_data_format())

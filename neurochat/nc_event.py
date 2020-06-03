@@ -355,7 +355,7 @@ class NEvent(NBase):
                     line = f.readline()
                     try:
                         line = line.decode('latin-1')
-                    except:
+                    except BaseException:
                         break
 
                     if line == '':
@@ -394,7 +394,7 @@ class NEvent(NBase):
                 while True:
                     try:
                         buff = f.read(10).decode('UTF-8')
-                    except:
+                    except BaseException:
                         break
                     if buff == 'data_start':
                         header_offset = f.tell()

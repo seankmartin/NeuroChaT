@@ -200,7 +200,8 @@ class NDataContainer():
                 "given {}".format(f_type))
             return
 
-        if f_type.name == "Position" and self._share_positions and len(filenames) == 1:
+        if f_type.name == "Position" and self._share_positions and len(
+                filenames) == 1:
             for _ in range(len(self.get_file_dict()["Spike"]) - 1):
                 filenames.append(filenames[0])
 

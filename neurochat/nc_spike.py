@@ -503,7 +503,7 @@ class NSpike(NBase):
 
         try:
             data_type = lfp.get_type()
-        except:
+        except BaseException:
             logging.error(
                 'The data type of the added object cannot be determined!')
 
@@ -1065,7 +1065,7 @@ class NSpike(NBase):
         else:
             try:
                 lfp.phase_dist(self.get_unit_stamp(), **kwargs)
-            except:
+            except BaseException:
                 logging.error('No phase_dist() method in lfp data specified!')
 
     def plv(self, lfp=None, **kwargs):
@@ -1097,7 +1097,7 @@ class NSpike(NBase):
         else:
             try:
                 lfp.plv(self.get_unit_stamp(), **kwargs)
-            except:
+            except BaseException:
                 logging.error('No plv() method in lfp data specified!')
 
     def spike_lfp_causality(self, lfp=None, **kwargs):
@@ -1127,7 +1127,7 @@ class NSpike(NBase):
         else:
             try:
                 lfp.spike_lfp_causality(self.get_unit_stamp(), **kwargs)
-            except:
+            except BaseException:
                 logging.error('No sfc() method in lfp data specified!')
 
     def _set_total_spikes(self, spike_count=1):
@@ -1539,10 +1539,12 @@ class NSpike(NBase):
                     logging.error(
                         path_wave + '/data contains for more than 3 dimensions!')
 
-                if num_events != hdf.get_dataset(group=g_wave, name='num_events'):
+                if num_events != hdf.get_dataset(
+                        group=g_wave, name='num_events'):
                     logging.error(
                         'Mismatch between num_events and 1st dimension of ' + path_wave + '/data')
-                if num_samples != hdf.get_dataset(group=g_wave, name='num_samples'):
+                if num_samples != hdf.get_dataset(
+                        group=g_wave, name='num_samples'):
                     logging.error(
                         'Mismatch between num_samples and 2nd dimension of ' + path_wave + '/data')
                 for i in np.arange(tot_chans):
@@ -1587,7 +1589,7 @@ class NSpike(NBase):
                 line = f.readline()
                 try:
                     line = line.decode('latin-1')
-                except:
+                except BaseException:
                     break
 
                 if line == '':
@@ -1639,7 +1641,7 @@ class NSpike(NBase):
                         break
                     else:
                         f.seek(-9, 1)
-                except:
+                except BaseException:
                     break
 
             tot_channels = self.get_total_channels()
@@ -1782,7 +1784,7 @@ class NSpike(NBase):
                 line = f.readline()
                 try:
                     line = line.decode('UTF-8')
-                except:
+                except BaseException:
                     break
 
                 if line == '':
@@ -1871,7 +1873,8 @@ class NSpike(NBase):
 
     # def sfc(self, lfp=None, **kwargs):
     #     """
-    #     Calculates spike-field coherence of spike train with underlying LFP signal.
+    # Calculates spike-field coherence of spike train with underlying LFP
+    # signal.
 
     #     Delegates to NLfp().sfc()
 

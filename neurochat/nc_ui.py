@@ -47,7 +47,8 @@ try:
     _encoding = QtWidgets.QApplication.UnicodeUTF8
 
     def _translate(context, text, disambig):
-        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(
+            context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig)
@@ -590,7 +591,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 results.to_excel(excel_file)
                 logging.info("Analysis results exported to: " +
                              excel_file.rstrip("\n\r").split(os.sep)[-1])
-            except:
+            except BaseException:
                 logging.error('Failed to export results!')
 
     def export_graphic_info(self):
@@ -617,7 +618,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 info.to_excel(excel_file)
                 logging.info("Graphics information exported to: " +
                              excel_file.rstrip("\n\r").split(os.sep)[-1])
-            except:
+            except BaseException:
                 logging.error('Failed to export graphics information!')
 
     def closeEvent(self, event):
@@ -653,7 +654,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                     logging.info("Session saved in: " + config_file)
                     os.chdir(os.path.dirname(config_file))
                     save_last(event)
-                except:
+                except BaseException:
                     logging.error('Failed to save configuration!')
                     event.ignore()
         elif reply == QtWidgets.QMessageBox.Close:
@@ -737,11 +738,13 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         if self.select_all_box.isChecked():
             logging.info("Selected ALL analyses")
-            for checkbox in self.function_widget.findChildren(QtWidgets.QCheckBox):
+            for checkbox in self.function_widget.findChildren(
+                    QtWidgets.QCheckBox):
                 checkbox.setChecked(True)
         else:
             logging.info("Deselected ALL analyses")
-            for checkbox in self.function_widget.findChildren(QtWidgets.QCheckBox):
+            for checkbox in self.function_widget.findChildren(
+                    QtWidgets.QCheckBox):
                 checkbox.setChecked(False)
 
     def lfp_chan_getitems(self):
@@ -773,7 +776,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 #                    items = list(hdf.f[path].keys())
 #                else:
 #                    logging.warning('No Lfp channel stored in the path:'+ path)
-            except:
+            except BaseException:
                 logging.error('Cannot read the hdf file')
         else:
             items = [str(i) for i in list(range(256))]
@@ -971,7 +974,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 file = open(name, 'w')
                 file.write(text)
                 logging.info("Log saved in: " + name)
-            except:
+            except BaseException:
                 logging.error(
                     'Log is not saved! See if the file is open in another application!')
 
@@ -1077,7 +1080,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             try:
                 value = int(text)
                 self._control.set_param(combobox.objectName(), value)
-            except:
+            except BaseException:
                 self._control.set_param(combobox.objectName(), text)
 
     def save_session(self):
@@ -1744,7 +1747,8 @@ class UiParameters(QtWidgets.QDialog):
 
         items = []
         widget_names = []
-        for checkbox in self.parent.function_widget.findChildren(QtWidgets.QCheckBox):
+        for checkbox in self.parent.function_widget.findChildren(
+                QtWidgets.QCheckBox):
             items.append(checkbox.text())
             widget_names.append(checkbox.objectName())
 

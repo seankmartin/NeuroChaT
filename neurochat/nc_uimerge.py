@@ -268,16 +268,17 @@ class UiMerge(QtWidgets.QDialog):
                 try:
                     merger.write(self.dst_file)
                     logging.info('Files merged to ' + self.dst_file)
-                except:
+                except BaseException:
                     logging.error('Cannot merge files to ' +
                                   self.dst_directory)
             else:
-                if os.path.exists(self.dst_directory) and os.access(self.dst_directory, os.W_OK):
+                if os.path.exists(self.dst_directory) and os.access(
+                        self.dst_directory, os.W_OK):
                     for f in self.files:
                         try:
                             shutil.move(f, os.path.join(
                                 self.dst_directory, f.split(os.sep)[-1]))
-                        except:
+                        except BaseException:
                             logging.warning(
                                 'Cannot move file ' + f + ' to ' + self.dst_directory)
                     logging.info('Files moved to ' + self.dst_directory)

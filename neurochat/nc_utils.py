@@ -124,13 +124,13 @@ def bhatt(X1, X2):
         C2 = np.cov(X2.T)
         C = (C1 + C2) / 2
         chol = nalg.cholesky(C).T
-        dmu = (mu1 - mu2)@nalg.inv(chol)
+        dmu = (mu1 - mu2) @ nalg.inv(chol)
         try:
-            d = 0.125 * dmu@(dmu.T) + 0.5 * np.log(nalg.det(C) /
-                                                   np.sqrt(nalg.det(C1) * nalg.det(C2)))
-        except:
-            d = 0.125 * dmu@(dmu.T) + 0.5 * np.log(np.abs(nalg.det(C @
-                                                                   nalg.inv(scipy.linalg.sqrtm(C1@C2)))))
+            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(nalg.det(C) /
+                                                     np.sqrt(nalg.det(C1) * nalg.det(C2)))
+        except BaseException:
+            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(np.abs(nalg.det(C @
+                                                                     nalg.inv(scipy.linalg.sqrtm(C1 @ C2)))))
         bc = np.exp(-1 * d)
 
         return bc, d
@@ -311,7 +311,7 @@ def corr_coeff(x1, x2):
     try:
         return np.sum(np.multiply(x1 - x1.mean(), x2 - x2.mean())) / \
             np.sqrt(np.sum((x1 - x1.mean())**2) * np.sum((x2 - x2.mean())**2))
-    except:
+    except BaseException:
         return 0
 
 
@@ -506,7 +506,8 @@ def find_chunk(x):
 
     """
 
-    # x is a binary array input i.e. x= data> 0.5 will find all the chunks in data where data is greater than 0.5
+    # x is a binary array input i.e. x= data> 0.5 will find all the chunks in
+    # data where data is greater than 0.5
     i = 0
     segsize = []
     segind = np.zeros(x.shape)
@@ -569,7 +570,8 @@ def histogram(x, bins):
 
     """
     # This function is not a replacement of np.histogram; it is created for convenience
-    # of binned-based rate calculations and mimicking matlab histc that includes digitized indices
+    # of binned-based rate calculations and mimicking matlab histc that
+    # includes digitized indices
     if isinstance(bins, int):
         bins = np.arange(np.min(x), np.max(x), (np.max(x) - np.min(x)) / bins)
     bins = np.append(bins, bins[-1] + np.mean(np.diff(bins)))
@@ -746,7 +748,8 @@ def rot_2d(x, theta):
 
     """
 
-    return scipy.ndimage.interpolation.rotate(x, theta, reshape=False, mode='constant', cval=np.min(x))
+    return scipy.ndimage.interpolation.rotate(
+        x, theta, reshape=False, mode='constant', cval=np.min(x))
 
 # Created by Sean Martin 14/02/2019
 
@@ -1125,7 +1128,7 @@ def has_ext(filename, ext, case_sensitive_ext=False):
     bool indicating if the filename has the extension
 
     """
-    if ext == None:
+    if ext is None:
         return True
     if ext[0] != ".":
         ext = "." + ext

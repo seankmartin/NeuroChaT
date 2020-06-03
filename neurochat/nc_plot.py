@@ -2103,7 +2103,8 @@ def _get_angle_plot(
         # Uses the color of line 1 if color parameter is not passed.
         color = line1.get_color()
 
-    return Arc(origin, len_x_axis * offset, len_y_axis * offset, 0, theta1, theta2, color=color, label="%0.2f" % float(angle) + u"\u00b0")
+    return Arc(origin, len_x_axis * offset, len_y_axis * offset, 0, theta1,
+               theta2, color=color, label="%0.2f" % float(angle) + u"\u00b0")
 
 
 def _make_ax_if_none(ax, **kwargs):
@@ -2171,7 +2172,7 @@ def print_place_cells(
                     ax = fig.add_subplot(gs[j, idx])
                     if fixed_color:
                         color = fixed_color
-                    elif units == None:
+                    elif units is None:
                         color = get_axona_colours(i)
                     else:
                         color = get_axona_colours(units[i] - 1)

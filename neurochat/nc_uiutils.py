@@ -510,7 +510,8 @@ def add_widget(parent=None, position=None, obj_name=''):
     return widget
 
 
-def add_spin_box(parent=None, position=None, obj_name='', min_val=0, max_val=128):
+def add_spin_box(parent=None, position=None,
+                 obj_name='', min_val=0, max_val=128):
     """
     Returns a QtWidgets.QSpinBox() object.
 
@@ -546,7 +547,8 @@ def add_spin_box(parent=None, position=None, obj_name='', min_val=0, max_val=128
     return box
 
 
-def add_double_spin_box(parent=None, position=None, min_val=0, max_val=1, obj_name=""):
+def add_double_spin_box(parent=None, position=None,
+                        min_val=0, max_val=1, obj_name=""):
     """
     Returns a QtWidgets.QDoubleSpinBox() object.
 

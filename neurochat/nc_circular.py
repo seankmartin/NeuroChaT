@@ -181,7 +181,7 @@ class CircStat(object):
                     result['stdRho'] = 0
                 else:
                     result['stdRho'] = np.sqrt(x)
-            except:
+            except BaseException:
                 # This except is to protect against -ve inside sqrt
                 result['stdRho'] = 0
 

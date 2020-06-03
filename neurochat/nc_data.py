@@ -223,19 +223,19 @@ class NData():
 
         try:
             self.hdf.save_object(obj=self.spike)
-        except:
+        except BaseException:
             logging.warning(
                 'Error in exporting NSpike data from NData object to the hdf5 file!')
 
         try:
             self.hdf.save_object(obj=self.spatial)
-        except:
+        except BaseException:
             logging.warning(
                 'Error in exporting NSpatial data from NData object to the hdf5 file!')
 
         try:
             self.hdf.save_object(obj=self.lfp)
-        except:
+        except BaseException:
             logging.warning(
                 'Error in exporting NLfp data from NData object to the hdf5 file!')
 
@@ -782,7 +782,8 @@ class NData():
 
     # def sfc(self, **kwargs):
         # """
-        # Calculates spike-field coherence of spike train with underlying LFP signal.
+        # Calculates spike-field coherence of spike train with underlying LFP
+        # signal.
 
         # Delegates to NLfp().sfc()
 

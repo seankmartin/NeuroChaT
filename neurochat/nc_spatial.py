@@ -201,7 +201,7 @@ class NSpatial(NAbstract):
         if sampling_rate:
             self._fs = sampling_rate
         elif np.array(self._time).any():
-            self._fs = 1/np.diff(np.array(self._time)).mean()
+            self._fs = 1 / np.diff(np.array(self._time)).mean()
 
     def _set_pos_x(self, pos_x):
         """
@@ -790,7 +790,7 @@ class NSpatial(NAbstract):
         loader(filename)
         try:
             self.smooth_speed()
-        except:
+        except BaseException:
             logging.warning(self.get_system() +
                             ' files may not have speed data!')
         if not np.array(self._ang_vel).any():
@@ -832,7 +832,7 @@ class NSpatial(NAbstract):
                 map(float, re.findall(r"\d+.\d+|\d+", f.readline())))
             self.set_pixel_size(pixel_size)
             self.smooth_direction()
-        except:
+        except BaseException:
             logging.error('File does not exist or is open in another process!')
 
     def load_spatial_NWB(self, file_name):
@@ -921,18 +921,18 @@ class NSpatial(NAbstract):
         self._set_source_format('Neuralynx')
 
         # Format description for the NLX file:
-        header_offset = 16*1024  # fixed for NLX files
+        header_offset = 16 * 1024  # fixed for NLX files
 
         bytes_start_record = 2
         bytes_origin_id = 2
         bytes_videoRec_size = 2
         bytes_per_timestamp = 8
-        bytes_per_bitfield = 4*400
+        bytes_per_bitfield = 4 * 400
         bytes_sncrc = 2
         bytes_per_xloc = 4
         bytes_per_yloc = 4
         bytes_per_angle = 4
-        bytes_per_target = 4*50
+        bytes_per_target = 4 * 50
 
         record_size = None
         with open(file_name, 'rb') as f:
@@ -940,7 +940,7 @@ class NSpatial(NAbstract):
                 line = f.readline()
                 try:
                     line = line.decode('UTF-8')
-                except:
+                except BaseException:
                     break
 
                 if line == '':
@@ -976,8 +976,8 @@ class NSpatial(NAbstract):
                 bytes_per_timestamp + \
                 bytes_per_bitfield + \
                 bytes_sncrc
-            yloc_offset = xloc_offset+bytes_per_xloc
-            angle_offset = yloc_offset+bytes_per_xloc
+            yloc_offset = xloc_offset + bytes_per_xloc
+            angle_offset = yloc_offset + bytes_per_xloc
 
             f.seek(0, 2)
             self._total_samples = int((f.tell() - header_offset) / record_size)
@@ -998,7 +998,7 @@ class NSpatial(NAbstract):
             spatial_data[:, 0] /= 10**6
             spatial_data[:, 0] -= np.min(spatial_data[:, 0])
             self._timestamp = np.mean(np.diff(spatial_data[:, 0]))
-            self._set_sampling_rate(1/self._timestamp)
+            self._set_sampling_rate(1 / self._timestamp)
             self._set_time(spatial_data[:, 0])
             self._set_pos_x(spatial_data[:, 1] - np.min(spatial_data[:, 1]))
             self._set_pos_y(spatial_data[:, 2] - np.min(spatial_data[:, 2]))
@@ -1065,21 +1065,21 @@ class NSpatial(NAbstract):
         ang_vel = np.zeros(theta.shape)
         N = theta.size
         L = npoint
-        l = int(np.floor(L/2))
+        l = int(np.floor(L / 2))
         cs = CircStat()
         for i in np.arange(l):
-            y = cs.circ_regroup(theta[:L-l + i])
+            y = cs.circ_regroup(theta[:L - l + i])
             ang_vel[i] = np.polyfit(np.arange(len(y)), y, 1)[0]
 
         for i in np.arange(l, N - l, 1):
-            y = cs.circ_regroup(theta[i-l:i+l + 1])
+            y = cs.circ_regroup(theta[i - l:i + l + 1])
             ang_vel[i] = np.polyfit(np.arange(len(y)), y, 1)[0]
 
         for i in np.arange(N - l, N):
             y = cs.circ_regroup(theta[i - l:])
             ang_vel[i] = np.polyfit(np.arange(len(y)), y, 1)[0]
 
-        return ang_vel*self.get_sampling_rate()
+        return ang_vel * self.get_sampling_rate()
 
     def calc_border(self, **kwargs):
         """
@@ -1127,7 +1127,8 @@ class NSpatial(NAbstract):
 
         for J in np.arange(ybin):
             for I in np.arange(xbin):
-                if not border[J, I] and (J == ybin-1 or J == 0 or I == xbin-1 or I == 0):
+                if not border[J, I] and (
+                        J == ybin - 1 or J == 0 or I == xbin - 1 or I == 0):
                     border[J, I] = True
 
         # Optimize the border
@@ -1157,7 +1158,8 @@ class NSpatial(NAbstract):
         xborder = np.zeros(tmap.shape, dtype=bool)
         yborder = np.zeros(tmap.shape, dtype=bool)
         for J in np.arange(ybin):
-            # 1 added/subed to the next pixel of the traversed arena as the border
+            # 1 added/subed to the next pixel of the traversed arena as the
+            # border
             xborder[J, find(border[J, :], 1, 'first')] = True
             xborder[J, find(border[J, :], 1, 'last')] = True
         for I in np.arange(xbin):
@@ -1166,14 +1168,14 @@ class NSpatial(NAbstract):
 
         #        self.border = border
         border = xborder | yborder
-        self.tmap = tmap*self._timestamp
+        self.tmap = tmap * self._timestamp
 
         distMat = np.zeros(border.shape)
         xx, yy = np.meshgrid(np.arange(xbin), np.arange(ybin))
         borderDist = np.zeros(self._time.size)
 
-        xedges = np.arange(xbin)*pixel
-        yedges = np.arange(ybin)*pixel
+        xedges = np.arange(xbin) * pixel
+        yedges = np.arange(ybin) * pixel
         xind = histogram(self._pos_x, xedges)[1]
         yind = histogram(self._pos_y, yedges)[1]
 
@@ -1190,8 +1192,8 @@ class NSpatial(NAbstract):
                     borderDist[np.logical_and(xind == I, yind == J)] = tmp_dist
                 distMat[J, I] = tmp_dist
 
-        dist_mat = distMat*pixel
-        border_dist = borderDist*pixel
+        dist_mat = distMat * pixel
+        border_dist = borderDist * pixel
 
         return border_dist, xedges, yedges, dist_mat
 
@@ -1217,10 +1219,11 @@ class NSpatial(NAbstract):
 
         firing_rate[np.isnan(firing_rate)] = 0
         Li = firing_rate  # Lambda
-        L = np.sum(firing_rate*visit_time) / visit_time.sum()
-        P = visit_time/visit_time.sum()
+        L = np.sum(firing_rate * visit_time) / visit_time.sum()
+        P = visit_time / visit_time.sum()
 
-        return np.sum(P[Li > 0]*(Li[Li > 0]/L)*np.log2(Li[Li > 0]/L))
+        return np.sum(
+            P[Li > 0] * (Li[Li > 0] / L) * np.log2(Li[Li > 0] / L))
 
     @staticmethod
     def spatial_sparsity(firing_rate, visit_time):
@@ -1244,8 +1247,8 @@ class NSpatial(NAbstract):
         firing_rate[np.isnan(firing_rate)] = 0
         Li = firing_rate  # Lambda
         # L = np.sum(firing_rate*visit_time)/ visit_time.sum()
-        P = visit_time/visit_time.sum()
-        return np.sum(P*Li)**2 / np.sum(P*Li**2)
+        P = visit_time / visit_time.sum()
+        return np.sum(P * Li)**2 / np.sum(P * Li**2)
 
     def speed(self, ftimes, **kwargs):
         """
@@ -1278,13 +1281,13 @@ class NSpatial(NAbstract):
         min_speed, max_speed = kwargs.get('range', [0, 40])
 
         speed = self.get_speed()
-        max_speed = min(max_speed, np.ceil(speed.max()/binsize)*binsize)
-        min_speed = max(min_speed, np.floor(speed.min()/binsize)*binsize)
+        max_speed = min(max_speed, np.ceil(speed.max() / binsize) * binsize)
+        min_speed = max(min_speed, np.floor(speed.min() / binsize) * binsize)
         bins = np.arange(min_speed, max_speed, binsize)
 
         vid_count = histogram(ftimes, self.get_time())[0]
         visit_time, speedInd = histogram(speed, bins)[0:2]
-        visit_time = visit_time/self.get_sampling_rate()
+        visit_time = visit_time / self.get_sampling_rate()
 
         rate = np.array([sum(vid_count[speedInd == i])
                          for i in range(len(bins))]) / visit_time
@@ -1342,13 +1345,13 @@ class NSpatial(NAbstract):
 
         ang_vel = self.get_ang_vel()
 
-        max_vel = min(max_vel, np.ceil(ang_vel.max()/binsize)*binsize)
-        min_vel = max(min_vel, np.floor(ang_vel.min()/binsize)*binsize)
+        max_vel = min(max_vel, np.ceil(ang_vel.max() / binsize) * binsize)
+        min_vel = max(min_vel, np.floor(ang_vel.min() / binsize) * binsize)
         bins = np.arange(min_vel, max_vel, binsize)
 
         vid_count = histogram(ftimes, self.get_time())[0]
         visit_time, velInd = histogram(ang_vel, bins)[0:2]
-        visit_time = visit_time/self.get_sampling_rate()
+        visit_time = visit_time / self.get_sampling_rate()
 
         rate = np.array([sum(vid_count[velInd == i])
                          for i in range(len(bins))]) / visit_time
@@ -1448,13 +1451,14 @@ class NSpatial(NAbstract):
 
         tmap, yedges, xedges = histogram2d(posY, posX, yedges, xedges)
 
-        if tmap.shape[0] != tmap.shape[1] & np.abs(tmap.shape[0] - tmap.shape[1]) <= chop_bound:
+        if tmap.shape[0] != tmap.shape[1] & np.abs(
+                tmap.shape[0] - tmap.shape[1]) <= chop_bound:
             tmap = chop_edges(tmap, min(tmap.shape), min(tmap.shape))[2]
         tmap /= self.get_sampling_rate()
 
         ybin, xbin = tmap.shape
-        xedges = np.arange(xbin)*pixel
-        yedges = np.arange(ybin)*pixel
+        xedges = np.arange(xbin) * pixel
+        yedges = np.arange(ybin) * pixel
 
         spike_count = histogram2d(spikeLoc[1], spikeLoc[0], yedges, xedges)[0]
         fmap = np.divide(spike_count, tmap, out=np.zeros_like(
@@ -1462,7 +1466,8 @@ class NSpatial(NAbstract):
 
         if brAdjust:
             nfmap = fmap / fmap.max()
-            if np.sum(np.logical_and(nfmap >= 0.2, tmap != 0)) >= 0.8*nfmap[tmap != 0].flatten().shape[0]:
+            if np.sum(np.logical_and(nfmap >= 0.2, tmap != 0)
+                      ) >= 0.8 * nfmap[tmap != 0].flatten().shape[0]:
                 back_rate = np.mean(
                     fmap[np.logical_and(nfmap >= 0.2, nfmap < 0.4)])
                 fmap -= back_rate
@@ -1506,7 +1511,7 @@ class NSpatial(NAbstract):
             j = (i + 1) % 2
             boundary[i] = (
                 co_ords[j].min() * scales[i],
-                np.clip((co_ords[j].max()+1) * scales[i], 0, maxes[i]))
+                np.clip((co_ords[j].max() + 1) * scales[i], 0, maxes[i]))
         inside_x = (
             (boundary[0][0] <= spikeLoc[0]) &
             (spikeLoc[0] <= boundary[0][1]))
@@ -1659,44 +1664,44 @@ class NSpatial(NAbstract):
         filter = kwargs.get('filter', ['b', 5])
         brAdjust = kwargs.get('brAdjust', True)
 
-        lim = [0, 1*60]
+        lim = [0, 1 * 60]
         graph_data['0To1min'] = self.place(ftimes, range=lim, filter=filter,
                                            chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-        lim = [0, 2*60]
+        lim = [0, 2 * 60]
         graph_data['0To2min'] = self.place(ftimes, range=lim, filter=filter,
                                            chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-        lim = [0, 4*60]
+        lim = [0, 4 * 60]
         graph_data['0To4min'] = self.place(ftimes, range=lim, filter=filter,
                                            chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-        lim = [0, 8*60]
+        lim = [0, 8 * 60]
         graph_data['0To8min'] = self.place(ftimes, range=lim, filter=filter,
                                            chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
         # 0-1min, 1-2min,  2-4min, 4-8min
-        lim = [1*60, 2*60]
+        lim = [1 * 60, 2 * 60]
         graph_data['1To2min'] = self.place(ftimes, range=lim, filter=filter,
                                            chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-        lim = [2*60, 4*60]
+        lim = [2 * 60, 4 * 60]
         graph_data['2To4min'] = self.place(ftimes, range=lim, filter=filter,
                                            chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-        lim = [4*60, 8*60]
+        lim = [4 * 60, 8 * 60]
         graph_data['4To8min'] = self.place(ftimes, range=lim, filter=filter,
                                            chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
         # 0-16min, 8-16min 0-20min, 16-20min
 
-        if self.get_duration() > 8*60:
-            if self.get_duration() > 16*60:
-                lim = [0, 16*60]
+        if self.get_duration() > 8 * 60:
+            if self.get_duration() > 16 * 60:
+                lim = [0, 16 * 60]
                 graph_data['0To16min'] = self.place(ftimes, range=lim, filter=filter,
                                                     chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-                lim = [8*60, 16*60]
+                lim = [8 * 60, 16 * 60]
                 graph_data['8To16min'] = self.place(ftimes, range=lim, filter=filter,
                                                     chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
@@ -1704,7 +1709,7 @@ class NSpatial(NAbstract):
                 graph_data['0ToEnd'] = self.place(ftimes, range=lim, filter=filter,
                                                   chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-                lim = [16*60, self.get_duration()]
+                lim = [16 * 60, self.get_duration()]
                 graph_data['16ToEnd'] = self.place(ftimes, range=lim, filter=filter,
                                                    chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
@@ -1713,7 +1718,7 @@ class NSpatial(NAbstract):
                 graph_data['0ToEnd'] = self.place(ftimes, range=lim, filter=filter,
                                                   chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
-                lim = [8*60, self.get_duration()]
+                lim = [8 * 60, self.get_duration()]
                 graph_data['8ToEnd'] = self.place(ftimes, range=lim, filter=filter,
                                                   chop_bound=chop_bound, pixel=pixel, brAdjust=brAdjust, update=False)
 
@@ -1772,7 +1777,7 @@ class NSpatial(NAbstract):
             hd_rate,
             hd_rate[:extra_for_smooth]])
         smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
-        smoothRate = smoothRate[2:len(smoothRate)-2]
+        smoothRate = smoothRate[2:len(smoothRate) - 2]
 
         if update:
             _results['HD Skaggs'] = self.skaggs_info(hd_rate, tcount)
@@ -1793,7 +1798,7 @@ class NSpatial(NAbstract):
             _results['HD Peak'] = binInterp[np.argmax(rateInterp)]
 
             half_max = np.amin(rateInterp) + \
-                (np.amax(rateInterp) - np.amin(rateInterp))/2
+                (np.amax(rateInterp) - np.amin(rateInterp)) / 2
             d = np.sign(half_max - rateInterp[0:-1]) - \
                 np.sign(half_max - rateInterp[1:])
             left_possible = find(d > 0)
@@ -1820,14 +1825,14 @@ class NSpatial(NAbstract):
                 tmap = histogram2d(self.get_pos_y()[hdInd], self.get_pos_x()[
                                    hdInd], placeData['yedges'], placeData['xedges'])[0]
                 tmap /= self.get_sampling_rate()
-                hdPred[i] = np.sum(fmap*tmap) / tmap.sum()
+                hdPred[i] = np.sum(fmap * tmap) / tmap.sum()
 
             to_smooth_hd_pred = np.concatenate([
                 hdPred[len(hdPred) - extra_for_smooth:],
                 hdPred,
                 hdPred[:extra_for_smooth]])
             smoothRatePred = smooth_1d(to_smooth_hd_pred, filttype, filtsize)
-            smoothRatePred = smoothRatePred[2:len(smoothRatePred)-2]
+            smoothRatePred = smoothRatePred[2:len(smoothRatePred) - 2]
             graph_data['hdPred'] = smoothRatePred
             self.update_result(_results)
 
@@ -1912,7 +1917,7 @@ class NSpatial(NAbstract):
             ccwRate,
             ccwRate[:extra_for_smooth]])
         smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
-        smoothRate = smoothRate[2:len(smoothRate)-2]
+        smoothRate = smoothRate[2:len(smoothRate) - 2]
         smoothccwRate = smoothRate
         ccwRate = smoothccwRate
 
@@ -1958,37 +1963,37 @@ class NSpatial(NAbstract):
         # Breaking down the spike plot for firing evolution
         # 0-1min,  0-2min, 0-4min, 0-8min
         graph_data = oDict()
-        lim = [0, 1*60]
+        lim = [0, 1 * 60]
         graph_data['0To1min'] = self.hd_rate(ftimes, range=lim, update=False)
 
-        lim = [0, 2*60]
+        lim = [0, 2 * 60]
         graph_data['0To2min'] = self.hd_rate(ftimes, range=lim, update=False)
 
-        lim = [0, 4*60]
+        lim = [0, 4 * 60]
         graph_data['0To4min'] = self.hd_rate(ftimes, range=lim, update=False)
 
-        lim = [0, 8*60]
+        lim = [0, 8 * 60]
         graph_data['0To8min'] = self.hd_rate(ftimes, range=lim, update=False)
 
         # 0-1min, 1-2min,  2-4min, 4-8min
-        lim = [1*60, 2*60]
+        lim = [1 * 60, 2 * 60]
         graph_data['1To2min'] = self.hd_rate(ftimes, range=lim, update=False)
 
-        lim = [2*60, 4*60]
+        lim = [2 * 60, 4 * 60]
         graph_data['2To4min'] = self.hd_rate(ftimes, range=lim, update=False)
 
-        lim = [4*60, 8*60]
+        lim = [4 * 60, 8 * 60]
         graph_data['4To8min'] = self.hd_rate(ftimes, range=lim, update=False)
 
         # 0-16min, 8-16min 0-20min, 16-20min
 
-        if self.get_duration() > 8*60:
-            if self.get_duration() > 16*60:
-                lim = [0, 16*60]
+        if self.get_duration() > 8 * 60:
+            if self.get_duration() > 16 * 60:
+                lim = [0, 16 * 60]
                 graph_data['0To16min'] = self.hd_rate(
                     ftimes, range=lim, update=False)
 
-                lim = [8*60, 16*60]
+                lim = [8 * 60, 16 * 60]
                 graph_data['8To16min'] = self.hd_rate(
                     ftimes, range=lim, update=False)
 
@@ -1996,7 +2001,7 @@ class NSpatial(NAbstract):
                 graph_data['0ToEnd'] = self.hd_rate(
                     ftimes, range=lim, update=False)
 
-                lim = [16*60, self.get_duration()]
+                lim = [16 * 60, self.get_duration()]
                 graph_data['16ToEnd'] = self.hd_rate(
                     ftimes, range=lim, update=False)
 
@@ -2005,7 +2010,7 @@ class NSpatial(NAbstract):
                 graph_data['0ToEnd'] = self.hd_rate(
                     ftimes, range=lim, update=False)
 
-                lim = [8*60, self.get_duration()]
+                lim = [8 * 60, self.get_duration()]
                 graph_data['8ToEnd'] = self.hd_rate(
                     ftimes, range=lim, update=False)
 
@@ -2036,7 +2041,8 @@ class NSpatial(NAbstract):
         nshuff = kwargs.get('nshuff', 500)
         limit = kwargs.get('limit', 0)
         bins = kwargs.get('bins', 100)
-        # limit = 0 implies enirely random shuffle, limit = 'x' implies nshuff number of shuffles in the range [-x x]
+        # limit = 0 implies enirely random shuffle, limit = 'x' implies nshuff
+        # number of shuffles in the range [-x x]
         dur = self.get_time()[-1]
         shift = nprand.uniform(low=limit - dur, high=dur - limit, size=nshuff)
         raylZ = np.zeros((nshuff,))
@@ -2097,7 +2103,7 @@ class NSpatial(NAbstract):
 
         _results = oDict()
         graph_data = {}
-        shift = shift_ind/self.get_sampling_rate()
+        shift = shift_ind / self.get_sampling_rate()
         shiftlen = shift.size
         dur = self.get_time()[-1]
         delta = np.zeros((shiftlen,))
@@ -2120,11 +2126,11 @@ class NSpatial(NAbstract):
         graph_data['delta'] = delta
         graph_data['skaggs'] = skaggs
         graph_data['peakRate'] = peakRate
-        graph_data['shiftTime'] = shift*1000  # changing to milisecond
+        graph_data['shiftTime'] = shift * 1000  # changing to milisecond
 
         # Find out the optimum skaggs location
         shiftUpsamp = np.arange(
-            shift[0], shift[-1], np.mean(np.diff(shift))/10)
+            shift[0], shift[-1], np.mean(np.diff(shift)) / 10)
         skaggsUpsamp = np.interp(shiftUpsamp, shift, skaggs)
         peakRateUpsamp = np.interp(shiftUpsamp, shift, peakRate)
 
@@ -2132,20 +2138,20 @@ class NSpatial(NAbstract):
         deltaFit = dfit_result['yfit']
         sortInd = np.argsort(deltaFit)
         _results['HD ATI'] = np.interp(
-            0, deltaFit[sortInd], shift[sortInd])*1000 if dfit_result['Pearson R'] >= 0.85 else np.nan
+            0, deltaFit[sortInd], shift[sortInd]) * 1000 if dfit_result['Pearson R'] >= 0.85 else np.nan
 
         graph_data['deltaFit'] = deltaFit
         imax = sg.argrelmax(skaggsUpsamp)[0]
         maxloc = find(skaggsUpsamp[imax] == skaggsUpsamp.max())
         _results['HD Opt Shift Skaggs'] = np.nan if maxloc.size != 1 else \
             (np.nan if imax[maxloc] == 0 or imax[maxloc] ==
-             skaggsUpsamp.size else shiftUpsamp[imax[maxloc]][0]*1000)  # in milisecond
+             skaggsUpsamp.size else shiftUpsamp[imax[maxloc]][0] * 1000)  # in milisecond
 
         imax = sg.argrelmax(peakRateUpsamp)[0]
         maxloc = find(peakRateUpsamp[imax] == peakRateUpsamp.max())
         _results['HD Opt Shift Peak Rate'] = np.nan if maxloc.size != 1 else \
             (np.nan if imax[maxloc] == 0 or imax[maxloc] ==
-             peakRateUpsamp.size else shiftUpsamp[imax[maxloc]][0]*1000)  # in milisecond
+             peakRateUpsamp.size else shiftUpsamp[imax[maxloc]][0] * 1000)  # in milisecond
         self.update_result(_results)
 
         return graph_data
@@ -2190,20 +2196,20 @@ class NSpatial(NAbstract):
             Ji = J
             Ii = I
             rows = []
-            while J+1 < ptag.shape[0]:
-                if not pfield[J+1, I] or ptag[J+1, I]:
+            while J + 1 < ptag.shape[0]:
+                if not pfield[J + 1, I] or ptag[J + 1, I]:
                     break
                 else:
-                    ptag[J+1, I] = ptag[J, I]
-                    rows.append(J+1)
+                    ptag[J + 1, I] = ptag[J, I]
+                    rows.append(J + 1)
                     J += 1
             J = Ji
-            while J-1 > 0:
-                if not pfield[J-1, I] or ptag[J-1, I]:
+            while J - 1 > 0:
+                if not pfield[J - 1, I] or ptag[J - 1, I]:
                     break
                 else:
-                    ptag[J-1, I] = ptag[J, I]
-                    rows.append(J-1)
+                    ptag[J - 1, I] = ptag[J, I]
+                    rows.append(J - 1)
                     J -= 1
             for J in rows:
                 if J != Ji:
@@ -2231,20 +2237,20 @@ class NSpatial(NAbstract):
 
             Ii = I
             columns = []
-            while I+1 <= ptag.shape[1]:
-                if not pfield[J, I+1] or ptag[J, I+1]:
+            while I + 1 <= ptag.shape[1]:
+                if not pfield[J, I + 1] or ptag[J, I + 1]:
                     break
                 else:
-                    ptag[J, I+1] = ptag[J, I]
-                    columns.append(I+1)
+                    ptag[J, I + 1] = ptag[J, I]
+                    columns.append(I + 1)
                     I += 1
             I = Ii
-            while I-1 >= 0:
-                if not pfield[J, I-1] or ptag[J, I-1]:
+            while I - 1 >= 0:
+                if not pfield[J, I - 1] or ptag[J, I - 1]:
                     break
                 else:
-                    ptag[J, I-1] = ptag[J, I]
-                    columns.append(I-1)
+                    ptag[J, I - 1] = ptag[J, I]
+                    columns.append(I - 1)
                 I -= 1
             for I in columns:
                 if I != Ii:
@@ -2259,11 +2265,12 @@ class NSpatial(NAbstract):
         # Apply Rule 1
         where_are_NaNs = np.isnan(pmap)
         pmap[where_are_NaNs] = 0
-        pmap = pmap/pmap.max()
+        pmap = pmap / pmap.max()
         weights = pmap
         pmap = pmap > thresh
 
-        # Pad the place field with a single layer of zeros to compare neighbours
+        # Pad the place field with a single layer of zeros to compare
+        # neighbours
         pfield = np.zeros(np.add(pmap.shape, 2))
         pfield[1:-1, 1:-1] = pmap
 
@@ -2388,7 +2395,8 @@ class NSpatial(NAbstract):
         else:
             retInd = vidInd[vidInd != 0]
 
-        return retInd, [self._pos_x[retInd], self._pos_y[retInd]], self._direction[retInd]
+        return retInd, [self._pos_x[retInd],
+                        self._pos_y[retInd]], self._direction[retInd]
 
     def loc_shuffle(self, ftimes, **kwargs):
         """
@@ -2420,7 +2428,8 @@ class NSpatial(NAbstract):
         pixel = kwargs.get('pixel', 3)
         chop_bound = kwargs.get('chop_bound', 5)
         filter = kwargs.get('filter', ['b', 5])
-        # limit = 0 implies enirely random shuffle, limit = 'x' implies nshuff number of shuffles in the range [-x x]
+        # limit = 0 implies enirely random shuffle, limit = 'x' implies nshuff
+        # number of shuffles in the range [-x x]
         dur = self.get_time()[-1]
         shift = nprand.uniform(low=limit - dur, high=dur - limit, size=nshuff)
         skaggs = np.zeros((nshuff,))
@@ -2505,8 +2514,9 @@ class NSpatial(NAbstract):
         chop_bound = kwargs.get('chop_bound', 5)
         _filter = kwargs.get('filter', ['b', 5])
 
-        # limit = 0 implies enirely random shuffle, limit = 'x' implies nshuff number of shuffles in the range [-x x]
-        shift = shift_ind/self.get_sampling_rate()
+        # limit = 0 implies enirely random shuffle, limit = 'x' implies nshuff
+        # number of shuffles in the range [-x x]
+        shift = shift_ind / self.get_sampling_rate()
         shiftlen = shift.size
         dur = self.get_time()[-1]
         skaggs = np.zeros((shiftlen,))
@@ -2534,7 +2544,8 @@ class NSpatial(NAbstract):
         graph_data['shiftTime'] = shift
 
         # Find out the optimum skaggs location
-        shiftUpsamp = np.arange(shift[0], shift[-1], np.mean(np.diff(shift))/4)
+        shiftUpsamp = np.arange(
+            shift[0], shift[-1], np.mean(np.diff(shift)) / 4)
         skaggsUpsamp = np.interp(shiftUpsamp, shift, skaggs)
         sparsityUpsamp = np.interp(shiftUpsamp, shift, sparsity)
         coherenceUpsamp = np.interp(shiftUpsamp, shift, coherence)
@@ -2589,8 +2600,8 @@ class NSpatial(NAbstract):
         fmap[np.isnan(fmap)] = 0
         leny, lenx = fmap.shape
 
-        xshift = np.arange(-(lenx-1), lenx)
-        yshift = np.arange(-(leny-1), leny)
+        xshift = np.arange(-(lenx - 1), lenx)
+        yshift = np.arange(-(leny - 1), leny)
 
         corrMap = np.zeros((yshift.size, xshift.size))
 
@@ -2617,8 +2628,8 @@ class NSpatial(NAbstract):
                     corrMap[J, I] = corr_coeff(map1, map2)
 
         graph_data['corrMap'] = corrMap
-        graph_data['xshift'] = xshift*pixel
-        graph_data['yshift'] = yshift*pixel
+        graph_data['xshift'] = xshift * pixel
+        graph_data['yshift'] = yshift * pixel
 
         return graph_data
 
@@ -2721,7 +2732,8 @@ class NSpatial(NAbstract):
         smoothRate = np.zeros(distBins.shape)
         for i, edge in enumerate(distBins):
             edge_ind = distMat == edge
-            if edge_ind.any() and np.logical_and(np.logical_not(nanInd), distMat == edge).any():
+            if edge_ind.any() and np.logical_and(
+                    np.logical_not(nanInd), distMat == edge).any():
                 smoothRate[i] = fmap[np.logical_and(
                     np.logical_not(nanInd), distMat == edge)].mean()
 #        smoothRate = smooth_1d(smoothRate, filttype, filtsize)
@@ -2744,9 +2756,9 @@ class NSpatial(NAbstract):
         circBins = np.arange(0, 360, cbinsize)
 
         X, Y = np.meshgrid(xedges, np.flipud(yedges))
-        X = X - xedges[-1]/2
-        Y = Y - yedges[-1]/2
-        angDist = np.arctan2(Y, X) * 180/np.pi
+        X = X - xedges[-1] / 2
+        Y = Y - yedges[-1] / 2
+        angDist = np.arctan2(Y, X) * 180 / np.pi
         angDist[angDist < 0] += 360
 
         meanDist = distMat[fmap >= thresh].mean()
@@ -2764,19 +2776,19 @@ class NSpatial(NAbstract):
                 distMat == edge, fmap >= thresh)])
             circLinMap[i, :] = cs.circ_histogram(circBins)[0]
 
-        perSteps = np.arange(0, 1, 1/steps)
+        perSteps = np.arange(0, 1, 1 / steps)
         perDist = np.zeros(steps)
 
         for i in np.arange(steps):
             perDist[i] = distMat[np.logical_and(np.logical_not(nanInd),
-                                                np.logical_and(fmap >= perSteps[i], fmap < perSteps[i] + 1/steps))].mean()
+                                                np.logical_and(fmap >= perSteps[i], fmap < perSteps[i] + 1 / steps))].mean()
         if update:
             _results['Border Skaggs'] = self.skaggs_info(distRate, tcount)
 
             angDistExt = np.append(angDistCount, angDistCount)
 
             segsize = find_chunk(angDistExt > 0)[0]
-            _results['Border Ang Ext'] = max(segsize)*cbinsize
+            _results['Border Ang Ext'] = max(segsize) * cbinsize
 
             cBinsInterp = np.arange(0, 360, 0.1)
             dBinsInterp = np.arange(0, distBins[-1] + pixel, 0.1)
@@ -2793,7 +2805,7 @@ class NSpatial(NAbstract):
         graph_data['angDistCount'] = angDistCount
         graph_data['distRate'] = distRate
         graph_data['smoothRate'] = smoothRate
-        graph_data['perSteps'] = perSteps*100
+        graph_data['perSteps'] = perSteps * 100
         graph_data['perDist'] = perDist
 
         return graph_data
@@ -2838,18 +2850,19 @@ class NSpatial(NAbstract):
 
         d_half = x.mean()
         for i, dist in enumerate(x):
-            if i < x.size-1 and (y0 + bi/2) > y[i] and (y0 + bi/2) <= y[i+1]:
-                d_half = x[i:i+2].mean()
+            if i < x.size - \
+                    1 and (y0 + bi / 2) > y[i] and (y0 + bi / 2) <= y[i + 1]:
+                d_half = x[i:i + 2].mean()
 
-        ci = np.log(2)/d_half
+        ci = np.log(2) / d_half
 
         def fit_func(x, a, b, c):
-            return a - b*np.exp(-c*x)
+            return a - b * np.exp(-c * x)
 
         popt, pcov = curve_fit(fit_func, x, y,
                                p0=[ai, bi, ci],
-                               bounds=([(1 - alim)*ai, (1 - blim)*bi, (1 - clim)*ci],
-                                       [(1 + alim)*ai, (1 + blim)*bi, (1 + clim)*ci]),
+                               bounds=([(1 - alim) * ai, (1 - blim) * bi, (1 - clim) * ci],
+                                       [(1 + alim) * ai, (1 + blim) * bi, (1 + clim) * ci]),
                                max_nfev=100000)
         a, b, c = popt
 
@@ -2861,13 +2874,13 @@ class NSpatial(NAbstract):
         graph_data['distBins'] = x
 #        graph_data['smoothRate'] = y
         graph_data['rateFit'] = rateFit
-        graph_data['diffRate'] = b*c*np.multiply(rateFit, np.exp(-c*x))
+        graph_data['diffRate'] = b * c * np.multiply(rateFit, np.exp(-c * x))
 
         _results['Grad Pearse R'] = gof['Pearson R']
         _results['Grad Pearse P'] = gof['Pearson P']
         _results['Grad adj Rsq'] = gof['adj Rsq']
-        _results['Grad Max Growth Rate'] = c*np.exp(a-1)
-        _results['Grad Inflect Dist'] = np.log(b)/c
+        _results['Grad Max Growth Rate'] = c * np.exp(a - 1)
+        _results['Grad Inflect Dist'] = np.log(b) / c
 
         self.update_result(_results)
         return graph_data
@@ -2920,7 +2933,7 @@ class NSpatial(NAbstract):
 
         ymax, xmax, peakDist = (
             ymax[1:7], xmax[1:7], peakDist[1:7]) if ymax.size >= 7 else ([], [], [])
-        theta = np.arctan2(yshift[ymax], xshift[xmax])*180/np.pi
+        theta = np.arctan2(yshift[ymax], xshift[xmax]) * 180 / np.pi
         theta[theta < 0] += 360
         sortInd = np.argsort(theta)
         ymax, xmax, peakDist, theta = (
@@ -2931,12 +2944,13 @@ class NSpatial(NAbstract):
 
         meanDist = peakDist.mean()
         X, Y = np.meshgrid(xshift, yshift)
-        distMat = np.sqrt(X**2 + Y**2)/pixel
+        distMat = np.sqrt(X**2 + Y**2) / pixel
 
         # if all of them are within tolerance(25%)
-        if len(ymax) == np.logical_and(peakDist > 0.75*meanDist, peakDist < 1.25*meanDist).sum():
+        if len(ymax) == np.logical_and(peakDist > 0.75 *
+                                       meanDist, peakDist < 1.25 * meanDist).sum():
             maskInd = np.logical_and(
-                distMat > 0.5*meanDist, distMat < 1.5*meanDist)
+                distMat > 0.5 * meanDist, distMat < 1.5 * meanDist)
             rotCorr = np.array([corr_coeff(rot_2d(corrMap, theta)[
                                maskInd], corrMap[maskInd]) for k, theta in enumerate(bins)])
             ramax, rimax, ramin, rimin = extrema(rotCorr)
@@ -2967,8 +2981,9 @@ class NSpatial(NAbstract):
                 tol and 60 - tol < meanAlpha < 60 + tol
             _results['Grid Mean Alpha'] = meanAlpha
             _results['Grid Mean Psi'] = meanPsi
-            _results['Grid Spacing'] = meanDist*pixel
-            # Difference between highest Pearson R at peaks and lowest at troughs
+            _results['Grid Spacing'] = meanDist * pixel
+            # Difference between highest Pearson R at peaks and lowest at
+            # troughs
             _results['Grid Score'] = rotCorr[rimax].max() - \
                 rotCorr[rimin].min()
             _results['Grid Orientation'] = theta[0]
@@ -3004,13 +3019,13 @@ class NSpatial(NAbstract):
         subsampInterv = kwargs.get('subsampInterv', 0.1)
         episode = kwargs.get('episode', 120)
         nrep = kwargs.get('nrep', 1000)
-        sampRate = 1/subsampInterv
+        sampRate = 1 / subsampInterv
         stamp = subsampInterv
 
         a_size = np.round(self.get_duration(), 4)
         time = np.linspace(
             0, a_size, endpoint=True,
-            num=np.round(a_size/stamp)+1)
+            num=np.round(a_size / stamp) + 1)
         time = np.round(time, 4)
         Y = histogram(ftimes, time)[0] * sampRate  # Instant firing rate
 
@@ -3028,7 +3043,8 @@ class NSpatial(NAbstract):
                 continue
             xloc[i] = np.median(self.get_pos_x()[ind])
             yloc[i] = np.median(self.get_pos_y()[ind])
-            if histogram(yloc[i], yedges)[1] < yedges.size and histogram(xloc[i], xedges)[1] < xedges.size:
+            if histogram(yloc[i], yedges)[1] < yedges.size and histogram(
+                    xloc[i], xedges)[1] < xedges.size:
                 loc[i] = placeRate[histogram(yloc[i], yedges)[
                     1], histogram(xloc[i], xedges)[1]]
             hd[i] = np.median(self.get_direction()[ind])
@@ -3042,13 +3058,14 @@ class NSpatial(NAbstract):
         cs.set_theta(hd)
         # replaced by corresponding rate
         hd = hd_rate[cs.circ_histogram(hdBins)[1]]
-        # Speed+ ang_vel will be linearly modelled, so no transformation required; ang_vel will be replaced by the non-linear rate
+        # Speed+ ang_vel will be linearly modelled, so no transformation
+        # required; ang_vel will be replaced by the non-linear rate
         tmp = self.border(ftimes, update=False)
         borderRate, borderBins = (tmp['distRate'], tmp['distBins'])
         # replaced by corresponding rate
         distBorder = borderRate[histogram(distBorder, borderBins)[1]]
 
-        ns = int(episode/stamp)  # row to select in random
+        ns = int(episode / stamp)  # row to select in random
 
         X = np.vstack((loc, hd, speed, ang_vel, distBorder)).transpose()
         lm = LinearRegression(fit_intercept=True, normalize=True)
@@ -3062,7 +3079,7 @@ class NSpatial(NAbstract):
                 varind = np.array([k for k in range(5) if k != j])
                 # np.ix_ is used for braodcasting the index arrays
                 lm.fit(X[np.ix_(ind, varind)], Y[ind])
-                Rsq[i, j+1] = Rsq[i, 0] - \
+                Rsq[i, j + 1] = Rsq[i, 0] - \
                     lm.score(X[np.ix_(ind, varind)], Y[ind])
 
         meanRsq = Rsq.mean(axis=0)
@@ -3079,7 +3096,7 @@ class NSpatial(NAbstract):
         _results['Mult Rsq'] = meanRsq[0]
         for i, key in enumerate(varOrder):
             if i > 0:
-                _results['Semi Rsq '+key] = meanRsq[i]
+                _results['Semi Rsq ' + key] = meanRsq[i]
         self.update_result(_results)
 
         return graph_data
@@ -3127,9 +3144,9 @@ class NSpatial(NAbstract):
                 hdData['hd'] >= b, hdData['hd'] < b + hdbinsize)
             tmap = histogram2d(yloc[ind], xloc[ind], yedges, xedges)[0]
             tmap /= self.get_sampling_rate()
-            predRate[i] = np.sum(fmap*tmap) / tmap.sum()
+            predRate[i] = np.sum(fmap * tmap) / tmap.sum()
         _results['DR HP'] = np.abs(
-            np.log((1 + hdData['smoothRate']) / (1 + predRate))).sum()/bins.size
+            np.log((1 + hdData['smoothRate']) / (1 + predRate))).sum() / bins.size
 
         spData = self.speed(ftimes, binsize=spbinsize,
                             range=sprange, update=False)
@@ -3140,9 +3157,9 @@ class NSpatial(NAbstract):
             ind = np.logical_and(speed >= b, speed < b + spbinsize)
             tmap = histogram2d(yloc[ind], xloc[ind], yedges, xedges)[0]
             tmap /= self.get_sampling_rate()
-            predRate[i] = np.sum(fmap*tmap) / tmap.sum()
+            predRate[i] = np.sum(fmap * tmap) / tmap.sum()
         _results['DR SP'] = np.abs(
-            np.log((1 + spData['rate']) / (1 + predRate))).sum()/bins.size
+            np.log((1 + spData['rate']) / (1 + predRate))).sum() / bins.size
 
         ang_velData = self.angular_velocity(
             ftimes, binsize=abinsize, range=ang_velrange, update=False)
@@ -3153,11 +3170,11 @@ class NSpatial(NAbstract):
             ind = np.logical_and(ang_vel >= b, ang_vel < b + abinsize)
             tmap = histogram2d(yloc[ind], xloc[ind], yedges, xedges)[0]
             tmap /= self.get_sampling_rate()
-            predRate[i] = np.sum(fmap*tmap) / tmap.sum()
+            predRate[i] = np.sum(fmap * tmap) / tmap.sum()
         ang_velObs = np.hstack(
             (ang_velData['leftRate'], ang_velData['rightRate']))
         _results['DR AP'] = np.abs(
-            np.log((1 + ang_velObs) / (1 + predRate))).sum()/bins.size
+            np.log((1 + ang_velObs) / (1 + predRate))).sum() / bins.size
 
         borderData = self.border(ftimes, update=False)
         bins = borderData['distBins']
@@ -3168,9 +3185,9 @@ class NSpatial(NAbstract):
             ind = np.logical_and(border >= b, border < b + dbinsize)
             tmap = histogram2d(yloc[ind], xloc[ind], yedges, xedges)[0]
             tmap /= self.get_sampling_rate()
-            predRate[i] = np.sum(fmap*tmap) / tmap.sum()
+            predRate[i] = np.sum(fmap * tmap) / tmap.sum()
         _results['DR BP'] = np.abs(
-            np.log((1 + borderData['distRate']) / (1 + predRate))).sum()/bins.size
+            np.log((1 + borderData['distRate']) / (1 + predRate))).sum() / bins.size
 
         self.update_result(_results)
 
