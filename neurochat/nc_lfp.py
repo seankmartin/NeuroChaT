@@ -1709,7 +1709,7 @@ class NLfp(NBase):
         return mean, std, thr_locs, thr_vals, thr_time, per_removed
 
     def __str__(self):
-        """A friendly string representation of the object."""
+        """Return a friendly string representation of the object."""
         return ("{} object with tag {} from channel {} at {}Hz with {} samples".format(
             "NeuroChaT NLfp", self._tag, self._channel_id,
             self.get_sampling_rate(),
