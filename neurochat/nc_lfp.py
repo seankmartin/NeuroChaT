@@ -20,7 +20,8 @@ from neurochat.nc_utils import window_rms
 from neurochat.nc_utils import butter_filter
 from neurochat.nc_utils import find_peaks
 from neurochat.nc_utils import find_true_ranges
-from neurochat.nc_utils import butter_filter, fft_psd, find
+from neurochat.nc_utils import fft_psd
+from neurochat.nc_utils import find
 
 from neurochat.nc_circular import CircStat
 from neurochat.nc_hdf import Nhdf
@@ -36,15 +37,26 @@ from scipy.fftpack import fft
 
 class NLfp(NBase):
     """
-    This data class is the placeholder for the dataset that contains
-    information about the neural LFP signal.
+    This data class contains information about the neural LFP signal.
 
     It decodes data from different formats and analyses LFP signal in
     the recording.
 
+    Attributes
+    ----------
+    _file_tag : str
+        The tag of the lfp data.
+    _channel_id : int
+        The id of the channel the lfp data came from.
+    _samples : np.ndarray
+        Array of lfp samples.
+    _timestamp : np.ndarray
+        Array of timestamps of the lfp samples.
+
     """
 
     def __init__(self, **kwargs):
+        """See the class description."""
         super().__init__(**kwargs)
         self._file_tag = ''
         self._channel_id = 0
@@ -56,7 +68,7 @@ class NLfp(NBase):
 
     def get_type(self):
         """
-        Returns the type of object. For NLfp, this is always `lfp` type.
+        Return the type of object. For NLfp, this is always `lfp` type.
 
         Parameters
         ----------
@@ -74,7 +86,7 @@ class NLfp(NBase):
 
     def set_channel_id(self, channel_id=''):
         """
-        Sets the electrode channels ID.
+        Set the electrode channels ID.
 
         Parameters
         ----------
@@ -90,7 +102,7 @@ class NLfp(NBase):
 
     def get_channel_id(self):
         """
-        Returns the electrode channels ID.
+        Return the electrode channels ID.
 
         Parameters
         ----------
@@ -102,13 +114,14 @@ class NLfp(NBase):
             LFP channel ID
 
         """
-
         return self._channel_id
 
     def set_file_tag(self, file_tag):
         """
-        Sets the file tag or extension for the LFP dataset. For example, Axona
-        recordings usually have file tags like 'eeg' or 'eeg8' etc.
+        Set the file tag or extension for the LFP dataset.
+
+        For example,
+        Axona recordings usually have file tags like 'eeg' or 'eeg8' etc.
 
         Parameters
         ----------
@@ -120,12 +133,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._file_tag = file_tag
 
     def get_file_tag(self):
         """
-        Returns the file tag or extension for the LFP dataset. For example,
+        Return the file tag or extension for the LFP dataset.
+
+        For example,
         Axona recordings usually have file tags like 'eeg' or 'eeg8' etc.
 
         Parameters
@@ -138,12 +152,11 @@ class NLfp(NBase):
             File tag or extension for the LFP dataset
 
         """
-
         return self._file_tag
 
     def get_timestamp(self):
         """
-        Returns the timestamps of the LFP waveform.
+        Return the timestamps of the LFP waveform.
 
         Parameters
         ----------
@@ -155,12 +168,11 @@ class NLfp(NBase):
             Timestamps of the LFP signal
 
         """
-
         return self._timestamp
 
     def _set_timestamp(self, timestamp=None):
         """
-        Sets the timestamps for LFP samples.
+        Set the timestamps for LFP samples.
 
         Parameters
         ----------
@@ -172,13 +184,12 @@ class NLfp(NBase):
         None
 
         """
-
         if timestamp is not None:
             self._timestamp = timestamp
 
     def get_samples(self):
         """
-        Returns LFP waveform samples.
+        Return LFP waveform samples.
 
         Parameters
         ----------
@@ -190,12 +201,11 @@ class NLfp(NBase):
             Samples of the LFP signal
 
         """
-
         return self._samples
 
     def _set_samples(self, samples=[]):
         """
-        Sets LFP samples.
+        Set LFP samples.
 
         Parameters
         ----------
@@ -207,13 +217,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._samples = samples
 
     def _set_total_samples(self, tot_samples=0):
         """
-        Sets the number of LFP samples as part of storing the recording
-        information.
+        Set the number of LFP samples.
+
+        This is performed as part of storing the recording information.
 
         Parameters
         ----------
@@ -225,13 +235,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._record_info['No of samples'] = tot_samples
 
     def _set_total_channel(self, tot_channels):
         """
-        Sets the value of number of channels as part of storing the recording
-        information.
+        Set the value of the number of channels.
+
+        This is performed as part of storing the recording information.
 
         Parameters
         ----------
@@ -243,13 +253,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._record_info['No of channels'] = tot_channels
 
     def _set_timestamp_bytes(self, bytes_per_timestamp):
         """
-        Sets `bytes per timestamp` value as part of storing the recording
-        information.
+        Set `bytes per timestamp` value.
+
+        This is performed as part of storing the recording information.
 
         Parameters
         ----------
@@ -261,13 +271,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._record_info['Bytes per timestamp'] = bytes_per_timestamp
 
     def _set_sampling_rate(self, sampling_rate):
         """
-        Sets the sampling rate of the LFP signal as part of storing the
-        recording information.
+        Set the sampling rate of the LFP signal.
+
+        This is performed as part of storing the recording information.
 
         Parameters
         ----------
@@ -279,13 +289,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._record_info['Sampling rate'] = sampling_rate
 
     def _set_bytes_per_sample(self, bytes_per_sample):
         """
-        Sets `bytes per sample` value as part of storing the recording
-        information.
+        Set `bytes per sample` value.
+
+        This is performed as part of storing the recording information.
 
         Parameters
         ----------
@@ -297,13 +307,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._record_info['Bytes per sample'] = bytes_per_sample
 
     def _set_fullscale_mv(self, adc_fullscale_mv):
         """
-        Sets fullscale value of ADC value in mV as part of storing the
-        recording information.
+        Set fullscale value of ADC value in mV.
+
+        This is performed as part of storing the recording information.
 
         Parameters
         ----------
@@ -315,12 +325,11 @@ class NLfp(NBase):
         None
 
         """
-
         self._record_info['ADC Fullscale mv'] = adc_fullscale_mv
 
     def get_total_samples(self):
         """
-        Returns total number of LFP samples.
+        Return total number of LFP samples.
 
         Parameters
         ----------
@@ -336,7 +345,7 @@ class NLfp(NBase):
 
     def get_total_channel(self):
         """
-        Returns total number of electrode channels in the LFP data file.
+        Return total number of electrode channels in the LFP data file.
 
         Parameters
         ----------
@@ -348,13 +357,11 @@ class NLfp(NBase):
             Total number of electrode channels
 
         """
-
         return self._record_info['No of channels']
 
     def get_timestamp_bytes(self):
         """
-        Returns the number of bytes to represent each timestamp in the binary
-        file.
+        Return number of bytes to represent each timestamp in the binary file.
 
         Parameters
         ----------
@@ -366,12 +373,11 @@ class NLfp(NBase):
             Number of bytes to represent timestamps
 
         """
-
         return self._record_info['Bytes per timestamp']
 
     def get_sampling_rate(self):
         """
-        Returns the sampling rate of spike waveforms.
+        Return the sampling rate of spike waveforms.
 
         Parameters
         ----------
@@ -383,12 +389,11 @@ class NLfp(NBase):
             Sampling rate for spike waveforms
 
         """
-
         return self._record_info['Sampling rate']
 
     def get_bytes_per_sample(self):
         """
-        Returns the number of bytes to represent each LFP waveform sample.
+        Return the number of bytes to represent each LFP waveform sample.
 
         Parameters
         ----------
@@ -400,12 +405,11 @@ class NLfp(NBase):
             Number of bytes to represent each sample of the LFP waveform
 
         """
-
         return self._record_info['Bytes per sample']
 
     def get_fullscale_mv(self):
         """
-        Returns the fullscale value of the ADC in mV.
+        Return the fullscale value of the ADC in mV.
 
         Parameters
         ----------
@@ -417,12 +421,11 @@ class NLfp(NBase):
             Fullscale ADC value in mV
 
         """
-
         return self._record_info['ADC Fullscale mv']
 
     def get_recording_time(self):
         """
-        Returns the recording time in seconds.
+        Return the recording time in seconds.
 
         Parameters
         ----------
@@ -434,12 +437,11 @@ class NLfp(NBase):
             Recording time in seconds
 
         """
-
         return self.get_total_samples() / (self.get_sampling_rate())
 
     def load(self, filename=None, system=None):
         """
-        Loads LFP datasets.
+        Load LFP datasets.
 
         Parameters
         ----------
@@ -470,7 +472,7 @@ class NLfp(NBase):
 
     def add_spike(self, spike=None, **kwargs):
         """
-        Adds new spike node to current NLfp() object.
+        Add new spike node to current NLfp() object.
 
         Parameters
         ----------
@@ -483,7 +485,6 @@ class NLfp(NBase):
             A new NSpike() object
 
         """
-
         cls = kwargs.get('cls', None)
         if not inspect.isclass(cls):
             try:
@@ -500,8 +501,9 @@ class NLfp(NBase):
 
     def load_spike(self, names='all'):
         """
-        Loads datasets of the spike nodes. Name of each node is used for
-        obtaining the filenames.
+        Load datasets of the spike nodes.
+
+        The name of each node is used for obtaining the filenames.
 
         Parameters
         ----------
@@ -513,7 +515,6 @@ class NLfp(NBase):
         None
 
         """
-
         if names == 'all':
             for spike in self._spikes:
                 spike.load()
@@ -525,7 +526,7 @@ class NLfp(NBase):
 
     def add_lfp(self, lfp=None, **kwargs):
         """
-        Adds new LFP node to current NLfp() object.
+        Add new LFP node to current NLfp() object.
 
         Parameters
         ----------
@@ -538,15 +539,15 @@ class NLfp(NBase):
             A new NLfp() object
 
         """
-
         new_lfp = self._add_node(self.__class__, lfp, 'lfp', **kwargs)
 
         return new_lfp
 
     def load_lfp(self, names=None):
         """
-        Loads datasets of the LFP nodes. Name of each node is used for
-        obtaining the filenames.
+        Load datasets of the LFP nodes.
+
+        The name of each node is used for obtaining the filenames.
 
         Parameters
         ----------
@@ -558,7 +559,6 @@ class NLfp(NBase):
         None
 
         """
-
         if names is None:
             self.load()
         elif names == 'all':
@@ -566,18 +566,15 @@ class NLfp(NBase):
                 lfp.load()
         else:
             logging.error("Lfp by name has yet to be implemented")
-            # for name in names:
-            #     lfp = self.get_lfp_by_name(name)
-            #     lfp.load()
 
     def spectrum(self, **kwargs):
         """
-        Analyses frequency spectrum of the LFP signal.
+        Analyse frequency spectrum of the LFP signal.
 
         Parameters
         ----------
         **kwargs
-            Keywrod arguments
+            Keyword arguments
 
         Returns
         -------
@@ -585,7 +582,6 @@ class NLfp(NBase):
             Graphical data of the analysis
 
         """
-
         graph_data = oDict()
 
         Fs = self.get_sampling_rate()
@@ -622,9 +618,11 @@ class NLfp(NBase):
         tr = kwargs.get('tr', False)
         db = kwargs.get('db', False)
         if tr:
-            f, t, Sxx = sg.spectrogram(lfp, fs=Fs,
-                                       window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
-                                       detrend='constant', return_onesided=True, scaling=ptype)
+            f, t, Sxx = sg.spectrogram(
+                lfp, fs=Fs,
+                window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                detrend='constant', return_onesided=True,
+                scaling=ptype)
 
             graph_data['t'] = t + self.get_timestamp()[0]
             graph_data['f'] = f[find(f <= fmax)]
@@ -635,13 +633,12 @@ class NLfp(NBase):
                 Sxx[find(Sxx < -40)] = -40
                 Sxx = np.reshape(Sxx, [f.size, t.size])
 
-#            graph_data['Sxx'] = np.empty([find(f<= fmax).size, t.size])
-#            graph_data['Sxx'] = np.array([Sxx[i, :] for i in find(f<= fmax)])
             graph_data['Sxx'] = Sxx[find(f <= fmax), :]
         else:
-            f, Pxx = sg.welch(lfp, fs=Fs,
-                              window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
-                              detrend='constant', return_onesided=True, scaling=ptype)
+            f, Pxx = sg.welch(
+                lfp, fs=Fs,
+                window=window, nperseg=window.size, noverlap=noverlap, nfft=nfft,
+                detrend='constant', return_onesided=True, scaling=ptype)
 
             graph_data['f'] = f[find(f <= fmax)]
 
@@ -658,11 +655,11 @@ class NLfp(NBase):
 
         Parameters
         ----------
-        evnet_stamp : ndarray
-            Timestamps of the events of spiking activities for measring the phase
-            distribution
+        event_stamp : ndarray
+            Timestamps of the events of spiking activities for
+            measuring the phase distribution.
         **kwargs
-            Keywrod arguments
+            Keyword arguments
 
         Returns
         -------
@@ -670,7 +667,6 @@ class NLfp(NBase):
             Graphical data of the analysis
 
         """
-
         _results = oDict()
         graph_data = oDict()
 
@@ -688,7 +684,7 @@ class NLfp(NBase):
         pratio = kwargs.get('pratio', 0.2)
         aratio = kwargs.get('aratio', 0.15)
 
-    # Filter
+        # Filter
         fmax = fwin[1]
         fmin = fwin[0]
         _filter = [5, fmin, fmax, 'bandpass']
@@ -697,10 +693,8 @@ class NLfp(NBase):
         b_lfp = butter_filter(lfp, Fs, *_filter)  # band LFP
         lfp = butter_filter(lfp, Fs, *_prefilt)
 
-    # Measure phase
+        # Measure phase
         hilb = sg.hilbert(b_lfp)
-#        self.hilb = hilb
-#        phase = np.remainder(np.angle(hilb, deg=True)+ 360, 360)
         phase = np.angle(hilb, deg=True)
         phase[phase < 0] = phase[phase < 0] + 360
         mag = np.abs(hilb)
@@ -717,7 +711,10 @@ class NLfp(NBase):
         mag3 = mag[2:-1]
 
         xind = np.union1d(find(np.logical_and(mag1 < xline, mag2 > xline)),
-                          find(np.logical_and(np.logical_and(mag1 < xline, mag2 == xline), mag3 > xline)))
+                          find(np.logical_and(
+                              np.logical_and(mag1 < xline, mag2 == xline),
+                              mag3 > xline))
+                          )
 
         # Ignore segments <1/fmax
         i = 0
@@ -733,7 +730,6 @@ class NLfp(NBase):
             while time[xind[k]] - time[xind[i]] < 1 / \
                     fmin and k < len(xind) - 1:
                 k += 1
-#            print(time[xind[i]], time[xind[k]])
             s_lfp = lfp[xind[i]: xind[k]]
             s_p2p = np.abs(np.max(s_lfp) - np.min(s_lfp))
 
@@ -744,7 +740,6 @@ class NLfp(NBase):
                     # Phase distribution
                     s_phase = ephase[np.logical_and(
                         event_stamp > time[xind[i]], event_stamp <= time[xind[k]])]
-#                    print(s_phase.shape, s_phase.shape)
 
                     if not s_phase.shape[0]:
                         pass
@@ -752,7 +747,6 @@ class NLfp(NBase):
                         seg_count += 1
                         cs.set_theta(s_phase)
                         temp_count = cs.circ_histogram(bins=rbinsize)
-#                        temp_count = np.histogram(s_phase, bins=rbins, range=[0, 360])
                         temp_count = temp_count[0]
                         if not rcount.size:
                             rcount = temp_count
@@ -837,16 +831,15 @@ class NLfp(NBase):
 
     def plv(self, event_stamp, **kwargs):
         """
-        Calculates phase-locking value of the spike train to underlying LFP
-        signal.
+        Calculate phase-locking value of the spike train to underlying LFP signal.
 
-        When 'mode'= None in the inpput kwargs, it calculates the PLV and SFC over
+        When 'mode'= None in the input kwargs, it calculates the PLV and SFC over
         the entire spike-train.
 
         If 'mode'= 'bs', it bootstraps the spike-timestamps
         and calculates the locking values for each set of new spike timestamps.
 
-        If 'mode'= 'tr', a time-resilved phase-locking analysis is performed where
+        If 'mode'= 'tr', a time-resolved phase-locking analysis is performed where
         the LFP signal is split into overlapped segments for each calculation.
 
         Parameters
@@ -855,7 +848,7 @@ class NLfp(NBase):
             Timestamps of the events or the spiking activities for measuring the phase
             locking
         **kwargs
-            Keywrod arguments
+            Keyword arguments
 
         Returns
         -------
@@ -1014,7 +1007,6 @@ class NLfp(NBase):
             Graphical data of the analysis
 
         """
-
         graph_data = oDict()
         window = np.array(kwargs.get('window', [-0.5, 0.5]))
 
@@ -1057,7 +1049,7 @@ class NLfp(NBase):
 
     def spike_lfp_causality(self, spike=None, **kwargs):
         """
-        (Not implemented yet)
+        (Not implemented yet).
 
         Analyses spike to underlying LFP causality
 
@@ -1075,7 +1067,6 @@ class NLfp(NBase):
             implemented yet.
 
         """
-
         pass
 
     def subsample(self, sample_range=None):
@@ -1085,7 +1076,7 @@ class NLfp(NBase):
         Parameters
         ----------
         sample_range : tuple
-            the time in seconds to extract from the lfp
+            the time in seconds to extract from the lfp as (lower, upper)
 
         Returns
         -------
@@ -1118,6 +1109,11 @@ class NLfp(NBase):
     def sharp_wave_ripples(self, in_range=None, **kwargs):
         """
         Detect SWR events in the lfp, optionally in a given range.
+
+        This method is based on finding peaks in the
+        Root mean square envelope of a filtered signal between
+        100 and 250Hz (default params).
+        Peaks that are above the peak_percentile keyword argument are returned.
 
         Parameters
         ----------
@@ -1180,20 +1176,25 @@ class NLfp(NBase):
         Parameters
         ----------
         band : list
-        Lower and upper frequencies of the band of interest.
+            Lower and upper frequencies of the band of interest. [lower, upper].
 
-        kwargs:
-            method : string
-                Periodogram method: 'welch'
-            window_sec : float
-                Length of each window in seconds.
-                If None, window_sec = (1 / min(band)) * 2.
-            band_total : bool
-                Whether to band the total power
-                Default False
-            total_band: List
-                low and high frequency values for the filter
-                Default [1.5, 40]
+        Keyword Arguments
+        -----------------
+        method : string
+            Periodogram method.
+            Only 'welch' is currently supported.
+        window_sec : float
+            Length of each window in seconds.
+            If None, window_sec = (1 / min(band)) * 2.
+        band_total : bool
+            Whether to band the total power
+            Default False
+        total_band: List
+            low and high frequency values for the filter on total band.
+            Default [1.5, 90]
+        unit : str
+            Currently support micro and milli.
+            The scale to return Volts in.
 
         Returns
         ------
@@ -1264,27 +1265,31 @@ class NLfp(NBase):
 
         Parameters
         ----------
-        first_band - 1d array
+        first_band : 1d array
             lower and upper bands
-        second_band - 1d array
+        second_band : 1d array
             lower and upper bands
-        win_sec - float
+        win_sec : float
             length of the windows to bin lfp into in seconds.
             recommend 4 for eg.
-        kwargs:
-            first_name - str name of band 1, default "Band 1"
-            second_name - str name of band 2, default "Band 2"
+
+        Keyword Arguments
+        -----------------
+        first_name : str
+            name of band 1, default "Band 1"
+        second_name : str
+            name of band 2, default "Band 2"
 
         Returns
         -------
-        float - the ratio between the power signals.
+        float
+            the ratio between the power signals.
 
         See also
         --------
         nc_lfp.NLfp().bandpower()
 
         """
-
         _results = oDict()
         name1 = kwargs.get("first_name", "Band 1")
         name2 = kwargs.get("second_name", "Band 2")
@@ -1311,7 +1316,7 @@ class NLfp(NBase):
 
     def save_to_hdf5(self, file_name=None, system=None):
         """
-        Stores NLfp() object to HDF5 file.
+        Store NLfp() object to HDF5 file.
 
         Parameters
         ----------
@@ -1329,7 +1334,6 @@ class NLfp(NBase):
         nc_hdf.Nhdf().save_lfp()
 
         """
-
         hdf = Nhdf()
         if file_name and system:
             if os.path.exists(file_name):
@@ -1344,7 +1348,7 @@ class NLfp(NBase):
 
     def load_lfp_NWB(self, file_name):
         """
-        Decodes LFP data from NWB (HDF5) file format.
+        Decode LFP data from NWB (HDF5) file format.
 
         Parameters
         ----------
@@ -1356,7 +1360,6 @@ class NLfp(NBase):
         None
 
         """
-
         file_name, path = file_name.split('+')
         if os.path.exists(file_name):
             hdf = Nhdf()
@@ -1388,7 +1391,7 @@ class NLfp(NBase):
 
     def load_lfp_Axona(self, file_name):
         """
-        Decodes LFP data from Axona file format.
+        Decode LFP data from Axona file format.
 
         Parameters
         ----------
@@ -1473,13 +1476,17 @@ class NLfp(NBase):
 
                 with open(set_file, 'r', encoding='latin-1') as f_set:
                     lines = f_set.readlines()
-                    channel_lines = dict([tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))
-                                          for line in lines if line.startswith('EEG_ch_')])
+                    channel_lines = dict(
+                        [tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))
+                            for line in lines if line.startswith('EEG_ch_')]
+                    )
                     channel_id = channel_lines[self.get_file_tag()]
                     self.set_channel_id(channel_id)
 
-                    gain_lines = dict([tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))
-                                       for line in lines if 'gain_ch_' in line])
+                    gain_lines = dict(
+                        [tuple(map(int, re.findall(r'\d+.\d+|\d+', line)[0].split()))
+                            for line in lines if 'gain_ch_' in line]
+                    )
                     gain = gain_lines[channel_id - 1]
 
                     for line in lines:
@@ -1503,8 +1510,8 @@ class NLfp(NBase):
                     lfp_wave = np.zeros([num_samples, ], dtype=np.float64)
                     for k in np.arange(0, bytes_per_sample, 1):
                         byte_offset = k
-                        sample_value = (sample_le[k] * byte_buffer[byte_offset:byte_offset +
-                                                                   len_bytebuffer - end_offset - record_size:record_size])
+                        sample_value = (
+                            sample_le[k] * byte_buffer[byte_offset:byte_offset + len_bytebuffer - end_offset - record_size:record_size])
                         if sample_value.size < num_samples:
                             sample_value = np.append(sample_value, np.zeros(
                                 [num_samples - sample_value.size, ]))
@@ -1524,7 +1531,7 @@ class NLfp(NBase):
 
     def load_lfp_Neuralynx(self, file_name):
         """
-        Decodes LFP data from Neuralynx file format.
+        Decode LFP data from Neuralynx file format.
 
         Parameters
         ----------
@@ -1536,13 +1543,13 @@ class NLfp(NBase):
         None
 
         """
-
         self._set_data_source(file_name)
         self._set_source_format('Neuralynx')
 
         # Format description for the NLX file:
 
-        resamp_freq = 250  # NeuroChaT subsamples the original recording from 32000 to 250
+        # NeuroChaT subsamples the original recording from 32000 to 250
+        resamp_freq = 250
 
         header_offset = 16 * 1024  # fixed for NLX files
 
@@ -1613,18 +1620,24 @@ class NLfp(NBase):
             sample_le = 256**(np.arange(0, bytes_per_sample, 1))
             for _ in np.arange(num_samples):
                 sample_bytes = np.fromfile(f, dtype='uint8', count=record_size)
-                block_start = int.from_bytes(sample_bytes[time_offset +
-                                                          np.arange(bytes_per_timestamp)], byteorder='little', signed=False) / 10**6
-                valid_samples = int.from_bytes(sample_bytes[num_valid_samples_offset +
-                                                            np.arange(bytes_num_valid_samples)], byteorder='little', signed=False)
-                sampling_freq = int.from_bytes(sample_bytes[sample_freq_offset +
-                                                            np.arange(bytes_sample_freq)], byteorder='little', signed=False)
+                block_start = int.from_bytes(
+                    sample_bytes[time_offset + np.arange(bytes_per_timestamp)],
+                    byteorder='little', signed=False) / 10**6
+                valid_samples = int.from_bytes(
+                    sample_bytes[num_valid_samples_offset +
+                                 np.arange(bytes_num_valid_samples)],
+                    byteorder='little', signed=False)
+                sampling_freq = int.from_bytes(
+                    sample_bytes[sample_freq_offset +
+                                 np.arange(bytes_sample_freq)],
+                    byteorder='little', signed=False)
 
                 wave_bytes = sample_bytes[sample_offset + np.arange(valid_samples * bytes_per_sample)]\
                     .reshape([valid_samples, bytes_per_sample])
                 block_wave = np.dot(wave_bytes, sample_le)
                 #    for k in np.arange(valid_samples):
-                #        block_wave[k] = int.from_bytes(sample_bytes[sample_offset+ k*bytes_per_sample+ \
+                #        block_wave[k] = int.from_bytes(
+                #           sample_bytes[sample_offset+ k*bytes_per_sample+ \
                 # np.arange(bytes_per_sample)], byteorder='little',
                 # signed=False)
                 np.putmask(block_wave, block_wave > max_ADC_count,
@@ -1645,9 +1658,11 @@ class NLfp(NBase):
 
     def find_artf(self, sd_thresh=3, min_artf_freq=8):
         """
-        Obtains locations of signal above threshold in windows.
+        Obtain locations of signal above threshold in windows.
 
-        NOTE this function is still a work in progress and may see future changes.
+        NOTE
+        ----
+        This function is still a work in progress and may see future changes.
 
         Parameters
         ----------
@@ -1692,3 +1707,11 @@ class NLfp(NBase):
         per_removed = len(thr_locs) / len(samples) * 100
         # print(len(thr_locs), len(thr_time))
         return mean, std, thr_locs, thr_vals, thr_time, per_removed
+
+    def __str__(self):
+        """A friendly string representation of the object."""
+        return ("{} object with tag {} from channel {} at {}Hz with {} samples".format(
+            "NeuroChaT NLfp", self._tag, self._channel_id,
+            self.get_sampling_rate(),
+            self.get_total_samples()
+        ))
