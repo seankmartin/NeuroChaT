@@ -44,15 +44,17 @@ def main(url, file_name, verbose=False):
     ndata.load()
 
     # Choose the unit number from those available
-    print(ndata.get_unit_list())
+    print("Units are:", ndata.get_unit_list())
     unit_no = int(input("Unit to use:\n").strip())
     ndata.set_unit_no(unit_no)
 
     # Perform analysis
     ndata.place()
     ndata.wave_property()
-    print(ndata.get_results()["Spatial Skaggs"])
-    print(ndata.get_results()["Mean Spiking Freq"])
+    # print(ndata.get_results()["Spatial Skaggs"])
+    # print(ndata.get_results()["Mean Spiking Freq"])
+    print(ndata.get_results(spaces_to_underscores=True))
+    print(ndata.get_results(spaces_to_underscores=False))
 
 
 if __name__ == "__main__":
