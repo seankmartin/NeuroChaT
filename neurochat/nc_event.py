@@ -116,7 +116,7 @@ class NEvent(NBase):
 
     def set_curr_tag(self, event):
         """
-        Set current tag of to cosider for analysis.
+        Set current tag of to consider for analysis.
 
         Parameters
         ----------

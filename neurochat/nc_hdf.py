@@ -17,15 +17,22 @@ import h5py
 
 class Nhdf(object):
     """
-    The Nhdf class manages the import and export of various NeuroChaT dataset
-    to a HDF5 file dataset.
+    Manages importing and exporting NeuroChaT datasets to HDF5 file.
 
     It also creates and manages the nomenclature for storage paths
-    within the file.
+    within the HDF5 file.
+
+    Attributes
+    ----------
+    _filename : str
+        The filename of the hdf5 file.
+    f : io.IOBase
+        The h5py file object that is opened.
 
     """
 
     def __init__(self, **kwargs):
+        """See the class description."""
         self._filename = kwargs.get('filename', '')
         self.f = None
 
@@ -36,7 +43,7 @@ class Nhdf(object):
 
     def get_type(self):
         """
-        Returns the type of object. For Nhdf, this is always `hdf` type.
+        Return the type of object. For Nhdf, this is always `hdf` type.
 
         Parameters
         ----------
@@ -51,7 +58,7 @@ class Nhdf(object):
 
     def get_filename(self):
         """
-        Returns the full file of the HDF5 dataset.
+        Return the full file of the HDF5 dataset.
 
         Parameters
         ----------
@@ -62,12 +69,11 @@ class Nhdf(object):
         str
 
         """
-
         return self._filename
 
     def set_filename(self, filename=None):
         """
-        Sets the full file of the HDF5 dataset.
+        Set the full file of the HDF5 dataset.
 
         Parameters
         ----------
@@ -79,7 +85,6 @@ class Nhdf(object):
         None
 
         """
-
         if filename:
             self._filename = filename
         try:
@@ -89,7 +94,7 @@ class Nhdf(object):
 
     def get_file_object(self):
         """
-        Returns the file object that is opened using h5py.
+        Return the file object that is opened using h5py.
 
         Parameters
         ----------
@@ -109,7 +114,7 @@ class Nhdf(object):
 
     def file(self):
         """
-        Opens the file, and returns the file object.
+        Open the file, and returns the file object.
 
         Parameters
         ----------
@@ -132,7 +137,7 @@ class Nhdf(object):
 
     def close(self):
         """
-        Closes the h5py file object.
+        Close the h5py file object.
 
         Parameters
         ----------
@@ -143,14 +148,13 @@ class Nhdf(object):
         None
 
         """
-
         if isinstance(self.f, h5py.File):
             self.f.close()
             self.f = None
 
     def initialize(self):
         """
-        Initializes the basic groups for the HDF5 file.
+        Initialize the basic groups for the HDF5 file.
 
         Parameters
         ----------
@@ -168,7 +172,7 @@ class Nhdf(object):
 
     def get_groups_in_path(self, path=''):
         """
-        Returns the names of groups or datasets in a path.
+        Return the names of groups or datasets in a path.
 
         Parameters
         ----------
@@ -192,8 +196,7 @@ class Nhdf(object):
     @staticmethod
     def resolve_hdfname(data=None):
         """
-        Resolves and returns the name of the HDF5 file from the filenames of
-        the NeuroChaT data.
+        Return the name of the HDF5 file from the filenames of NeuroChaT data.
 
         Parameters
         ----------
@@ -225,7 +228,8 @@ class Nhdf(object):
                 elif data_type == 'spatial':
                     hdf_name = os.sep.join(
                         [f_path,
-                         '_'.join(os.path.splitext(f_name)[0].split('_')[:-1]) + '.hdf5'])
+                         '_'.join(os.path.splitext(f_name)[0].split('_')[:-1]) +
+                         '.hdf5'])
             elif system == 'Neuralynx':
                 hdf_name = os.sep.join(
                     [f_path, f_path.split(os.sep)[-1] + '.hdf5'])
@@ -234,7 +238,9 @@ class Nhdf(object):
 
     def resolve_datapath(self, data=None):
         """
-        Resolves and returns path of the dataset from NeuroChaT data objects.
+        Resolve and return the path of the dataset from NeuroChaT data objects.
+
+        This is used to obtain a path within the HDF5 file.
 
         Parameters
         ----------
@@ -247,7 +253,6 @@ class Nhdf(object):
             Path of the NeuroChaT data
 
         """
-
         # No resolution for NWB file, this function will not be called if the
         # system == 'NWB'
         try:
@@ -269,8 +274,7 @@ class Nhdf(object):
     @staticmethod
     def get_file_tag(data=None):
         """
-        Resolves and returns the file tag or extension to name the group of the
-        neural data in the HDF5 file.
+        Return the file tag or extension to name the neural data in the HDF5 file.
 
         Parameters
         ----------
@@ -305,8 +309,9 @@ class Nhdf(object):
 
     def resolve_analysis_path(self, spike=None, lfp=None):
         """
-        Resolves and returns path of the dataset where analysis results will be
-        stroed. This path is also the unique unit ID.
+        Return path of the dataset where analysis results will be stored.
+
+        This path is also the unique unit ID.
 
         Parameters
         ----------
@@ -318,8 +323,8 @@ class Nhdf(object):
         Returns
         -------
         str
-            Unique unit ID resolved from spike and lfp filenames which is also the
-            name of the path to store the data of NeuroChaT analysis
+            Unique unit ID resolved from spike and lfp filenames.
+            This is the name of the path to store the data of NeuroChaT analysis.
 
         """
         # Each input is an object
@@ -349,7 +354,7 @@ class Nhdf(object):
 
     def save_dataset(self, path=None, name=None, data=None, create_group=True):
         """
-        Stores a dataset to a specific path.
+        Store a dataset to a specific path.
 
         Parameters
         ----------
@@ -357,7 +362,7 @@ class Nhdf(object):
             Path of a group in HDF5 file
         name : str
             Name of the new dataset
-        data : ndarrray or list of numbers
+        data : ndarray or list of numbers
             Data to be stored
         create_group : bool
             If True, creates a new group if the 'path' is not in the file
@@ -367,10 +372,6 @@ class Nhdf(object):
         None
 
         """
-        # Path is an abosulte path of the group where the dataset will be stored
-        # Abosulte path for the dataset will be created using the group path and the name of the dataset
-        # If create_group = False (default), it will check if the path exists. If not error will be generated
-        # If creat_group = True, it will create the group]\
         if not path:
             logging.error('Invalid group path specified!')
         if not name:
@@ -396,12 +397,13 @@ class Nhdf(object):
 
     def get_dataset(self, group=None, path='', name=''):
         """
-        Stores a dataset to a specific path.
+        Retrieve a dataset from a specific path.
 
         Parameters
         ----------
         group : str
-            Path of a group in HDF5 file
+            Path of a group in HDF5 file.
+            If None, uses self.f as the group.
         path : str
             Name of the member group. This path is relative to the 'group'
         name : str
@@ -413,7 +415,6 @@ class Nhdf(object):
             Value of the dataset
 
         """
-
         if isinstance(group, h5py.Group):
             g = group
         else:
@@ -434,19 +435,12 @@ class Nhdf(object):
             logging.error(path + ' not found!' +
                           'Specify a valid path or name or check if a proper group is specified!')
 
-#    def delete_group_data(self, path = None):
-#        # Deletes everything within a group, not the group itself
-#        if path in self.f:
-#            g = self.f[path]
-#        if g.keys():
-#            for node in g.keys():
-#                del self.f[path+ '/'+ node]
-
     def save_dict_recursive(self, path=None, name=None,
                             data=None, create_group=True):
         """
-        Stores a dictionary dataset to a specific path. If the dictionary is
-        nested, it creates a group for each of the outermost keys.
+        Store a dictionary dataset to a specific path.
+
+        If the dictionary is nested, it creates a group for each of the outermost keys.
 
         Parameters
         ----------
@@ -454,7 +448,7 @@ class Nhdf(object):
             Path of a group in HDF5 file
         name : str
             Name of the new dataset
-        data : ndarrray or list of numbers
+        data : ndarray or list of numbers
             Data to be stored
         create_group : bool
             If True, creates a new group if the 'path' is not in the file
@@ -464,7 +458,6 @@ class Nhdf(object):
         None
 
         """
-
         if not isinstance(data, dict):
             logging.error(
                 'Nhdf class method save_dict_recursive() takes only dictionary data input!')
@@ -472,14 +465,16 @@ class Nhdf(object):
             for key, value in data.items():
                 if isinstance(value, dict):
                     self.save_dict_recursive(
-                        path=path + name + '/', name=key, data=data[key], create_group=create_group)
+                        path=path + name + '/', name=key,
+                        data=data[key], create_group=create_group)
                 else:
-                    self.save_dataset(path=path + name, name=key,
-                                      data=value, create_group=create_group)
+                    self.save_dataset(
+                        path=path + name, name=key,
+                        data=value, create_group=create_group)
 
     def save_attributes(self, path=None, attr=None):
         """
-        Stores an attribute to a group or dataset.
+        Store attributes to a group or dataset.
 
         Parameters
         ----------
@@ -506,8 +501,9 @@ class Nhdf(object):
 
     def save_object(self, obj=None):
         """
-        Stores a NeuroChaT dataset to the HDF5 file. It resolves the name first
-        and then stores the data in the storage path.
+        Store a NeuroChaT dataset to the HDF5 file.
+
+        It resolves the name first and then stores the data in the storage path.
 
         Parameters
         ----------
@@ -533,7 +529,7 @@ class Nhdf(object):
 
     def save_spatial(self, spatial=None):
         """
-        Stores NSpatial() dataset to the HDF5 file.
+        Store NSpatial() dataset to the HDF5 file.
 
         Parameters
         ----------
@@ -545,7 +541,6 @@ class Nhdf(object):
         None
 
         """
-
         # derive the path from the filename to ensure uniqueness
         self.set_filename(self.resolve_hdfname(data=spatial))
         # Get the lfp data path/group
@@ -595,7 +590,7 @@ class Nhdf(object):
 
     def save_lfp(self, lfp=None):
         """
-        Stores NLfp() dataset to the HDF5 file.
+        Store NLfp() dataset to the HDF5 file.
 
         Parameters
         ----------
@@ -607,7 +602,6 @@ class Nhdf(object):
         None
 
         """
-
         # derive the path from the filename to ensure uniqueness
         self.set_filename(self.resolve_hdfname(data=lfp))
         # Get the lfp data path/group
@@ -629,7 +623,7 @@ class Nhdf(object):
 
     def save_spike(self, spike=None):
         """
-        Stores NSpike() dataset to the HDF5 file.
+        Store NSpike() dataset to the HDF5 file.
 
         Parameters
         ----------
@@ -641,7 +635,6 @@ class Nhdf(object):
         None
 
         """
-
         # derive the path from the filename to ensure uniqueness
         self.set_filename(self.resolve_hdfname(data=spike))
         # Get the spike data path/group
@@ -677,7 +670,7 @@ class Nhdf(object):
                               data=spike.get_samples_per_spike())
         g_wave.create_dataset(name='timestamps', data=spike.get_timestamp())
 
-        # save Clutser number
+        # save Cluster number
         g_clust.create_dataset(name='cluster_nums', data=spike.get_unit_list())
         g_clust.create_dataset(name='num', data=spike.get_unit_tags())
         g_clust.create_dataset(name='times', data=spike.get_timestamp())
@@ -686,7 +679,7 @@ class Nhdf(object):
 
     def save_cluster(self, clust=None):
         """
-        Stores NClust() dataset to the HDF5 file.
+        Store NClust() dataset to the HDF5 file.
 
         Parameters
         ----------
@@ -698,7 +691,6 @@ class Nhdf(object):
         None
 
         """
-
         # Nclust is a NSpike derivative (inherited from NSpike) to add clustering facilities to the NSpike data
         # But we will consider putting it within NSpike itself
         # This will store data to Shank's Clustering and Feature Extraction
