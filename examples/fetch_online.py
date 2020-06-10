@@ -47,6 +47,7 @@ def main(url, file_name, verbose=False):
     print("Units are:", ndata.get_unit_list())
     unit_no = int(input("Unit to use:\n").strip())
     ndata.set_unit_no(unit_no)
+    print("Loaded:", ndata)
 
     # Perform analysis
     ndata.place()
