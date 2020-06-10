@@ -1711,7 +1711,7 @@ class NLfp(NBase):
     def __str__(self):
         """Return a friendly string representation of the object."""
         return ("{} object with tag {} from channel {} at {}Hz with {} samples".format(
-            "NeuroChaT NLfp", self._tag, self._channel_id,
+            "NeuroChaT NLfp", self._file_tag, self._channel_id,
             self.get_sampling_rate(),
             self.get_total_samples()
         ))

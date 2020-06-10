@@ -1409,3 +1409,12 @@ class NData():
             logging.warning(
                 'No ' + arg + ' method or attribute in NeuroData' +
                 'or in composing data class')
+
+    def __str__(self):
+        """Return a friendly string representation of the object."""
+        return "{} object in {} format containing:\n\t{}\n\t{}\n\t{}".format(
+            "NeuroChaT NData", self.data_format,
+            self.spike,
+            self.spatial,
+            self.lfp
+        )

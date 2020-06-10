@@ -1871,35 +1871,47 @@ class NSpike(NBase):
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
 
+    def __str__(self):
+        """Return a friendly string representation of this object."""
+        if self.get_unit_no() not in self._unit_list:
+            total_spikes = "not in unit list"
+        else:
+            total_spikes = "with {} spikes".format(
+                self.get_unit_spikes_count())
+        return "{} object with units {} and current unit {} {}".format(
+            "NeuroChaT NSpike", self.get_unit_list(), self.get_unit_no(),
+            total_spikes
+        )
+
     # def sfc(self, lfp=None, **kwargs):
-    #     """
-    # Calculates spike-field coherence of spike train with underlying LFP
-    # signal.
+        # """
+        # Calculates spike-field coherence of spike train with underlying LFP
+        # signal.
 
-    #     Delegates to NLfp().sfc()
+        # Delegates to NLfp().sfc()
 
-    #     Parameters
-    #     ----------
-    #     lfp : NLfp
-    #         LFP object which contains the LFP data
-    #     **kwargs
-    #         Keyword arguments
+        # Parameters
+        # ----------
+        # lfp : NLfp
+        #     LFP object which contains the LFP data
+        # **kwargs
+        #     Keyword arguments
 
-    #     Returns
-    #     -------
-    #     dict
-    #         Graphical data of the analysis
+        # Returns
+        # -------
+        # dict
+        #     Graphical data of the analysis
 
-    #     See also
-    #     --------
-    #     nc_lfp.NLfp().sfc()
+        # See also
+        # --------
+        # nc_lfp.NLfp().sfc()
 
-    #     """
+        # """
 
-    #     if lfp is None:
-    #         logging.error('LFP data not specified!')
-    #     else:
-    #         try:
-    #             lfp.sfc(self.get_unit_stamp(), **kwargs)
-    #         except:
-    #             logging.error('No sfc() method in lfp data specified!')
+        # if lfp is None:
+        #     logging.error('LFP data not specified!')
+        # else:
+        #     try:
+        #         lfp.sfc(self.get_unit_stamp(), **kwargs)
+        #     except:
+        #         logging.error('No sfc() method in lfp data specified!')

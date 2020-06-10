@@ -3191,8 +3191,7 @@ class NSpatial(NAbstract):
 
         self.update_result(_results)
 
-#    def __getattr__(self, arg):
-#        if hasattr(self.spike, arg):
-#            return getattr(self.spike, arg)
-#        elif hasattr(self.lfp, arg):
-#            return getattr(self.lfp, arg)
+    def __str__(self):
+        """Return a friendly string representation of this object."""
+        return "{} object with {} samples at {}Hz".format(
+            "NeuroChaT NSpatial", self.get_total_samples(), self.get_sampling_rate())
