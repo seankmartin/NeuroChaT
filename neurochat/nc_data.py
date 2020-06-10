@@ -919,35 +919,6 @@ class NData():
 
         return gdata
 
-    def place_field_centroid_zscore(self, **kwargs):
-        """
-        Calculate a very simple centroid of place field using z-scores.
-
-        Delegates to NSpatial().place_field()
-        ndata.place() calculates a more rigorous centroid, and should
-        generally be preferred over this method.
-
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments
-
-        Returns
-        -------
-        ndarray
-            Centroid of the place field
-
-        See also
-        --------
-        nc_spatial.NSpatial().place_field()
-
-        """
-        gdata = self.spatial.place_field_centroid_zscore(
-            self.spike.get_unit_stamp(), **kwargs)
-        self.update_results(self.spatial.get_results())
-
-        return gdata
-
     def loc_time_lapse(self, **kwargs):
         """
         Time-lapse firing properties of the unit with respect to location.
