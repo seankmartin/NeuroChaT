@@ -28,8 +28,7 @@ from scipy.fftpack import fft
 
 class NLog(logging.Handler):
     """
-    Class for handling log information (messages, errors and warnings) for
-    NeuroChaT.
+    Class for handling log information (messages, errors and warnings).
 
     It formats the incoming message in HTML and sends it to the log
     interface of NeuroChaT.
@@ -42,8 +41,7 @@ class NLog(logging.Handler):
 
     def setup(self):
         """
-        Removes all the logging handlers and sets up a new logger with HTML
-        formatting.
+        Remove all the logging handlers and set up a logger in HTML format.
 
         Parameters
         ----------
@@ -54,7 +52,6 @@ class NLog(logging.Handler):
         None
 
         """
-
         log = logging.getLogger()
         for hdlr in log.handlers[:]:  # remove all old handlers
             log.removeHandler(hdlr)
@@ -68,31 +65,30 @@ class NLog(logging.Handler):
 
     def emit(self, record):
         """
-        Formats the incoming record and.
+        Format the incoming record and display it.
 
         Parameters
         ----------
         record
-            Log record to dispkay or store
+            Log record to display or store
 
         Returns
         -------
         None
 
         """
-
         msg = self.format(record)
         level = record.levelname
         msg = level + ':' + msg
         print(msg)
         time.sleep(0.25)
-#        self.emit(QtCore.SIGNAL('update_log(QString)'), msg)
 
 
 class Singleton(object):
-    """Creates a Singleton object created from a subclass of this class."""
+    """Create a Singleton object created from a subclass of this class."""
 
     def __new__(cls, *arg, **kwarg):
+        """Create a Singleton object created from a subclass of this class."""
         if not hasattr(cls, '_instance'):
             cls._instance = super().__new__(cls, *arg, **kwarg)
         return cls._instance
@@ -100,8 +96,7 @@ class Singleton(object):
 
 def bhatt(X1, X2):
     """
-    Calculates Bhattacharyya coefficient and Bhattacharyya distance between two
-    distributions.
+    Calculate Bhattacharyya coefficient and distance between distributions.
 
     Parameters
     ----------
@@ -114,7 +109,6 @@ def bhatt(X1, X2):
         Bhattacharyya coefficient and Bhattacharyya distance
 
     """
-
     r1, c1 = X1.shape
     r2, c2 = X2.shape
     if c1 == c2:
@@ -126,11 +120,11 @@ def bhatt(X1, X2):
         chol = nalg.cholesky(C).T
         dmu = (mu1 - mu2) @ nalg.inv(chol)
         try:
-            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(nalg.det(C) /
-                                                     np.sqrt(nalg.det(C1) * nalg.det(C2)))
+            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(
+                nalg.det(C) / np.sqrt(nalg.det(C1) * nalg.det(C2)))
         except BaseException:
-            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(np.abs(nalg.det(C @
-                                                                     nalg.inv(scipy.linalg.sqrtm(C1 @ C2)))))
+            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(
+                np.abs(nalg.det(C @ nalg.inv(scipy.linalg.sqrtm(C1 @ C2)))))
         bc = np.exp(-1 * d)
 
         return bc, d
@@ -141,7 +135,7 @@ def bhatt(X1, X2):
 
 def butter_filter(x, Fs, *args):
     """
-    Filtering function using bidirectional zero-phase shift Butterworth filter.
+    Filter using bidirectional zero-phase shift Butterworth filter.
 
     Parameters
     ----------
@@ -157,10 +151,8 @@ def butter_filter(x, Fs, *args):
         Filtered signal
 
     """
-
     gstop = 20  # minimum dB attenuation at stopabnd
     gpass = 3  # maximum dB loss during ripple
-#    order= args[0]
     for arg in args:
         if isinstance(arg, str):
             filttype = arg
@@ -170,7 +162,7 @@ def butter_filter(x, Fs, *args):
             wp = 1
             if filttype == 'lowpass':
                 logging.warning(
-                    'Butterworth filter critical freqeuncy Wp is capped at 1')
+                    'Butterworth filter critical frequency Wp is capped at 1')
             else:
                 logging.error('Cannot highpass filter over Nyquist frequency!')
 
@@ -181,11 +173,11 @@ def butter_filter(x, Fs, *args):
             wp = np.array(args[1:3]) / (Fs / 2)
             if wp[0] >= wp[1]:
                 logging.error(
-                    'Butterworth filter lower cutoff frequency must be smaller than upper cutoff freqeuncy!')
+                    'Butterworth filter lower cutoff frequency must be smaller than upper cutoff frequency!')
 
             if wp[0] == 0 and wp[1] >= 1:
                 logging.error(
-                    'Invalid filter specifications, check cutt off frequencies and sampling frequency!')
+                    'Invalid filter specifications, check cut off frequencies and sampling frequency!')
             elif wp[0] == 0:
                 wp = wp[1]
                 filttype = 'lowpass'
@@ -205,9 +197,6 @@ def butter_filter(x, Fs, *args):
         ws[1] = min([wp[1] + 0.1, 1])
 
     min_order, min_wp = sg.buttord(wp, ws, gpass, gstop)
-#    if order<= min_order:
-#        order= min_order
-#        wp= min_wp
 
     b, a = sg.butter(min_order, min_wp, btype=filttype, output='ba')
 
@@ -216,8 +205,10 @@ def butter_filter(x, Fs, *args):
 
 def chop_edges(x, xlen, ylen):
     """
-    Chope the edges of a firing rate map if they are not visited at ll or with
-    zero firing rate.
+    Chop the edges of a firing rate map.
+
+    They are considered to be the edges if they are not
+    visited at all or with zero firing rate.
 
     Parameters
     ----------
@@ -238,7 +229,6 @@ def chop_edges(x, xlen, ylen):
         Chopped firing map
 
     """
-
     y = np.copy(x)
     low_ind = [0, 0]
     high_ind = [x.shape[0], x.shape[1]]
@@ -259,11 +249,6 @@ def chop_edges(x, xlen, ylen):
         else:
             MOVEON = False
 
-# Following is the old MATLAB logic, we have changed it to remove the edges with zero count
-#        if no_filled_bins1< no_filled_bins2:
-#            low_ind[1] += 1
-#        else:
-#            high_ind[1] -= 1
         y = x[low_ind[0]: high_ind[0], low_ind[1]:high_ind[1]]
 
     MOVEON = True
@@ -282,11 +267,6 @@ def chop_edges(x, xlen, ylen):
         else:
             MOVEON = False
 
-# Following is the old MATLAB logic, we have changed it to remove the edges with zero count
-#        if no_filled_bins1< no_filled_bins2:
-#            low_ind[0] += 1
-#        else:
-#            high_ind[0]-=1
         y = x[low_ind[0]: high_ind[0], low_ind[1]:high_ind[1]]
 
     return low_ind, high_ind, y
@@ -307,7 +287,6 @@ def corr_coeff(x1, x2):
         Correlation coefficient of input arrays
 
     """
-
     try:
         return np.sum(np.multiply(x1 - x1.mean(), x2 - x2.mean())) / \
             np.sqrt(np.sum((x1 - x1.mean())**2) * np.sum((x2 - x2.mean())**2))
@@ -317,7 +296,7 @@ def corr_coeff(x1, x2):
 
 def extrema(x, mincap=None, maxcap=None):
     """
-    Finds the extrema in a numeric array or a signal.
+    Find the extrema in a numeric array or a signal.
 
     Parameters
     ----------
@@ -338,7 +317,6 @@ def extrema(x, mincap=None, maxcap=None):
         Minima indices
 
     """
-
     x = np.array(x)
     # Flat peaks at the end of the series are not considered yet
     dx = np.diff(x)
@@ -369,7 +347,7 @@ def extrema(x, mincap=None, maxcap=None):
 
 def fft_psd(x, Fs, nfft=None, side='one', ptype='psd'):
     """
-    Calculates the Fast Fourier Transform (FFT) of a signal.
+    Calculate the Fast Fourier Transform (FFT) of a signal.
 
     Parameters
     ----------
@@ -392,7 +370,6 @@ def fft_psd(x, Fs, nfft=None, side='one', ptype='psd'):
         FFt frequency
 
     """
-
     if nfft is None:
         nfft = 2**(np.floor(np.log2(len(x))) + 1)
 
@@ -419,7 +396,7 @@ def fft_psd(x, Fs, nfft=None, side='one', ptype='psd'):
 
 def find(X, n=None, direction='all'):
     """
-    Finds the non-zero entries of a signal or array.
+    Find the non-zero entries of a signal or array.
 
     Parameters
     ----------
@@ -428,8 +405,9 @@ def find(X, n=None, direction='all'):
     n : int
         Number of such entries
     direction : str
-        If 'all', all entries of length n are returned. If 'first', first n entries
-        are returned. If 'last', last n entrues are returned.
+        If 'all', all entries of length n are returned.
+        If 'first', first n entries are returned.
+        If 'last', last n entries are returned.
 
     Returns
     -------
@@ -437,7 +415,6 @@ def find(X, n=None, direction='all'):
         Indices of non-zero entries.
 
     """
-
     if isinstance(X, list):
         X = np.array(X)
     X = X.flatten()
@@ -454,7 +431,7 @@ def find(X, n=None, direction='all'):
 
 def find2d(X, n=None):
     """
-    Finds the non-zero entries of a matrix.
+    Find the non-zero entries of a matrix.
 
     Parameters
     ----------
@@ -471,7 +448,6 @@ def find2d(X, n=None):
         y-indices of non-zero entries.
 
     """
-
     if len(X.shape) == 2:
         J = []
         I = []
@@ -490,7 +466,7 @@ def find2d(X, n=None):
 
 def find_chunk(x):
     """
-    Finds size and indeices of chunks of non-zero segments in an array.
+    Find size and indices of chunks of non-zero segments in an array.
 
     Parameters
     ----------
@@ -505,7 +481,6 @@ def find_chunk(x):
         Indices of non-zero chunks
 
     """
-
     # x is a binary array input i.e. x= data> 0.5 will find all the chunks in
     # data where data is greater than 0.5
     i = 0
@@ -529,7 +504,7 @@ def find_chunk(x):
 
 def hellinger(X1, X2):
     """
-    Calculates Hellinger distance between two distributions.
+    Calculate Hellinger distance between two distributions.
 
     Parameters
     ----------
@@ -542,7 +517,6 @@ def hellinger(X1, X2):
         Calculated Hellinger distance
 
     """
-
     if X1.shape[1] != X2.shape[1]:
         logging.error(
             'Hellinger distance cannot be computed, column sizes do not match!')
@@ -552,7 +526,11 @@ def hellinger(X1, X2):
 
 def histogram(x, bins):
     """
-    Calculates the histogram count of input array.
+    Calculate the histogram count of input array.
+
+    This function is not a replacement of np.histogram;
+    it is created for convenience of binned-based rate calculations
+    and mimicking matlab histc that includes digitized indices
 
     Parameters
     ----------
@@ -569,9 +547,6 @@ def histogram(x, bins):
         Histogram bins(lowers edges)
 
     """
-    # This function is not a replacement of np.histogram; it is created for convenience
-    # of binned-based rate calculations and mimicking matlab histc that
-    # includes digitized indices
     if isinstance(bins, int):
         bins = np.arange(np.min(x), np.max(x), (np.max(x) - np.min(x)) / bins)
     bins = np.append(bins, bins[-1] + np.mean(np.diff(bins)))
@@ -580,7 +555,11 @@ def histogram(x, bins):
 
 def histogram2d(y, x, ybins, xbins):
     """
-    Calculates the joint histogram count of two arrays.
+    Calculate the joint histogram count of two arrays.
+
+    This function is not a replacement of np.histogram2d;
+    it is created for convenience of binned-based rate calculations
+    and mimicking matlab histc that includes digitized indices
 
     Parameters
     ----------
@@ -601,8 +580,6 @@ def histogram2d(y, x, ybins, xbins):
         Histogram bins in y-axis (lowers edges)
 
     """
-
-    # This function is not a repalcement of np.histogram
     if isinstance(xbins, int):
         xbins = np.arange(np.min(x), np.max(
             x), (np.max(x) - np.min(x)) / xbins)
@@ -617,7 +594,7 @@ def histogram2d(y, x, ybins, xbins):
 
 def linfit(X, Y, getPartial=False):
     """
-    Calculates the linear regression coefficients in least-square sense.
+    Calculate the linear regression coefficients in least-square sense.
 
     Parameters
     ----------
@@ -634,7 +611,6 @@ def linfit(X, Y, getPartial=False):
         Dictionary with results of least-square optimization of linear regression
 
     """
-
     _results = oDict()
     if len(X.shape) == 2:
         Nd, Nobs = X.shape
@@ -665,8 +641,7 @@ def linfit(X, Y, getPartial=False):
 def nxl_write(
         file_name, data_frame, sheet_name='Sheet1', startRow=0, startColumn=0):
     """
-    Write Pandas DataFrame to excel file. It is a wrapper for
-    Pandas.ExcelWriter()
+    Write Pandas DataFrame to excel file, wraps Pandas.ExcelWriter().
 
     Parameters
     ----------
@@ -696,8 +671,9 @@ def nxl_write(
 
 def residual_stat(y, y_fit, p):
     """
-    Calculates the goodness of fit and other residual statistics between
-    observed and fitted values from a model.
+    Calculate the goodness of fit and other residual statistics.
+
+    These are calculated between observed and fitted values from a model.
 
     Parameters
     ----------
@@ -714,8 +690,7 @@ def residual_stat(y, y_fit, p):
         Dictionary of residual statistics
 
     """
-
-   # p= total explanatory variables excluding constants
+    # p= total explanatory variables excluding constants
     _results = oDict()
     res = y - y_fit
     ss_res = np.sum(res**2)
@@ -732,7 +707,7 @@ def residual_stat(y, y_fit, p):
 
 def rot_2d(x, theta):
     """
-    Rotates a firing map by a specified angle.
+    Rotate a firing map by a specified angle.
 
     Parameters
     ----------
@@ -747,16 +722,19 @@ def rot_2d(x, theta):
         Rotated matrix
 
     """
-
     return scipy.ndimage.interpolation.rotate(
         x, theta, reshape=False, mode='constant', cval=np.min(x))
-
-# Created by Sean Martin 14/02/2019
 
 
 def angle_between_points(a, b, c):
     """
-    Returns the angle between the lines ab and bc, <abc.
+    Return the angle between the lines ab and bc, <abc.
+
+    This function always returns an angle less than 180degrees.
+    The orientation of the lines can be used to determine which
+    side of the lines this angle is formed from.
+
+    Returns np.nan if ab and bc are the same point.
 
     Parameters
     ----------
@@ -792,13 +770,15 @@ def angle_between_points(a, b, c):
 
 def centre_of_mass(co_ords, weights, axis=0):
     """
-    Calculates the co-ordinate centre of mass for a system of particles with co
-    ords and weights.
+    Calculate the co-ordinate centre of mass for a 2D system of particles.
+
+    The particles all have co-ords and weights.
 
     Parameters
     ----------
     co_ords : ndarray
-        Array of co-ordinate positions, assumed to have co_ords.shape[axis] co-ordinates
+        Array of co-ordinate positions,
+        assumed to have co_ords.shape[axis] co-ordinates.
     weights : ndarray
         Array of corresponding weights
     axis : int, default 0
@@ -826,12 +806,13 @@ def centre_of_mass(co_ords, weights, axis=0):
 
 def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
     """
-    Filters a 1D array or signal.
+    Filter a 1D array or signal.
 
     Parameters
     ----------
     x : ndarray
-        Array or signal to be filtered. If matrix, each column or row is filtered
+        Array or signal to be filtered.
+        If matrix, each column or row is filtered
         individually depending on 'dir' parameter that takes either '0' for along-column
         and '1' for along-row filtering.
     filttype : str
@@ -845,7 +826,6 @@ def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
         Filtered data
 
     """
-
     x = np.array(x)
     direction = kwargs.get('dir', 0)  # default along column
     if filttype == 'g':
@@ -871,7 +851,7 @@ def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
 
 def smooth_2d(x, filttype='b', filtsize=5):
     """
-    Filters a 2D array or signal.
+    Filter a 2D array or signal.
 
     Parameters
     ----------
@@ -888,7 +868,6 @@ def smooth_2d(x, filttype='b', filtsize=5):
         Filtered matrix
 
     """
-
     nanInd = np.isnan(x)
     x[nanInd] = 0
     if filttype == 'g':
@@ -910,8 +889,13 @@ def smooth_2d(x, filttype='b', filtsize=5):
 
 def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     """
-    Returns a list of ranges where truth values occur and the corresponding
-    values from arr, arr is assumed to be a sorted list.
+    Return a list of ranges where truth values occur in sorted array.
+
+    Also return the corresponding values from the input array.
+
+    Note
+    ----
+    The input array arr is assumed to be a sorted list.
 
     Parameters
     ----------
@@ -928,7 +912,6 @@ def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
         A list of tuples, ranges in arr where truth values are truth_arr
 
     """
-
     in_range = False
     ranges = []
     range_idxs = []
@@ -953,7 +936,7 @@ def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
 
 def find_peaks(data, **kwargs):
     """
-    Returns the peaks in the data based on gradient calculations.
+    Return the peaks in the data based on gradient calculations.
 
     Parameters
     ----------
@@ -966,7 +949,6 @@ def find_peaks(data, **kwargs):
             Don't consider any peaks with a value below this, default 0
 
     """
-
     data = np.array(data)
     slope = np.diff(data)
     start_at = kwargs.get('start', 0)
@@ -1001,7 +983,6 @@ def log_exception(ex, more_info=""):
     None
 
     """
-
     default_loc = os.path.join(
         os.path.expanduser("~"), ".nc_saved", "nc_caught.txt")
     now = datetime.datetime.now()
@@ -1019,8 +1000,22 @@ def window_rms(a, window_size, mode="same"):
     """
     Calculate the rms envelope, similar to matlab.
 
-    mode determines how many points are output mode valid will have no
-    border effects mode same will produce a value for each input
+    Parameters
+    ----------
+    a : ndarray
+        The input signal to envelope.
+    window_size : int
+        The length of the window to convolve the signal with.
+    mode : str
+        The mode determines how many points are output
+        mode "valid" will have no border effects
+        mode "same" will produce a value for each input
+        See np.convolve for more information.
+
+    Returns
+    -------
+    np.ndarray
+        The RMS envelope of the signal
 
     """
     a2 = np.power(a, 2)
@@ -1029,7 +1024,22 @@ def window_rms(a, window_size, mode="same"):
 
 
 def distinct_window_rms(a, N):
-    """Calculate the rms of a in windows of N data points."""
+    """
+    Calculate the rms of an array in windows of N data points.
+
+    Parameters
+    ----------
+    a : np.ndarray
+        The input array to compute the RMS of.
+    N : int
+        The length of the window to compute RMS in.
+
+    Returns
+    -------
+    list
+        The RMS in each window.
+
+    """
     a = np.array(a)
     a = np.square(a) / float(N)
     rms_array = []
@@ -1045,6 +1055,7 @@ def distinct_window_rms(a, N):
 
 
 def static_vars(**kwargs):
+    """Return decorator to create a function with static variables."""
     def decorate(func):
         for k in kwargs:
             setattr(func, k, kwargs[k])
@@ -1061,15 +1072,16 @@ def get_axona_colours(index=None):
     ----------
     index : int
         Optional integer to get colours at
+
     Returns
     -------
-    list :
-        A list of colours as rgb tuples with values in 0 to 1
+    list | tuple
+        A list of colours as rgb tuples with values in 0 to 1.
+        Or a single rgb tuple if index is specified.
 
     """
-
     if len(get_axona_colours.colorcells) == 0:
-        # crget_axona_colours.eate Axona cell colours if don't exist
+        # create Axona cell colours if don't exist
         get_axona_colours.colorcells.append((0, 0, 200 / 255))
         get_axona_colours.colorcells.append((80 / 255, 1, 80 / 255))
         get_axona_colours.colorcells.append((1, 0, 0))
@@ -1153,18 +1165,19 @@ def get_all_files_in_dir(
         The extension of files to get.
     return_absolute : bool, optional. Defaults to True.
         Whether to return the absolute filename or not.
-    recursive: bool, optional. Defaults to False.
+    recursive : bool, optional. Defaults to False.
         Whether to recurse through directories.
-    verbose: bool, optional. Defaults to False.
+    verbose : bool, optional. Defaults to False.
         Whether to print the files found.
-    re_filter: str, optional. Defaults to None
+    re_filter : str, optional. Defaults to None
         a regular expression used to filter the results
-    case_sensitive_ext: bool, optional. Defaults to False,
+    case_sensitive_ext : bool, optional. Defaults to False,
         Whether to match the case of the file extension
 
     Returns
     -------
-    List : A list of filenames
+    list 
+        A list of filenames
 
     """
     if not isdir(in_dir):
@@ -1221,11 +1234,32 @@ def get_all_files_in_dir(
 
 
 def make_dir_if_not_exists(location):
-    """Makes directory structure for given location."""
+    """Make directory structure for given location."""
     os.makedirs(os.path.dirname(location), exist_ok=True)
 
 
 def remove_extension(filename, keep_dot=True, return_ext=False):
+    """
+    Return the filename without the extension.
+
+    Very similar to os.path.splitext()
+
+    Parameters
+    ----------
+    filename : str
+        The filename to remove extension from.
+    keep_dot : bool
+        Whether to return filename + ".".
+    return_ext : bool
+        Whether to return filename or filename, ext.
+
+    Returns
+    -------
+    str | tuple
+        str if return_ext is False, the filename with no ext
+        (str, str) if return_ext is True, (filename, ext)
+
+    """
     modifier = 0 if keep_dot else 1
     ext = filename.split(".")[-1]
     remove = len(ext) + modifier
