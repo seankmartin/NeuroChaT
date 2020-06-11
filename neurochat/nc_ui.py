@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NeuroChaT_Ui, the main class for NeuroChaT graphical
-user interface. It contains other graphical and data objects and connects to
+This module implements NeuroChaT_Ui, the main class for NeuroChaT GUI.
+
+It contains other graphical and data objects and connects to
 the NeuroChaT class for setting configuration and analysis in NeuroChaT.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
@@ -677,8 +678,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
     def graphic_format_select(self):
         """
-        Called when there is a change in the graphic format selection button
-        groups.
+        Called when there is a change in the graphic format selection.
 
         Sets the output graphic format to the selected item.
 
@@ -984,10 +984,12 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             self._control.set_lfp_file(lfp_file)
 
     def view_help(self):
+        """Display user guide pdf on GitHub."""
         url = r"https://github.com/shanemomara/omaraneurolab/blob/master/NeuroChaT/docs/NeuroChaT%20User%20Guide.pdf"
         webbrowser.open_new(url)
 
     def view_api(self):
+        """Display API documentation for neurochat."""
         script_dir = os.path.dirname(__file__)
         rel_path = "../docs/index.html"
         url = os.path.join(script_dir, rel_path)
@@ -996,9 +998,11 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         webbrowser.open_new(url)
 
     def tutorial(self):
+        """Display a tutorial for the program."""
         pass
 
     def about_nc(self):
+        """Display a wiki page about the program."""
         url = "https://github.com/shanemomara/omaraneurolab/wiki/NeuroChaT"
         webbrowser.open_new(url)
 
@@ -1162,7 +1166,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
     def compare_units(self):
         """
-        Opens a file dialog for selecting the Excel list.
+        Open a file dialog for selecting the Excel list.
 
         This excel list contains specifications for comparing units
         and compares the units through NeuroChaT().cluster_similarity() method.
@@ -1235,7 +1239,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
     def verify_units(self):
         """
-        Opens a file dialog for selecting the Excel list.
+        Open a file dialog for selecting the Excel list.
 
         This excel list contains specifications for verifying the units
         and verifies the unit using the NeuroChaT().verify_units() method.
@@ -1259,7 +1263,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
     def cluster_evaluate(self):
         """
-        Opens a file dialog for selecting the Excel list.
+        Open a file dialog for selecting the Excel list.
 
         This excel list contains specifications for cluster evaluation
         and evaluates the clusters using NeuroChaT().cluster_evaluate() method.
@@ -1283,7 +1287,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
     def convert_to_nwb(self):
         """
-        Opens a file dialog for selecting the Excel list.
+        Open a file dialog for selecting the Excel list.
 
         This excel list contains specifications for NWB file for conversion.
         It then converts the files using the NeuroChaT().convert_to_nwb() method.
@@ -1810,7 +1814,6 @@ class UiParameters(QtWidgets.QDialog):
 
     def set_loc_rate_filter(self, filt_type):
         """Set the ui elements for the filters for firing rate map."""
-
         if filt_type == "Gaussian":
             self.loc_rate_kern_len.setSingleStep(1)
             self.loc_rate_kern_len.setValue(3)
@@ -1820,7 +1823,6 @@ class UiParameters(QtWidgets.QDialog):
 
     def set_spat_corr_filter(self, filt_type):
         """Set the ui elements for the filters for autocorrelation of fmap."""
-
         if filt_type == "Gaussian":
             self.spatial_corr_kern_len.setSingleStep(1)
             self.spatial_corr_kern_len.setValue(3)
@@ -2977,7 +2979,7 @@ class UiParameters(QtWidgets.QDialog):
 
 class ParamBoxLayout(QtWidgets.QVBoxLayout):
     """
-    Faciliates adding new widget items to the analysis parameter window.
+    Facilitates adding new widget items to the analysis parameter window.
 
     Subclass of QtWidgets.QVBoxLayout.
 
@@ -2988,7 +2990,7 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
 
     def addRow(self, label_1, widg, label_2):
         """
-        Adds a new row of widget using the QtWidgets.QHBoxLayout().
+        Add a new row of widget using the QtWidgets.QHBoxLayout().
 
         Parameters
         ----------
@@ -3000,7 +3002,6 @@ class ParamBoxLayout(QtWidgets.QVBoxLayout):
             Additional description of the parameter, i.e., unit, range etc.
 
         """
-
         widg.resize(widg.sizeHint())
         hLayout = QtWidgets.QHBoxLayout()
         hLayout.addWidget(QtWidgets.QLabel(label_1), 0, QtCore.Qt.AlignLeft)
