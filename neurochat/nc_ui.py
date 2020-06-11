@@ -83,7 +83,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         self.setObjectName(xlt_from_utf8("MainWindow"))
         self.setEnabled(True)
-        self.setFixedSize(725, 420)
+        self.setFixedSize(800, 480)
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName(xlt_from_utf8("centralwidget"))
 
