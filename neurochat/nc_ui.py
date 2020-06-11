@@ -282,7 +282,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         self.utilities_menu.addSeparator()
 
-        self.merge_act = self.utilities_menu.addAction("Merge Output PS/PDF")
+        self.merge_act = self.utilities_menu.addAction("Merge output PS/PDF")
         self.accumulate_act = self.utilities_menu.addAction(
             "Accumulate output PS/PDF")
 
@@ -297,7 +297,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             "Convert to NWB format")
 
         self.angle_act = self.multifile_menu.addAction(
-            "Centroid Angle Calculation")
+            "Centroid angle calculation")
         self.angle_act.setStatusTip(
             "Select an excel file which specifies files " +
             "in the order of: " +
@@ -396,9 +396,6 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
     def select_analysis_ui(self):
         """Set up the analysis type selection panel in NeuroChaT GUI."""
-        self.wave_property = add_check_box(
-            text="Waveform Properties", obj_name="wave_property")
-
         self.isi = add_check_box(text="Interspike Interval", obj_name="isi")
 
         self.isi_corr = add_check_box(
@@ -471,8 +468,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.lfp_spike_causality = add_check_box(
             text="Unit-LFP Causality", obj_name="lfp_spike_causality")
 
+        self.wave_property = add_check_box(
+            text="Waveform Properties", obj_name="wave_property")
+
         self.scroll_layout = QtWidgets.QVBoxLayout()
-        self.scroll_layout.addWidget(self.wave_property)
         self.scroll_layout.addWidget(self.isi)
         self.scroll_layout.addWidget(self.isi_corr)
         self.scroll_layout.addWidget(self.theta_cell)
@@ -498,6 +497,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.scroll_layout.addWidget(self.spike_phase)
         self.scroll_layout.addWidget(self.phase_lock)
         self.scroll_layout.addWidget(self.lfp_spike_causality)
+        self.scroll_layout.addWidget(self.wave_property)
 
         self.function_widget = ScrollableWidget()
         self.function_widget.setContents(self.scroll_layout)
@@ -1712,16 +1712,16 @@ class UiParameters(QtWidgets.QDialog):
         """Set the GUI elements for the widget."""
         self.setObjectName(xlt_from_utf8("paramSetWindow"))
         self.setEnabled(True)
-        self.setFixedSize(640, 320)
+        self.setFixedSize(900, 480)
         self.setWindowTitle(QtWidgets.QApplication.translate(
             "paramSetWindow", "Parameter settings", None))
 
         self.selectLabel = add_label(
-            self, (10, 10, 180, 17), "inpFormatLabel",
-            "Select analysis to set parameters")
+            self, (10, 10, 260, 17), "inpFormatLabel",
+            "Double click an analysis to set parameters")
 
         self.param_list = QtWidgets.QListWidget(self)
-        self.param_list.setGeometry(QtCore.QRect(10, 30, 170, 280))
+        self.param_list.setGeometry(QtCore.QRect(10, 30, 260, 420))
         self.param_list.setObjectName(xlt_from_utf8("paramList"))
 
         items = []
@@ -1734,10 +1734,8 @@ class UiParameters(QtWidgets.QDialog):
         self.param_list.addItems(items)
 
         self.param_stack = QtWidgets.QStackedWidget(self)
-        self.param_stack.setGeometry(QtCore.QRect(190, 30, 440, 280))
+        self.param_stack.setGeometry(QtCore.QRect(290, 30, 560, 420))
         self.param_stack.setObjectName(xlt_from_utf8("paramStack"))
-
-        self.param_stack.addWidget(self.waveform_page())
 
         self.param_stack.addWidget(self.isi_page())
 
@@ -1788,6 +1786,8 @@ class UiParameters(QtWidgets.QDialog):
         self.param_stack.addWidget(self.phase_lock_page())
 
         self.param_stack.addWidget(self.lfp_spike_causality_page())
+
+        self.param_stack.addWidget(self.waveform_page())
 
     def behaviour_ui(self):
         """Set the behaviour of the GUI elements."""
@@ -2039,8 +2039,9 @@ class UiParameters(QtWidgets.QDialog):
 
         box_layout = QtWidgets.QVBoxLayout()
         box_layout.addWidget(QtWidgets.QLabel(
-            "Uses the parameters from 'Theta-modulated Cell Index' analysis\n" +
-            "The fitting parameters for 2nd frequency component is derived \n\rfrom the 1st component"))
+            "Uses the parameters from 'Theta-modulated Cell Index' analysis.\n" +
+            "The fitting parameters for 2nd frequency component are derived " +
+            "from the 1st component"))
         self.theta_skip_cell_gb1.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
@@ -2056,7 +2057,7 @@ class UiParameters(QtWidgets.QDialog):
 
         # Box- 1
         self.burst_gb1 = add_group_box(
-            title="Bursting conditions", obj_name="burst_gb1")
+            title="Bursting Conditions", obj_name="burst_gb1")
 
         self.burst_thresh = add_spin_box(
             min_val=1, max_val=15, obj_name="burst_thresh")
@@ -2114,7 +2115,7 @@ class UiParameters(QtWidgets.QDialog):
         self.speed_gb1.setLayout(box_layout)
 
         self.speed_gb2 = add_group_box(
-            title="Smoothing Box Kernal Length", obj_name="speed_gb2")
+            title="Smoothing Box Kernel Length", obj_name="speed_gb2")
 
         self.speed_kern_len = add_spin_box(
             min_val=1, max_val=25, obj_name="speedKernLen")
@@ -2179,7 +2180,7 @@ class UiParameters(QtWidgets.QDialog):
         self.ang_vel_gb1.setLayout(box_layout)
 
         self.ang_vel_gb2 = add_group_box(
-            title="Smoothing Box Kernal Length", obj_name="ang_vel_gb2")
+            title="Smoothing Box Kernel Length", obj_name="ang_vel_gb2")
 
         self.ang_vel_kern_len = add_spin_box(
             min_val=1, max_val=25, obj_name="ang_vel_kern_len")
@@ -2211,7 +2212,7 @@ class UiParameters(QtWidgets.QDialog):
         """Set the ui elements for the 'hd_rate' analysis parameters."""
         widget = ScrollableWidget()
         self.hd_rate_gb1 = add_group_box(
-            title="Analyses Paramters", obj_name="hd_rate_gb1")
+            title="Analyses Parameters", obj_name="hd_rate_gb1")
 
         self.hd_bin = add_combo_box(obj_name="hd_bin")
         hd_bin_items = [str(d) for d in range(1, 360) if 360 %
@@ -2231,7 +2232,7 @@ class UiParameters(QtWidgets.QDialog):
         self.hd_rate_gb1.setLayout(box_layout)
 
         self.hd_rate_gb2 = add_group_box(
-            title="Smoothing Box Kernal Length", obj_name="hd_rate_gb2")
+            title="Smoothing Box Kernel Length", obj_name="hd_rate_gb2")
 
         self.hd_rate_kern_len = add_spin_box(
             min_val=1, max_val=11, obj_name="hd_rate_kern_len")
@@ -2256,7 +2257,7 @@ class UiParameters(QtWidgets.QDialog):
         """Set the ui elements for the 'hd_shuffle' analysis parameters."""
         widget = ScrollableWidget()
         self.hd_shuffle_gb1 = add_group_box(
-            title="Analyses Paramters", obj_name="hd_shuffle_gb1")
+            title="Analyses Parameters", obj_name="hd_shuffle_gb1")
 
         self.hd_shuffle_total = add_spin_box(
             min_val=100, max_val=10000, obj_name="hd_shuffle_total")
@@ -2346,7 +2347,7 @@ class UiParameters(QtWidgets.QDialog):
         widget = ScrollableWidget()
         # Box- 1
         self.loc_rate_gb1 = add_group_box(
-            title="Analyses Paramters", obj_name="loc_rate_gb1")
+            title="Analyses Parameters", obj_name="loc_rate_gb1")
 
         self.loc_pixel_size = add_spin_box(
             min_val=1, max_val=100, obj_name="loc_pixel_size")
@@ -2390,7 +2391,7 @@ class UiParameters(QtWidgets.QDialog):
 
         # Box- 2
         self.loc_rate_gb2 = add_group_box(
-            title="Smoothing Box Kernal", obj_name="loc_rate_gb2")
+            title="Smoothing Box Kernel", obj_name="loc_rate_gb2")
 
         self.loc_rate_filter = add_combo_box(obj_name="loc_rate_filter")
         self.loc_rate_filter.addItems(["Box", "Gaussian"])
@@ -2552,7 +2553,7 @@ class UiParameters(QtWidgets.QDialog):
 
         # Box- 3
         self.spatial_corr_gb3 = add_group_box(
-            title="Smoothing Box Kernal", obj_name="spatial_corr_gb3")
+            title="Smoothing Box Kernel", obj_name="spatial_corr_gb3")
 
         self.spatial_corr_filter = add_combo_box(
             obj_name="spatial_corr_filter")
@@ -2585,7 +2586,7 @@ class UiParameters(QtWidgets.QDialog):
         widget = ScrollableWidget()
 
         self.grid_gb1 = add_group_box(
-            title="Analyses Paramters", obj_name="grid_gb1")
+            title="Analyses Parameters", obj_name="grid_gb1")
 
         self.grid_ang_tol = add_spin_box(
             min_val=1, max_val=5, obj_name="grid_ang_tol")
@@ -2614,7 +2615,7 @@ class UiParameters(QtWidgets.QDialog):
         widget = ScrollableWidget()
 
         self.border_gb1 = add_group_box(
-            title="Analyses Paramters", obj_name="border_gb1")
+            title="Analyses Parameters", obj_name="border_gb1")
 
         self.border_firing_thresh = add_double_spin_box(
             min_val=0, max_val=1, obj_name="border_firing_thresh")
@@ -2688,7 +2689,7 @@ class UiParameters(QtWidgets.QDialog):
         """Set the ui elements for the 'multiple_regression' parameters."""
         widget = ScrollableWidget()
         self.mra_gb1 = add_group_box(
-            title="Analyses Paramters", obj_name="mra_gb1")
+            title="Analyses Parameters", obj_name="mra_gb1")
 
         self.mra_interval = add_double_spin_box(
             min_val=0.1, max_val=2, obj_name="mra_interval")
