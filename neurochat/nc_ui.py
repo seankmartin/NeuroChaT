@@ -449,7 +449,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             text="Spike Rate vs Location", obj_name="loc_rate")
 
         self.loc_shuffle = add_check_box(
-            text="Locational Shuffling Analysiss", obj_name="loc_shuffle")
+            text="Locational Shuffling Analysis", obj_name="loc_shuffle")
 
 #        self.place_field = add_check_box("Place Field Map", "placeField")
 
