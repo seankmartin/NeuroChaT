@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-This module implements UiGetFiles Class for NeuroChaT that provides the
-graphical interface and functionalities for manually selecting files.
+Provides the GUI and functionalities for manually selecting files.
+
+This module implements UiGetFiles Class for NeuroChaT.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -17,6 +18,29 @@ from neurochat.nc_uiutils import add_push_button, add_combo_box, add_label, add_
 
 
 class UiGetFiles(QtWidgets.QDialog):
+    """
+    A class to get files using a QDialog widget.
+
+    Parameters
+    ----------
+    parent
+        Parent widget if any
+    filters: list of str
+        File filters for manual selection
+
+    Attributes
+    ----------
+    parent
+        Parent widget
+    filters: list of str
+        Approved filters
+    current_filter: str
+        Currently set filter
+    files: list
+        List of selected files
+
+    """
+
     DOWN = 1
     UP = -1
 
@@ -43,7 +67,6 @@ class UiGetFiles(QtWidgets.QDialog):
             List of selected files
 
         """
-
         super().__init__(parent)
         self.parent = parent
         self.filters = filters
@@ -53,8 +76,7 @@ class UiGetFiles(QtWidgets.QDialog):
         self.file_icon = self.style().standardIcon(QtWidgets.QStyle.SP_FileIcon)
 
     def setup_ui(self):
-        """Sets up the elements of UiGetFiles class."""
-
+        """Set up the elements of UiGetFiles class."""
         self.setObjectName(xlt_from_utf8("getFilesWindow"))
         self.setEnabled(True)
         self.setFixedSize(680, 400)
@@ -135,8 +157,7 @@ class UiGetFiles(QtWidgets.QDialog):
         self.setLayout(main_layout)
 
     def behaviour_ui(self):
-        """Sets up the behaviour of UiGetFiles class."""
-
+        """Set up the behaviour of UiGetFiles class."""
         self.filter_box.currentIndexChanged[str].connect(self.filter_changed)
         self.folder_line.textEdited[str].connect(self.line_edited)
         self.dir_box.currentIndexChanged[int].connect(self.dir_changed)
@@ -167,14 +188,14 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         self.current_filter = value
         self.update_list(self.folder_line.text())
 
     def line_edited(self, value):
         """
-        Called if the directory text box in the widget is changed to update the
-        list of new subdirectories.
+        Called if the directory text box in the widget is changed.
+
+        This updates the list of new subdirectories.
 
         Parameters
         ----------
@@ -186,7 +207,6 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         if os.path.exists(value):
             self.dir_box.clear()
             self.dir_box.addItems(value.split(os.sep))
@@ -195,8 +215,9 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def dir_changed(self, value):
         """
-        Called if the subdirectoy combo-box in the widget is changed to update
-        the list of new subdirectories.
+        Called if the subdirectory combo-box in the widget is changed.
+
+        This to updates the list of new subdirectories.
 
         Parameters
         ----------
@@ -208,7 +229,6 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         directory = os.sep.join([self.dir_box.itemText(i)
                                  for i in range(value + 1)])
         if os.sep not in directory:
@@ -218,8 +238,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def update_list(self, directory):
         """
-        Updates the list of folders and sets the item model for the scrollable
-        list.
+        Update the list of folders and set the item for the scrollable list.
 
         Parameters
         ----------
@@ -260,15 +279,13 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         curr_ind = self.dir_box.currentIndex() - 1
         if curr_ind >= 0:
             self.dir_box.setCurrentIndex(curr_ind)
 
     def item_activated(self, qind):
         """
-        Called if any of the model item in the list of folders and files is
-        double-clicked.
+        Called if any of the items in the list of files is double-clicked.
 
         Parameters
         ----------
@@ -280,7 +297,6 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         data = self.dir_model.itemFromIndex(qind).text()
         directory = os.path.join(self.folder_line.text(), data)
         if os.path.isdir(directory):
@@ -291,8 +307,10 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def add_items(self):
         """
-        Called if the add button is clicked. Adds selected model item to the
-        right side selected file box if that passes the filter.
+        Called if the add button is clicked.
+
+        Adds selected model item to the right side
+        selected file box if that passes the filter.
 
         Parameters
         ----------
@@ -303,7 +321,6 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         qind = self.dir_list.selectedIndexes()
         items = [self.dir_model.itemFromIndex(i) for i in qind]
         curr_files = [self.file_model.item(i).text()
@@ -319,8 +336,9 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def remove_items(self):
         """
-        Removes the item which is added to the selection list. Updates the item
-        model.
+        Remove the item which is added to the selection list.
+
+        Updates the item model.
 
         Parameters
         ----------
@@ -331,7 +349,6 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         qind = self.file_list.selectedIndexes()
         rows = [i.row() for i in qind][::-1]
         for r in rows:
@@ -342,7 +359,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def move_items(self, direction='down'):
         """
-        Moves item in the item model by changing their indices.
+        Move item in the item model by changing their indices.
 
         Parameters
         ----------
@@ -374,7 +391,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def done_merge(self):
         """
-        Sets the list of files and closes the widget.
+        Set the list of files and closes the widget.
 
         Parameters
         ----------
@@ -391,7 +408,7 @@ class UiGetFiles(QtWidgets.QDialog):
 
     def close_dialog(self):
         """
-        Closes the widget for file selection.
+        Close the widget for file selection.
 
         Parameters
         ----------
@@ -402,13 +419,12 @@ class UiGetFiles(QtWidgets.QDialog):
         None
 
         """
-
         self.file_model.clear()
         self.close()
 
     def get_files(self):
         """
-        Returns the list of files.
+        Return the list of files.
 
         Parameters
         ----------
@@ -420,5 +436,4 @@ class UiGetFiles(QtWidgets.QDialog):
             List of selected files
 
         """
-
         return self.files
