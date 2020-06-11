@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-This module implements UiMerge Class for NeuroChaT that provides the graphical
-interface and functionalities for merging and accumulating the output graphics
-of NeuroChaT.
+Provides the GUI and functionalities for merging and accumulating graphics.
+
+This module implements UiMerge Class for NeuroChaT.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -25,9 +25,14 @@ import pandas as pd
 
 
 class UiMerge(QtWidgets.QDialog):
-    """This class invokes a graphical user interface where the user can upload
+    """
+    Allow for merging graphics files through a UI.
+
+    This class invokes a graphical user interface where the user can upload
     a list of PDF or Postscript files in Excel format or can use a filepicker
-    to manually pick the files to merge in a file or accumulate in a folder."""
+    to manually pick the files to merge in a file or accumulate in a folder.
+
+    """
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -43,7 +48,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def setup_ui(self):
         """
-        Sets up the GUI elements.
+        Set up the GUI elements.
 
         Parameters
         ----------
@@ -54,7 +59,6 @@ class UiMerge(QtWidgets.QDialog):
         None
 
         """
-
         self.setObjectName(xlt_from_utf8("mergeWindow"))
         self.setEnabled(True)
         self.setFixedSize(324, 220)
@@ -98,7 +102,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def set_default(self):
         """
-        Sets up the defaults of the GUI.
+        Set up the defaults of the GUI.
 
         Parameters
         ----------
@@ -109,7 +113,6 @@ class UiMerge(QtWidgets.QDialog):
         None
 
         """
-
         self.use_list_button.setChecked(True)
         self.select_button.setEnabled(False)
         self.filename_line.setText("Select Excel (.xls/.xlsx) file")
@@ -117,7 +120,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def _behaviour_ui(self):
         """
-        Sets up the behaviour of the GUI elements.
+        Set up the behaviour of the GUI elements.
 
         Parameters
         ----------
@@ -128,7 +131,6 @@ class UiMerge(QtWidgets.QDialog):
         None
 
         """
-
         self._get_files_ui.behaviour_ui()
 
         self.input_format_group.buttonClicked.connect(self.merge_files)
@@ -140,8 +142,9 @@ class UiMerge(QtWidgets.QDialog):
 
     def merge_files(self):
         """
-        Calling this method toggles the UI selection for using an Excel list or
-        picking files manually.
+        Calling this method toggles the UI selection.
+
+        Switches between using an Excel list or picking files manually.
 
         Parameters
         ----------
@@ -152,7 +155,6 @@ class UiMerge(QtWidgets.QDialog):
         None
 
         """
-
         button = self.input_format_group.checkedButton()
         if button.objectName() == "useList":
             self.browse_excel_button.setEnabled(True)
@@ -167,8 +169,10 @@ class UiMerge(QtWidgets.QDialog):
 
     def browse_excel_merge(self):
         """
-        Opens a dialogue for selecting the Excel list of PDF/Postscript files
-        and reads the file information.
+        Open a dialogue for selecting an Excel list.
+
+        The excel list should describe PDF/Postscript files,
+        and this reads the file information.
 
         Parameters
         ----------
@@ -179,10 +183,11 @@ class UiMerge(QtWidgets.QDialog):
         None
 
         """
-
         self.files = []
-        excel_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                                          'Select output graphic file list...', os.getcwd(), "*.xlsx;; .*xls")[0])
+        excel_file = QtCore.QDir.toNativeSeparators(
+            QtWidgets.QFileDialog.getOpenFileName(
+                self,
+                'Select output graphic file list...', os.getcwd(), "*.xlsx;; .*xls")[0])
         if not excel_file:
             logging.warning(
                 "No excel file selected! Merging/accumulating is unsuccessful!")
@@ -199,8 +204,9 @@ class UiMerge(QtWidgets.QDialog):
 
     def select_files_merge(self):
         """
-        Invokes the UiGetFiles class for manual selection of the PDF or
-        Postscript files for merging or accumulating.
+        Invoke the UiGetFiles class for manual selection of the files.
+
+        Pick the PDF Postscript files for merging or accumulating.
 
         Parameters
         ----------
@@ -211,14 +217,14 @@ class UiMerge(QtWidgets.QDialog):
         None
 
         """
-
         self._get_files_ui.show()
         self.files = self._get_files_ui.get_files()
 
     def save_in_merge(self):
         """
-        Opens a dialogue for selecting the file or folder where the
-        PDF/Postscript files qill be merged or accumulated.
+        Opens a dialogue for selecting the file or folder.
+
+        The PDF/Postscript files will be merged or accumulated here.
 
         Parameters
         ----------
@@ -229,16 +235,18 @@ class UiMerge(QtWidgets.QDialog):
         None
 
         """
-
         if self.merge_enable:
-            self.dst_file = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getSaveFileName(
-                self, 'Save as...', os.getcwd(), "*.pdf;; *.ps")[0])
+            self.dst_file = QtCore.QDir.toNativeSeparators(
+                QtWidgets.QFileDialog.getSaveFileName(
+                    self, 'Save as...', os.getcwd(), "*.pdf;; *.ps")[0])
             self.save_filename_line.setText(self.dst_file)
             if os.path.exists(self.dst_file):
                 logging.info('PDF files will be merged to ' + self.dst_file)
         else:
-            self.dst_directory = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getExistingDirectory(self,
-                                                                                                           'Select data directory...', os.getcwd()))
+            self.dst_directory = QtCore.QDir.toNativeSeparators(
+                QtWidgets.QFileDialog.getExistingDirectory(
+                    self,
+                    'Select data directory...', os.getcwd()))
             self.save_filename_line.setText(self.dst_directory)
             if os.path.exists(self.dst_directory):
                 logging.info('Files will be accumulated to ' +
@@ -246,7 +254,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def start(self):
         """
-        Executes the merging or accumulating operation.
+        Execute the merging or accumulating operation.
 
         Parameters
         ----------
