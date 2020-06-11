@@ -222,7 +222,7 @@ class UiMerge(QtWidgets.QDialog):
 
     def save_in_merge(self):
         """
-        Opens a dialogue for selecting the file or folder.
+        Open a dialogue for selecting the file or folder.
 
         The PDF/Postscript files will be merged or accumulated here.
 
