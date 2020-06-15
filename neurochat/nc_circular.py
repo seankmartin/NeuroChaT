@@ -24,11 +24,15 @@ class CircStat(object):
     Currently the class only supports calculations in degrees.
     As such, radians should be converted to degrees when entering theta.
 
-    The initialisation function should be passed with keyword arguments:
+    The initialisation function should be passed with keyword arguments.
+
+    Keyword Arguments
+    -----------------
         rho : ndarry
             Polar co-ordinate rho, the radii of points.
         theta : ndarray
             Polar co-ordinate theta, the angle of points.
+
     Attributes
     ----------
     _rho : ndarray

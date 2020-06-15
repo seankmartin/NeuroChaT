@@ -615,21 +615,33 @@ class NData():
         Calculate the ratio in power between two bandpass filtered signals.
 
         Delegates to NLfp.bandpower_ratio()
-        Suggested [5, 11] and [1.5, 4 bands] for theta delta ratio as e.g.
-
+        For example [5, 11] and [1.5, 4 bands] for theta delta ratio.
 
         Parameters
         ----------
-        first_band, second_band, win_sec, **kwargs
+        first_band : list | tuple
+            The frequency band of the ratio numerator [lower, upper].
+        second_band : list | tuple
+            The frequency band of the ratio denominator [lower, upper].
+        win_sec : float
+            The length of the window in seconds for power computation.
+        **kwargs : keyword arguments
+            Passed to nc_lfp.NLfp.bandpower_ratio()
+
+        Returns
+        -------
+        float
+            The ratio between the band powers first_band / second_band.
 
         See also
         --------
         nc_lfp.NLfp.bandpower_ratio()
 
         """
-        self.lfp.bandpower_ratio(
+        bp = self.lfp.bandpower_ratio(
             first_band, second_band, win_sec, **kwargs)
         self.update_results(self.lfp.get_results())
+        return bp
 
     def spectrum(self, **kwargs):
         """
