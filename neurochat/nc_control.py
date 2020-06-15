@@ -968,7 +968,7 @@ class NeuroChaT(QtCore.QThread):
 
         if self.get_analysis('inter_depend'):
             # No plot
-            logging.info('Assessing dependence of variables to...')
+            logging.info('Assessing dependence of spatial variables...')
             try:
                 self.interdependence(
                     pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40],
@@ -1047,7 +1047,7 @@ class NeuroChaT(QtCore.QThread):
         if self.get_analysis('phase_lock'):
             # PLV with mode = None (all events or spikes)
             logging.info(
-                'Analysis of Phase-locking value and spike-filed coherence...')
+                'Analysis of Phase-locking value and spike-field coherence...')
             try:
                 params = self.get_params_by_analysis('phase_lock')
 
