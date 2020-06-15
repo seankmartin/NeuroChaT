@@ -68,7 +68,7 @@ class NSpatial(NAbstract):
     def __init__(self, **kwargs):
         """See the class description."""
         super().__init__(**kwargs)
-        self._time = []
+        self._time = np.array([])
         self._timestamp = []
         self._total_samples = []
         self._fs = 0

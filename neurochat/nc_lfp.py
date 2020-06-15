@@ -62,7 +62,7 @@ class NLfp(NBase):
         self._channel_id = 0
         self._samples = None
         self._timestamp = None
-        self.set_record_info({'Total samples': 0})
+        self.set_record_info({'Total samples': 0, "No of samples": 0})
 
         self.__type = 'lfp'
 
