@@ -986,11 +986,14 @@ def log_exception(ex, more_info=""):
     default_loc = os.path.join(
         os.path.expanduser("~"), ".nc_saved", "nc_caught.txt")
     now = datetime.datetime.now()
-    tb = traceback.format_tb(ex.__traceback__)
+    # tb = traceback.format_tb(ex.__traceback__)
     make_dir_if_not_exists(default_loc)
     with open(default_loc, "a+") as f:
-        f.write("{}: {}".format(now, tb))
-        logging.error("{} with caught exception".format(more_info), exc=ex)
+        f.write("\n----------Caught Exception at {}----------\n".format(now))
+        traceback.print_exc(file=f)
+    logging.error(
+        "{} failed with caught exception.\nSee {} for more information.".format(
+            more_info, default_loc), exc_info=False)
     # template = "{0} because exception of type {1} occurred. Arguments:\n{2!r}"
     # message = template.format(more_info, type(ex).__name__, ex.args)
     # logging.error(message)

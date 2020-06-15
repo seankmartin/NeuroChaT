@@ -42,7 +42,7 @@ def excepthook(exc_type, exc_value, exc_traceback):
 
     now = datetime.datetime.now()
     this_logger.critical(
-        "Uncaught Exception at {}".format(now), exc_info=(
+        "\n----------Uncaught Exception at {}----------".format(now), exc_info=(
             exc_type, exc_value, exc_traceback))
 
     QtWidgets.QApplication.quit()
