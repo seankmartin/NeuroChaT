@@ -52,7 +52,7 @@ def place_cell_summary(
     filter_place_cells: bool, default True
         Whether to filter out non spatial place cells from the plots.
         A unit is considered a spatial place cell if:
-        Sparsity < 0.3 and Coherence > 0.55
+        Sparsity < 0.3 and Coherence > 0.55.
         Recommended filter_low_freq=True if this flag is True.
         See https://www.nature.com/articles/ncomms11824.
     filter_low_freq: bool, default True

@@ -525,7 +525,7 @@ class NAbstract(object):
         Returns
         -------
         dict or str
-            dict is record_name is None.
+            dict if record_name is None.
             str if record_name is a key in _record_info.
 
         """
