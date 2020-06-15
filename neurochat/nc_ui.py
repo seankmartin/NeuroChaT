@@ -517,7 +517,14 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
     def retranslate_ui(self):
         """Set up the title and icon in NeuroChaT GUI."""
-        self.setWindowTitle(_translate("MainWindow", "NeuroChaT", None))
+        import neurochat
+        version = neurochat.__version__
+        self.setWindowTitle(_translate(
+            "MainWindow",
+            "NeuroChaT - The Neuron Characterisation Toolbox (Version {})".format(
+                version),
+            None)
+        )
         # <-- absolute dir the script is in
         script_dir = os.path.dirname(__file__)
         rel_path = "../NeuroChat.png"

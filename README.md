@@ -1,4 +1,4 @@
-# NeuroChaT
+# NeuroChaT v1.1.1a0
 
 NeuroChaT (RRID:SCR_018020) is an open-source neuron characterisation toolbox. It is described in our paper on [Wellcome Open Research](https://wellcomeopenresearch.org/articles/4-196).
 
@@ -65,3 +65,11 @@ See the docs folder for a pdf user guide which should be the first port of call.
 ## Open Science Framework Storage
 
 Sample hdf5 datasets and results are stored on OSF, at https://osf.io/kqz8b/files/.
+
+## Version
+
+The NeuroChaT version number should be maintained in:
+
+1. `setup.py`
+2. `neurochat\__init__.py`
+3. `README.md`
