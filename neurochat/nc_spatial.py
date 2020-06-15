@@ -3008,6 +3008,11 @@ class NSpatial(NAbstract):
 
         else:
             _results['Is Grid'] = False
+            _results['Grid Mean Alpha'] = np.nan
+            _results['Grid Mean Psi'] = np.nan
+            _results['Grid Spacing'] = np.nan
+            _results['Grid Score'] = np.nan
+            _results['Grid Orientation'] = np.nan
 
         self.update_result(_results)
         return graph_data
