@@ -767,8 +767,16 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 items = self._control.hdf.f[path]
             else:
                 data = self._control.ndata
-                data.load_spike()
-                items = data.get_unit_list()
+                if data.spike.get_filename() == "":
+                    from neurochat.nc_spike import NSpike
+                    spike_file = self._control.get_spike_file()
+                    system = self._control.format
+                    spike_obj = NSpike(filename=spike_file, system=system)
+                    spike_obj.load()
+                    items = spike_obj.get_unit_list()
+                else:
+                    data.load_spike()
+                    items = data.get_unit_list()
             if len(items) == 0:
                 logging.error("No units in this file.")
                 items = [i for i in range(256)]
@@ -778,7 +786,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             if file_format == "NWB":
                 self._control.close_hdf_file()
         except Exception as e:
-            log_exception(e, "Populating unit list failed")
+            log_exception(
+                e, "Populating unit list failed - you can still manually select a unit -")
             items = [str(i) for i in range(256)]
             self.unit_no_box.clear()
             self.unit_no_box.addItems(items)
@@ -1102,9 +1111,12 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 '_button').setChecked(True)
         self.graphic_format_select()
 
+        # populate unit list
+        old_unit_no = self._control.get_unit_no()
         self.unit_getitems()
-        index = self._control.get_unit_no()
+        index = self.unit_no_box.findText(str(old_unit_no))
         if index >= 0 & index < 256:
+            self._control.set_unit_no(old_unit_no)
             self.unit_no_box.setCurrentIndex(index)
 
         file = self._control.get_lfp_file()
