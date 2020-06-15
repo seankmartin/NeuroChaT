@@ -546,6 +546,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         """Reactivate the start button, displays the results in UI table."""
         pd_model = PandasModel(self._control.get_results())
         self._results_ui.set_data(pd_model)
+        self._results_ui.table.resizeColumnsToContents()
         self._results_ui.show()
 
     def export_results(self):
@@ -1650,7 +1651,7 @@ class UiResults(QtWidgets.QDialog):
         """
         self.setObjectName(xlt_from_utf8("resultsWindow"))
         self.setEnabled(True)
-        self.setFixedSize(725, 220)
+        self.setFixedSize(900, 480)
         self.setWindowTitle(QtWidgets.QApplication.translate(
             "resultsWindow", "Analysis results", None))
 
