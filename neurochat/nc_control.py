@@ -292,8 +292,8 @@ class NeuroChaT(QtCore.QThread):
                     self.open_pdf(special_analysis["pdf_name"])
                     self.angle_calculation(special_analysis["excel_file"])
                     self.close_pdf()
-                else:
-                    logging.error('No analysis method has been selected')
+            else:
+                logging.error('No analysis method has been selected')
         else:
             # Could take this to mode,
             # but replication would occur for each data format
