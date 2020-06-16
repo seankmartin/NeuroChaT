@@ -106,14 +106,37 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         layer_5_1.addLayout(layer_6_2)
         layer_5_1.addLayout(layer_6_3)
 
-        layer_5_2 = QtWidgets.QHBoxLayout()
-        self.browse_button = add_push_button(
-            text="Browse", obj_name="browseButton")
-        self.filename_line = add_line_edit(
-            obj_name="filenameLine",
-            text="Select spike(.n) &/or position file(.txt)")
-        layer_5_2.addWidget(self.browse_button)
-        layer_5_2.addWidget(self.filename_line)
+        # Spike browser
+        layer_5_2_1 = QtWidgets.QHBoxLayout()
+        self.browse_button_spike = add_push_button(
+            text="Browse Spike  ", obj_name="browseButtonSpike")
+        self.filename_line_spike = add_line_edit(
+            obj_name="filenameLineSpike", text="")
+        layer_5_2_1.addWidget(self.browse_button_spike)
+        layer_5_2_1.addWidget(self.filename_line_spike)
+
+        # LFP Browser
+        layer_5_2_2 = QtWidgets.QHBoxLayout()
+        self.browse_button_lfp = add_push_button(
+            text="Browse LFP     ", obj_name="browseButtonLFP")
+        self.filename_line_lfp = add_line_edit(
+            obj_name="filenameLineLFP", text="")
+        layer_5_2_2.addWidget(self.browse_button_lfp)
+        layer_5_2_2.addWidget(self.filename_line_lfp)
+
+        # Spatial Browser
+        layer_5_2_3 = QtWidgets.QHBoxLayout()
+        self.browse_button_spatial = add_push_button(
+            text="Browse Spatial", obj_name="browseButtonSpatial")
+        self.filename_line_spatial = add_line_edit(
+            obj_name="filenameLineSpatial", text="")
+        layer_5_2_3.addWidget(self.browse_button_spatial)
+        layer_5_2_3.addWidget(self.filename_line_spatial)
+
+        layer_5_2 = QtWidgets.QVBoxLayout()
+        layer_5_2.addLayout(layer_5_2_1)
+        layer_5_2.addLayout(layer_5_2_2)
+        layer_5_2.addLayout(layer_5_2_3)
 
         layer_4_1 = QtWidgets.QVBoxLayout()
         layer_4_1.addLayout(layer_5_1)
@@ -189,6 +212,9 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         # Set the callbacks
         self.behaviour_ui()
 
+        # Set the initial text
+        self._set_dictation()
+
     def behaviour_ui(self):
         """Set up the behaviour of NeuroChaT_ui widgets."""
         # self.connect(self.nout, QtCore.SIGNAL('update_log(QString)'), self.update_log)
@@ -202,7 +228,9 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.unit_no_box.currentIndexChanged[int].connect(self.set_unit_no)
         self.lfp_chan_box.currentIndexChanged[int].connect(self.set_lfp_chan)
         self.select_all_box.stateChanged.connect(self.select_all)
-        self.browse_button.clicked.connect(self.browse)
+        self.browse_button_spike.clicked.connect(self.browse_spike)
+        self.browse_button_lfp.clicked.connect(self.browse_lfp)
+        self.browse_button_spatial.clicked.connect(self.browse_spatial)
         self.clear_log_button.clicked.connect(self.clear_log)
         self.save_log_button.clicked.connect(self.save_log)
         self.open_file_act.triggered.connect(self.browse)
@@ -795,6 +823,83 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             self.unit_no_box.clear()
             self.unit_no_box.addItems(items)
 
+    def browse_spike(self):
+        mode_id = self.mode_box.currentIndex()
+        file_format = self._control.get_data_format()
+        if mode_id == 0 or mode_id == 1:
+            if file_format == "Axona" or file_format == "Neuralynx":
+                if file_format == "Axona":
+                    spike_filter = "".join(
+                        ["*." + str(x) + ";;" for x in list(range(1, 129))])
+                elif file_format == "Neuralynx":
+                    spike_filter = "*.ntt;; *.nst;; *.nse"
+                spike_file = QtCore.QDir.toNativeSeparators(
+                    QtWidgets.QFileDialog.getOpenFileName(
+                        self, 'Select spike file...',
+                        os.getcwd(), spike_filter)[0])
+                if not spike_file:
+                    logging.warning("No spike file selected")
+                else:
+                    words = spike_file.rstrip("\n\r").split(os.sep)
+                    directory = os.sep.join(words[0:-1])
+                    os.chdir(directory)
+                    self._control.set_spike_file(spike_file)
+                    self._control.ndata.set_spike_file(spike_file)
+                    logging.info("New spike file added: " + words[-1])
+                    self.unit_getitems()
+
+            elif file_format == "NWB":
+                nwb_file = QtCore.QDir.toNativeSeparators(
+                    QtWidgets.QFileDialog.getOpenFileName(
+                        self, 'Select NWB file...', os.getcwd(), "*.hdf5")[0])
+                if not nwb_file:
+                    logging.warning("No NWB file selected")
+                else:
+                    words = nwb_file.rstrip("\n\r").split(os.sep)
+                    directory = os.sep.join(words[0:-1])
+                    os.chdir(directory)
+                    self._control.set_nwb_file(nwb_file)
+                    logging.info("New NWB file added: " + words[-1])
+                    try:
+                        path = '/processing/Shank'
+                        self._control.open_hdf_file()
+                        items = self._control.get_hdf_groups(path=path)
+                        if items:
+                            item, ok = QtWidgets.QInputDialog.getItem(
+                                self, "Select electrode group",
+                                "Electrode groups: ", items, 0, False)
+                            if ok:
+                                self._control.set_spike_file(
+                                    nwb_file + '+' + path + '/' + item)
+                                logging.info(
+                                    'Spike data set to electrode group: '
+                                    + path + '/' + item)
+                        self._control.close_hdf_file()
+                    except Exception as e:
+                        log_exception(
+                            e, "Cannot read hdf file in nc_ui browse")
+
+                    self.unit_getitems()
+
+        elif mode_id == 2:
+            excel_file = QtCore.QDir.toNativeSeparators(
+                QtWidgets.QFileDialog.getOpenFileName(
+                    self, 'Select Excel file...', os.getcwd(), "*.xlsx;; .*xls")[0])
+            if not excel_file:
+                logging.warning("No excel file selected")
+            else:
+                words = excel_file.rstrip("\n\r").split(os.sep)
+                directory = os.sep.join(words[0:-1])
+                os.chdir(directory)
+                self._control.set_excel_file(excel_file)
+                logging.info("New excel file added: " + words[-1])
+
+    def browse_spatial(self):
+        pass
+
+    def browse_lfp(self):
+        pass
+
     def browse(self):
         """
         Open a file dialog asking the user to select data files.
@@ -1023,18 +1128,58 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         This is used for the browse button as the input data format changes.
 
         """
-        _dictation = ["Select spike(.n) &/or position file(.txt)",
-                      "Select spike(.n) &/or position file(.txt)",
-                      "Select excel(.xls/.xlsx) file with unit list",
-                      "Select folder"]
         file_format = self._control.get_data_format()
         analysis_mode, mode_id = self._control.get_analysis_mode()
-        if file_format == "Neuralynx":
-            _dictation[:2] = [
-                "Select spike(.ntt/.nst/.nse) &/or position file(.nvt)"] * 2
+
+        # Set dictation for spike browse button
+        _dictation_spike = [
+            "Select spike(.n) file",
+            "Select spike(.n) file",
+            "Select excel(.xls/.xlsx) file with unit list",
+            "Select folder"]
+        _dictation_lfp = [
+            "Select lfp(.eegXX or .egfXX) file",
+            "Select lfp(.eegXX or .egfXX) file",
+            "Unused in this mode",
+            "Unused in this mode"]
+        _dictation_spatial = [
+            "Select position(.txt) file produced by TINT",
+            "Select position(.txt) file produced by TINT",
+            "Unused in this mode",
+            "Unused in this mode"]
+
+        if file_format == "Axona":
+            self.browse_button_lfp.setEnabled(True)
+            self.browse_button_spatial.setEnabled(True)
+        elif file_format == "Neuralynx":
+            _dictation_spike[:2] = ["Select spike(.ntt/.nst/.nse) file"] * 2
+            _dictation_lfp[:2] = ["Select lfp(.ncs) file"] * 2
+            _dictation_spatial[:2] = ["Select postion(.nvt) file"] * 2
+            self.browse_button_lfp.setEnabled(True)
+            self.browse_button_spatial.setEnabled(True)
         elif file_format == "NWB":
-            _dictation[:2] = ["Select .hdf5 file"] * 2
-        self.filename_line.setText(_dictation[mode_id])
+            _dictation_spike[:2] = ["Select .hdf5 file"] * 2
+            _dictation_lfp[:2] = ["Unused in this mode"] * 2
+            _dictation_spatial[:2] = ["Unused in this mode"] * 2
+            self.browse_button_lfp.setEnabled(False)
+            self.browse_button_spatial.setEnabled(False)
+
+        if mode_id >= 2:
+            self.browse_button_lfp.setEnabled(False)
+            self.browse_button_spatial.setEnabled(False)
+
+        if mode_id == 2:
+            self.browse_button_spike.setText("Browse Excel  ")
+        else:
+            if file_format == "NWB":
+                self.browse_button_spike.setText("Browse HDF5  ")
+            else:
+                self.browse_button_spike.setText("Browse Spike  ")
+
+        # Set the text boxes
+        self.filename_line_spike.setText(_dictation_spike[mode_id])
+        self.filename_line_lfp.setText(_dictation_lfp[mode_id])
+        self.filename_line_spatial.setText(_dictation_spatial[mode_id])
 
     def _get_config(self):
         """
