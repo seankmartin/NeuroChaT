@@ -1825,7 +1825,7 @@ class NSpike(NBase):
 
             f.seek(header_offset, 0)
             spike_time = np.zeros([num_spikes, ])
-            unit_ID = np.zeros([num_spikes, ], dtype=int)
+            unit_ID = np.zeros([num_spikes, ], dtype=np.int64)
             spike_wave = oDict()
             sample_le = 256**(np.arange(bytes_per_sample))
             for i in np.arange(tot_channels):
@@ -1834,11 +1834,12 @@ class NSpike(NBase):
 
             for i in np.arange(num_spikes):
                 sample_bytes = np.fromfile(f, dtype='uint8', count=record_size)
-                spike_time[i] = int.from_bytes(sample_bytes[time_offset + np.arange(
-                    bytes_per_timestamp)], byteorder='little', signed=False) / 10**6
+                spike_time[i] = int.from_bytes(
+                    sample_bytes[time_offset + np.arange(bytes_per_timestamp)],
+                    byteorder='little', signed=False) / 10**6
                 unit_ID[i] = int.from_bytes(
-                    sample_bytes[unitID_offset + np.arange(bytes_cell_no)], byteorder='little', signed=False)
-
+                    sample_bytes[unitID_offset + np.arange(bytes_cell_no)],
+                    byteorder='little', signed=False)
                 for j in range(tot_channels):
                     sample_value = np.zeros(
                         [samples_per_record, bytes_per_sample])
