@@ -75,9 +75,9 @@ class NSpatial(NAbstract):
         self._pixel_size = 3
         self._pos_x = []
         self._pos_y = []
-        self._direction = []
+        self._direction = np.array([])
         self._speed = []
-        self._ang_vel = []
+        self._ang_vel = np.array([])
         self._border_dist = []
         self._xbound = []
         self._ybound = []
@@ -950,7 +950,6 @@ class NSpatial(NAbstract):
                         ''.join(re.findall(r'\d+.\d+|\d+', line)))
                 if 'Time Opened' in line:
                     self._set_date(re.search(r'\d+/\d+/\d+', line).group())
-                    self._set_time(re.search(r'\d+:\d+:\d+', line).group())
                 if 'FileVersion' in line:
                     self._set_file_version(line.split()[1])
 
@@ -1060,6 +1059,10 @@ class NSpatial(NAbstract):
 
         """
         theta = self.get_direction()
+        if theta.size == 0:
+            logging.warning(
+                "No head direction data available for angular velocity")
+            return np.nan
         ang_vel = np.zeros(theta.shape)
         N = theta.size
         L = npoint
@@ -1105,6 +1108,10 @@ class NSpatial(NAbstract):
         """
         pixel = kwargs.get('pixel', 3)
         chop_bound = kwargs.get('chop_bound', 5)
+
+        if len(self._pos_x) == 0:
+            raise ValueError(
+                "No positional data to calculate border from")
 
         xedges = np.arange(0, np.ceil(np.max(self._pos_x)), pixel)
         yedges = np.arange(0, np.ceil(np.max(self._pos_y)), pixel)
