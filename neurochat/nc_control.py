@@ -306,6 +306,7 @@ class NeuroChaT(QtCore.QThread):
 
                 if not os.path.isfile(self.get_spatial_file()):
                     logging.warning('Position file does not exist')
+
             elif mode_id == 2:
                 if not os.path.isfile(self.get_excel_file()):
                     verified = False
@@ -397,10 +398,20 @@ class NeuroChaT(QtCore.QThread):
         if info['unit']:
             for i, unit_no in enumerate(info['unit']):
                 logging.info('Starting a new unit...')
-                self.ndata.set_spatial_file(info['spat'][i])
-                self.ndata.set_spike_file(info['spike'][i])
-                self.ndata.set_lfp_file(info['lfp'][i])
-                self.ndata.load()
+                if os.path.isfile(info['spat'][i]):
+                    logging.info(
+                        "Loading spatial file {}".format(info['spat'][i]))
+                    self.ndata.set_spatial_file(info['spat'][i])
+                    self.ndata.spatial.load()
+                if os.path.isfile(info['spike'][i]):
+                    logging.info(
+                        "Loading spike file {}".format(info['spike'][i]))
+                    self.ndata.set_spike_file(info['spike'][i])
+                    self.ndata.spike.load()
+                if os.path.isfile(info['lfp'][i]):
+                    logging.info("Loading LFP file {}".format(info['lfp'][i]))
+                    self.ndata.set_lfp_file(info['lfp'][i])
+                    self.ndata.lfp.load()
                 self.ndata.set_unit_no(info['unit'][i])
 
                 self.ndata.reset_results()
