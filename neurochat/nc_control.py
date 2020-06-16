@@ -396,22 +396,45 @@ class NeuroChaT(QtCore.QThread):
                     info['lfp'].append(lfp_file)
 
         if info['unit']:
+            last_used_info = {
+                'spat': None,
+                'spike': None,
+                'lfp': None,
+            }
             for i, unit_no in enumerate(info['unit']):
                 logging.info('Starting a new unit...')
                 if os.path.isfile(info['spat'][i]):
-                    logging.info(
-                        "Loading spatial file {}".format(info['spat'][i]))
-                    self.ndata.set_spatial_file(info['spat'][i])
-                    self.ndata.spatial.load()
+                    if last_used_info['spat'] == info['spat'][i]:
+                        logging.info(
+                            "Using loaded spatial file {}".format(info['spat'][i]))
+                    else:
+                        logging.info(
+                            "Loading spatial file {}".format(info['spat'][i]))
+                        self.ndata.set_spatial_file(info['spat'][i])
+                        self.ndata.spatial.load()
+                        last_used_info['spat'] = info['spat'][i]
+
                 if os.path.isfile(info['spike'][i]):
-                    logging.info(
-                        "Loading spike file {}".format(info['spike'][i]))
-                    self.ndata.set_spike_file(info['spike'][i])
-                    self.ndata.spike.load()
+                    if last_used_info['spike'] == info['spike'][i]:
+                        logging.info(
+                            "Using loaded spike file {}".format(info['spike'][i]))
+                    else:
+                        logging.info(
+                            "Loading spike file {}".format(info['spike'][i]))
+                        self.ndata.set_spike_file(info['spike'][i])
+                        self.ndata.spike.load()
+                        last_used_info['spike'] = info['spike'][i]
+
                 if os.path.isfile(info['lfp'][i]):
-                    logging.info("Loading LFP file {}".format(info['lfp'][i]))
-                    self.ndata.set_lfp_file(info['lfp'][i])
-                    self.ndata.lfp.load()
+                    if last_used_info['lfp'] == info['lfp'][i]:
+                        logging.info(
+                            "Using loaded lfp file {}".format(info['lfp'][i]))
+                    else:
+                        logging.info("Loading LFP file {}".format(info['lfp'][i]))
+                        self.ndata.set_lfp_file(info['lfp'][i])
+                        self.ndata.lfp.load()
+                        last_used_info['lfp'] = info['lfp'][i]
+
                 self.ndata.set_unit_no(info['unit'][i])
 
                 self.ndata.reset_results()
