@@ -774,17 +774,12 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 path = path + '/Clustering/cluster_nums'
                 items = self._control.hdf.f[path]
             else:
-                data = self._control.ndata
-                if data.spike.get_filename() == "":
-                    from neurochat.nc_spike import NSpike
-                    spike_file = self._control.get_spike_file()
-                    system = self._control.format
-                    spike_obj = NSpike(filename=spike_file, system=system)
-                    spike_obj.load()
-                    items = spike_obj.get_unit_list()
-                else:
-                    data.load_spike()
-                    items = data.get_unit_list()
+                from neurochat.nc_spike import NSpike
+                spike_file = self._control.get_spike_file()
+                system = self._control.format
+                spike_obj = NSpike(filename=spike_file, system=system)
+                spike_obj.load()
+                items = spike_obj.get_unit_list()
             if len(items) == 0:
                 logging.error("No units in this file.")
                 items = [i for i in range(256)]
