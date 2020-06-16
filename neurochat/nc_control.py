@@ -396,6 +396,7 @@ class NeuroChaT(QtCore.QThread):
                     info['lfp'].append(lfp_file)
 
         if info['unit']:
+            do_border = False
             last_used_info = {
                 'spat': None,
                 'spike': None,
@@ -413,6 +414,7 @@ class NeuroChaT(QtCore.QThread):
                         self.ndata.set_spatial_file(info['spat'][i])
                         self.ndata.spatial.load()
                         last_used_info['spat'] = info['spat'][i]
+                        do_border = True
 
                 if os.path.isfile(info['spike'][i]):
                     if last_used_info['spike'] == info['spike'][i]:
@@ -430,7 +432,8 @@ class NeuroChaT(QtCore.QThread):
                         logging.info(
                             "Using loaded lfp file {}".format(info['lfp'][i]))
                     else:
-                        logging.info("Loading LFP file {}".format(info['lfp'][i]))
+                        logging.info(
+                            "Loading LFP file {}".format(info['lfp'][i]))
                         self.ndata.set_lfp_file(info['lfp'][i])
                         self.ndata.lfp.load()
                         last_used_info['lfp'] = info['lfp'][i]
@@ -469,7 +472,7 @@ class NeuroChaT(QtCore.QThread):
                 self.hdf.set_filename(nwb_name)
                 if '/analysis/' + cell_id in self.hdf.f:
                     del self.hdf.f['/analysis/' + cell_id]
-                self.execute(name=cell_id)
+                self.execute(name=cell_id, do_border=do_border)
 
                 self.close_pdf()
 
@@ -491,7 +494,7 @@ class NeuroChaT(QtCore.QThread):
         self.nwb_files = info['nwb']
         self.graphic_files = info['graphics']
 
-    def execute(self, name=None):
+    def execute(self, name=None, do_border=True):
         """
         Execute each analysis that is selected in the configuration.
 
@@ -501,20 +504,24 @@ class NeuroChaT(QtCore.QThread):
 
         Parameters
         ----------
-        name : str
-            Name of the unit or the unique unit ID
+        name : str, optional
+            Name of the unit or the unique unit ID. Defaults to None.
+        do_border : bool, optional
+            If true, calculate the border. Defaults to True.
 
         Returns
         -------
         None
 
         """
-        try:
-            logging.info('Calculating environmental border...')
-            self.set_border(self.calc_border())
+        if do_border:
+            try:
+                logging.info('Calculating environmental border...')
+                self.set_border(self.calc_border())
 
-        except BaseException:
-            logging.warning('Border calculation was not properly completed!')
+            except BaseException:
+                logging.warning(
+                    'Border calculation was not properly completed!')
 
         if self.get_analysis('wave_property'):
             logging.info('Assessing waveform properties...')
