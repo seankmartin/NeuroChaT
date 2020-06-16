@@ -984,8 +984,6 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 lfp_file = remove_extension(spike_file) + lfpID
             elif data_format == 'Neuralynx':
                 spike_file = self._control.get_spike_file()
-                print(os.sep.join(spike_file.split(
-                    os.sep)[:-1]) + os.sep + lfpID)
                 lfp_file = os.sep.join(spike_file.split(os.sep)[
                                        :-1]) + os.sep + lfpID
             elif data_format == 'NWB':
