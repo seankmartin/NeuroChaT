@@ -475,6 +475,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.scroll_layout = QtWidgets.QVBoxLayout()
         self.scroll_layout.addWidget(self.isi)
         self.scroll_layout.addWidget(self.isi_corr)
+        self.scroll_layout.addWidget(self.wave_property)
         self.scroll_layout.addWidget(self.theta_cell)
         self.scroll_layout.addWidget(self.theta_skip_cell)
         self.scroll_layout.addWidget(self.burst)
@@ -498,7 +499,6 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.scroll_layout.addWidget(self.spike_phase)
         self.scroll_layout.addWidget(self.phase_lock)
         self.scroll_layout.addWidget(self.lfp_spike_causality)
-        self.scroll_layout.addWidget(self.wave_property)
 
         self.function_widget = ScrollableWidget()
         self.function_widget.setContents(self.scroll_layout)
@@ -1758,6 +1758,8 @@ class UiParameters(QtWidgets.QDialog):
 
         self.param_stack.addWidget(self.isi_corr_page())
 
+        self.param_stack.addWidget(self.waveform_page())
+
         self.param_stack.addWidget(self.theta_cell_page())
 
         self.param_stack.addWidget(self.theta_skip_cell_page())
@@ -1803,8 +1805,6 @@ class UiParameters(QtWidgets.QDialog):
         self.param_stack.addWidget(self.phase_lock_page())
 
         self.param_stack.addWidget(self.lfp_spike_causality_page())
-
-        self.param_stack.addWidget(self.waveform_page())
 
     def behaviour_ui(self):
         """Set the behaviour of the GUI elements."""
