@@ -274,11 +274,13 @@ class NeuroChaT(QtCore.QThread):
         """
         self.reset()
         verified = True
-        # Deduce the configuration
-        # Same filename for spike, lfp and spatial will go for NWB
+        no_spike = False
+        no_spatial = False
+        no_lfp = False
+
+        # Handles menu functions
         if not any(self.get_analysis('all')):
             verified = False
-            # Handle menu functions
             special_analysis = self.get_special_analysis()
             if special_analysis:
                 key = special_analysis["key"]
@@ -295,17 +297,37 @@ class NeuroChaT(QtCore.QThread):
             else:
                 logging.error('No analysis method has been selected')
         else:
-            # Could take this to mode,
-            # but replication would occur for each data format
             mode_id = self.get_analysis_mode()[1]
-            if (mode_id == 0 or mode_id == 1) and \
-                    (self.get_data_format() == 'Axona' or self.get_data_format() == 'Neuralynx'):
+            if (
+                (mode_id == 0 or mode_id == 1) and
+                (self.get_data_format() == 'Axona' or
+                    self.get_data_format() == 'Neuralynx')):
                 if not os.path.isfile(self.get_spike_file()):
-                    verified = False
-                    logging.error('Spike file does not exist')
+                    logging.warning(
+                        'Spike file does not exist or was not selected')
+                    no_spike = True
 
                 if not os.path.isfile(self.get_spatial_file()):
-                    logging.warning('Position file does not exist')
+                    logging.warning(
+                        'Position file does not exist or was not selected')
+                    no_spatial = True
+
+                if not os.path.isfile(self.get_lfp_file()):
+                    logging.warning(
+                        'LFP file does not exist or was not selected')
+                    no_lfp = True
+
+                if no_spike and no_lfp:
+                    verified = False
+                    name_spike = (
+                        "None" if self.get_spike_file() == ""
+                        else self.get_spike_file())
+                    name_lfp = (
+                        "None" if self.get_lfp_file() == ""
+                        else self.get_lfp_file())
+                    logging.error(
+                        "No spike or LFP files found, respectively: {} and {}".format(
+                            name_spike, name_lfp))
 
             elif mode_id == 2:
                 if not os.path.isfile(self.get_excel_file()):
@@ -1294,16 +1316,6 @@ class NeuroChaT(QtCore.QThread):
         """
         return self.config
 
-    def __getattr__(self, arg):
-        """Forward __getattr__ to configuration class."""
-        if hasattr(self.config, arg):
-            return getattr(self.config, arg)
-        elif hasattr(self.ndata, arg):
-            return getattr(self.ndata, arg)
-        else:
-            logging.warning(
-                'No ' + arg + ' method or attribute in NeuroChaT class')
-
     def convert_to_nwb(self, excel_file=None):
         """
         Take a list of datasets in Excel file and converts them into NWB.
@@ -1676,3 +1688,13 @@ class NeuroChaT(QtCore.QThread):
             log_exception(
                 ex, "In walking a directory for place cell summaries")
         return
+
+    def __getattr__(self, arg):
+        """Forward __getattr__ to configuration class."""
+        if hasattr(self.config, arg):
+            return getattr(self.config, arg)
+        elif hasattr(self.ndata, arg):
+            return getattr(self.ndata, arg)
+        else:
+            logging.warning(
+                'No ' + arg + ' method or attribute in NeuroChaT class')

@@ -71,6 +71,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         else:
             self._curr_dir = "/home/"
         self.setup_ui()
+        self._should_clear_backend = True
 
     def setup_ui(self):
         """Set up the elements of NeuroChaT_ui class."""
@@ -233,7 +234,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.browse_button_spatial.clicked.connect(self.browse_spatial)
         self.clear_log_button.clicked.connect(self.clear_log)
         self.save_log_button.clicked.connect(self.save_log)
-        self.open_file_act.triggered.connect(self.browse)
+        self.open_file_act.triggered.connect(self.browse_all)
         self.save_session_act.triggered.connect(self.save_session)
         self.load_session_act.triggered.connect(self.load_session)
 
@@ -698,6 +699,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self._control.set_data_format(data_format)
         logging.info("Input data format set to: " + data_format)
         self._set_dictation()
+        self.clear_backend_files()
         if data_format == 'Axona' or data_format == 'Neuralynx':
             self._control.set_nwb_file('')
 
@@ -711,6 +713,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self._control.set_analysis_mode(ind)
         logging.info("Analysis mode set to: " + self.mode_box.itemText(ind))
         self._set_dictation()
+        self.clear_backend_files()
 
     def graphic_format_select(self):
         """
@@ -788,8 +791,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         else:
             items = [str(i) for i in list(range(256))]
 
+        self._first_chan_call = True
         self.lfp_chan_box.clear()
         self.lfp_chan_box.addItems(items)
+        self._first_chan_call = False
 
     def unit_getitems(self):
         """Return the list of units once spike data is set."""
@@ -824,18 +829,25 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             self.unit_no_box.addItems(items)
 
     def browse_spike(self):
+        """
+        Open a file dialog for selecting a spike file.
+
+        Depending on the mode, also browses Excel or HDF5 files.
+        Also populates a set of units and lfps available on selection.
+
+        """
         mode_id = self.mode_box.currentIndex()
         file_format = self._control.get_data_format()
         if mode_id == 0 or mode_id == 1:
             if file_format == "Axona" or file_format == "Neuralynx":
                 if file_format == "Axona":
-                    spike_filter = "".join(
+                    spike_filter = "All (*.*);; " + "".join(
                         ["*." + str(x) + ";;" for x in list(range(1, 129))])
                 elif file_format == "Neuralynx":
                     spike_filter = "*.ntt;; *.nst;; *.nse"
                 spike_file = QtCore.QDir.toNativeSeparators(
                     QtWidgets.QFileDialog.getOpenFileName(
-                        self, 'Select spike file...',
+                        self, 'Select {} spike file...'.format(file_format),
                         os.getcwd(), spike_filter)[0])
                 if not spike_file:
                     logging.warning("No spike file selected")
@@ -846,104 +858,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                     self._control.set_spike_file(spike_file)
                     self._control.ndata.set_spike_file(spike_file)
                     logging.info("New spike file added: " + words[-1])
+                    self.filename_line_spike.setText(
+                        "Selected {}".format(spike_file))
                     self.unit_getitems()
-
-            elif file_format == "NWB":
-                nwb_file = QtCore.QDir.toNativeSeparators(
-                    QtWidgets.QFileDialog.getOpenFileName(
-                        self, 'Select NWB file...', os.getcwd(), "*.hdf5")[0])
-                if not nwb_file:
-                    logging.warning("No NWB file selected")
-                else:
-                    words = nwb_file.rstrip("\n\r").split(os.sep)
-                    directory = os.sep.join(words[0:-1])
-                    os.chdir(directory)
-                    self._control.set_nwb_file(nwb_file)
-                    logging.info("New NWB file added: " + words[-1])
-                    try:
-                        path = '/processing/Shank'
-                        self._control.open_hdf_file()
-                        items = self._control.get_hdf_groups(path=path)
-                        if items:
-                            item, ok = QtWidgets.QInputDialog.getItem(
-                                self, "Select electrode group",
-                                "Electrode groups: ", items, 0, False)
-                            if ok:
-                                self._control.set_spike_file(
-                                    nwb_file + '+' + path + '/' + item)
-                                logging.info(
-                                    'Spike data set to electrode group: '
-                                    + path + '/' + item)
-                        self._control.close_hdf_file()
-                    except Exception as e:
-                        log_exception(
-                            e, "Cannot read hdf file in nc_ui browse")
-
-                    self.unit_getitems()
-
-        elif mode_id == 2:
-            excel_file = QtCore.QDir.toNativeSeparators(
-                QtWidgets.QFileDialog.getOpenFileName(
-                    self, 'Select Excel file...', os.getcwd(), "*.xlsx;; .*xls")[0])
-            if not excel_file:
-                logging.warning("No excel file selected")
-            else:
-                words = excel_file.rstrip("\n\r").split(os.sep)
-                directory = os.sep.join(words[0:-1])
-                os.chdir(directory)
-                self._control.set_excel_file(excel_file)
-                logging.info("New excel file added: " + words[-1])
-
-    def browse_spatial(self):
-        pass
-
-    def browse_lfp(self):
-        pass
-
-    def browse(self):
-        """
-        Open a file dialog asking the user to select data files.
-
-        Once selected, it also set the LFP channels in the 'LFP Ch No'
-        combo box.
-
-        """
-        mode_id = self.mode_box.currentIndex()
-        file_format = self._control.get_data_format()
-        if mode_id == 0 or mode_id == 1:
-            if file_format == "Axona" or file_format == "Neuralynx":
-                if file_format == "Axona":
-                    spike_filter = "".join(
-                        ["*." + str(x) + ";;" for x in list(range(1, 129))])
-                    spatial_filter = "*.txt"
-                elif file_format == "Neuralynx":
-                    spike_filter = "*.ntt;; *.nst;; *.nse"
-                    spatial_filter = "*.nvt"
-                spike_file = QtCore.QDir.toNativeSeparators(
-                    QtWidgets.QFileDialog.getOpenFileName(
-                        self, 'Select spike file...',
-                        os.getcwd(), spike_filter)[0])
-                if not spike_file:
-                    logging.warning("No spike file selected")
-                else:
-                    words = spike_file.rstrip("\n\r").split(os.sep)
-                    directory = os.sep.join(words[0:-1])
-                    os.chdir(directory)
-                    self._control.set_spike_file(spike_file)
-                    self._control.ndata.set_spike_file(spike_file)
-                    logging.info("New spike file added: " + words[-1])
-                    spatial_file = QtCore.QDir.toNativeSeparators(
-                        QtWidgets.QFileDialog.getOpenFileName(
-                            self, 'Select spatial file...',
-                            os.getcwd(), spatial_filter)[0])
-                    if not spatial_file:
-                        logging.warning("No spatial file selected")
-                    else:
-                        words = spatial_file.rstrip("\n\r").split(os.sep)
-                        self._control.set_spatial_file(spatial_file)
-                        logging.info("New spatial file added: " + words[-1])
                     self.lfp_chan_getitems()
-                    self.unit_getitems()
 
             elif file_format == "NWB":
                 nwb_file = QtCore.QDir.toNativeSeparators(
@@ -957,17 +875,12 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                     os.chdir(directory)
                     self._control.set_nwb_file(nwb_file)
                     logging.info("New NWB file added: " + words[-1])
+                    self.filename_line_spike.setText(
+                        "Selected {}".format(nwb_file))
                     try:
                         path = '/processing/Shank'
                         self._control.open_hdf_file()
                         items = self._control.get_hdf_groups(path=path)
-                        # hdf = Nhdf()
-                        # hdf.set_filename(nwb_file)
-                        # path = '/processing/Shank'
-                        # if path in hdf.f:
-                        #     items = list(hdf.f[path].keys())
-                        # else:
-                        #     logging.warning('No Shank data stored in the path:'+ path)
                         if items:
                             item, ok = QtWidgets.QInputDialog.getItem(
                                 self, "Select electrode group",
@@ -978,6 +891,9 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                                 logging.info(
                                     'Spike data set to electrode group: '
                                     + path + '/' + item)
+                                self.filename_line_spike.setText(
+                                    "Selected {} with electrodes {}".format(
+                                        os.path.basename(nwb_file), path + '/' + item))
 
                                 path = '/processing/Behavioural/Position'
                                 if self._control.exist_hdf_path(path=path):
@@ -985,6 +901,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                                         nwb_file + '+' + path)
                                     logging.info(
                                         'Position data set to group: ' + path)
+                                    self.filename_line_spatial.setText(
+                                        "Selected HDF5 Path {}".format(path))
                                 else:
                                     logging.warning(
                                         path +
@@ -994,8 +912,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                         log_exception(
                             e, "Cannot read hdf file in nc_ui browse")
 
-                    self.lfp_chan_getitems()
                     self.unit_getitems()
+                    self.lfp_chan_getitems()
 
         elif mode_id == 2:
             excel_file = QtCore.QDir.toNativeSeparators(
@@ -1009,14 +927,95 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 os.chdir(directory)
                 self._control.set_excel_file(excel_file)
                 logging.info("New excel file added: " + words[-1])
+
         # elif mode_id == 3:
-        #     data_directory = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getExistingDirectory(self, \
+        #     data_directory = QtCore.QDir.toNativeSeparators(
+        # QtWidgets.QFileDialog.getExistingDirectory(self,
         #                     'Select data directory...', os.getcwd()))
         #     if not data_directory:
         #         logging.warning("No data directory selected")
         #     else:
         #         self._control.set_dataDir(data_directory)
         #         logging.info("New directory added: "+ data_directory)
+
+    def browse_lfp(self):
+        """
+        Open a file dialog for selecting an lfp file.
+
+        This is disabled, depending on the mode and file format.
+
+        """
+        mode_id = self.mode_box.currentIndex()
+        file_format = self._control.get_data_format()
+        if mode_id == 0 or mode_id == 1:
+            if file_format == "Axona" or file_format == "Neuralynx":
+                if file_format == "Axona":
+                    lfp_filter = "*.eeg*;; *.egf*"
+                elif file_format == "Neuralynx":
+                    lfp_filter = "*.ncs"
+                lfp_file = QtCore.QDir.toNativeSeparators(
+                    QtWidgets.QFileDialog.getOpenFileName(
+                        self, 'Select {} lfp file...'.format(file_format),
+                        os.getcwd(), lfp_filter)[0])
+                if not lfp_file:
+                    logging.warning("No lfp file selected")
+                else:
+                    words = lfp_file.rstrip("\n\r").split(os.sep)
+                    directory = os.sep.join(words[0:-1])
+                    os.chdir(directory)
+                    logging.info("New lfp file added: " + words[-1])
+                    self._control.set_lfp_file(lfp_file)
+                    self.filename_line_lfp.setText(
+                        "Selected {}".format(lfp_file))
+                    self.lfp_chan_getitems()
+
+    def browse_spatial(self):
+        """
+        Open a file dialog for selecting a spatial file.
+
+        This is disabled, depending on the mode and file format.
+
+        """
+        mode_id = self.mode_box.currentIndex()
+        file_format = self._control.get_data_format()
+        if mode_id == 0 or mode_id == 1:
+            if file_format == "Axona" or file_format == "Neuralynx":
+                if file_format == "Axona":
+                    spatial_filter = "*.txt"
+                elif file_format == "Neuralynx":
+                    spatial_filter = "*.nvt"
+                spatial_file = QtCore.QDir.toNativeSeparators(
+                    QtWidgets.QFileDialog.getOpenFileName(
+                        self, 'Select {} spatial file...'.format(file_format),
+                        os.getcwd(), spatial_filter)[0])
+                if not spatial_file:
+                    logging.warning("No spatial file selected")
+                else:
+                    words = spatial_file.rstrip("\n\r").split(os.sep)
+                    directory = os.sep.join(words[0:-1])
+                    os.chdir(directory)
+                    self._control.set_spatial_file(spatial_file)
+                    logging.info("New spatial file added: " + words[-1])
+                    self.filename_line_spatial.setText(
+                        "Selected {}".format(spatial_file))
+
+    def browse_all(self):
+        """
+        In turn, browse spike, lfp and spatial.
+
+        See also
+        --------
+        neurochat.nc_ui.browse_spike
+        neurochat.nc_ui.browse_spatial
+        neurochat.nc_ui.browse_lfp
+
+        """
+        if self.browse_button_spike.isEnabled():
+            self.browse_spike()
+        if self.browse_button_lfp.isEnabled():
+            self.browse_lfp()
+        if self.browse_button_spatial.isEnabled():
+            self.browse_spatial()
 
     def update_log(self, msg):
         """
@@ -1080,23 +1079,61 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         """
         lfpID = self.lfp_chan_box.itemText(value)
+        should_set = True
 
-        if lfpID:
+        if self._first_chan_call:
+            data_format = self._control.get_data_format()
+            lfp_file = self._control.get_lfp_file()
+            if data_format == 'Axona':
+                if os.path.isfile(lfp_file):
+                    _, lfpID = remove_extension(lfp_file, return_ext=True)
+                    should_set = False
+            elif data_format == 'Neuralynx':
+                if os.path.isfile(lfp_file):
+                    lfpID = os.path.basename(lfp_file)
+                    should_set = False
+            elif data_format == 'NWB':
+                should_set = True
+            else:
+                logging.error('Input data format not supported for file')
+            index = self.lfp_chan_box.findText(lfpID)
+            if index >= 0:
+                self.lfp_chan_box.setCurrentIndex(index)
+
+        if lfpID and should_set:
             logging.info("Selected LFP channel: " + lfpID)
             data_format = self._control.get_data_format()
             if data_format == 'Axona':
                 spike_file = self._control.get_spike_file()
-                lfp_file = remove_extension(spike_file) + lfpID
+                lfp_file = self._control.get_lfp_file()
+                if spike_file != "":
+                    lfp_file = remove_extension(spike_file) + lfpID
+                elif lfp_file != "":
+                    lfp_file = remove_extension(lfp_file) + lfpID
+                if not os.path.isfile(lfp_file):
+                    raise ValueError("LFP file {} not found".format(lfp_file))
             elif data_format == 'Neuralynx':
                 spike_file = self._control.get_spike_file()
-                lfp_file = os.sep.join(spike_file.split(os.sep)[
-                                       :-1]) + os.sep + lfpID
+                lfp_file = self._control.get_lfp_file()
+                if spike_file != "":
+                    lfp_file = (os.sep.join(
+                        spike_file.split(os.sep)[:-1]) + os.sep + lfpID)
+                elif lfp_file != "":
+                    lfp_file = os.path.join(os.path.dirname(lfp_file), lfpID)
+                if not os.path.isfile(lfp_file):
+                    raise ValueError("LFP file {} not found".format(lfp_file))
             elif data_format == 'NWB':
                 nwb_file = self._control.get_nwb_file()
-                lfp_file = nwb_file + '+' + '/processing/Neural Continuous/LFP' + '/' + lfpID
+                lfp_file = (
+                    nwb_file + '+' + '/processing/Neural Continuous/LFP' + '/' + lfpID)
             else:
-                logging.error('The input data format not supported!')
+                logging.error('Input data format not supported!')
             self._control.set_lfp_file(lfp_file)
+            if data_format == "NWB":
+                self.filename_line_lfp.setText("Selected HDF5 Path {}".format(
+                    lfp_file.split("+")[1]))
+            else:
+                self.filename_line_lfp.setText("Selected {}".format(lfp_file))
 
     def view_help(self):
         """Display user guide pdf on GitHub."""
@@ -1138,8 +1175,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             "Select excel(.xls/.xlsx) file with unit list",
             "Select folder"]
         _dictation_lfp = [
-            "Select lfp(.eegXX or .egfXX) file",
-            "Select lfp(.eegXX or .egfXX) file",
+            "Select lfp(.eeg/.egf) file",
+            "Select lfp(.eeg/.egf) file",
             "Unused in this mode",
             "Unused in this mode"]
         _dictation_spatial = [
@@ -1185,7 +1222,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         """
         Retrive all the configurations from the GUI elements.
 
-        After retreival, it sets them to the Configuration() object
+        After retrieval, it sets them to the Configuration() object
         through the NeuroChaT() object.
 
         """
@@ -1244,6 +1281,9 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         if not ncfg_file:
             logging.error("No saved session selected! Loading failed!")
         else:
+            self._should_clear_backend = True
+            self.clear_backend_files()
+            self._should_clear_backend = False
             self._control.load_config(ncfg_file)
             os.chdir(os.path.dirname(ncfg_file))
 
@@ -1261,7 +1301,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         old_unit_no = self._control.get_unit_no()
         self.unit_getitems()
         index = self.unit_no_box.findText(str(old_unit_no))
-        if index >= 0 & index < 256:
+        if index >= 0:
             self._control.set_unit_no(old_unit_no)
             self.unit_no_box.setCurrentIndex(index)
 
@@ -1302,6 +1342,18 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 param_widget.setChecked(self._control.get_params(name))
             else:
                 param_widget.setValue(self._control.get_params(name))
+
+        lfp_file = self._control.get_lfp_file()
+        if os.path.isfile(lfp_file):
+            self.filename_line_lfp.setText("Selected {}".format(lfp_file))
+        spike_file = self._control.get_spike_file()
+        if os.path.isfile(spike_file):
+            self.filename_line_spike.setText("Selected {}".format(spike_file))
+        position_file = self._control.get_spatial_file()
+        if os.path.isfile(position_file):
+            self.filename_line_spatial.setText("Selected {}".format(position_file))
+
+        self._should_clear_backend = True
 
     def merge_output(self):
         """Open the UiMerge() object to merge PDF or PS files."""
@@ -1347,6 +1399,20 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         excel_data = pd.read_excel(excel_file)
         print('Create an excel read warpper from PANDAS')
         print(excel_data)
+
+    def clear_backend_files(self):
+        if self._should_clear_backend:
+            # Clear names on the config object
+            self._control.set_lfp_file("")
+            self._control.set_spike_file("")
+            self._control.set_spatial_file("")
+            self._control.set_nwb_file("")
+            self._control.set_unit_no(0)
+
+            # Clear names on the data object
+            self._control.ndata.set_lfp_file("")
+            self._control.ndata.set_spike_file("")
+            self._control.ndata.set_spatial_file("")
 
     def angle_calculation(self):
         """
