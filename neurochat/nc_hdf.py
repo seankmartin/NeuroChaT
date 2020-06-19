@@ -391,8 +391,8 @@ class Nhdf(object):
                     pass
             try:
                 g.create_dataset(name=name, data=data)
-            except BaseException:
-                logging.error('Error in creating ' +
+            except BaseException as e:
+                log_exception(e, 'Saving ' +
                               name + ' dataset to hdf5 file')
         else:
             logging.error('hdf5 file path can be created or restored!')
