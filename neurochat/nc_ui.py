@@ -77,7 +77,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         """Set up the elements of NeuroChaT_ui class."""
         self.setObjectName(xlt_from_utf8("MainWindow"))
         self.setEnabled(True)
-        self.setFixedSize(800, 480)
+        self.setFixedSize(1000, 600)
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName(xlt_from_utf8("centralwidget"))
 
@@ -1351,7 +1351,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             self.filename_line_spike.setText("Selected {}".format(spike_file))
         position_file = self._control.get_spatial_file()
         if os.path.isfile(position_file):
-            self.filename_line_spatial.setText("Selected {}".format(position_file))
+            self.filename_line_spatial.setText(
+                "Selected {}".format(position_file))
 
         self._should_clear_backend = True
 
