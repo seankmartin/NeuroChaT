@@ -1214,6 +1214,8 @@ class NeuroChaT(QtCore.QThread):
                 logging.error(
                     "LFP data is required for spectrum analysis")
             else:
+                logging.info(
+                    "Analysing LFP power spectrum.")
                 try:
                     params = self.get_params_by_analysis('lfp_spectrum')
 
