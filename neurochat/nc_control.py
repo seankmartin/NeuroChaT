@@ -19,6 +19,9 @@ from PyQt5 import QtCore
 from neurochat.nc_utils import NLog, angle_between_points, log_exception
 from neurochat.nc_utils import remove_extension
 from neurochat.nc_data import NData
+from neurochat.nc_spike import NSpike
+from neurochat.nc_lfp import NLfp
+from neurochat.nc_spatial import NSpatial
 from neurochat.nc_datacontainer import NDataContainer
 from neurochat.nc_hdf import Nhdf
 from neurochat.nc_clust import NClust
@@ -437,6 +440,10 @@ class NeuroChaT(QtCore.QThread):
                         self.ndata.spatial.load()
                         last_used_info['spat'] = info['spat'][i]
                         do_border = True
+                else:
+                    logging.info(
+                        'Spatial data does not exist or was not selected')
+                    self.ndata.spatial = NSpatial(name='S0')
 
                 if os.path.isfile(info['spike'][i]):
                     if last_used_info['spike'] == info['spike'][i]:
@@ -448,6 +455,10 @@ class NeuroChaT(QtCore.QThread):
                         self.ndata.set_spike_file(info['spike'][i])
                         self.ndata.spike.load()
                         last_used_info['spike'] = info['spike'][i]
+                else:
+                    logging.info(
+                        'Spike data does not exist or was not selected')
+                    self.ndata.spike = NSpike(name='C0')
 
                 if os.path.isfile(info['lfp'][i]):
                     if last_used_info['lfp'] == info['lfp'][i]:
@@ -459,6 +470,10 @@ class NeuroChaT(QtCore.QThread):
                         self.ndata.set_lfp_file(info['lfp'][i])
                         self.ndata.lfp.load()
                         last_used_info['lfp'] = info['lfp'][i]
+                else:
+                    logging.info(
+                        'lfp data does not exist or was not selected')
+                    self.ndata.lfp = NLfp(name='L0')
 
                 self.ndata.set_unit_no(info['unit'][i])
 
