@@ -306,18 +306,12 @@ class NeuroChaT(QtCore.QThread):
                 (self.get_data_format() == 'Axona' or
                     self.get_data_format() == 'Neuralynx')):
                 if not os.path.isfile(self.get_spike_file()):
-                    logging.warning(
-                        'Spike file does not exist or was not selected')
                     no_spike = True
 
                 if not os.path.isfile(self.get_spatial_file()):
-                    logging.warning(
-                        'Position file does not exist or was not selected')
                     no_spatial = True
 
                 if not os.path.isfile(self.get_lfp_file()):
-                    logging.warning(
-                        'LFP file does not exist or was not selected')
                     no_lfp = True
 
                 if no_spike and no_lfp:
@@ -373,20 +367,26 @@ class NeuroChaT(QtCore.QThread):
             spike_file = self.get_spike_file()
             lfp_file = self.get_lfp_file()
 
-            self.ndata.set_spike_file(spike_file)
-            self.ndata.load_spike()
+            if os.path.isfile(spike_file):
+                self.ndata.set_spike_file(spike_file)
+                self.ndata.load_spike()
 
-            units = (
-                [self.get_unit_no()]
-                if mode_id == 0 else self.ndata.get_unit_list())
-            if not units:
-                logging.error('No unit found in analysis')
+                units = (
+                    [self.get_unit_no()]
+                    if mode_id == 0 else self.ndata.get_unit_list())
+                if not units:
+                    logging.error('No unit found in analysis')
+                else:
+                    for unit_no in units:
+                        info['spat'].append(spatial_file)
+                        info['spike'].append(spike_file)
+                        info['unit'].append(unit_no)
+                        info['lfp'].append(lfp_file)
             else:
-                for unit_no in units:
-                    info['spat'].append(spatial_file)
-                    info['spike'].append(spike_file)
-                    info['unit'].append(unit_no)
-                    info['lfp'].append(lfp_file)
+                info['spat'].append(spatial_file)
+                info['spike'].append(spike_file)
+                info['lfp'].append(lfp_file)
+                info['unit'].append(0)
 
         # Read files from an excel list
         elif mode_id == 2:
@@ -421,13 +421,14 @@ class NeuroChaT(QtCore.QThread):
                     info['lfp'].append(lfp_file)
 
         if info['unit']:
-            do_border = False
             last_used_info = {
                 'spat': None,
                 'spike': None,
                 'lfp': None,
             }
             for i, unit_no in enumerate(info['unit']):
+                do_border = False
+                data_for_hdf = None
                 logging.info('Starting a new unit...')
                 if os.path.isfile(info['spat'][i]):
                     if last_used_info['spat'] == info['spat'][i]:
@@ -441,24 +442,11 @@ class NeuroChaT(QtCore.QThread):
                         last_used_info['spat'] = info['spat'][i]
                         do_border = True
                 else:
-                    logging.info(
+                    # TODO remove these logs when sure it is working
+                    logging.warning(
                         'Spatial data does not exist or was not selected')
                     self.ndata.spatial = NSpatial(name='S0')
-
-                if os.path.isfile(info['spike'][i]):
-                    if last_used_info['spike'] == info['spike'][i]:
-                        logging.info(
-                            "Using loaded spike file {}".format(info['spike'][i]))
-                    else:
-                        logging.info(
-                            "Loading spike file {}".format(info['spike'][i]))
-                        self.ndata.set_spike_file(info['spike'][i])
-                        self.ndata.spike.load()
-                        last_used_info['spike'] = info['spike'][i]
-                else:
-                    logging.info(
-                        'Spike data does not exist or was not selected')
-                    self.ndata.spike = NSpike(name='C0')
+                    self.ndata.spatial.set_filename(".no_spatial.NONE")
 
                 if os.path.isfile(info['lfp'][i]):
                     if last_used_info['lfp'] == info['lfp'][i]:
@@ -470,18 +458,42 @@ class NeuroChaT(QtCore.QThread):
                         self.ndata.set_lfp_file(info['lfp'][i])
                         self.ndata.lfp.load()
                         last_used_info['lfp'] = info['lfp'][i]
+                    data_for_hdf = self.ndata.lfp
                 else:
-                    logging.info(
+                    logging.warning(
                         'lfp data does not exist or was not selected')
                     self.ndata.lfp = NLfp(name='L0')
+                    self.ndata.lfp.set_filename(".no_lfp.NONE")
+
+                if os.path.isfile(info['spike'][i]):
+                    if last_used_info['spike'] == info['spike'][i]:
+                        logging.info(
+                            "Using loaded spike file {}".format(info['spike'][i]))
+                    else:
+                        logging.info(
+                            "Loading spike file {}".format(info['spike'][i]))
+                        self.ndata.set_spike_file(info['spike'][i])
+                        self.ndata.spike.load()
+                        last_used_info['spike'] = info['spike'][i]
+                    data_for_hdf = self.ndata.spike
+                else:
+                    logging.warning(
+                        'Spike data does not exist or was not selected')
+                    self.ndata.spike = NSpike(name='C0')
+                    self.ndata.spike.set_filename(".no_spike.NONE")
 
                 self.ndata.set_unit_no(info['unit'][i])
 
                 self.ndata.reset_results()
 
+                if data_for_hdf is None:
+                    logging.error("Could not analyse this dataset")
+                    continue
+
                 cell_id = self.hdf.resolve_analysis_path(
                     spike=self.ndata.spike, lfp=self.ndata.lfp)
-                nwb_name = self.hdf.resolve_hdfname(data=self.ndata.spike)
+                nwb_name = self.hdf.resolve_hdfname(
+                    data=data_for_hdf)
                 pdf_name = (
                     remove_extension(nwb_name, keep_dot=False) +
                     '_' + cell_id + '.' + self.get_graphic_format())
