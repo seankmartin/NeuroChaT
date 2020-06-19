@@ -14,6 +14,8 @@ import numpy as np
 
 import h5py
 
+from neurochat.nc_utils import log_exception
+
 
 class Nhdf(object):
     """
@@ -130,8 +132,8 @@ class Nhdf(object):
         try:
             self.f = h5py.File(self._filename, 'a')
             self.initialize()
-        except BaseException:
-            logging.error('Cannot open ' + self._filename)
+        except BaseException as e:
+            log_exception(e, 'Opening hdf file' + self._filename)
 
         return self.f
 
@@ -517,15 +519,16 @@ class Nhdf(object):
         """
         try:
             obj_type = obj.get_type()
-        except BaseException:
-            logging.error(
-                'Cannot get object! It is not of one of the neurochat data types!')
+        except BaseException as e:
+            log_exception(
+                e, 'Object passed is not a neurochat data type')
 
         try:
-            fun = getattr(self, 'save_' + obj_type)
-            fun(obj)
-        except BaseException:
-            logging.error('Failed to save the dataset!')
+            if os.path.isfile(obj.get_filename()):
+                fun = getattr(self, 'save_' + obj_type)
+                fun(obj)
+        except BaseException as e:
+            log_exception(e, 'Saving hdf5 dataset')
 
     def save_spatial(self, spatial=None):
         """
@@ -545,6 +548,9 @@ class Nhdf(object):
         self.set_filename(self.resolve_hdfname(data=spatial))
         # Get the lfp data path/group
         path = self.resolve_datapath(data=spatial)
+
+        logging.info("Saving spatial info to {} path {}".format(
+            self._filename, path))
         # delete old data
         if path in self.f:
             del self.f[path]
@@ -606,6 +612,10 @@ class Nhdf(object):
         self.set_filename(self.resolve_hdfname(data=lfp))
         # Get the lfp data path/group
         path = self.resolve_datapath(data=lfp)
+
+        logging.info("Saving lfp info to {} path {}".format(
+            self._filename, path))
+
         # delete old data
         if path in self.f:
             del self.f[path]
@@ -639,6 +649,9 @@ class Nhdf(object):
         self.set_filename(self.resolve_hdfname(data=spike))
         # Get the spike data path/group
         path = self.resolve_datapath(data=spike)
+
+        logging.info("Saving spike info to {} path {}".format(
+            self._filename, path))
 
         # delete old data
         if path in self.f:
