@@ -568,616 +568,775 @@ class NeuroChaT(QtCore.QThread):
                 logging.info('Calculating environmental border...')
                 self.set_border(self.calc_border())
 
-            except BaseException:
+            except BaseException as ex:
                 logging.warning(
                     'Border calculation was not properly completed!')
 
         if self.get_analysis('wave_property'):
-            logging.info('Assessing waveform properties...')
-            try:
-                graph_data = self.wave_property()  # gd = graph_data
-                fig = nc_plot.wave_property(
-                    graph_data, [int(self.get_total_channels() / 2), 2])
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/waveProperty/', graph_data=graph_data)
-            except BaseException:
-                logging.error('Error in assessing waveform property')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for wave property analysis")
+            else:
+                logging.info('Assessing waveform properties...')
+                try:
+                    graph_data = self.wave_property()  # gd = graph_data
+                    fig = nc_plot.wave_property(
+                        graph_data, [int(self.get_total_channels() / 2), 2])
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/waveProperty/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(ex, 'Assessing waveform property')
 
         if self.get_analysis('isi'):
-            # ISI analysis
-            logging.info('Calculating inter-spike interval distribution...')
-            try:
-                params = self.get_params_by_analysis('isi')
-                graph_data = self.isi(
-                    bins=int(params['isi_length'] / params['isi_bin']),
-                    bound=[0, params['isi_length']],
-                    refractory_threshold=params['isi_refractory'])
-                fig = nc_plot.isi(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/isi/', graph_data=graph_data)
-            except Exception as ex:
-                log_exception(
-                    ex, 'Error in assessing interspike interval distribution')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for isi analysis")
+            else:
+                logging.info(
+                    'Calculating inter-spike interval distribution...')
+                try:
+                    params = self.get_params_by_analysis('isi')
+                    graph_data = self.isi(
+                        bins=int(params['isi_length'] / params['isi_bin']),
+                        bound=[0, params['isi_length']],
+                        refractory_threshold=params['isi_refractory'])
+                    fig = nc_plot.isi(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/isi/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(
+                        ex, 'Assessing interspike interval distribution')
 
         if self.get_analysis('isi_corr'):
-            # Autocorr 1000ms
-            logging.info(
-                'Calculating inter-spike interval autocorrelation histogram...')
-            try:
-                params = self.get_params_by_analysis('isi_corr')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for isi correlation analysis")
+            else:
+                logging.info(
+                    'Calculating inter-spike interval autocorrelation histogram...')
+                try:
+                    params = self.get_params_by_analysis('isi_corr')
 
-                graph_data = self.isi_corr(
-                    bins=params['isi_corr_bin_long'],
-                    bound=[
-                        -params['isi_corr_len_long'],
-                        params['isi_corr_len_long']])
-                fig = nc_plot.isi_corr(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/isiCorrLong/', graph_data=graph_data)
-                # Autocorr 10ms
-                graph_data = self.isi_corr(
-                    bins=params['isi_corr_bin_short'],
-                    bound=[
-                        -params['isi_corr_len_short'],
-                        params['isi_corr_len_short']])
-                fig = nc_plot.isi_corr(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/isiCorrShort/', graph_data=graph_data)
-            except BaseException:
-                logging.error('Error in assessing ISI autocorrelation')
+                    graph_data = self.isi_corr(
+                        bins=params['isi_corr_bin_long'],
+                        bound=[
+                            -params['isi_corr_len_long'],
+                            params['isi_corr_len_long']])
+                    fig = nc_plot.isi_corr(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/isiCorrLong/', graph_data=graph_data)
+                    # Autocorr 10ms
+                    graph_data = self.isi_corr(
+                        bins=params['isi_corr_bin_short'],
+                        bound=[
+                            -params['isi_corr_len_short'],
+                            params['isi_corr_len_short']])
+                    fig = nc_plot.isi_corr(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/isiCorrShort/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(ex, 'Assessing ISI autocorrelation')
 
         if self.get_analysis('theta_cell'):
-            # Theta-Index analysis
-            logging.info('Estimating theta-modulation index...')
-            try:
-                params = self.get_params_by_analysis('theta_cell')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for theta cell analysis")
+            else:
+                logging.info('Estimating theta-modulation index...')
+                try:
+                    params = self.get_params_by_analysis('theta_cell')
 
-                graph_data = self.theta_index(
-                    start=[
-                        params['theta_cell_freq_start'],
-                        params['theta_cell_tau1_start'],
-                        params['theta_cell_tau2_start']],
-                    lower=[
-                        params['theta_cell_freq_min'], 0, 0],
-                    upper=[
-                        params['theta_cell_freq_max'],
-                        params['theta_cell_tau1_max'],
-                        params['theta_cell_tau2_max']],
-                    bins=params['isi_corr_bin_long'],
-                    bound=[
-                        -params['isi_corr_len_long'],
-                        params['isi_corr_len_long']])
-                fig = nc_plot.theta_cell(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/theta_cell/', graph_data=graph_data)
-            except BaseException:
-                logging.error('Error in theta-index analysis')
+                    graph_data = self.theta_index(
+                        start=[
+                            params['theta_cell_freq_start'],
+                            params['theta_cell_tau1_start'],
+                            params['theta_cell_tau2_start']],
+                        lower=[
+                            params['theta_cell_freq_min'], 0, 0],
+                        upper=[
+                            params['theta_cell_freq_max'],
+                            params['theta_cell_tau1_max'],
+                            params['theta_cell_tau2_max']],
+                        bins=params['isi_corr_bin_long'],
+                        bound=[
+                            -params['isi_corr_len_long'],
+                            params['isi_corr_len_long']])
+                    fig = nc_plot.theta_cell(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/theta_cell/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(ex, 'Theta-index analysis')
 
         if self.get_analysis('theta_skip_cell'):
-            logging.info('Estimating theta-skipping index...')
-            try:
-                params = self.get_params_by_analysis('theta_cell')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for theta skip analysis")
+            else:
+                logging.info('Estimating theta-skipping index...')
+                try:
+                    params = self.get_params_by_analysis('theta_cell')
 
-                graph_data = self.theta_skip_index(
-                    start=[
-                        params['theta_cell_freq_start'],
-                        params['theta_cell_tau1_start'],
-                        params['theta_cell_tau2_start']],
-                    lower=[
-                        params['theta_cell_freq_min'], 0, 0],
-                    upper=[
-                        params['theta_cell_freq_max'],
-                        params['theta_cell_tau1_max'],
-                        params['theta_cell_tau2_max']],
-                    bins=params['isi_corr_bin_long'],
-                    bound=[
-                        -params['isi_corr_len_long'],
-                        params['isi_corr_len_long']])
-                fig = nc_plot.theta_cell(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/theta_skip_cell/', graph_data=graph_data)
-            except BaseException:
-                logging.error('Error in theta-skipping cell index analysis')
+                    graph_data = self.theta_skip_index(
+                        start=[
+                            params['theta_cell_freq_start'],
+                            params['theta_cell_tau1_start'],
+                            params['theta_cell_tau2_start']],
+                        lower=[
+                            params['theta_cell_freq_min'], 0, 0],
+                        upper=[
+                            params['theta_cell_freq_max'],
+                            params['theta_cell_tau1_max'],
+                            params['theta_cell_tau2_max']],
+                        bins=params['isi_corr_bin_long'],
+                        bound=[
+                            -params['isi_corr_len_long'],
+                            params['isi_corr_len_long']])
+                    fig = nc_plot.theta_cell(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/theta_skip_cell/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(ex, 'Theta-skipping cell index analysis')
 
         if self.get_analysis('burst'):
-            # Burst analysis
-            logging.info('Analyzing bursting property...')
-            try:
-                params = self.get_params_by_analysis('burst')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for burst analysis")
+            else:
+                logging.info('Analyzing bursting property...')
+                try:
+                    params = self.get_params_by_analysis('burst')
 
-                self.burst(
-                    burst_thresh=params['burst_thresh'],
-                    ibi_thresh=params['ibi_thresh'])
-            except BaseException:
-                logging.error('Error in analysing bursting property')
+                    self.burst(
+                        burst_thresh=params['burst_thresh'],
+                        ibi_thresh=params['ibi_thresh'])
+
+                except BaseException as ex:
+                    log_exception(ex, 'Analysing bursting property')
 
         if self.get_analysis('speed'):
-            # Speed analysis
-            logging.info('Calculating spike-rate vs running speed...')
-            try:
-                params = self.get_params_by_analysis('speed')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for speed analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for speed analysis")
+            else:
+                logging.info('Calculating spike-rate vs running speed...')
+                try:
+                    params = self.get_params_by_analysis('speed')
 
-                graph_data = self.speed(
-                    range=[params['speed_min'], params['speed_max']],
-                    binsize=params['speed_bin'],
-                    update=True)
-                fig = nc_plot.speed(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/speed/', graph_data=graph_data)
-            except BaseException:
-                logging.error('Error in analysis of spike rate vs speed')
+                    graph_data = self.speed(
+                        range=[params['speed_min'], params['speed_max']],
+                        binsize=params['speed_bin'],
+                        update=True)
+                    fig = nc_plot.speed(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/speed/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(ex, 'Analysis of spike rate vs speed')
 
         if self.get_analysis('ang_vel'):
-            # Angular velocity analysis
-            logging.info('Calculating spike-rate vs angular head velocity...')
-            try:
-                params = self.get_params_by_analysis('ang_vel')
-
-                graph_data = self.angular_velocity(
-                    range=[params['ang_vel_min'], params['ang_vel_max']],
-                    binsize=params['ang_vel_bin'],
-                    cutoff=params['ang_vel_cutoff'], update=True)
-                fig = nc_plot.angular_velocity(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/ang_vel/', graph_data=graph_data)
-            except BaseException:
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
                 logging.error(
-                    'Error in analysis of spike rate vs angular velocity')
+                    "Spike data is required for angular velocity analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for angular velocity analysis")
+            else:
+                logging.info(
+                    'Calculating spike-rate vs angular head velocity...')
+                try:
+                    params = self.get_params_by_analysis('ang_vel')
+
+                    graph_data = self.angular_velocity(
+                        range=[params['ang_vel_min'], params['ang_vel_max']],
+                        binsize=params['ang_vel_bin'],
+                        cutoff=params['ang_vel_cutoff'], update=True)
+                    fig = nc_plot.angular_velocity(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/ang_vel/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(
+                        ex, 'Analysis of spike rate vs angular velocity')
 
         if self.get_analysis('hd_rate'):
-            logging.info('Assessing head-directional tuning...')
-            try:
-                params = self.get_params_by_analysis('hd_rate')
-
-                hdData = self.hd_rate(
-                    binsize=params['hd_bin'],
-                    filter=['b', params['hd_rate_kern_len']],
-                    pixel=params['loc_pixel_size'],
-                    update=True)
-                fig = nc_plot.hd_firing(hdData)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/hd_rate/', graph_data=hdData)
-
-                hdData = self.hd_rate_ccw(
-                    binsize=params['hd_bin'],
-                    filter=['b', params['hd_rate_kern_len']],
-                    thresh=params['hd_ang_vel_cutoff'],
-                    pixel=params['loc_pixel_size'],
-                    update=True)
-                fig = nc_plot.hd_rate_ccw(hdData)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/hd_rate_CCW/', graph_data=hdData)
-
-            except BaseException:
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
                 logging.error(
-                    'Error in analysis of spike rate vs head direction')
+                    "Spike data is required for head-directional analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for head-directional analysis")
+            else:
+                logging.info('Assessing head-directional tuning...')
+                try:
+                    params = self.get_params_by_analysis('hd_rate')
+
+                    hdData = self.hd_rate(
+                        binsize=params['hd_bin'],
+                        filter=['b', params['hd_rate_kern_len']],
+                        pixel=params['loc_pixel_size'],
+                        update=True)
+                    fig = nc_plot.hd_firing(hdData)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/hd_rate/', graph_data=hdData)
+
+                    hdData = self.hd_rate_ccw(
+                        binsize=params['hd_bin'],
+                        filter=['b', params['hd_rate_kern_len']],
+                        thresh=params['hd_ang_vel_cutoff'],
+                        pixel=params['loc_pixel_size'],
+                        update=True)
+                    fig = nc_plot.hd_rate_ccw(hdData)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/hd_rate_CCW/', graph_data=hdData)
+
+                except BaseException as ex:
+                    log_exception(
+                        ex, 'Analysis of spike rate vs head direction')
 
         if self.get_analysis('hd_shuffle'):
-            logging.info('Shuffling analysis of head-directional tuning...')
-            try:
-                params = self.get_params_by_analysis('hd_shuffle')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for hd shuffle analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for hd shuffle analysis")
+            else:
+                logging.info(
+                    'Shuffling analysis of head-directional tuning...')
+                try:
+                    params = self.get_params_by_analysis('hd_shuffle')
 
-                graph_data = self.hd_shuffle(
-                    bins=params['hd_shuffle_bins'],
-                    nshuff=params['hd_shuffle_total'],
-                    limit=params['hd_shuffle_limit'])
-                fig = nc_plot.hd_shuffle(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/hd_shuffle/', graph_data=graph_data)
-            except BaseException:
-                logging.error('Error in head directional shuffling analysis')
+                    graph_data = self.hd_shuffle(
+                        bins=params['hd_shuffle_bins'],
+                        nshuff=params['hd_shuffle_total'],
+                        limit=params['hd_shuffle_limit'])
+                    fig = nc_plot.hd_shuffle(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/hd_shuffle/', graph_data=graph_data)
+
+                except BaseException as ex:
+                    log_exception(ex, 'Head directional shuffling analysis')
 
         if self.get_analysis('hd_time_lapse'):
-            logging.info('Time-lapsed head-directional tuning...')
-            try:
-                graph_data = self.hd_time_lapse()
+             if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for hd time lapse analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for hd time lapse analysis")
+            else:
+                logging.info('Time-lapsed head-directional tuning...')
+                try:
+                    graph_data = self.hd_time_lapse()
 
-                fig = nc_plot.hd_spike_time_lapse(graph_data)
-                self.close_fig(fig)
+                    fig = nc_plot.hd_spike_time_lapse(graph_data)
+                    self.close_fig(fig)
 
-                fig = nc_plot.hd_rate_time_lapse(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/hd_time_lapse/', graph_data=graph_data)
+                    fig = nc_plot.hd_rate_time_lapse(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/hd_time_lapse/', graph_data=graph_data)
 
-            except BaseException:
-                logging.error('Error in locational time-lapse analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Head directional time-lapse analysis')
 
         if self.get_analysis('hd_time_shift'):
-            logging.info('Time-shift analysis of head-directional tuning...')
-            try:
-                params = self.get_params_by_analysis('hd_time_shift')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for hd time shift analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for hd time shift analysis")
+            else:
+                logging.info('Time-shift analysis of head-directional tuning...')
+                try:
+                    params = self.get_params_by_analysis('hd_time_shift')
 
-                hdData = self.hd_shift(
-                    shift_ind=np.arange(params['hd_shift_min'],
-                                        params['hd_shift_max'] +
-                                        params['hd_shift_step'],
-                                        params['hd_shift_step']))
-                fig = nc_plot.hd_time_shift(hdData)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/hd_time_shift/', graph_data=hdData)
-            except BaseException:
-                logging.error('Error in head directional time-shift analysis')
+                    hdData = self.hd_shift(
+                        shift_ind=np.arange(params['hd_shift_min'],
+                                            params['hd_shift_max'] +
+                                            params['hd_shift_step'],
+                                            params['hd_shift_step']))
+                    fig = nc_plot.hd_time_shift(hdData)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/hd_time_shift/', graph_data=hdData)
+
+                except BaseException as ex:
+                    log_exception(ex, 'Head directional time-shift analysis')
 
         if self.get_analysis('loc_rate'):
-            logging.info('Assessing of locational tuning...')
-            try:
-                params = self.get_params_by_analysis('loc_rate')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for locational rate analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for locational rate analysis")
+            else:
+                logging.info('Assessing of locational tuning...')
+                try:
+                    params = self.get_params_by_analysis('loc_rate')
 
-                if params['loc_rate_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['loc_rate_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                place_data = self.ndata.place(
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['loc_rate_kern_len']],
-                    fieldThresh=params['loc_field_thresh'],
-                    smoothPlace=params['loc_field_smooth'],
-                    brAdjust=True, update=True)
-                fig1 = nc_plot.loc_firing(
-                    place_data, colormap=params['loc_colormap'],
-                    style=params['loc_style'])
-                self.close_fig(fig1)
-                fig2 = nc_plot.loc_firing_and_place(
-                    place_data, colormap=params['loc_colormap'],
-                    style=params['loc_style'])
-                self.close_fig(fig2)
-                self.plot_data_to_hdf(
-                    name=name + '/loc_rate/', graph_data=place_data)
+                    place_data = self.ndata.place(
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['loc_rate_kern_len']],
+                        fieldThresh=params['loc_field_thresh'],
+                        smoothPlace=params['loc_field_smooth'],
+                        brAdjust=True, update=True)
+                    fig1 = nc_plot.loc_firing(
+                        place_data, colormap=params['loc_colormap'],
+                        style=params['loc_style'])
+                    self.close_fig(fig1)
+                    fig2 = nc_plot.loc_firing_and_place(
+                        place_data, colormap=params['loc_colormap'],
+                        style=params['loc_style'])
+                    self.close_fig(fig2)
+                    self.plot_data_to_hdf(
+                        name=name + '/loc_rate/', graph_data=place_data)
 
-            except BaseException:
-                logging.error('Error in analysis of locational firing rate')
+                except BaseException as ex:
+                    log_exception(ex, 'Analysis of locational firing rate')
 
         if self.get_analysis('loc_shuffle'):
-            logging.info('Shuffling analysis of locational tuning...')
-            try:
-                params = self.get_params_by_analysis('loc_shuffle')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for locational shuffle analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for locational shuffle analysis")
+            else:
+                logging.info('Shuffling analysis of locational tuning...')
+                try:
+                    params = self.get_params_by_analysis('loc_shuffle')
 
-                if params['loc_rate_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['loc_rate_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                place_data = self.loc_shuffle(
-                    bins=params['loc_shuffle_nbins'],
-                    nshuff=params['loc_shuffle_total'],
-                    limit=params['loc_shuffle_limit'],
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['loc_rate_kern_len']],
-                    brAdjust=True, update=False)
-                fig = nc_plot.loc_shuffle(place_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/loc_shuffle/', graph_data=place_data)
+                    place_data = self.loc_shuffle(
+                        bins=params['loc_shuffle_nbins'],
+                        nshuff=params['loc_shuffle_total'],
+                        limit=params['loc_shuffle_limit'],
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['loc_rate_kern_len']],
+                        brAdjust=True, update=False)
+                    fig = nc_plot.loc_shuffle(place_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/loc_shuffle/', graph_data=place_data)
 
-            except BaseException:
-                logging.error('Error in locational shiffling analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Locational shuffling analysis')
 
         if self.get_analysis('loc_time_lapse'):
-            logging.info('Time-lapse analysis of locational tuning...')
-            try:
-                params = self.get_params_by_analysis('loc_time_lapse')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for locational time lapse analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for locational time lapse analysis")
+            else:
+                logging.info('Time-lapse analysis of locational tuning...')
+                try:
+                    params = self.get_params_by_analysis('loc_time_lapse')
 
-                if params['loc_rate_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['loc_rate_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                graph_data = self.loc_time_lapse(
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['loc_rate_kern_len']],
-                    brAdjust=True)
+                    graph_data = self.loc_time_lapse(
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['loc_rate_kern_len']],
+                        brAdjust=True)
 
-                fig = nc_plot.loc_spike_time_lapse(graph_data)
-                self.close_fig(fig)
+                    fig = nc_plot.loc_spike_time_lapse(graph_data)
+                    self.close_fig(fig)
 
-                fig = nc_plot.loc_rate_time_lapse(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/loc_time_lapse/', graph_data=graph_data)
+                    fig = nc_plot.loc_rate_time_lapse(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/loc_time_lapse/', graph_data=graph_data)
 
-            except BaseException:
-                logging.error('Error in locational time-lapse analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Locational time-lapse analysis')
 
         if self.get_analysis('loc_time_shift'):
-            logging.info('Time-shift analysis of locational tuning...')
-            try:
-                params = self.get_params_by_analysis('loc_time_shift')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for locational time shift analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for locational time shift analysis")
+            else:
+                logging.info('Time-shift analysis of locational tuning...')
+                try:
+                    params = self.get_params_by_analysis('loc_time_shift')
 
-                if params['loc_rate_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['loc_rate_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                plot_data = self.loc_shift(
-                    shift_ind=np.arange(params['loc_shift_min'],
-                                        params['loc_shift_max'] +
-                                        params['loc_shift_step'],
-                                        params['loc_shift_step']),
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[
-                        filttype, params['loc_rate_kern_len']],
-                    brAdjust=True, update=False)
-                fig = nc_plot.loc_time_shift(plot_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/loc_time_shift/', graph_data=plot_data)
+                    plot_data = self.loc_shift(
+                        shift_ind=np.arange(params['loc_shift_min'],
+                                            params['loc_shift_max'] +
+                                            params['loc_shift_step'],
+                                            params['loc_shift_step']),
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[
+                            filttype, params['loc_rate_kern_len']],
+                        brAdjust=True, update=False)
+                    fig = nc_plot.loc_time_shift(plot_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/loc_time_shift/', graph_data=plot_data)
 
-            except BaseException:
-                logging.error('Error in locational time-shift analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Locational time-shift analysis')
 
         if self.get_analysis('spatial_corr'):
-            logging.info(
-                'Spatial and rotational correlation of locational tuning...')
-            try:
-                params = self.get_params_by_analysis('spatial_corr')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for spatial correlation analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for spatial correlation analysis")
+            else:
+                logging.info(
+                    'Spatial and rotational correlation of locational tuning...')
+                try:
+                    params = self.get_params_by_analysis('spatial_corr')
 
-                if params['spatial_corr_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['spatial_corr_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                plot_data = self.loc_auto_corr(
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['spatial_corr_kern_len']],
-                    minPixel=params['spatial_corr_min_obs'], brAdjust=True)
-                fig = nc_plot.loc_auto_corr(plot_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/spatial_corr/', graph_data=plot_data)
+                    plot_data = self.loc_auto_corr(
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['spatial_corr_kern_len']],
+                        minPixel=params['spatial_corr_min_obs'], brAdjust=True)
+                    fig = nc_plot.loc_auto_corr(plot_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/spatial_corr/', graph_data=plot_data)
 
-                plot_data = self.loc_rot_corr(
-                    binsize=params['rot_corr_bin'],
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['spatial_corr_kern_len']],
-                    minPixel=params['spatial_corr_min_obs'], brAdjust=True)
-                fig = nc_plot.rot_corr(plot_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/spatial_corr/', graph_data=plot_data)
+                    plot_data = self.loc_rot_corr(
+                        binsize=params['rot_corr_bin'],
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['spatial_corr_kern_len']],
+                        minPixel=params['spatial_corr_min_obs'], brAdjust=True)
+                    fig = nc_plot.rot_corr(plot_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/spatial_corr/', graph_data=plot_data)
 
-            except BaseException:
-                logging.error('Error in assessing spatial autocorrelation')
+                except BaseException as ex:
+                    log_exception(ex, 'Assessing spatial autocorrelation')
 
         if self.get_analysis('grid'):
-            logging.info('Assessing gridness...')
-            try:
-                params = self.get_params_by_analysis('grid')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for grid cell analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for grid cell analysis")
+            else:
+                logging.info('Assessing gridness...')
+                try:
+                    params = self.get_params_by_analysis('grid')
 
-                if params['spatial_corr_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['spatial_corr_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                graph_data = self.grid(
-                    angtol=params['grid_ang_tol'],
-                    binsize=params['grid_ang_bin'],
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['spatial_corr_kern_len']],
-                    minPixel=params['spatial_corr_min_obs'],
-                    brAdjust=True)  # Add other paramaters
-                fig = nc_plot.grid(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/grid/', graph_data=graph_data)
+                    graph_data = self.grid(
+                        angtol=params['grid_ang_tol'],
+                        binsize=params['grid_ang_bin'],
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['spatial_corr_kern_len']],
+                        minPixel=params['spatial_corr_min_obs'],
+                        brAdjust=True)  # Add other paramaters
+                    fig = nc_plot.grid(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/grid/', graph_data=graph_data)
 
-            except BaseException:
-                logging.error('Error in grid cell analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Grid cell analysis')
 
         if self.get_analysis('border'):
-            logging.info('Estimating tuning to border...')
-            try:
-                params = self.get_params_by_analysis('border')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for border analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for border analysis")
+            else:
+                logging.info('Estimating tuning to border...')
+                try:
+                    params = self.get_params_by_analysis('border')
 
-                if params['loc_rate_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['loc_rate_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                graph_data = self.border(
-                    update=True, thresh=params['border_firing_thresh'],
-                    cbinsize=params['border_ang_bin'],
-                    nstep=params['border_stair_steps'],
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['loc_rate_kern_len']],
-                    brAdjust=True)
+                    graph_data = self.border(
+                        update=True, thresh=params['border_firing_thresh'],
+                        cbinsize=params['border_ang_bin'],
+                        nstep=params['border_stair_steps'],
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['loc_rate_kern_len']],
+                        brAdjust=True)
 
-                fig = nc_plot.border(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/border/', graph_data=graph_data)
+                    fig = nc_plot.border(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/border/', graph_data=graph_data)
 
-            except BaseException:
-                logging.error('Error in border cell analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Border cell analysis')
 
         if self.get_analysis('gradient'):
-            logging.info('Calculating gradient-cell properties...')
-            try:
-                params = self.get_params_by_analysis('gradient')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for gradient analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for gradient analysis")
+            else:
+                logging.info('Calculating gradient-cell properties...')
+                try:
+                    params = self.get_params_by_analysis('gradient')
 
-                if params['loc_rate_filter'] == 'Gaussian':
-                    filttype = 'g'
-                else:
-                    filttype = 'b'
+                    if params['loc_rate_filter'] == 'Gaussian':
+                        filttype = 'g'
+                    else:
+                        filttype = 'b'
 
-                graph_data = self.gradient(
-                    alim=params['grad_asymp_lim'],
-                    blim=params['grad_displace_lim'],
-                    clim=params['grad_growth_rate_lim'],
-                    pixel=params['loc_pixel_size'],
-                    chop_bound=params['loc_chop_bound'],
-                    filter=[filttype, params['loc_rate_kern_len']],
-                    brAdjust=True)
-                fig = nc_plot.gradient(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/gradient/', graph_data=graph_data)
+                    graph_data = self.gradient(
+                        alim=params['grad_asymp_lim'],
+                        blim=params['grad_displace_lim'],
+                        clim=params['grad_growth_rate_lim'],
+                        pixel=params['loc_pixel_size'],
+                        chop_bound=params['loc_chop_bound'],
+                        filter=[filttype, params['loc_rate_kern_len']],
+                        brAdjust=True)
+                    fig = nc_plot.gradient(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/gradient/', graph_data=graph_data)
 
-            except BaseException:
-                logging.error('Error in gradient cell analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Gradient cell analysis')
 
         if self.get_analysis('multiple_regression'):
-            logging.info('Multiple-regression analysis...')
-            try:
-                params = self.get_params_by_analysis('multiple_regression')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for multi-regression analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for multi-regression analysis")
+            else:
+                logging.info('Multiple-regression analysis...')
+                try:
+                    params = self.get_params_by_analysis('multiple_regression')
 
-                graph_data = self.multiple_regression(
-                    nrep=params['mra_nrep'],
-                    episode=params['mra_episode'],
-                    subsampInterv=params['mra_interval'])
+                    graph_data = self.multiple_regression(
+                        nrep=params['mra_nrep'],
+                        episode=params['mra_episode'],
+                        subsampInterv=params['mra_interval'])
 
-                fig = nc_plot.multiple_regression(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/multiple_regression/', graph_data=graph_data)
+                    fig = nc_plot.multiple_regression(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/multiple_regression/', graph_data=graph_data)
 
-            except Exception as ex:
-                log_exception(
-                    ex, "in multiple-regression analysis")
+                except Exception as ex:
+                    log_exception(ex, "Multiple-regression analysis")
 
         if self.get_analysis('inter_depend'):
-            # No plot
-            logging.info('Assessing dependence of spatial variables...')
-            try:
-                self.interdependence(
-                    pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40],
-                    abinsize=10, angvelrange=[-500, 500])
-            except BaseException:
-                logging.error('Error in interdependence analysis')
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for interdependence analysis")
+            elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
+                logging.error(
+                    "Spatial data is required for interdependence analysis")
+            else:
+                logging.info('Assessing dependence of spatial variables...')
+                try:
+                    self.interdependence(
+                        pixel=3, hdbinsize=5, spbinsize=1, sprange=[0, 40],
+                        abinsize=10, angvelrange=[-500, 500])
+
+                except BaseException as ex:
+                    log_exception(ex, 'Error in interdependence analysis')
 
         if self.get_analysis('lfp_spectrum'):
-            try:
-                params = self.get_params_by_analysis('lfp_spectrum')
+            if self.ndata.lfp.get_filename() == ".no_lfp.NONE":
+                logging.error(
+                    "LFP data is required for spectrum analysis")
+            else:
+                try:
+                    params = self.get_params_by_analysis('lfp_spectrum')
 
-                graph_data = self.spectrum(
-                    window=params['lfp_pwelch_seg_size'],
-                    noverlap=params['lfp_pwelch_overlap'],
-                    nfft=params['lfp_pwelch_nfft'],
-                    ptype='psd', prefilt=True,
-                    filtset=[params['lfp_prefilt_order'],
-                             params['lfp_prefilt_lowcut'],
-                             params['lfp_prefilt_highcut'], 'bandpass'],
-                    fmax=params['lfp_pwelch_freq_max'],
-                    db=False, tr=False)
-                fig = nc_plot.lfp_spectrum(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/lfp_spectrum/', graph_data=graph_data)
+                    graph_data = self.spectrum(
+                        window=params['lfp_pwelch_seg_size'],
+                        noverlap=params['lfp_pwelch_overlap'],
+                        nfft=params['lfp_pwelch_nfft'],
+                        ptype='psd', prefilt=True,
+                        filtset=[params['lfp_prefilt_order'],
+                                params['lfp_prefilt_lowcut'],
+                                params['lfp_prefilt_highcut'], 'bandpass'],
+                        fmax=params['lfp_pwelch_freq_max'],
+                        db=False, tr=False)
+                    fig = nc_plot.lfp_spectrum(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/lfp_spectrum/', graph_data=graph_data)
 
-                graph_data = self.spectrum(
-                    window=params['lfp_stft_seg_size'],
-                    noverlap=params['lfp_stft_overlap'],
-                    nfft=params['lfp_stft_nfft'],
-                    ptype='psd', prefilt=True,
-                    filtset=[params['lfp_prefilt_order'],
-                             params['lfp_prefilt_lowcut'],
-                             params['lfp_prefilt_highcut'], 'bandpass'],
-                    fmax=params['lfp_stft_freq_max'],
-                    db=True, tr=True)
-                fig = nc_plot.lfp_spectrum_tr(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/lfp_spectrum_TR/', graph_data=graph_data)
+                    graph_data = self.spectrum(
+                        window=params['lfp_stft_seg_size'],
+                        noverlap=params['lfp_stft_overlap'],
+                        nfft=params['lfp_stft_nfft'],
+                        ptype='psd', prefilt=True,
+                        filtset=[params['lfp_prefilt_order'],
+                                params['lfp_prefilt_lowcut'],
+                                params['lfp_prefilt_highcut'], 'bandpass'],
+                        fmax=params['lfp_stft_freq_max'],
+                        db=True, tr=True)
+                    fig = nc_plot.lfp_spectrum_tr(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/lfp_spectrum_TR/', graph_data=graph_data)
 
-                # These ranges are from Muessig et al. 2019
-                # Coordinated Emergence of Hippocampal Replay and
-                # Theta Sequences during Post - natal Development
-                # TODO add parameters for this
-                self.bandpower_ratio(
-                    [5, 11], [1.5, 4], 1.6, band_total=True,
-                    first_name="Theta", second_name="Delta")
-            except BaseException:
-                logging.error('Error in analyzing lfp spectrum')
+                    # These ranges are from Muessig et al. 2019
+                    # Coordinated Emergence of Hippocampal Replay and
+                    # Theta Sequences during Post - natal Development
+                    # TODO add parameters for this
+                    self.bandpower_ratio(
+                        [5, 11], [1.5, 4], 1.6, band_total=True,
+                        first_name="Theta", second_name="Delta")
+
+                except BaseException as ex:
+                    log_exception(ex, 'Analyzing lfp spectrum')
 
         if self.get_analysis('spike_phase'):
-            # Analysis of Phase distribution
-            logging.info('Analysing distribution of spike-phase in lfp...')
-            try:
-                params = self.get_params_by_analysis('spike_phase')
+            if self.ndata.lfp.get_filename() == ".no_lfp.NONE":
+                logging.error(
+                    "LFP data is required for spike phase analysis")
+            elif self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for spike phase analysis")
+            else:
+                logging.info('Analysing distribution of spike-phase in lfp...')
+                try:
+                    params = self.get_params_by_analysis('spike_phase')
 
-                graph_data = self.phase_dist(
-                    binsize=params['phase_bin'],
-                    rbinsize=params['phase_raster_bin'],
-                    fwin=[params['phase_freq_min'],
-                          params['phase_freq_max']],
-                    pratio=params['phase_power_thresh'],
-                    aratio=params['phase_amp_thresh'],
-                    filtset=[params['lfp_prefilt_order'],
-                             params['lfp_prefilt_lowcut'],
-                             params['lfp_prefilt_highcut'], 'bandpass'])
-                fig = nc_plot.spike_phase(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/spike_phase/', graph_data=graph_data)
+                    graph_data = self.phase_dist(
+                        binsize=params['phase_bin'],
+                        rbinsize=params['phase_raster_bin'],
+                        fwin=[params['phase_freq_min'],
+                            params['phase_freq_max']],
+                        pratio=params['phase_power_thresh'],
+                        aratio=params['phase_amp_thresh'],
+                        filtset=[params['lfp_prefilt_order'],
+                                params['lfp_prefilt_lowcut'],
+                                params['lfp_prefilt_highcut'], 'bandpass'])
+                    fig = nc_plot.spike_phase(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/spike_phase/', graph_data=graph_data)
 
-            except BaseException:
-                logging.error('Error in assessing spike-phase distribution')
+                except BaseException as ex:
+                    log_exception(ex, 'Assessing spike-phase distribution')
 
         if self.get_analysis('phase_lock'):
-            # PLV with mode = None (all events or spikes)
-            logging.info(
-                'Analysis of Phase-locking value and spike-field coherence...')
-            try:
-                params = self.get_params_by_analysis('phase_lock')
+            if self.ndata.lfp.get_filename() == ".no_lfp.NONE":
+                logging.error(
+                    "LFP data is required for phase lock analysis")
+            elif self.ndata.spike.get_filename() == ".no_spike.NONE":
+                logging.error(
+                    "Spike data is required for phase lock analysis")
+            else:
+                logging.info(
+                    'Analysis of Phase-locking value and spike-field coherence...')
+                try:
+                    params = self.get_params_by_analysis('phase_lock')
 
-                reparam = {
-                    'window': [
-                        params['phase_loc_win_low'],
-                        params['phase_loc_win_up']],
-                    'nfft': params['phase_loc_nfft'],
-                    'fwin': [2, params['phase_loc_freq_max']],
-                    'nsample': 2000,
-                    'slide': 25,
-                    'nrep': 500,
-                    'mode': 'tr'}
+                    reparam = {
+                        'window': [
+                            params['phase_loc_win_low'],
+                            params['phase_loc_win_up']],
+                        'nfft': params['phase_loc_nfft'],
+                        'fwin': [2, params['phase_loc_freq_max']],
+                        'nsample': 2000,
+                        'slide': 25,
+                        'nrep': 500,
+                        'mode': 'tr'}
 
-                graph_data = self.plv(**reparam)
-                fig = nc_plot.plv_tr(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/phase_lock_TR/', graph_data=graph_data)
+                    graph_data = self.plv(**reparam)
+                    fig = nc_plot.plv_tr(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/phase_lock_TR/', graph_data=graph_data)
 
-                reparam.update({'mode': 'bs', 'nsample': 100})
-                graph_data = self.plv(**reparam)
-                fig = nc_plot.plv_bs(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/phase_lock_BS/', graph_data=graph_data)
+                    reparam.update({'mode': 'bs', 'nsample': 100})
+                    graph_data = self.plv(**reparam)
+                    fig = nc_plot.plv_bs(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/phase_lock_BS/', graph_data=graph_data)
 
-                reparam.update({'mode': None})
-                graph_data = self.plv(**reparam)
-                fig = nc_plot.plv(graph_data)
-                self.close_fig(fig)
-                self.plot_data_to_hdf(
-                    name=name + '/phase_lock/', graph_data=graph_data)
+                    reparam.update({'mode': None})
+                    graph_data = self.plv(**reparam)
+                    fig = nc_plot.plv(graph_data)
+                    self.close_fig(fig)
+                    self.plot_data_to_hdf(
+                        name=name + '/phase_lock/', graph_data=graph_data)
 
-            except BaseException:
-                logging.error('Error in spike-phase locking analysis')
+                except BaseException as ex:
+                    log_exception(ex, 'Spike-phase locking analysis')
 
-            if self.get_analysis('lfp_spike_causality'):
-                logging.warning(
-                    'Unit-LFP analysis has not been implemented yet!')
+        if self.get_analysis('lfp_spike_causality'):
+            logging.warning(
+                'Unit-LFP analysis has not been implemented yet!')
 
     def open_hdf_file(self, filename=None):
         """
