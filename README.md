@@ -32,7 +32,7 @@ Open command prompt and type/paste the following. It is recommended to install n
 git clone https://github.com/seankmartin/NeuroChaT
 cd NeuroChaT
 pip install .
-python neurochat_gui\neurochat_ui.py
+python cli.py
 ```
 
 ### Option 2: Use Pip, but don't install NeuroChaT
@@ -44,10 +44,21 @@ git clone https://github.com/seankmartin/NeuroChaT
 cd NeuroChaT
 pip install -r requirements.txt
 python modify_neuro_path.py
-python neurochat_gui\neurochat_ui.py
+python cli.py
 ```
 
 This method only allows the GUI program to function, any other file will need to modify the python path to use neurochat.
+
+### Install PyQt5 on linux
+
+If you are running NeuroChaT on linux, after installing the requirements you will need to install further qt programs.
+Most likely, you only need `python3-pyqt5`, but just in case it might be safest to install all three of these if you have the available disk space.
+
+```
+sudo apt-get install python3-pyqt5
+sudo apt-get install pyqt5-dev-tools
+sudo apt-get install qttools5-dev-tools
+```
 
 ## Getting Started
 
