@@ -837,7 +837,7 @@ class NeuroChaT(QtCore.QThread):
                     log_exception(ex, 'Head directional shuffling analysis')
 
         if self.get_analysis('hd_time_lapse'):
-             if self.ndata.spike.get_filename() == ".no_spike.NONE":
+            if self.ndata.spike.get_filename() == ".no_spike.NONE":
                 logging.error(
                     "Spike data is required for hd time lapse analysis")
             elif self.ndata.spatial.get_filename() == ".no_spatial.NONE":
@@ -867,7 +867,8 @@ class NeuroChaT(QtCore.QThread):
                 logging.error(
                     "Spatial data is required for hd time shift analysis")
             else:
-                logging.info('Time-shift analysis of head-directional tuning...')
+                logging.info(
+                    'Time-shift analysis of head-directional tuning...')
                 try:
                     params = self.get_params_by_analysis('hd_time_shift')
 
@@ -1222,8 +1223,8 @@ class NeuroChaT(QtCore.QThread):
                         nfft=params['lfp_pwelch_nfft'],
                         ptype='psd', prefilt=True,
                         filtset=[params['lfp_prefilt_order'],
-                                params['lfp_prefilt_lowcut'],
-                                params['lfp_prefilt_highcut'], 'bandpass'],
+                                 params['lfp_prefilt_lowcut'],
+                                 params['lfp_prefilt_highcut'], 'bandpass'],
                         fmax=params['lfp_pwelch_freq_max'],
                         db=False, tr=False)
                     fig = nc_plot.lfp_spectrum(graph_data)
@@ -1237,8 +1238,8 @@ class NeuroChaT(QtCore.QThread):
                         nfft=params['lfp_stft_nfft'],
                         ptype='psd', prefilt=True,
                         filtset=[params['lfp_prefilt_order'],
-                                params['lfp_prefilt_lowcut'],
-                                params['lfp_prefilt_highcut'], 'bandpass'],
+                                 params['lfp_prefilt_lowcut'],
+                                 params['lfp_prefilt_highcut'], 'bandpass'],
                         fmax=params['lfp_stft_freq_max'],
                         db=True, tr=True)
                     fig = nc_plot.lfp_spectrum_tr(graph_data)
@@ -1273,12 +1274,12 @@ class NeuroChaT(QtCore.QThread):
                         binsize=params['phase_bin'],
                         rbinsize=params['phase_raster_bin'],
                         fwin=[params['phase_freq_min'],
-                            params['phase_freq_max']],
+                              params['phase_freq_max']],
                         pratio=params['phase_power_thresh'],
                         aratio=params['phase_amp_thresh'],
                         filtset=[params['lfp_prefilt_order'],
-                                params['lfp_prefilt_lowcut'],
-                                params['lfp_prefilt_highcut'], 'bandpass'])
+                                 params['lfp_prefilt_lowcut'],
+                                 params['lfp_prefilt_highcut'], 'bandpass'])
                     fig = nc_plot.spike_phase(graph_data)
                     self.close_fig(fig)
                     self.plot_data_to_hdf(
