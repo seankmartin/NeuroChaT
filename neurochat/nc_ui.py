@@ -18,6 +18,7 @@ import os
 import sys
 import logging
 import webbrowser
+from datetime import datetime
 
 
 from PyQt5 import QtCore, QtWidgets, QtGui
@@ -593,10 +594,23 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         exports the results in the table to the file
 
         """
+
+        try:
+            now = datetime.now()
+            whole_time = now.strftime("%Y-%m-%d--%H-%M-%S")
+            default_filename = (
+                os.path.splitext(self._control.hdf._filename)[0] +
+                "--" + whole_time + ".xlsx")
+
+        except BaseException as ex:
+            log_exception(
+                ex, "Automatically generating results name")
+            default_filename = 'nc_results.xlsx'
+
         excel_file = QtCore.QDir.toNativeSeparators(
             QtWidgets.QFileDialog.getSaveFileName(
                 self, 'Export analysis results to...',
-                os.getcwd() + os.sep + 'nc_results.xlsx',
+                os.getcwd() + os.sep + default_filename,
                 "Excel Files (*.xlsx .*xls)")[0]
         )
         if not excel_file:
