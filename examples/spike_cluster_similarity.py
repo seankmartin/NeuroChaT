@@ -1,4 +1,4 @@
-"""Plot all spatial cells in an Axona directory."""
+"""Compare a set of clusters from two Axona recordings."""
 import os
 
 from neurochat.nc_datacontainer import NDataContainer
@@ -10,6 +10,14 @@ import numpy as np
 
 
 def compare_two(file1, file2, index):
+    """
+    Compare spike file1 against spike file2.
+
+    Cluster similarity is calculated.
+    index is used for file naming, and saves to:
+    output1.csv if index is 1, for example.
+
+    """
     nclust1 = NClust()
     nclust2 = NClust()
     nclust1.load(file1, "Axona")

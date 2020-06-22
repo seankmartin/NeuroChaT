@@ -1,3 +1,4 @@
+"""Downloads an NWB file from neurochat's OSF."""
 import urllib.request
 import os
 
