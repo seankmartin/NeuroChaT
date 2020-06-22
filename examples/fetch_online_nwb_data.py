@@ -60,7 +60,16 @@ def main(url, file_name, verbose=False):
 
 
 if __name__ == "__main__":
-    file_name = "example.hdf"
+    home = os.path.abspath(os.path.expanduser("~"))
+    file_name = os.path.join(home, "neurochat_temp", "example.hdf")
+    if not os.path.isdir(os.path.dirname(file_name)):
+        inp = input("Will create directory {}, is this ok? (y/n) ".format(
+            os.path.dirname(file_name))).lower().strip()
+        if inp != "y":
+            "Ok, quitting"
+            exit(0)
+        else:
+            os.makedirs(os.path.dirname(file_name), exist_ok=True)
     url = 'https://osf.io/89t7g/download/'
     verbose = False
     main(url, file_name, verbose=verbose)
