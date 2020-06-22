@@ -235,6 +235,10 @@ class Nhdf(object):
             elif system == 'Neuralynx':
                 hdf_name = os.sep.join(
                     [f_path, f_path.split(os.sep)[-1] + '.hdf5'])
+            # TODO this will need to be reviewed
+            elif system == 'SpikeInterface':
+                hdf_name = os.path.join(
+                    f_path, os.path.basename(f_path) + "_NC_NWB.hdf5")
 
         return hdf_name
 
@@ -306,6 +310,8 @@ class Nhdf(object):
                 if system == 'Axona':
                     tag = ext
                 elif system == 'Neuralynx':
+                    tag = name
+                elif system == "SpikeInterface":
                     tag = name
         return tag
 

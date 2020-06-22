@@ -1860,6 +1860,7 @@ class NSpike(NBase):
 
     def load_spike_spikeinterface(self, sorting, channel_scaling=None):
         """
+        TODO fix this doc.
         Extract timestamps, tags, and waveforms from a sorting object.
 
         channel_scaling is used for gains.
