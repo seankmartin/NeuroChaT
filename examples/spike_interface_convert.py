@@ -11,25 +11,53 @@ import logging
 
 def main(fname, out_folder, plot=False):
     sorting = spikeinterface_test(fname)
+    print(sorting.params)
 
     if plot:
         print("Plotting waveforms to {}".format(out_folder))
         plot_all_waveforms(sorting, out_folder)
 
-    spike = NSpike()
-    spike.load_spike_spikeinterface(sorting)
-    unit_no = 12
-    spike.set_unit_no(unit_no)
-    print(spike)
-    results = spike.wave_property()
-    fig = nc_plot.wave_property(results)
-    out_loc = os.path.join(out_folder, "wave_test{}.png".format(unit_no))
-    print("Plotting neurochat waveform to {}".format(out_loc))
-    fig.savefig(out_loc)
+    unit_ids = sorting.get_unit_ids()
+    if 0 in unit_ids:
+        print(
+            "Unit numbers loaded from spike interface contain 0" +
+            ", as such, all unit numbers will be incremented by 1.")
+    groups = []
+    for unit in unit_ids:
+        try:
+            tetrode = sorting.get_unit_property(unit, "group")
+        except BaseException:
+            try:
+                tetrode = sorting.get_unit_property(unit, "ch_group")
+            except BaseException:
+                tetrode = None
+        if tetrode is not None:
+            if tetrode not in groups:
+                groups.append(tetrode)
+    print("All groups found {}".format(groups))
 
+    spike = NSpike()
     hdf_path = os.path.join(out_folder, "test.h5")
     nhdf = Nhdf(filename=hdf_path)
-    nhdf.save_spike(spike=spike)
+    if len(groups) == 0:
+        spike.load_spike_spikeinterface(sorting)
+        unit_no = unit_ids[0] + 1
+        spike.set_unit_no(spike.get_unit_list()[0])
+        print(spike)
+        print(spike.get_record_info())
+        results = spike.wave_property()
+        fig = nc_plot.wave_property(results)
+        out_loc = os.path.join(out_folder, "wave_test{}.png".format(unit_no))
+        print("Plotting neurochat waveform to {}".format(out_loc))
+        fig.savefig(out_loc)
+        nhdf.save_spike(spike=spike)
+
+    else:
+        for g in groups:
+            spike.load_spike_spikeinterface(sorting, group=g)
+            spike.set_unit_no(spike.get_unit_list()[0])
+            print(spike)
+            nhdf.save_spike(spike=spike)
 
 
 def spikeinterface_test(folder_name):

@@ -148,6 +148,10 @@ class NSpike(NBase):
         self._unit_list = list(map(int, set(self._unit_Tags)))
         if 0 in self._unit_list:
             self._unit_list.remove(0)
+        try:
+            self._unit_list = sorted(self._unit_list)
+        except BaseException:
+            self._unit_list = self._unit_list
 
     def set_unit_no(self, unit_no=None, spike_name=None):
         """
@@ -1858,7 +1862,7 @@ class NSpike(NBase):
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
 
-    def load_spike_spikeinterface(self, sorting, channel_scaling=None):
+    def load_spike_spikeinterface(self, sorting, channel_scaling=None, group=None):
         """
         TODO fix this doc.
         Extract timestamps, tags, and waveforms from a sorting object.
@@ -1869,15 +1873,40 @@ class NSpike(NBase):
         max_byte_value = np.power(2, bytes_per_sample * 8)
         channel_scaling = np.ones([total_channels, ]) / max_byte_value
         """
+        unit_ids = sorting.get_unit_ids()
+        should_increment = (0 in unit_ids)
+
+        if group is not None:
+            units_to_use = []
+            for unit in unit_ids:
+                try:
+                    tetrode = sorting.get_unit_property(unit, "group")
+                except BaseException:
+                    try:
+                        tetrode = sorting.get_unit_property(unit, "ch_group")
+                    except BaseException:
+                        logging.warning(
+                            "Did not find any channel groups in sorting")
+                        units_to_use = unit_ids
+                        group = None
+                        tetrode = None
+                        break
+                if tetrode is not None:
+                    if group == tetrode:
+                        units_to_use.append(unit)
+        else:
+            units_to_use = unit_ids
+
         sample_rate = sorting.params['sample_rate']
-        all_unit_trains = sorting.get_units_spike_train()
+        all_unit_trains = [
+            sorting.get_unit_spike_train(uid) for uid in units_to_use]
         timestamps = np.concatenate(all_unit_trains) / float(sample_rate)
         total_spikes = len(timestamps)
 
         # Set up the empty numpy arrays to hold the data
         unit_tags = np.zeros(total_spikes)
-        unit_ids = sorting.get_unit_ids()
-        waveform_eg = sorting.get_unit_spike_features(unit_ids[0], "waveforms")
+        waveform_eg = sorting.get_unit_spike_features(
+            units_to_use[0], "waveforms")
         samples_per_spike = waveform_eg.shape[2]
         total_channels = waveform_eg.shape[1]
         out_waveforms = oDict()
@@ -1892,7 +1921,7 @@ class NSpike(NBase):
 
         # Establish the tag of each and waveform
         start = 0
-        for u_i, u in enumerate(unit_ids):
+        for u_i, u in enumerate(units_to_use):
             end = start + all_unit_trains[u_i].size
             unit_tags[start:end] = u
 
@@ -1900,7 +1929,7 @@ class NSpike(NBase):
             for j in range(total_channels):
                 try:
                     wave = wf[:, j, :]
-                except Exception:
+                except BaseException:
                     wave = wf[j, :]
                 out_waveforms["ch{}".format(j + 1)][start:end] = (
                     wave * channel_scaling[j])
@@ -1908,10 +1937,7 @@ class NSpike(NBase):
             start = end
 
         # NC assumes unit 0 not in data
-        if 0 in unit_tags:
-            print(
-                "Unit numbers loaded from spike interface contained 0" +
-                ", as such, all unit numbers were incremented by 1.")
+        if should_increment:
             unit_tags = unit_tags + 1
 
         # Order spikes based on time
@@ -1934,7 +1960,8 @@ class NSpike(NBase):
         self.set_system("SpikeInterface")
         self._set_source_format(type(sorting).__name__)
         # Temp measure, will do by group
-        self._set_channel_ids([0])
+        self._set_channel_ids([i for i in range(total_channels)])
+        self._spikeinterface_group = group
 
     def __str__(self):
         """Return a friendly string representation of this object."""

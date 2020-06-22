@@ -312,7 +312,10 @@ class Nhdf(object):
                 elif system == 'Neuralynx':
                     tag = name
                 elif system == "SpikeInterface":
-                    tag = name
+                    if data._spikeinterface_group is not None:
+                        tag = data._spikeinterface_group
+                    else:
+                        tag = name
         return tag
 
     def resolve_analysis_path(self, spike=None, lfp=None):
