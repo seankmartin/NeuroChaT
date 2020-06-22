@@ -9,7 +9,7 @@ import neurochat.nc_plot as nc_plot
 import logging
 
 
-def main(fname, out_folder, plot=False):
+def write_hdf(fname, out_folder, plot=False):
     sorting = spikeinterface_test(fname)
     print(sorting.params)
 
@@ -109,7 +109,31 @@ def plot_all_waveforms(sorting, out_folder):
         plt.close("all")
 
 
+def read_hdf(hdf_path, out_folder, verbose=False, group=3):
+    if verbose:
+        from skm_pyutils.py_print import print_h5
+        print_h5(hdf_path)
+
+    spike_file = hdf_path + "+/processing/Shank/" + str(group)
+    spike = NSpike()
+    spike.set_system("NWB")
+    spike.set_filename(spike_file)
+    spike.load()
+    # unit_no = spike.get_unit_list()[0]
+    unit_no = 12
+    spike.set_unit_no(unit_no)
+    print(spike)
+    results = spike.wave_property()
+    fig = nc_plot.wave_property(results)
+    out_loc = os.path.join(out_folder, "wave_test_h5_{}.png".format(unit_no))
+    print("Plotting neurochat waveform to {}".format(out_loc))
+    fig.savefig(out_loc)
+
+
 if __name__ == '__main__':
+    to_write = False
+    to_read = True
+
     logging.basicConfig(level=logging.INFO)
     mpl_logger = logging.getLogger("matplotlib")
     mpl_logger.setLevel(level=logging.WARNING)
@@ -128,4 +152,10 @@ if __name__ == '__main__':
             os.makedirs(os.path.dirname(file_name), exist_ok=True)
 
     out_folder = os.path.dirname(file_name)
-    main(fname, out_folder)
+
+    if to_write:
+        write_hdf(fname, out_folder)
+
+    read_name = r"/media/sean/Elements/Ham_Data/Batch_2/A9_CAR-SA1/CAR-SA1_20191130_1_PreBox/CAR-SA1_20191130_1_PreBox_NC_NWB.hdf5"
+    if to_read:
+        read_hdf(read_name, out_folder)
