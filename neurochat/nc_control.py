@@ -411,7 +411,7 @@ class NeuroChaT(QtCore.QThread):
                         # excel list: directory| hdf5 file name w/o extension|
                         # spike group| unit_no| lfp group
                         hdf_name = row[1] + os.sep + row[2] + '.hdf5'
-                        spike_file = hdf_name + '/processing/Shank/' + row[3]
+                        spike_file = hdf_name + '+/processing/Shank/' + row[3]
                         spatial_file = hdf_name + '+/processing/Behavioural/Position'
                         lfp_file = hdf_name + '+/processing/Neural Continuous/LFP/' + lfp_id
 
@@ -1599,7 +1599,7 @@ class NeuroChaT(QtCore.QThread):
                 if self.get_data_format() == 'NWB':
                     # excel list: directory| spike group| unit_no
                     hdf_name = row[1] + os.sep + row[3] + '.hdf5'
-                    spike_file = hdf_name + '/processing/Shank' + '/' + row[4]
+                    spike_file = hdf_name + '+/processing/Shank' + '/' + row[4]
                 info['spike'].append(spike_file)
                 info['unit'].append(unit_no)
             n_units = excel_info.shape[0]
@@ -1750,7 +1750,7 @@ class NeuroChaT(QtCore.QThread):
                 if self.get_data_format() == 'NWB':
                     # excel list: directory| spike group| unit_no
                     hdf_name = row[1] + os.sep + row[2] + '.hdf5'
-                    spike_file = hdf_name + '/processing/Shank' + '/' + row[3]
+                    spike_file = hdf_name + '+/processing/Shank' + '/' + row[3]
                 info['spike'].append(spike_file)
                 info['unit'].append(unit_no)
             n_units = excel_info.shape[0]
@@ -1805,7 +1805,7 @@ class NeuroChaT(QtCore.QThread):
                 if self.get_data_format() == 'NWB':
                     # excel list: directory| spike group| unit_no
                     hdf_name = row[1] + os.sep + row[2] + '.hdf5'
-                    spike_file = hdf_name + '/processing/Shank' + '/' + row[3]
+                    spike_file = hdf_name + '+/processing/Shank' + '/' + row[3]
                 info['spike_1'].append(spike_file)
                 info['unit_1'].append(unit_1)
 
@@ -1814,7 +1814,7 @@ class NeuroChaT(QtCore.QThread):
                 if self.get_data_format() == 'NWB':
                     # excel list: directory| spike group| unit_no
                     hdf_name = row[4] + os.sep + row[5] + '.hdf5'
-                    spike_file = hdf_name + '/processing/Shank' + '/' + row[6]
+                    spike_file = hdf_name + '+/processing/Shank' + '/' + row[6]
                 info['spike_2'].append(spike_file)
                 info['unit_2'].append(unit_2)
 
