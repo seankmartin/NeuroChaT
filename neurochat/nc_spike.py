@@ -1858,6 +1858,80 @@ class NSpike(NBase):
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
 
+    def load_spike_spikeinterface(self, sorting, channel_scaling=None):
+        """
+        Extract timestamps, tags, and waveforms from a sorting object.
+
+        channel_scaling is used for gains.
+        For example, channel scaling could be:
+        bytes_per_sample = 2
+        max_byte_value = np.power(2, bytes_per_sample * 8)
+        channel_scaling = np.ones([total_channels, ]) / max_byte_value
+        """
+        sample_rate = sorting.params['sample_rate']
+        all_unit_trains = sorting.get_units_spike_train()
+        timestamps = np.concatenate(all_unit_trains) / float(sample_rate)
+        total_spikes = len(timestamps)
+
+        # Set up the empty numpy arrays to hold the data
+        unit_tags = np.zeros(total_spikes)
+        unit_ids = sorting.get_unit_ids()
+        waveform_eg = sorting.get_unit_spike_features(unit_ids[0], "waveforms")
+        samples_per_spike = waveform_eg.shape[2]
+        total_channels = waveform_eg.shape[1]
+        out_waveforms = oDict()
+
+        if channel_scaling is None:
+            channel_scaling = np.ones([total_channels, ])
+
+        for j in range(total_channels):
+            out_waveforms["ch{}".format(j + 1)] = np.zeros(
+                shape=(total_spikes, samples_per_spike),
+                dtype=np.float64)
+
+        # Establish the tag of each and waveform
+        start = 0
+        for u_i, u in enumerate(unit_ids):
+            end = start + all_unit_trains[u_i].size
+            unit_tags[start:end] = u
+
+            wf = sorting.get_unit_spike_features(u, "waveforms")
+            for j in range(total_channels):
+                try:
+                    wave = wf[:, j, :]
+                except Exception:
+                    wave = wf[j, :]
+                out_waveforms["ch{}".format(j + 1)][start:end] = (
+                    wave * channel_scaling[j])
+
+            start = end
+
+        # NC assumes unit 0 not in data
+        if 0 in unit_tags:
+            print(
+                "Unit numbers loaded from spike interface contained 0" +
+                ", as such, all unit numbers were incremented by 1.")
+            unit_tags = unit_tags + 1
+
+        # Order spikes based on time
+        ordering = timestamps.argsort()
+        timestamps = timestamps[ordering]
+        unit_tags = unit_tags[ordering].astype(np.uint64)
+        for j in range(total_channels):
+            out_waveforms["ch{}".format(j + 1)] = (
+                out_waveforms["ch{}".format(j + 1)][ordering])
+
+        self._set_total_channels(total_channels)
+        self._set_total_spikes(total_spikes)
+        self._set_duration(timestamps.max())
+        self._set_samples_per_spike(samples_per_spike)
+        self._set_timestamp(timestamps)
+        self._set_sampling_rate(sorting._sampling_frequency)
+        self.set_unit_tags(unit_tags)
+        self._set_waveform(out_waveforms)
+        self.set_filename(sorting.params["dat_path"])
+        self.set_system("SpikeInterface")
+
     def __str__(self):
         """Return a friendly string representation of this object."""
         if self.get_unit_no() not in self._unit_list:
