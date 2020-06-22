@@ -1932,6 +1932,9 @@ class NSpike(NBase):
         self._set_waveform(out_waveforms)
         self.set_filename(sorting.params["dat_path"])
         self.set_system("SpikeInterface")
+        self._set_source_format(type(sorting).__name__)
+        # Temp measure, will do by group
+        self._set_channel_ids([0])
 
     def __str__(self):
         """Return a friendly string representation of this object."""
