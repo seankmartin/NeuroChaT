@@ -1570,7 +1570,8 @@ class NeuroChaT(QtCore.QThread):
                                    'dir', 'nwb', 'spike', 'lfp'])
         words = excel_file.split(os.sep)
         name = 'NWB_list_' + words[-1]
-        export_info.to_excel(os.path.join(os.sep.join(words[:-1]), name))
+        export_info.to_excel(
+            os.path.join(os.sep.join(words[:-1]), name), index=False)
         logging.info('Conversion process completed!')
 
     def verify_units(self, excel_file=None):
