@@ -830,9 +830,16 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 self.file_format_box.currentIndex())
             if file_format == "NWB":
                 self._control.open_hdf_file()
-                _, path = self._control.get_spike_file().split("+")
-                path = path + '/Clustering/cluster_nums'
-                items = self._control.hdf.f[path]
+                if "+" in self._control.get_spike_file():
+                    _, path = self._control.get_spike_file().split("+")
+                    path = path + '/Clustering/cluster_nums'
+                    items = self._control.hdf.f[path]
+                else:
+                    logging.warning("No spike information found in hdf5 file")
+                    items = [str(i) for i in range(256)]
+                    if self._control.get_unit_no() != 0:
+                        self.unit_no_box.clear()
+                        self.unit_no_box.addItems(items)
             else:
                 from neurochat.nc_spike import NSpike
                 spike_file = self._control.get_spike_file()
@@ -850,7 +857,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 self._control.close_hdf_file()
         except Exception as e:
             log_exception(
-                e, "Populating unit list failed - you can still manually select a unit -")
+                e, "Populating unit list failed - you can still manually select a unit.")
             items = [str(i) for i in range(256)]
             self.unit_no_box.clear()
             self.unit_no_box.addItems(items)
@@ -922,18 +929,18 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                                     "Selected {} with electrodes {}".format(
                                         os.path.basename(nwb_file), path + '/' + item))
 
-                                path = '/processing/Behavioural/Position'
-                                if self._control.exist_hdf_path(path=path):
-                                    self._control.set_spatial_file(
-                                        nwb_file + '+' + path)
-                                    logging.info(
-                                        'Position data set to group: ' + path)
-                                    self.filename_line_spatial.setText(
-                                        "Selected HDF5 Path {}".format(path))
-                                else:
-                                    logging.warning(
-                                        path +
-                                        ' not found! Spatial data not set.')
+                        path = '/processing/Behavioural/Position'
+                        if self._control.exist_hdf_path(path=path):
+                            self._control.set_spatial_file(
+                                nwb_file + '+' + path)
+                            logging.info(
+                                'Position data set to group: ' + path)
+                            self.filename_line_spatial.setText(
+                                "Selected HDF5 Path {}".format(path))
+                        else:
+                            logging.warning(
+                                path +
+                                ' not found. Spatial data not set.')
                         self._control.close_hdf_file()
                     except Exception as e:
                         log_exception(
