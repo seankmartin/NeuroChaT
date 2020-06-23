@@ -949,6 +949,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 os.chdir(directory)
                 self._control.set_excel_file(excel_file)
                 logging.info("New excel file added: " + words[-1])
+                self.filename_line_spike.setText(
+                    "Selected {}".format(excel_file))
 
         # elif mode_id == 3:
         #     data_directory = QtCore.QDir.toNativeSeparators(

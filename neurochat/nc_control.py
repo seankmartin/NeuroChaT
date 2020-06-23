@@ -391,35 +391,41 @@ class NeuroChaT(QtCore.QThread):
 
         # Read files from an excel list
         elif mode_id == 2:
-            excel_file = self.get_excel_file()
-            if os.path.exists(excel_file):
-                excel_info = pd.read_excel(excel_file)
-                for row in excel_info.itertuples():
-                    spike_file = row[1] + os.sep + row[3]
-                    unit_no = int(row[4])
-                    lfp_id = str(row[5])
+            try:
+                excel_file = self.get_excel_file()
+                if os.path.exists(excel_file):
+                    excel_info = pd.read_excel(excel_file)
+                    for row in excel_info.itertuples():
+                        spike_file = row[1] + os.sep + row[3]
+                        unit_no = int(row[4])
+                        lfp_id = str(row[5])
 
-                    if self.get_data_format() == 'Axona':
-                        end = "" if row[2][-4:] == ".txt" else ".txt"
-                        spatial_file = row[1] + os.sep + row[2] + end
-                        lfp_file = remove_extension(spike_file) + lfp_id
+                        if self.get_data_format() == 'Axona':
+                            end = "" if row[2][-4:] == ".txt" else ".txt"
+                            spatial_file = row[1] + os.sep + row[2] + end
+                            lfp_file = remove_extension(spike_file) + lfp_id
 
-                    elif self.get_data_format() == 'Neuralynx':
-                        spatial_file = row[1] + os.sep + row[2] + '.nvt'
-                        lfp_file = row[1] + os.sep + lfp_id + '.ncs'
+                        elif self.get_data_format() == 'Neuralynx':
+                            spatial_file = row[1] + os.sep + row[2] + '.nvt'
+                            lfp_file = row[1] + os.sep + lfp_id + '.ncs'
 
-                    elif self.get_data_format() == 'NWB':
-                        # excel list: directory| hdf5 file name w/o extension|
-                        # spike group| unit_no| lfp group
-                        hdf_name = row[1] + os.sep + row[2] + '.hdf5'
-                        spike_file = hdf_name + '+/processing/Shank/' + row[3]
-                        spatial_file = hdf_name + '+/processing/Behavioural/Position'
-                        lfp_file = hdf_name + '+/processing/Neural Continuous/LFP/' + lfp_id
+                        elif self.get_data_format() == 'NWB':
+                            # excel list: directory| hdf5 file name w/o extension|
+                            # spike group| unit_no| lfp group
+                            hdf_name = row[1] + os.sep + row[2] + '.hdf5'
+                            spike_file = hdf_name + \
+                                '+/processing/Shank/' + row[3]
+                            spatial_file = hdf_name + '+/processing/Behavioural/Position'
+                            lfp_file = hdf_name + '+/processing/Neural Continuous/LFP/' + lfp_id
 
-                    info['spat'].append(spatial_file)
-                    info['spike'].append(spike_file)
-                    info['unit'].append(unit_no)
-                    info['lfp'].append(lfp_file)
+                        info['spat'].append(spatial_file)
+                        info['spike'].append(spike_file)
+                        info['unit'].append(unit_no)
+                        info['lfp'].append(lfp_file)
+            except BaseException as e:
+                log_exception(e, "Parsing excel file")
+                logging.warning("Please check if the data format is set correctly.")
+                return
 
         if info['unit']:
             last_used_info = {
