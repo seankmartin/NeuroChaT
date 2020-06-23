@@ -823,6 +823,11 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.lfp_chan_box.addItems(items)
         self._first_chan_call = False
 
+        if len(items) == 0:
+            self.filename_line_lfp.setText(
+                "No LFP information found")
+            self._control.set_lfp_file("")
+
     def unit_getitems(self):
         """Return the list of units once spike data is set."""
         try:
@@ -904,6 +909,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 if not nwb_file:
                     logging.warning("No NWB file selected")
                 else:
+                    self.clear_backend_files()
                     words = nwb_file.rstrip("\n\r").split(os.sep)
                     directory = os.sep.join(words[0:-1])
                     os.chdir(directory)
@@ -941,6 +947,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                             logging.warning(
                                 path +
                                 ' not found. Spatial data not set.')
+                            self.filename_line_spatial.setText(
+                                "No spatial data found")
                         self._control.close_hdf_file()
                     except Exception as e:
                         log_exception(
