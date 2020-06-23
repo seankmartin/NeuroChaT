@@ -395,7 +395,32 @@ class NeuroChaT(QtCore.QThread):
                 excel_file = self.get_excel_file()
                 if os.path.exists(excel_file):
                     excel_info = pd.read_excel(excel_file)
-                    for row in excel_info.itertuples():
+                    excel_info = excel_info.replace(
+                        to_replace=np.nan, value="__EMPTY__")
+                    for pd_row in excel_info.itertuples():
+                        row = []
+                        for val in pd_row:
+                            row.append(val)
+                        print(row)
+                        if row[1] == "__EMPTY__":
+                            logging.error("Directory is not set in excel file")
+                            raise ValueError(
+                                "Directory is not set in excel file")
+                        if row[2] == "__EMPTY__":
+                            if self.get_data_format() == 'NWB':
+                                logging.error(
+                                    "HDF5 filename is not set in excel file")
+                                raise ValueError(
+                                    "HDF5 filename is not set in excel file")
+                            else:
+                                row[2] = ".no_spatial.None"
+                        if row[3] == "__EMPTY__":
+                            row[3] = ".no_spike.NONE"
+                        if row[4] == "__EMPTY__":
+                            row[4] = 0
+                        if row[5] == "__EMPTY__":
+                            row[5] = ".no_lfp.NONE"
+
                         spike_file = row[1] + os.sep + row[3]
                         unit_no = int(row[4])
                         lfp_id = str(row[5])
