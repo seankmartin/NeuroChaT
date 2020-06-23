@@ -368,7 +368,14 @@ class NeuroChaT(QtCore.QThread):
             spike_file = self.get_spike_file()
             lfp_file = self.get_lfp_file()
 
-            if os.path.isfile(spike_file):
+            using_nwb = (self.get_data_format() == "NWB")
+
+            if using_nwb:
+                _spike_exists = self.hdf.path_exists(spike_file)
+            else:
+                _spike_exists = os.path.isfile(spike_file)
+
+            if _spike_exists:
                 self.ndata.set_spike_file(spike_file)
                 self.ndata.load_spike()
 
@@ -438,10 +445,13 @@ class NeuroChaT(QtCore.QThread):
                             # excel list: directory| hdf5 file name w/o extension|
                             # spike group| unit_no| lfp group
                             hdf_name = row[1] + os.sep + row[2] + '.hdf5'
-                            spike_file = hdf_name + \
-                                '+/processing/Shank/' + row[3]
-                            spatial_file = hdf_name + '+/processing/Behavioural/Position'
-                            lfp_file = hdf_name + '+/processing/Neural Continuous/LFP/' + lfp_id
+                            spike_file = (
+                                hdf_name + '+/processing/Shank/' + row[3])
+                            spatial_file = (
+                                hdf_name + '+/processing/Behavioural/Position')
+                            lfp_file = (
+                                hdf_name + '+/processing/Neural Continuous/LFP/'
+                                + lfp_id)
 
                         info['spat'].append(spatial_file)
                         info['spike'].append(spike_file)
@@ -449,7 +459,8 @@ class NeuroChaT(QtCore.QThread):
                         info['lfp'].append(lfp_file)
             except BaseException as e:
                 log_exception(e, "Parsing excel file")
-                logging.warning("Please check if the data format is set correctly.")
+                logging.warning(
+                    "Please check if the data format is set correctly.")
                 return
 
         if info['unit']:
@@ -461,8 +472,17 @@ class NeuroChaT(QtCore.QThread):
             for i, unit_no in enumerate(info['unit']):
                 do_border = False
                 data_for_hdf = None
-                logging.info('Starting a new unit...')
-                if os.path.isfile(info['spat'][i]):
+                logging.info('Starting a new unit ({})...'.format(unit_no))
+                using_nwb = (self.get_data_format() == "NWB")
+                if using_nwb:
+                    _spat_exists = self.hdf.path_exists(info['spat'][i])
+                    _lfp_exists = self.hdf.path_exists(info['lfp'][i])
+                    _spike_exists = self.hdf.path_exists(info['spike'][i])
+                else:
+                    _spat_exists = os.path.isfile(info['spat'][i])
+                    _lfp_exists = os.path.isfile(info['lfp'][i])
+                    _spike_exists = os.path.isfile(info['spike'][i])
+                if _spat_exists:
                     if last_used_info['spat'] == info['spat'][i]:
                         logging.info(
                             "Using loaded spatial file {}".format(info['spat'][i]))
@@ -472,15 +492,15 @@ class NeuroChaT(QtCore.QThread):
                         self.ndata.set_spatial_file(info['spat'][i])
                         self.ndata.spatial.load()
                         last_used_info['spat'] = info['spat'][i]
+                        # TODO make sure border not done twice on same data
                         do_border = True
                 else:
-                    # TODO remove these logs when sure it is working
                     logging.warning(
                         'Spatial data does not exist or was not selected')
                     self.ndata.spatial = NSpatial(name='S0')
                     self.ndata.spatial.set_filename(".no_spatial.NONE")
 
-                if os.path.isfile(info['lfp'][i]):
+                if _lfp_exists:
                     if last_used_info['lfp'] == info['lfp'][i]:
                         logging.info(
                             "Using loaded lfp file {}".format(info['lfp'][i]))
@@ -497,7 +517,7 @@ class NeuroChaT(QtCore.QThread):
                     self.ndata.lfp = NLfp(name='L0')
                     self.ndata.lfp.set_filename(".no_lfp.NONE")
 
-                if os.path.isfile(info['spike'][i]):
+                if _spike_exists:
                     if last_used_info['spike'] == info['spike'][i]:
                         logging.info(
                             "Using loaded spike file {}".format(info['spike'][i]))
@@ -570,7 +590,7 @@ class NeuroChaT(QtCore.QThread):
                 self.__count += 1
                 logging.info('Units already analyzed = ' + str(self.__count))
 
-        logging.info('Total cell analyzed: ' + str(self.__count))
+        logging.info('Total cells analyzed: ' + str(self.__count))
         self.cellid = info['cellid']
         self.nwb_files = info['nwb']
         self.graphic_files = info['graphics']
