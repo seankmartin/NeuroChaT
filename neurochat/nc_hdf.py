@@ -191,7 +191,7 @@ class Nhdf(object):
         if path in self.f:
             items = list(self.f[path].keys())
         else:
-            logging.warning('No groups in the path:' + path)
+            logging.warning('No groups in the path: ' + path)
 
         return items
 
@@ -719,3 +719,35 @@ class Nhdf(object):
         # group
 
         logging.warning('save_cluster() method is not implemented yet!')
+
+    def path_exists(self, path):
+        """
+        Return True if self.f exists and path is in it.
+
+        path can be either a path in the hdf5 file.
+        or the full name of a hdf5 file.
+
+        Parameters
+        ----------
+        path : str
+            The path to check for.
+
+        Returns
+        -------
+        bool
+            Whether or not the path is exists
+
+        See also
+        --------
+        neurochat.nc_control.exist_hdf_path
+
+        """
+        if path == "":
+            return False
+        if "+" in path:
+            name, path = path.split("+")
+            if os.path.isfile(name):
+                self.set_filename(name)
+            else:
+                return False
+        return path in self.f
