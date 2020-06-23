@@ -2039,12 +2039,19 @@ class NeuroChaT(QtCore.QThread):
             # TODO check file handling for NWB with missing files.
             fname = spike_file.split("+")[0]
             row_info[0] = os.path.dirname(fname)
-            row_info[1] = os.path.basename(fname)
-            path = spike_file.split("+")[1]
-            row_info[2] = path.split("/")[-1]
+            # TODO make sure this works when loading
+            row_info[1] = os.path.splitext(os.path.basename(fname))[0]
+            if "+" in spike_file:
+                path = spike_file.split("+")[1]
+                row_info[2] = path.split("/")[-1]
+            else:
+                row_info[2] = None
             row_info[3] = self.get_unit_no()
-            path = lfp_file.split("+")[1]
-            row_info[4] = path.split("/")[-1]
+            if "+" in lfp_file:
+                path = lfp_file.split("+")[1]
+                row_info[4] = path.split("/")[-1]
+            else:
+                row_info[4] = None
 
         df_to_append = pd.DataFrame(
             data=[row_info, ], columns=list(excel_info.columns))
