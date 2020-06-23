@@ -248,6 +248,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.export_results_act.triggered.connect(self.export_results)
         self.export_graphic_info_act.triggered.connect(
             self.export_graphic_info)
+        self.view_results_act.triggered.connect(self.restore_start_button)
 
         self.merge_act.triggered.connect(self.merge_output)
         self.accumulate_act.triggered.connect(self.accumulate_output)
@@ -318,6 +319,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.export_graphic_info_act = self.utilities_menu.addAction(
             "Export graphic file info")
         self.export_graphic_info_act.setShortcut(QtGui.QKeySequence("Ctrl+G"))
+
+        self.view_results_act = self.utilities_menu.addAction(
+            "View results")
+        self.view_results_act.setShortcut(QtGui.QKeySequence("Ctrl+V"))
 
         self.utilities_menu.addSeparator()
 
