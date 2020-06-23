@@ -10,6 +10,7 @@ import os.path
 import logging
 import inspect
 from collections import OrderedDict as oDict
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
@@ -1878,6 +1879,131 @@ class NeuroChaT(QtCore.QThread):
             log_exception(
                 ex, "In walking a directory for place cell summaries")
         return
+
+    def append_selection_to_excel(self, excel_file):
+        """
+        Append the current selection of files to the Excel file.
+
+        Parameters
+        ----------
+        excel_file : str
+            The path to the Excel file to append the selection to.
+
+        Returns
+        -------
+        None
+
+        """
+        if os.path.exists(excel_file):
+            try:
+                excel_info = pd.read_excel(excel_file)
+            except PermissionError:
+                logging.error(
+                    "Please close {} before writing to it".format(excel_file))
+                return
+        else:
+            if self.get_data_format() == 'NWB':
+                excel_info = pd.Dataframe(
+                    columns=[
+                        "Directory", "NWB Name", "Electrode Group",
+                        "Cell ID", "LFP Group"])
+            else:
+                excel_info = pd.Dataframe(
+                    columns=[
+                        "Directory", "Position File", "Spike File",
+                        "Cell ID", "LFP Chan"])
+        logging.info(
+            "Saving selected files to {}".format(excel_file))
+        logging.info(
+            "ALL files in this excel sheet should be in {} format".format(
+                self.get_data_format()))
+        row_info = [None] * 5
+        spike_file = self.get_spike_file()
+        lfp_file = self.get_lfp_file()
+        spatial_file = self.get_spatial_file()
+        if self.get_data_format() != 'NWB':
+            try:
+                dname_spike = os.path.dirname(spike_file)
+                if dname_spike == "":
+                    dname_spike = None
+                bname_spike = os.path.basename(spike_file)
+            except BaseException:
+                dname_spike = None
+                bname_spike = ""
+            try:
+                dname_spatial = os.path.dirname(spatial_file)
+                bname_spatial = os.path.basename(spatial_file)
+                if dname_spatial == "":
+                    dname_spatial = None
+            except BaseException:
+                dname_spatial = None
+                bname_spatial = ""
+            try:
+                dname_lfp = os.path.dirname(lfp_file)
+                bname_lfp = os.path.basename(lfp_file)
+                if dname_lfp == "":
+                    dname_lfp = None
+            except BaseException:
+                dname_lfp = None
+                bname_lfp = ""
+
+            count = 0
+            dnames = [dname_spike, dname_lfp, dname_spatial]
+            for i, val in enumerate(dnames):
+                dname_cpy = deepcopy(dnames)
+                if val is not None:
+                    dname_cpy.pop(i)
+                    for val2 in dname_cpy:
+                        if val2 is not None:
+                            if val != val2:
+                                count += 1
+
+            if count > 0:
+                raise ValueError(
+                    "All input files must be in the same directory" +
+                    " or be left blank, provided {}, {}, {}".format(
+                        spike_file, lfp_file, spatial_file))
+            dname = next(
+                (item for item in dnames if item is not None), "")
+
+        if self.get_data_format() == 'Axona':
+            row_info[0] = dname
+            row_info[1] = bname_spatial
+            row_info[2] = bname_spike
+            row_info[3] = self.get_unit_no()
+            # TODO fix the excel reading with this
+            if os.path.isfile(spike_file):
+                row_info[4] = os.path.splitext(bname_lfp)[1]
+            else:
+                row_info[4] = bname_lfp
+
+        elif self.get_data_format() == 'Neuralynx':
+            row_info[0] = dname
+            row_info[1] = bname_spatial
+            row_info[2] = bname_spike
+            row_info[3] = self.get_unit_no()
+            row_info[4] = os.path.splitext(bname_lfp)[0]
+
+        elif self.get_data_format() == 'NWB':
+            # TODO check file handling for NWB with missing files.
+            fname = spike_file.split("+")[0]
+            row_info[0] = os.path.dirname(fname)
+            row_info[1] = os.path.basename(fname)
+            path = spike_file.split("+")[1]
+            row_info[2] = path.split("/")[-1]
+            row_info[3] = self.get_unit_no()
+            path = lfp_file.split("+")[1]
+            row_info[4] = path.split("/")[-1]
+
+        df_to_append = pd.DataFrame(
+            data=[row_info, ], columns=list(excel_info.columns))
+        excel_info = excel_info.append(df_to_append, ignore_index=True)
+
+        try:
+            excel_info.to_excel(excel_file, index=False)
+        except PermissionError:
+            logging.error(
+                "Please close {} before saving".format(excel_file))
 
     def __getattr__(self, arg):
         """Forward __getattr__ to configuration class."""
