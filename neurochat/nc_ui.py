@@ -61,6 +61,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self._mode_dict = self._control.get_all_modes()
         self._default_loc = os.path.join(
             os.path.expanduser("~"), ".nc_saved", "last_dir_location.txt")
+        self._last_excel_loc = ""
         make_dir_if_not_exists(self._default_loc)
         if os.path.isfile(self._default_loc):
             with open(self._default_loc, "r") as f:
@@ -236,6 +237,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.clear_log_button.clicked.connect(self.clear_log)
         self.save_log_button.clicked.connect(self.save_log)
         self.open_file_act.triggered.connect(self.browse_all)
+        self.append_excel_act.triggered.connect(self.append_excel)
         self.save_session_act.triggered.connect(self.save_session)
         self.load_session_act.triggered.connect(self.load_session)
 
@@ -294,6 +296,12 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         self.load_session_act = self.file_menu.addAction("Load session...")
         self.load_session_act.setShortcut(QtGui.QKeySequence("Ctrl+L"))
+
+        self.file_menu.addSeparator()
+
+        self.append_excel_act = self.file_menu.addAction(
+            "Add files to spreadsheet...")
+        self.append_excel_act.setShortcut(QtGui.QKeySequence("Ctrl+A"))
 
         self.file_menu.addSeparator()
 
@@ -1030,6 +1038,20 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             self.browse_lfp()
         if self.browse_button_spatial.isEnabled():
             self.browse_spatial()
+
+    def append_excel(self):
+        if os.path.isfile(self._last_excel_loc):
+            _default = os.path.dirname(self._last_excel_loc)
+        else:
+            _default = os.getcwd()
+        excel_file = QtCore.QDir.toNativeSeparators(
+            QtWidgets.QFileDialog.getSaveFileName(
+                self, 'Select Excel file...',
+                _default, "*.xlsx;; .*xls")[0])
+        if excel_file != "":
+            if not os.path.splitext(excel_file)[1] in [".xlsx", ".xls"]:
+                excel_file = excel_file + ".xlsx"
+            self._control.append_selection_to_excel(excel_file)
 
     def update_log(self, msg):
         """

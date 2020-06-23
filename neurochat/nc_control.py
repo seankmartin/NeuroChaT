@@ -1903,12 +1903,12 @@ class NeuroChaT(QtCore.QThread):
                 return
         else:
             if self.get_data_format() == 'NWB':
-                excel_info = pd.Dataframe(
+                excel_info = pd.DataFrame(
                     columns=[
                         "Directory", "NWB Name", "Electrode Group",
                         "Cell ID", "LFP Group"])
             else:
-                excel_info = pd.Dataframe(
+                excel_info = pd.DataFrame(
                     columns=[
                         "Directory", "Position File", "Spike File",
                         "Cell ID", "LFP Chan"])
