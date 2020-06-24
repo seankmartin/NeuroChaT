@@ -2641,7 +2641,7 @@ class UiParameters(QtWidgets.QDialog):
         widget = ScrollableWidget()
         # Box- 1
         self.loc_rate_gb1 = add_group_box(
-            title="Analyses Parameters", obj_name="loc_rate_gb1")
+            title="Firing Map", obj_name="loc_rate_gb1")
 
         self.loc_pixel_size = add_spin_box(
             min_val=1, max_val=100, obj_name="loc_pixel_size")
@@ -2651,45 +2651,46 @@ class UiParameters(QtWidgets.QDialog):
             min_val=3, max_val=20, obj_name="loc_chop_bound")
         self.loc_chop_bound.setValue(5)
 
-        self.loc_field_thresh = add_double_spin_box(
-            min_val=0.0, max_val=1.0, obj_name="loc_field_thresh")
-        self.loc_field_thresh.setValue(0.20)
-        self.loc_field_thresh.setSingleStep(0.01)
-
-        self.loc_field_smooth = add_check_box(obj_name='loc_field_smooth')
-        self.loc_field_smooth.setChecked(False)
-
-        self.loc_style = add_combo_box(obj_name="loc_style")
-        self.loc_style.addItems(
-            ["contour", "digitized", "interpolated"])
-
-        self.loc_colormap = add_combo_box(obj_name="loc_colormap")
-        self.loc_colormap.addItems(
-            ["viridis", "default", "gray", "plasma",
-             "inferno", "magma", "cividis"])
-
-        self.loc_contour_levels = add_spin_box(
-            min_val=4, max_val=12, obj_name="loc_contour_levels")
-        self.loc_contour_levels.setValue(5)
-
         box_layout = ParamBoxLayout()
         box_layout.addRow(
             "Pixel Size", self.loc_pixel_size, "cm [range: 1-100]")
         box_layout.addRow(
             "Bound for Chopping Edges",
             self.loc_chop_bound, "pixels [range: 3-20]")
-        box_layout.addRow(
-            "Place Field Threshold",
-            self.loc_field_thresh, "ratio [range: 0-1, step: 0.01]")
-        box_layout.addRow(
-            "Compute Place Field on Smoothed Firing Map",
-            self.loc_field_smooth, "True or False")
-
         self.loc_rate_gb1.setLayout(box_layout)
 
-        # Box- 2
+        # Box 2
         self.loc_rate_gb2 = add_group_box(
-            title="Smoothing Box Kernel", obj_name="loc_rate_gb2")
+            title="Place Field", obj_name="loc_rate_gb2")
+
+        self.loc_field_thresh = add_double_spin_box(
+            min_val=0.01, max_val=1.0, obj_name="loc_field_thresh")
+        self.loc_field_thresh.setValue(0.20)
+        self.loc_field_thresh.setSingleStep(0.01)
+
+        self.loc_field_smooth = add_check_box(obj_name='loc_field_smooth')
+        self.loc_field_smooth.setChecked(False)
+
+        self.loc_field_bins = add_spin_box(
+            min_val=3, max_val=50, obj_name="loc_field_bins")
+        self.loc_field_bins.setValue(9)
+
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Place Field Threshold",
+            self.loc_field_thresh, "[range: 0.01-1, step: 0.01]")
+        box_layout.addRow(
+            "Compute Place Field from Smoothed Map",
+            self.loc_field_smooth, "True or False")
+        box_layout.addRow(
+            "Required Adjacent Bins for Place Field",
+            self.loc_field_bins, "[range: 5-50]")
+
+        self.loc_rate_gb2.setLayout(box_layout)
+
+        # Box- 3
+        self.loc_rate_gb3 = add_group_box(
+            title="Smoothing Box Kernel", obj_name="loc_rate_gb3")
 
         self.loc_rate_filter = add_combo_box(obj_name="loc_rate_filter")
         self.loc_rate_filter.addItems(["Box", "Gaussian"])
@@ -2707,11 +2708,23 @@ class UiParameters(QtWidgets.QDialog):
             "Spike Rate Pixels/Sigma",
             self.loc_rate_kern_len, "[range: 1-11]\n\r Box: odds")
 
-        self.loc_rate_gb2.setLayout(box_layout)
+        self.loc_rate_gb3.setLayout(box_layout)
 
-        # Box 3
-        self.loc_rate_gb3 = add_group_box(
-            title="Plotting Style", obj_name="loc_rate_gb3")
+        # Box 4
+        self.loc_style = add_combo_box(obj_name="loc_style")
+        self.loc_style.addItems(
+            ["contour", "digitized", "interpolated"])
+
+        self.loc_colormap = add_combo_box(obj_name="loc_colormap")
+        self.loc_colormap.addItems(
+            ["viridis", "default", "gray", "plasma",
+             "inferno", "magma", "cividis"])
+
+        self.loc_contour_levels = add_spin_box(
+            min_val=4, max_val=12, obj_name="loc_contour_levels")
+        self.loc_contour_levels.setValue(5)
+        self.loc_rate_gb4 = add_group_box(
+            title="Plotting Style", obj_name="loc_rate_gb4")
         box_layout = ParamBoxLayout()
         box_layout.addRow(
             "Firing Rate Map Style", self.loc_style, "")
@@ -2720,12 +2733,13 @@ class UiParameters(QtWidgets.QDialog):
         box_layout.addRow(
             "Firing Rate Map Contour Levels",
             self.loc_contour_levels, "range [4-12]")
-        self.loc_rate_gb3.setLayout(box_layout)
+        self.loc_rate_gb4.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.loc_rate_gb1)
         layout.addWidget(self.loc_rate_gb2)
         layout.addWidget(self.loc_rate_gb3)
+        layout.addWidget(self.loc_rate_gb4)
 
         widget.setContents(layout)
 

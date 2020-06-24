@@ -103,6 +103,7 @@ PARAMETERS = {
         "loc_rate_kern_len": 5,
         "loc_field_thresh": 0.2,
         "loc_field_smooth": False,
+        "loc_field_bins": 9,
         "loc_style": "contour",
         "loc_colormap": "viridis",
         "loc_contour_levels": 5

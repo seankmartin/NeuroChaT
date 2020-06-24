@@ -960,6 +960,7 @@ class NeuroChaT(QtCore.QThread):
                         filter=[filttype, params['loc_rate_kern_len']],
                         fieldThresh=params['loc_field_thresh'],
                         smoothPlace=params['loc_field_smooth'],
+                        minPlaceFieldNeighbours=params['loc_field_bins'],
                         brAdjust=True, update=True)
                     fig1 = nc_plot.loc_firing(
                         place_data, colormap=params['loc_colormap'],
