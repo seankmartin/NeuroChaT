@@ -237,6 +237,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.clear_log_button.clicked.connect(self.clear_log)
         self.save_log_button.clicked.connect(self.save_log)
         self.open_file_act.triggered.connect(self.browse_all)
+        self.clear_files_act.triggered.connect(self.clear_files)
         self.append_excel_act.triggered.connect(self.append_excel)
         self.save_session_act.triggered.connect(self.save_session)
         self.load_session_act.triggered.connect(self.load_session)
@@ -303,6 +304,9 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.append_excel_act = self.file_menu.addAction(
             "Add files to spreadsheet...")
         self.append_excel_act.setShortcut(QtGui.QKeySequence("Ctrl+A"))
+
+        self.clear_files_act = self.file_menu.addAction(
+            "Clear selected files...")
 
         self.file_menu.addSeparator()
 
@@ -1470,18 +1474,32 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         print(excel_data)
 
     def clear_backend_files(self):
+        """Reset all file selections to default."""
         if self._should_clear_backend:
             # Clear names on the config object
             self._control.set_lfp_file("")
             self._control.set_spike_file("")
             self._control.set_spatial_file("")
             self._control.set_nwb_file("")
+            self.unit_no_box.clear()
+            items = [str(i) for i in range(256)]
+            self.unit_no_box.addItems(items)
             self._control.set_unit_no(0)
 
             # Clear names on the data object
             self._control.ndata.set_lfp_file("")
             self._control.ndata.set_spike_file("")
             self._control.ndata.set_spatial_file("")
+
+            self._set_dictation()
+
+    def clear_files(self):
+        """Call to clear_backend_files."""
+        temp = self._should_clear_backend
+        self._should_clear_backend = True
+        logging.info("Clearing selected files and units")
+        self.clear_backend_files()
+        self._should_clear_backend = temp
 
     def angle_calculation(self):
         """
