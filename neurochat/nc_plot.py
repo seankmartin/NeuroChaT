@@ -1184,6 +1184,10 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     """
     Plot location vs spike rate.
 
+    By default, colormap="viridis", style="contour".
+    However, the old NC style was colormap="default", style="digitized".
+    The old style produces very nice maps, but not colorblind.
+
     Parameters
     ----------
     place_data : dict
@@ -1254,6 +1258,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
             splits = np.linspace(vmin, vmax, levels + 1)
         else:
             splits = np.array([vmin, vmin * 2])
+        splits = np.around(splits, decimals=1)
         x_edges = np.append(
             place_data["xedges"] - dx / 2,
             place_data["xedges"][-1] + dx / 2)
@@ -1282,11 +1287,6 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     ax.invert_yaxis()
     cbar = plt.colorbar(
         res, cax=cax, orientation='vertical', use_gridspec=True)
-    # cbar.ax.set_ticks(levels)
-    # cbar.ax.set_yticklabels(np.around(levels, decimals=1))
-    if splits is not None:
-        split_text = np.around(splits, decimals=1)
-        cbar.ax.set_yticklabels(split_text)
 
     return ax
 
