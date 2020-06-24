@@ -253,7 +253,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.merge_act.triggered.connect(self.merge_output)
         self.accumulate_act.triggered.connect(self.accumulate_output)
 
-        self.angle_act.triggered.connect(self.angle_calculation)
+        # self.angle_act.triggered.connect(self.angle_calculation)
         self.multi_place_cell_act.triggered.connect(self.place_cell_plots)
 
         self.view_help_act.triggered.connect(self.view_help)
@@ -340,17 +340,18 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.convert_files_act = self.utilities_menu.addAction(
             "Convert to NWB format")
 
-        self.angle_act = self.multifile_menu.addAction(
-            "Centroid angle calculation")
-        self.angle_act.setStatusTip(
-            "Select an excel file which specifies files " +
-            "in the order of: " +
-            "directory | position_file | spike_file | unit_no | eeg extension")
+        # self.angle_act = self.multifile_menu.addAction(
+        #     "Centroid angle calculation")
+        # self.angle_act.setStatusTip(
+        #     "Select an excel file which specifies files " +
+        #     "in the order of: " +
+        #     "directory | position_file | spike_file | unit_no | eeg extension")
 
         self.multi_place_cell_act = self.multifile_menu.addAction(
             "Directory place cell summary")
         self.multi_place_cell_act.setStatusTip(
-            "Select a folder to analyse units for place cells")
+            "Select a folder to recursively analyse units for place cells " +
+            "-- Currently only supports Axona")
 
         self.view_help_act = self.help_menu.addAction(
             "NeuroChaT user interface guide")
