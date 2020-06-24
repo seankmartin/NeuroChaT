@@ -1307,13 +1307,26 @@ class NeuroChaT(QtCore.QThread):
                     self.plot_data_to_hdf(
                         name=name + '/lfp_spectrum_TR/', graph_data=graph_data)
 
-                    # These ranges are from Muessig et al. 2019
+                    # Default band ranges are from Muessig et al. 2019
+                    # They are theta delta ranges. From
                     # Coordinated Emergence of Hippocampal Replay and
                     # Theta Sequences during Post - natal Development
-                    # TODO add parameters for this
+                    first_name = (
+                        str(params["lfp_highband_lowcut"]) + "Hz to " +
+                        str(params["lfp_highband_highcut"]) + "Hz")
+                    second_name = (
+                        str(params["lfp_lowband_lowcut"]) + "Hz to " +
+                        str(params["lfp_lowband_highcut"]) + "Hz")
+                    total_band = [
+                        params["lfp_prefilt_lowcut"], params['lfp_prefilt_highcut']]
                     self.bandpower_ratio(
-                        [5, 11], [1.5, 4], 1.6, band_total=True,
-                        first_name="Theta", second_name="Delta")
+                        [params["lfp_highband_lowcut"],
+                            params["lfp_highband_highcut"]],
+                        [params["lfp_lowband_lowcut"],
+                            params["lfp_lowband_highcut"]],
+                        params["lfp_band_win_len"], band_total=True,
+                        total_band=total_band,
+                        first_name=first_name, second_name=second_name)
 
                 except BaseException as ex:
                     log_exception(ex, 'Analyzing lfp spectrum')

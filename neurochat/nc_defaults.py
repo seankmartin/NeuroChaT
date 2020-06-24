@@ -193,6 +193,11 @@ PARAMETERS = {
         "lfp_stft_overlap": 1.0,
         "lfp_stft_seg_size": 2.0,
         "lfp_spectrum_colormap": "viridis",
+        "lfp_lowband_lowcut": 1.5,
+        "lfp_lowband_highcut": 4,
+        "lfp_highband_lowcut": 5,
+        "lfp_highband_highcut": 11,
+        "lfp_band_win_len": 1.6,
     },
     "spike_phase": {
         "phase_amp_thresh": 0.15,

@@ -1195,6 +1195,7 @@ class NLfp(NBase):
         unit : str
             Currently support micro and milli.
             The scale to return Volts in.
+            Defaults to micro.
 
         Returns
         ------
@@ -1209,7 +1210,7 @@ class NLfp(NBase):
         low, high = band
         method = kwargs.get("method", "welch")
         window_sec = kwargs.get("window_sec", 2 / (low + 0.000001))
-        unit = kwargs.get("unit", "milli")
+        unit = kwargs.get("unit", "micro")
         scale = 1000 if unit == "micro" else 1
         sf = self.get_sampling_rate()
         lfp_samples = self.get_samples() * scale

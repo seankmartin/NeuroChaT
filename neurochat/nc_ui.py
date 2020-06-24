@@ -3175,23 +3175,66 @@ class UiParameters(QtWidgets.QDialog):
         self.lfp_spectrum_gb3.setLayout(box_layout)
 
         # Box 4
+        self.lfp_lowband_lowcut = add_double_spin_box(
+            min_val=0.5, max_val=100, obj_name="lfp_lowband_lowcut")
+        self.lfp_lowband_lowcut.setValue(1.5)
+        self.lfp_lowband_lowcut.setSingleStep(0.5)
+
+        self.lfp_lowband_highcut = add_double_spin_box(
+            min_val=3, max_val=500, obj_name="lfp_lowband_highcut")
+        self.lfp_lowband_highcut.setValue(4)
+        self.lfp_lowband_highcut.setSingleStep(0.5)
+
+        self.lfp_highband_lowcut = add_double_spin_box(
+            min_val=0.5, max_val=100, obj_name="lfp_highband_lowcut")
+        self.lfp_highband_lowcut.setValue(5)
+        self.lfp_highband_lowcut.setSingleStep(0.5)
+
+        self.lfp_highband_highcut = add_double_spin_box(
+            min_val=3, max_val=500, obj_name="lfp_highband_highcut")
+        self.lfp_highband_highcut.setValue(11)
+        self.lfp_highband_highcut.setSingleStep(0.5)
+
+        self.lfp_band_win_len = add_double_spin_box(
+            min_val=0.5, max_val=5, obj_name="lfp_band_win_len")
+        self.lfp_band_win_len.setValue(1.6)
+        self.lfp_band_win_len.setSingleStep(0.1)
+
+        box_layout = ParamBoxLayout()
+        box_layout.addRow("Lower Band Low Cutoff",
+                          self.lfp_lowband_lowcut, "Hz [range: 0.5-100, step: 0.5]")
+        box_layout.addRow("Lower Band High Cutoff",
+                          self.lfp_lowband_highcut, "Hz [range: 3-500, step: 0.5]")
+        box_layout.addRow("Upper Band Low Cutoff",
+                          self.lfp_highband_lowcut, "Hz [range: 0.5-100, step: 0.5]")
+        box_layout.addRow("Upper Band High Cutoff",
+                          self.lfp_highband_highcut, "Hz [range: 3-500, step: 0.5]")
+        box_layout.addRow("Band Power Window Length",
+                          self.lfp_band_win_len, "sec [range 0.5 - 5, step: 0.1]")
+
+        self.lfp_spectrum_gb4 = add_group_box(
+            title="Band Power Settings", obj_name="lfp_spectrum_gb4")
+        self.lfp_spectrum_gb4.setLayout(box_layout)
+
+        # Box 5
         self.lfp_spectrum_colormap = add_combo_box(
             obj_name="lfp_spectrum_colormap")
         self.lfp_spectrum_colormap.addItems(
             ["viridis", "default", "gray", "plasma",
              "inferno", "magma", "cividis"])
-        self.lfp_spectrum_gb4 = add_group_box(
-            title="Plotting Style", obj_name="lfp_spectrum_gb4")
+        self.lfp_spectrum_gb5 = add_group_box(
+            title="Plotting Style", obj_name="lfp_spectrum_gb5")
         box_layout = ParamBoxLayout()
         box_layout.addRow(
             "Spectogram Colormap", self.lfp_spectrum_colormap, "")
-        self.lfp_spectrum_gb4.setLayout(box_layout)
+        self.lfp_spectrum_gb5.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.lfp_spectrum_gb1)
         layout.addWidget(self.lfp_spectrum_gb2)
         layout.addWidget(self.lfp_spectrum_gb3)
         layout.addWidget(self.lfp_spectrum_gb4)
+        layout.addWidget(self.lfp_spectrum_gb5)
 
         widget.setContents(layout)
 
