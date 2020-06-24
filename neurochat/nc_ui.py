@@ -2659,6 +2659,10 @@ class UiParameters(QtWidgets.QDialog):
             ["viridis", "default", "gray", "plasma",
              "inferno", "magma", "cividis"])
 
+        self.loc_contour_levels = add_spin_box(
+            min_val=4, max_val=12, obj_name="loc_contour_levels")
+        self.loc_contour_levels.setValue(5)
+
         box_layout = ParamBoxLayout()
         box_layout.addRow(
             "Pixel Size", self.loc_pixel_size, "cm [range: 1-100]")
@@ -2669,7 +2673,7 @@ class UiParameters(QtWidgets.QDialog):
             "Place Field Threshold",
             self.loc_field_thresh, "ratio [range: 0-1, step: 0.01]")
         box_layout.addRow(
-            "Whether to Smooth Firing Map Before Centroid Calculation",
+            "Compute Place Field on Smoothed Firing Map",
             self.loc_field_smooth, "True or False")
 
         self.loc_rate_gb1.setLayout(box_layout)
@@ -2704,6 +2708,9 @@ class UiParameters(QtWidgets.QDialog):
             "Firing Rate Map Style", self.loc_style, "")
         box_layout.addRow(
             "Firing Rate Map Colormap", self.loc_colormap, "")
+        box_layout.addRow(
+            "Firing Rate Map Contour Levels",
+            self.loc_contour_levels, "range [4-12]")
         self.loc_rate_gb3.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()

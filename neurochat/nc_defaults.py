@@ -105,6 +105,7 @@ PARAMETERS = {
         "loc_field_smooth": False,
         "loc_style": "contour",
         "loc_colormap": "viridis",
+        "loc_contour_levels": 5
     },
     "loc_shuffle": {
         "loc_shuffle_limit": 0,
