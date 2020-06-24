@@ -1862,16 +1862,70 @@ class NSpike(NBase):
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
 
-    def load_spike_spikeinterface(self, sorting, channel_scaling=None, group=None):
+    def load_spike_spikeinterface(
+            self, sorting, channel_scaling=None, group=None):
         """
-        TODO fix this doc.
-        Extract timestamps, tags, and waveforms from a sorting object.
+        Load spike information from any Sorting Extractor object.
 
-        channel_scaling is used for gains.
-        For example, channel scaling could be:
-        bytes_per_sample = 2
-        max_byte_value = np.power(2, bytes_per_sample * 8)
-        channel_scaling = np.ones([total_channels, ]) / max_byte_value
+        This extracts timestamps, tags, and waveforms from a sorting object.
+        Then stores them into NeuroChaT NCSpike attributes.
+
+        Parameters
+        ----------
+        sorting : spikeinterface.extractors.SortingExtractor
+            The sorting extractor object to load from.
+        channel_scaling : list | np.ndarray
+            This is used to apply gains.
+            There should be one entry for each channel if provided.
+            Applied as waveform_channel_i * channel_scaling[i].
+            Defaults to unit gain for each channel.
+        group : int | str
+            The group in the sorting extractor to consider.
+            This can be used to split the data into tetrodes or probes.
+
+        Returns
+        -------
+        None
+
+        Note
+        ----
+        NC assumes that unit 0 is not present in the sorting.
+        However, other sorters don't assume this.
+        As such, if your sorter contains 0 as a unit,
+        ALL unit numbers will be incremented by 1.
+
+        Example
+        -------
+        # This would convert from Phy to NeuroChaT native NWB
+        import spikeinterface.extractors as se
+        to_exclude = ["mua", "noise"]
+        sorting = se.PhySortingExtractor(
+            "phy_folder", exclude_cluster_groups=to_exclude,
+            load_waveforms=True, verbose=False)
+        spike = NSpike()
+        hdf_path = "test.h5"
+        nhdf = Nhdf(filename=hdf_path)
+
+        groups = []
+        unit_ids = sorting.get_unit_ids()
+        for unit in unit_ids:
+            try:
+                tetrode = sorting.get_unit_property(unit, "group")
+            except BaseException:
+                try:
+                    tetrode = sorting.get_unit_property(unit, "ch_group")
+                except BaseException:
+                    tetrode = None
+            if tetrode is not None:
+                if tetrode not in groups:
+                    groups.append(tetrode)
+
+        for g in groups:
+        spike.load_spike_spikeinterface(sorting, group=g)
+            spike.set_unit_no(spike.get_unit_list()[0])
+            print(spike)
+            nhdf.save_spike(spike=spike)
+
         """
         unit_ids = sorting.get_unit_ids()
         should_increment = (0 in unit_ids)

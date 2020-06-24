@@ -408,7 +408,6 @@ class NeuroChaT(QtCore.QThread):
                         row = []
                         for val in pd_row:
                             row.append(val)
-                        print(row)
                         if row[1] == "__EMPTY__":
                             logging.error("Directory is not set in excel file")
                             raise ValueError(
@@ -435,7 +434,11 @@ class NeuroChaT(QtCore.QThread):
                         if self.get_data_format() == 'Axona':
                             end = "" if row[2][-4:] == ".txt" else ".txt"
                             spatial_file = row[1] + os.sep + row[2] + end
-                            lfp_file = remove_extension(spike_file) + lfp_id
+                            if os.path.isfile(spike_file):
+                                lfp_file = remove_extension(
+                                    spike_file) + lfp_id
+                            else:
+                                lfp_file = row[1] + os.sep + row[5]
 
                         elif self.get_data_format() == 'Neuralynx':
                             spatial_file = row[1] + os.sep + row[2] + '.nvt'
@@ -492,7 +495,6 @@ class NeuroChaT(QtCore.QThread):
                         self.ndata.set_spatial_file(info['spat'][i])
                         self.ndata.spatial.load()
                         last_used_info['spat'] = info['spat'][i]
-                        # TODO make sure border not done twice on same data
                         do_border = True
                 else:
                     logging.warning(
@@ -2042,7 +2044,6 @@ class NeuroChaT(QtCore.QThread):
             row_info[1] = bname_spatial
             row_info[2] = bname_spike
             row_info[3] = self.get_unit_no()
-            # TODO fix the excel reading with this
             if os.path.isfile(spike_file):
                 row_info[4] = os.path.splitext(bname_lfp)[1]
             else:
@@ -2056,10 +2057,8 @@ class NeuroChaT(QtCore.QThread):
             row_info[4] = os.path.splitext(bname_lfp)[0]
 
         elif self.get_data_format() == 'NWB':
-            # TODO check file handling for NWB with missing files.
             fname = spike_file.split("+")[0]
             row_info[0] = os.path.dirname(fname)
-            # TODO make sure this works when loading
             row_info[1] = os.path.splitext(os.path.basename(fname))[0]
             if "+" in spike_file:
                 path = spike_file.split("+")[1]
