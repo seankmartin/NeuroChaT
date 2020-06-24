@@ -215,7 +215,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     max_axis = isi_data['isiBins'].max()
-    max_axisLog = np.ceil(np.log10(max_axis))
+    max_axisLog = int(np.ceil(np.log10(max_axis)))
 
     # ISI scatterplot
     ax, fig2 = _make_ax_if_none(axes[1])
