@@ -1301,7 +1301,8 @@ class NeuroChaT(QtCore.QThread):
                                  params['lfp_prefilt_highcut'], 'bandpass'],
                         fmax=params['lfp_stft_freq_max'],
                         db=True, tr=True)
-                    fig = nc_plot.lfp_spectrum_tr(graph_data)
+                    fig = nc_plot.lfp_spectrum_tr(
+                        graph_data, colormap=params['lfp_spectrum_colormap'])
                     self.close_fig(fig)
                     self.plot_data_to_hdf(
                         name=name + '/lfp_spectrum_TR/', graph_data=graph_data)

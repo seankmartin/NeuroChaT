@@ -192,6 +192,7 @@ PARAMETERS = {
         "lfp_stft_nfft": 1024,
         "lfp_stft_overlap": 1.0,
         "lfp_stft_seg_size": 2.0,
+        "lfp_spectrum_colormap": "viridis",
     },
     "spike_phase": {
         "phase_amp_thresh": 0.15,

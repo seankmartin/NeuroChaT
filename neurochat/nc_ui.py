@@ -1346,7 +1346,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             QtWidgets.QFileDialog.getOpenFileName(
                 self, 'Select NCFG file...', os.getcwd(), "(*.ncfg)")[0])
         if not ncfg_file:
-            logging.error("No saved session selected! Loading failed!")
+            logging.warning("No saved session selected.")
         else:
             self._should_clear_backend = True
             self.clear_backend_files()
@@ -3174,10 +3174,24 @@ class UiParameters(QtWidgets.QDialog):
 
         self.lfp_spectrum_gb3.setLayout(box_layout)
 
+        # Box 4
+        self.lfp_spectrum_colormap = add_combo_box(
+            obj_name="lfp_spectrum_colormap")
+        self.lfp_spectrum_colormap.addItems(
+            ["viridis", "default", "gray", "plasma",
+             "inferno", "magma", "cividis"])
+        self.lfp_spectrum_gb4 = add_group_box(
+            title="Plotting Style", obj_name="lfp_spectrum_gb4")
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Spectogram Colormap", self.lfp_spectrum_colormap, "")
+        self.lfp_spectrum_gb4.setLayout(box_layout)
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.lfp_spectrum_gb1)
         layout.addWidget(self.lfp_spectrum_gb2)
         layout.addWidget(self.lfp_spectrum_gb3)
+        layout.addWidget(self.lfp_spectrum_gb4)
 
         widget.setContents(layout)
 

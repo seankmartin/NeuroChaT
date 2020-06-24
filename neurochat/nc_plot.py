@@ -384,7 +384,7 @@ def lfp_spectrum(plot_data, ax=None, color=None, style="Solid"):
     return fig1
 
 
-def lfp_spectrum_tr(plot_data, ax=None):
+def lfp_spectrum_tr(plot_data, ax=None, **kwargs):
     """
     Plot time-resolved LFP spectrum analysis data.
 
@@ -392,6 +392,11 @@ def lfp_spectrum_tr(plot_data, ax=None):
     ----------
     plot_data : dict
         Graphical data from the ISI correlation
+    ax : matplotlib axis
+        An optional matplotlib axis object to plot to.
+    kwargs :
+        colormap : str
+            The colormap to use. Defaults to "viridis".
 
     Returns
     -------
@@ -400,8 +405,13 @@ def lfp_spectrum_tr(plot_data, ax=None):
 
     """
     ax, fig1 = _make_ax_if_none(ax)
+    colormap = kwargs.get("colormap", "viridis")
 
-    c_map = plt.cm.jet
+    if colormap == "default":
+        c_map = plt.cm.jet
+    else:
+        c_map = colormap
+
     pcm = ax.pcolormesh(
         plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map)
     _extent = [
@@ -1673,6 +1683,8 @@ def loc_auto_corr(locAuto_data, **kwargs):
         style : str
             What kind of map to plot - can be
             "contour", "digitized" or "interpolated"
+        levels : int
+            The number of levels in the contour plot
 
     Returns
     -------
