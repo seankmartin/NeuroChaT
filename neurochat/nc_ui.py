@@ -3078,7 +3078,7 @@ class UiParameters(QtWidgets.QDialog):
             title="Pre-filter (Butterworth) Properties", obj_name="lfp_spectrum_gb1")
 
         self.lfp_prefilt_lowcut = add_double_spin_box(
-            min_val=0.1, max_val=4, obj_name="lfp_prefilt_lowcut")
+            min_val=1.0, max_val=4, obj_name="lfp_prefilt_lowcut")
         self.lfp_prefilt_lowcut.setValue(1.5)
         self.lfp_prefilt_lowcut.setSingleStep(0.1)
 
@@ -3093,7 +3093,7 @@ class UiParameters(QtWidgets.QDialog):
 
         box_layout = ParamBoxLayout()
         box_layout.addRow("Lower Cutoff Frequency",
-                          self.lfp_prefilt_lowcut, "Hz [range: 0.1-4, step: 0.1]")
+                          self.lfp_prefilt_lowcut, "Hz [range: 1.0-4, step: 0.1]")
         box_layout.addRow("Higher Cutoff Frequency",
                           self.lfp_prefilt_highcut, "Hz [range: 10-500, step: 5]")
         box_layout.addRow(
