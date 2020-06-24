@@ -1102,7 +1102,10 @@ class NeuroChaT(QtCore.QThread):
                         chop_bound=params['loc_chop_bound'],
                         filter=[filttype, params['spatial_corr_kern_len']],
                         minPixel=params['spatial_corr_min_obs'], brAdjust=True)
-                    fig = nc_plot.loc_auto_corr(plot_data)
+                    fig = nc_plot.loc_auto_corr(
+                        plot_data, colormap=params['spatial_corr_colormap'],
+                        style=params['spatial_corr_style'],
+                        levels=params['spatial_corr_contour_levels'])
                     self.close_fig(fig)
                     self.plot_data_to_hdf(
                         name=name + '/spatial_corr/', graph_data=plot_data)

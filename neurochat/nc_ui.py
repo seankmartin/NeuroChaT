@@ -2814,6 +2814,7 @@ class UiParameters(QtWidgets.QDialog):
     def spatial_corr_page(self):
         """Set the ui elements for the 'spatial_corr' analysis parameters."""
         widget = ScrollableWidget()
+
         # Box- 1
         self.spatial_corr_gb1 = add_group_box(
             title="2D Correlation", obj_name="spatial_corr_gb1")
@@ -2864,10 +2865,37 @@ class UiParameters(QtWidgets.QDialog):
 
         self.spatial_corr_gb3.setLayout(box_layout)
 
+        # Box- 4
+        self.spatial_corr_style = add_combo_box(
+            obj_name="spatial_corr_style")
+        self.spatial_corr_style.addItems(
+            ["contour", "digitized"])
+        self.spatial_corr_colormap = add_combo_box(
+            obj_name="spatial_corr_colormap")
+        self.spatial_corr_colormap.addItems(
+            ["viridis", "default", "bwr", "seismic",
+             "gray", "plasma",
+             "inferno", "magma", "cividis"])
+        self.spatial_corr_contour_levels = add_spin_box(
+            min_val=4, max_val=12, obj_name="spatial_corr_contour_levels")
+        self.spatial_corr_contour_levels.setValue(5)
+        self.spatial_corr_gb4 = add_group_box(
+            title="Plotting Style", obj_name="spatial_corr_gb4")
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Correlation Map Style", self.spatial_corr_style, "")
+        box_layout.addRow(
+            "Correlation Map Colormap", self.spatial_corr_colormap, "")
+        box_layout.addRow(
+            "Correlation Map Contour Levels", self.spatial_corr_contour_levels,
+            "range [4-12]")
+        self.spatial_corr_gb4.setLayout(box_layout)
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.spatial_corr_gb1)
         layout.addWidget(self.spatial_corr_gb2)
         layout.addWidget(self.spatial_corr_gb3)
+        layout.addWidget(self.spatial_corr_gb4)
 
         widget.setContents(layout)
 

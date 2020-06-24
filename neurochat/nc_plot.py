@@ -965,14 +965,14 @@ def hd_shuffle(hd_shuffle_data):
     Parameters
     ----------
     hd_shuffle_data : dict
-        Graphical data from head-directional shuffling anlaysis
+        Graphical data from head-directional shuffling analysis
 
     Returns
     -------
     fig1 : matplotlib.pyplot.Figure
         Distribution of Rayleigh Z statistics
     fig2 : matplotlib.pyplot.Figure
-        Distribution of Von Mises concentration parameter Kapppa
+        Distribution of Von Mises concentration parameter Kappa
 
     """
     fig1 = plt.figure()
@@ -1130,7 +1130,8 @@ def hd_time_shift(hd_shift_data):
     ax.plot(hd_shift_data['shiftTime'], hd_shift_data['deltaFit'],
             color=BLUE, linewidth=1.5, zorder=1)
     ax.plot(hd_shift_data['shiftTime'], np.zeros(
-        hd_shift_data['shiftTime'].size), color='k', linestyle='--', linewidth=1.5, zorder=2)
+        hd_shift_data['shiftTime'].size), color='k',
+        linestyle='--', linewidth=1.5, zorder=2)
     ax.set_xlabel('Shift time (ms)')
     ax.set_ylabel('Delta (degree)')
     ax.set_title('Delta of hd firing in shifted time of spiking events')
@@ -1148,6 +1149,11 @@ def loc_spike(place_data, ax=None, **kwargs):
         Graphical data from the correlation of unit firing to location of the animal
     ax : matplotlib.pyplot.axis
         Axis object. If specified, the figure is plotted in this axis.
+    kwargs :
+        color : matplotlib colour
+            default red
+        point_size : float
+            default 2
 
     Returns
     -------
@@ -1411,7 +1417,7 @@ def loc_place_field(place_data, ax=None):
 
 def loc_place_centroid(place_data, centroid):
     """
-    Plot firing map with the centroid of the largest place field.
+    Plot firing map with the centroid of the highest firing place field.
 
     The path of the animal in the arena is also returned.
 
@@ -1647,14 +1653,26 @@ def loc_time_shift(loc_shift_data):
     return fig1, fig2, fig3
 
 
-def loc_auto_corr(locAuto_data):
+def loc_auto_corr(locAuto_data, **kwargs):
     """
     Plot the analysis outcome of locational firing rate autocorrelation.
+
+    By default, colormap="viridis", style="contour".
+    However, the old NC style was colormap="default", style="digitized".
+    The old style produces very nice maps, but not colorblind.
 
     Parameters
     ----------
     locAuto_data : dict
         Graphical data from spatial correlation of firing map
+    kwargs :
+        colormap : str
+            viridis is used if not specified
+            "default" uses the standard red green intensity colours
+            but these are bad for colorblindness.
+        style : str
+            What kind of map to plot - can be
+            "contour", "digitized" or "interpolated"
 
     Returns
     -------
@@ -1662,28 +1680,64 @@ def loc_auto_corr(locAuto_data):
         Spatial correlation map
 
     """
-    clist = [(1.0, 1.0, 1.0),
-             (0.0, 0.0, 0.5),
-             (0.0, 0.0, 1.0),
-             (0.0, 0.5, 1.0),
-             (0.0, 0.75, 1.0),
-             (0.5, 1.0, 0.0),
-             (0.9, 1.0, 0.0),
-             (1.0, 0.75, 0.0),
-             (1.0, 0.4, 0.0),
-             (1.0, 0.0, 0.0),
-             (0.5, 0.0, 0.0)]
+    colormap = kwargs.get("colormap", "viridis")
+    style = kwargs.get("style", "contour")
+    levels = kwargs.get("levels", 5)
+    if colormap == "default":
+        clist = [
+            (1.0, 1.0, 1.0),
+            (0.0, 0.0, 0.5),
+            (0.0, 0.0, 1.0),
+            (0.0, 0.5, 1.0),
+            (0.0, 0.75, 1.0),
+            (0.5, 1.0, 0.0),
+            (0.9, 1.0, 0.0),
+            (1.0, 0.75, 0.0),
+            (1.0, 0.4, 0.0),
+            (1.0, 0.0, 0.0),
+            (0.5, 0.0, 0.0)]
 
-    c_map = mcol.ListedColormap(clist)
+        c_map = mcol.ListedColormap(clist)
+    else:
+        c_map = colormap
 
     fig1 = plt.figure()
     ax = fig1.gca()
-    pc = ax.pcolormesh(
-        locAuto_data['xshift'], locAuto_data['yshift'],
-        np.ma.array(locAuto_data['corrMap'],
-                    mask=np.isnan(locAuto_data['corrMap'])),
-        cmap=c_map, rasterized=True)
-    ax.set_title('Spatial correlation of firing intensity map)')
+
+    if style == "digitized":
+        pc = ax.pcolormesh(
+            locAuto_data['xshift'], locAuto_data['yshift'],
+            np.ma.array(locAuto_data['corrMap'],
+                        mask=np.isnan(locAuto_data['corrMap'])),
+            cmap=c_map, rasterized=True)
+
+    elif style == "contour":
+        dx = np.mean(np.diff(locAuto_data['xshift']))
+        dy = np.mean(np.diff(locAuto_data['yshift']))
+        pad_map = np.pad(
+            locAuto_data['corrMap'][:-1, :-1],
+            ((1, 1), (1, 1)), "edge")
+        vmin, vmax = np.nanmin(pad_map), np.nanmax(pad_map)
+        if vmin != vmax:
+            splits = np.linspace(vmin, vmax, levels + 1)
+        else:
+            splits = np.array([vmin, vmin * 2])
+        splits = np.around(splits, decimals=1)
+        x_edges = np.append(
+            locAuto_data['xshift'] - dx / 2,
+            locAuto_data['xshift'][-1] + dx / 2)
+        y_edges = np.append(
+            locAuto_data['yshift'] - dy / 2,
+            locAuto_data['yshift'][-1] + dy / 2)
+        pc = ax.contourf(
+            x_edges, y_edges,
+            np.ma.array(pad_map, mask=np.isnan(pad_map)),
+            levels=splits, cmap=c_map, corner_mask=True)
+    else:
+        logging.warning(
+            "Unrecognised style passed to loc_auto_corr, using digitized")
+
+    ax.set_title('Spatial correlation of firing intensity map')
     ax.set_xlabel('X-lag')
     ax.set_ylabel('Y-lag')
     ax.set_aspect('equal')
@@ -1810,15 +1864,19 @@ def border(border_data):
     """
     fig1 = plt.figure()
     ax = fig1.add_subplot(211)
-    ax.bar(border_data['distBins'], border_data['distCount'], color='slateblue', alpha=0.6,
-           width=0.5 * np.diff(border_data['distBins']).mean())
+    ax.bar(
+        border_data['distBins'], border_data['distCount'],
+        color='slateblue', alpha=0.6,
+        width=0.5 * np.diff(border_data['distBins']).mean())
     ax.set_title('Histogram of taxicab distance of active pixels')
     ax.set_xlabel('Taxicab distance(cm)')
     ax.set_ylabel('Active pixel count')
 
     ax = fig1.add_subplot(212)
-    ax.bar(border_data['circBins'], border_data['angDistCount'], color='slateblue', alpha=0.6,
-           width=0.5 * np.diff(border_data['circBins']).mean())
+    ax.bar(
+        border_data['circBins'], border_data['angDistCount'],
+        color='slateblue', alpha=0.6,
+        width=0.5 * np.diff(border_data['circBins']).mean())
     ax.set_title('Angular distance vs Active pixel count')
     ax.set_xlabel('Angular distance')
     ax.set_ylabel('Active pixel count')

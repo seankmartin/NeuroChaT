@@ -138,6 +138,9 @@ PARAMETERS = {
         "spatial_corr_filter": "Box",
         "spatial_corr_kern_len": 5,
         "spatial_corr_min_obs": 20,
+        "spatial_corr_style": "contour",
+        "spatial_corr_colormap": "viridis",
+        "spatial_corr_contour_levels": 5,
     },
     "grid": {
         "grid_ang_bin": 3,
