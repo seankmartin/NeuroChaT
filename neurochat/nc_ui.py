@@ -849,9 +849,18 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 from neurochat.nc_spike import NSpike
                 spike_file = self._control.get_spike_file()
                 system = self._control.format
-                spike_obj = NSpike(filename=spike_file, system=system)
-                spike_obj.load()
-                items = spike_obj.get_unit_list()
+                if os.path.isfile(spike_file):
+                    spike_obj = NSpike(filename=spike_file, system=system)
+                    spike_obj.load()
+                    items = spike_obj.get_unit_list()
+                else:
+                    logging.warning(
+                        "No spike information found in {} file".format(
+                            file_format))
+                    items = [str(i) for i in range(256)]
+                    if self._control.get_unit_no() != 0:
+                        self.unit_no_box.clear()
+                        self.unit_no_box.addItems(items)
             if len(items) == 0:
                 logging.error("No units in this file.")
                 items = [i for i in range(256)]
