@@ -1868,7 +1868,7 @@ class NSpike(NBase):
         Load spike information from any Sorting Extractor object.
 
         This extracts timestamps, tags, and waveforms from a sorting object.
-        Then stores them into NeuroChaT NCSpike attributes.
+        Then stores them into NeuroChaT NSpike attributes.
 
         Parameters
         ----------

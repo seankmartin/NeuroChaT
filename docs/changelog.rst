@@ -24,6 +24,8 @@ Changes
 - Added further options to the UI the control the lfp spectral analysis and place field analysis.
 - Added support for colorblind friendly perceptually uniform colormaps from the NeuroChaT UI. These have been changed to the default output type.
 - Can control number of levels in contour plots from the UI. For example, on place cell analysis.
+- Added a legend to polar plots of head direction firing.
+- Excel results file in UI is automatically named based on the input files.
 
 Bugs
 ----
@@ -32,6 +34,7 @@ Bugs
 - Fix bug with loading time information from Neuralynx incorrectly on certain formats.
 - Reading an excel file for a list of files can now support blank cells in the spreadsheet.
 - Fixed rare bug with ISI being a float after ceil operation instead of int.
+- Fixed bug with outputting the wrong statistics for the head direction firing rate analysis split into Clockwise and CounterClockwise firing.
 
 Version 1.1.1a0
 ===============
