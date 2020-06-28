@@ -1,5 +1,5 @@
 """
-The NeuroChaT package, version 1.1.1a0.
+The neurochat package, version 1.1.1a0.
 
 NeuroChaT is described in our paper on Wellcome Trust Open Research
 https://wellcomeopenresearch.org/articles/4-196.
