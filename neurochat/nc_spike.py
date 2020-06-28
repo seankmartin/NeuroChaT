@@ -1896,35 +1896,38 @@ class NSpike(NBase):
 
         Example
         -------
-        # This would convert from Phy to NeuroChaT native NWB
-        import spikeinterface.extractors as se
-        to_exclude = ["mua", "noise"]
-        sorting = se.PhySortingExtractor(
-            "phy_folder", exclude_cluster_groups=to_exclude,
-            load_waveforms=True, verbose=False)
-        spike = NSpike()
-        hdf_path = "test.h5"
-        nhdf = Nhdf(filename=hdf_path)
+        .. highlight:: python
+        .. code-block:: python
 
-        groups = []
-        unit_ids = sorting.get_unit_ids()
-        for unit in unit_ids:
-            try:
-                tetrode = sorting.get_unit_property(unit, "group")
-            except BaseException:
+            # This would convert from Phy to NeuroChaT native NWB
+            import spikeinterface.extractors as se
+            to_exclude = ["mua", "noise"]
+            sorting = se.PhySortingExtractor(
+                "phy_folder", exclude_cluster_groups=to_exclude,
+                load_waveforms=True, verbose=False)
+            spike = NSpike()
+            hdf_path = "test.h5"
+            nhdf = Nhdf(filename=hdf_path)
+
+            groups = []
+            unit_ids = sorting.get_unit_ids()
+            for unit in unit_ids:
                 try:
-                    tetrode = sorting.get_unit_property(unit, "ch_group")
+                    tetrode = sorting.get_unit_property(unit, "group")
                 except BaseException:
-                    tetrode = None
-            if tetrode is not None:
-                if tetrode not in groups:
-                    groups.append(tetrode)
+                    try:
+                        tetrode = sorting.get_unit_property(unit, "ch_group")
+                    except BaseException:
+                        tetrode = None
+                if tetrode is not None:
+                    if tetrode not in groups:
+                        groups.append(tetrode)
 
-        for g in groups:
-        spike.load_spike_spikeinterface(sorting, group=g)
-            spike.set_unit_no(spike.get_unit_list()[0])
-            print(spike)
-            nhdf.save_spike(spike=spike)
+            for g in groups:
+            spike.load_spike_spikeinterface(sorting, group=g)
+                spike.set_unit_no(spike.get_unit_list()[0])
+                print(spike)
+                nhdf.save_spike(spike=spike)
 
         """
         unit_ids = sorting.get_unit_ids()
