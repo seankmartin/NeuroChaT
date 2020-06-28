@@ -614,16 +614,23 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         """
 
         try:
-            now = datetime.now()
-            whole_time = now.strftime("%Y-%m-%d--%H-%M-%S")
-            default_filename = (
-                os.path.splitext(self._control.hdf._filename)[0] +
-                "--" + whole_time + ".xlsx")
+            if self.mode_box.currentIndex() == 0:
+                default_filename = (
+                    os.path.splitext(self._control._pdf_file)[0] + ".xlsx")
+            elif self.mode_box.currentIndex() == 1:
+                default_filename = (
+                    os.path.splitext(self._control.hdf._filename)[0] + ".xlsx")
+            else:
+                default_filename = (
+                    os.path.splitext(self._control.get_excel_file()[0] +
+                                     "_results.xlsx"))
 
         except BaseException as ex:
+            now = datetime.now()
+            whole_time = now.strftime("%Y-%m-%d--%H-%M-%S")
             log_exception(
                 ex, "Automatically generating results name")
-            default_filename = 'nc_results.xlsx'
+            default_filename = 'nc_results--' + whole_time + '.xlsx'
 
         excel_file = QtCore.QDir.toNativeSeparators(
             QtWidgets.QFileDialog.getSaveFileName(
@@ -894,7 +901,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         if mode_id == 0 or mode_id == 1:
             if file_format == "Axona" or file_format == "Neuralynx":
                 if file_format == "Axona":
-                    spike_filter = "All (*.*);; " + "".join(
+                    spike_filter = "".join(
                         ["*." + str(x) + ";;" for x in list(range(1, 129))])
                 elif file_format == "Neuralynx":
                     spike_filter = "*.ntt;; *.nst;; *.nse"
