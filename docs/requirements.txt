@@ -1,3 +1,5 @@
 sphinx
 sphinxcontrib-apidoc
 sphinx_rtd_theme
+nbsphinx # Also needs pandoc installed https://pandoc.org/installing.html
+IPython

@@ -28,7 +28,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    'sphinxcontrib.apidoc'
+    'sphinxcontrib.apidoc',
+    'nbsphinx',
+    'IPython.sphinxext.ipython_console_highlighting'
 ]
 
 # -- Apidoc configuration ----------------------------------------------------
@@ -57,7 +59,8 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db',
-                    '.DS_Store', "reference/modules.rst"]
+                    '.DS_Store', "reference/modules.rst",
+                    '**.ipynb_checkpoints']
 
 # -- Options for HTML output -------------------------------------------------
 

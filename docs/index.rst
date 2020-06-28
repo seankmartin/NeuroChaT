@@ -35,14 +35,17 @@ Feel free to email us, or pop a message into our `Gitter channel <https://gitter
 Getting started
 ===============
 Sample hdf5 datasets and results are stored on OSF, at https://osf.io/kqz8b/files/.
+Include the other things from Github README.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   examples
    reference/neurochat
    roadmap
    changelog
+   api_use_guide
 
 
 
