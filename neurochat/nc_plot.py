@@ -869,11 +869,24 @@ def hd_rate_pred(hd_data, ax=None, **kwargs):
     bins = np.append(hd_data['bins'], hd_data['bins'][0])
     predRate = np.append(
         hd_data['hdPred'], hd_data['hdPred'][0])
-    ax.plot(np.radians(bins), predRate, color='green')
+    ax.plot(
+        np.radians(bins), predRate, color='green',
+        label="Predicted rate")
     rate = np.append(hd_data['smoothRate'], hd_data['smoothRate'][0])
-    ax.plot(np.radians(bins), rate, color=BLUE)
+    ax.plot(
+        np.radians(bins), rate, color=BLUE,
+        label="Actual rate")
+    ax.set_rmax(max([hd_data['smoothRate'].max(), hd_data['hdPred'].max()]))
     ax.set_rticks(
-        [hd_data['hdRate'].max(), hd_data['hdPred'].max()])
+        [hd_data['smoothRate'].max(), hd_data['hdPred'].max()])
+
+    legend = kwargs.get('legend', True)
+    if legend:
+        ax.legend(
+            loc="upper right",
+            bbox_to_anchor=(1.1, 1.05),
+            fontsize="small",
+        )
 
     return ax
 
@@ -928,10 +941,14 @@ def hd_firing(hd_data):
 
     """
     fig1 = plt.figure()
-    hd_spike(hd_data, ax=plt.gca(polar=True))
+    ax = fig1.add_axes(
+        [0.1, 0.1, 0.8, 0.8], projection='polar')
+    hd_spike(hd_data, ax=ax)
 
     fig2 = plt.figure()
-    ax2 = hd_rate_pred(hd_data, ax=plt.gca(polar=True))
+    ax = fig2.add_axes(
+        [0.1, 0.1, 0.8, 0.8], projection='polar')
+    hd_rate_pred(hd_data, ax=ax)
     return fig1, fig2
 
 
@@ -958,12 +975,30 @@ def hd_rate_ccw(hd_data):
     bins = np.append(hd_data['bins'], hd_data['bins'][0])
     predRate = np.append(
         hd_data['hdRateCW'], hd_data['hdRateCW'][0])
-    ax.plot(np.radians(bins), predRate, color=BLUE)
+    ax.plot(
+        np.radians(bins), predRate, color=BLUE,
+        label="Clockwise rate")
     predRate = np.append(
         hd_data['hdRateCCW'], hd_data['hdRateCCW'][0])
-    ax.plot(np.radians(bins), predRate, color=RED)
+    ax.plot(
+        np.radians(bins), predRate, color=RED,
+        label="Counterclockwise rate")
     ax.set_title('Counter/clockwise firing rate')
-    ax.set_rticks([hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()])
+    if abs(hd_data['hdRateCW'].max() - hd_data['hdRateCCW'].max()) < 1.5:
+        to_use = max(
+            (hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()))
+        ax.set_rmax(to_use)
+        ax.set_rticks([to_use, ])
+    else:
+        ax.set_rmax(
+            max([hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()]))
+        ax.set_rticks(
+            [hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()])
+    ax.legend(
+        loc="upper right",
+        bbox_to_anchor=(1.25, 1.05),
+        fontsize="small",
+    )
 
     return fig1
 
