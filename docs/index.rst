@@ -5,7 +5,8 @@ NeuroChaT - Neuron Characterisation Toolbox
    :maxdepth: 2
    :caption: Contents:
 
-   reference/modules
+   reference/neurochat
+   changelog
 
 
 
