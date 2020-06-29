@@ -1648,6 +1648,128 @@ class NeuroChaT(QtCore.QThread):
             os.path.join(os.sep.join(words[:-1]), name), index=False)
         logging.info('Conversion process completed!')
 
+    @staticmethod
+    def sortingextractor_to_nwb(sorting, plot_waveforms=False):
+        """
+        Convert a SpikeInterface sortingextractor to NWB format.
+
+        This allows for Neurochat to later analyse it.
+        See examples/spike_inteface_convert.py for an example.
+
+        Parameters
+        ----------
+        sorting : spikeinterface.extractors.SortingExtractor
+            The sortingextractor to convert.
+        plot_waveforms : bool, optional.
+            Defaults to False. Whether to plot unit waveforms.
+
+        Returns
+        -------
+        None
+
+        """
+        def plot_all_waveforms(sorting, out_folder):
+            """Local function to plot all spike interface sorting waveforms."""
+            unit_ids = sorting.get_unit_ids()
+
+            waveform_eg = sorting.get_unit_spike_features(
+                unit_ids[0], "waveforms")
+            total_channels = waveform_eg.shape[1]
+
+            wf_by_group = [
+                sorting.get_unit_spike_features(u, "waveforms") for u in unit_ids]
+            tetrode = 0
+            for i, wf in enumerate(wf_by_group):
+                try:
+                    tetrode = sorting.get_unit_property(unit_ids[i], "group")
+                except Exception:
+                    try:
+                        tetrode = sorting.get_unit_property(
+                            unit_ids[i], "ch_group")
+                    except Exception:
+                        logging.warning(
+                            "Unable to find property cluster group or group in units")
+                        tetrode += 1
+                        print("Will use tetrode {}".format(tetrode))
+
+                fig, axes = plt.subplots(total_channels)
+                for j in range(total_channels):
+                    try:
+                        wave = wf[:, j, :]
+                    except Exception:
+                        wave = wf[j, :]
+
+                    axes[j].plot(wave.T, color="k", lw=0.3)
+
+                if 0 in unit_ids:
+                    to_use_id = unit_ids[i] + 1
+                else:
+                    to_use_id = unit_ids[i]
+
+                o_loc = os.path.join(
+                    out_folder, "tet{}_unit{}_waveforms.png".format(
+                        tetrode, to_use_id))
+                fig.savefig(o_loc, dpi=200)
+                plt.close("all")
+
+        sorting_path = sorting.params.get("dat_path", "")
+        if os.path.isdir(os.path.dirname(sorting_path)):
+            out_folder = os.path.dirname(sorting_path)
+            out_name = os.path.basename(sorting_path) + "_NC_NWB.h5"
+        else:
+            out_folder = os.getcwd()
+            out_name = "NC_NWB.h5"
+            count = 1
+            while os.path.isfile(os.path.join(out_folder, out_name)):
+                out_name = "NC_NWB_{}.h5".format(count)
+                count += 1
+            logging.warning(
+                "Sorting Extractor has no data path, saving waveforms to cwd")
+
+        unit_ids = sorting.get_unit_ids()
+        if 0 in unit_ids:
+            logging.warning(
+                "Unit numbers loaded from spike interface contain 0" +
+                ", as such, all unit numbers will be incremented by 1.")
+
+        if plot_waveforms:
+            plot_out_folder = os.path.join(out_folder, "nc_waveforms")
+            os.makedirs(plot_out_folder, exist_ok=True)
+            logging.info("Plotting waveforms to {}".format(plot_out_folder))
+            plot_all_waveforms(sorting, plot_out_folder)
+
+        groups = []
+        for unit in unit_ids:
+            try:
+                tetrode = sorting.get_unit_property(unit, "group")
+            except BaseException:
+                try:
+                    tetrode = sorting.get_unit_property(unit, "ch_group")
+                except BaseException:
+                    tetrode = None
+            if tetrode is not None:
+                if tetrode not in groups:
+                    groups.append(tetrode)
+        logging.info("All groups found in sorting: {}".format(groups))
+
+        spike = NSpike()
+        hdf_path = os.path.join(out_folder, out_name)
+        nhdf = Nhdf(filename=hdf_path)
+        logging.info(
+            "Converting spike extractor to {}".format(hdf_path))
+
+        # This occurs if no probe/tetrode information is found
+        if len(groups) == 0:
+            spike.load_spike_spikeinterface(sorting)
+            spike.set_unit_no(spike.get_unit_list()[0])
+            nhdf.save_spike(spike=spike)
+
+        else:
+            for g in groups:
+                spike.load_spike_spikeinterface(sorting, group=g)
+                spike.set_unit_no(spike.get_unit_list()[0])
+                nhdf.save_spike(spike=spike)
+
     def verify_units(self, excel_file=None):
         """
         Take a list of datasets and verify the specifications of the units.

@@ -2016,7 +2016,6 @@ class NSpike(NBase):
         self.set_filename(sorting.params["dat_path"])
         self.set_system("SpikeInterface")
         self._set_source_format(type(sorting).__name__)
-        # Temp measure, will do by group
         self._set_channel_ids([i for i in range(total_channels)])
         self._spikeinterface_group = group
 
