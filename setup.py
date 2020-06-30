@@ -6,15 +6,16 @@ def read(fname):
 
 
 DESCRIPTION = "NeuroChaT: Neuron Characterisation Toolbox"
-LONG_DESCRIPTION = """NeuroChaT is a neuroscience toolbox written in Python.
-"""
+
+LONG_DESCRIPTION = read("README.md")
+LONG_DESCRIPTION_CONTENT_TYPE = "text/markdown"
 
 DISTNAME = 'neurochat'
 MAINTAINER = 'Md Nurul Islam and Sean Martin'
 MAINTAINER_EMAIL = 'martins7@tcd.ie'
 URL = 'https://github.com/seankmartin/NeuroChaT'
-DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT'
-VERSION = '1.0'
+DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT/archive/v1.1.1a0.tar.gz'
+VERSION = '1.1.1a0'
 
 INSTALL_REQUIRES = [
     'PyPDF2 >= 1.26.0',
@@ -37,20 +38,18 @@ PACKAGES = [
 
 CLASSIFIERS = [
     'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering :: Mathematics',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
-    'Topic :: Scientific/Engineering :: Mathematics',
+    'Programming Language :: Python :: 3.8',
     'Operating System :: POSIX',
     'Operating System :: Unix',
-    'Operating System :: MacOS',
-    'Operating System :: Windows'
+    'Operating System :: Microsoft :: Windows',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+
 ]
 
-try:
-    from setuptools import setup
-    _has_setuptools = True
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
 if __name__ == "__main__":
 
@@ -61,7 +60,7 @@ if __name__ == "__main__":
           maintainer_email=MAINTAINER_EMAIL,
           description=DESCRIPTION,
           long_description=LONG_DESCRIPTION,
-          license=read('LICENSE'),
+          long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
           url=URL,
           version=VERSION,
           download_url=DOWNLOAD_URL,

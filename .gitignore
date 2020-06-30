@@ -24,3 +24,7 @@ dist/
 ignore/*
 
 neurochat.egg-info/
+
+# Sphinx documentation
+docs/_build/
+docs/reference/

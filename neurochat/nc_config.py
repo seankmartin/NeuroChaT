@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This module implements Configuration Class for NeuroChaT software
+This module implements Configuration Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 
 import os.path
@@ -31,50 +32,62 @@ yaml.add_constructor(_MAPPING_TAG, __dict_constructor)
 
 class Configuration(object):
     """
-    The Configuration object is the placeholder for all the settings of NeuroChaT
-    consisting of specification of data and analysis along with the parameters for
-    each analysis type.
+    The Configuration object is the placeholder for all NeuroChaT settings.
 
-    It also facilitates saving these setting to a .ncfg file and retrive them from the file.
+    The object consists of specification of data and analysis along with
+    the parameters for each analysis type.
+
+    It also facilitates saving these setting to a .ncfg file
+    and retriving them from the .ncfg file.
     The .ncfg file is a YAML-formatted file.
+
+    Attributes
+    ----------
+    filename: str
+        Full file name of the configuration storage (.ncfg)
+    format: str
+        Recording system or format of the data file
+    analysis_mode: str
+        Mode of analysis in NeuroChaT.
+        Options are 'Single Unit', 'Single Session' and 'Listed Units'
+    mode_id: int
+        Numeric ID of modes in NeuroChaT
+        Respectively 0, 1, and 2 for the three modes
+    graphic_format: str
+        File format for output graphics. Options are 'PDF' or 'Postscript'
+    unit_no: int
+        Unit number to be analyzed. Used in 'Single Unit' mode
+    spatial_file: str
+        Full file of the spatial dataset
+    spike_file: str
+        Full file of the spike dataset
+    lfp_file: str
+        Full file of the lfp dataset
+    nwb_file: str
+        Full file of the NWB format dataset
+    excel_dir: str
+        Full file of the Excel list of unit.
+        Used only in 'Listed Units' mode
+    analyses: dict
+        Dictionary of analysis methods as key and
+        their selection as boolean values
+    parameters: dict
+        (key: value) pairs of parameter names and their values
+    special_analysis: dict
+        A dict indicating a menu analysis method.
 
     """
 
     def __init__(self, filename=[]):
         """
-        Attributes
+        See also Configuration.
+
+        Parameters
         ----------
         filename : str
             Full file name of the configuration storage (.ncfg)
-        format : str
-            Recording system or format of the data file
-        analysis_mode : str
-            Mode of analysis in NeuroChaT. Options are 'Single Unit', 'Single Session'
-            and 'Listed Units'
-        mode_id : int
-            Numeric ID of modes in NeuroChaT, respectively 0, 1, and 2 for the three modes
-        graphic_format : str
-            File format for output graphics. Options are 'PDF' or 'Postscript'
-        unit_no : int
-            Unit number to be analyzed. Used in 'Single Unit' mode
-        spatial_fiel : str
-            Full file of the spatial dataset
-        spike_file : str
-            Full file of the spike dataset
-        lfp_file : str
-            Full file of the lfp dataset
-        nwb_file : str
-            Full file of the NWB format dataset
-        excel_dir : str
-            Full file of the Excel list of unit. Used only in 'Listed Units' mode
-        anayses : dict
-            Dictionary of analysis methods as key and their selection as boolean values
-        parameters : dict
-            It contains (key : value) pairs of parameter names and their values 
-        special_analysis : dict
-            A dict indicating a menu analysis method.
-        """
 
+        """
         self.filename = filename
         self.format = 'Axona'
         self.analysis_mode = 'Single Unit'
@@ -106,20 +119,46 @@ class Configuration(object):
                                 ('Listed Units', 2)])
 
     def set_special_analysis(self, in_dict={}):
+        """
+        Set special analysis to the input dictionary.
+
+        Parameters
+        ----------
+        in_dict: dict
+            Dictionary to set special analysis to.
+
+        Returns
+        -------
+        None
+
+        """
         self.special_analysis = in_dict
 
     def get_special_analysis(self):
+        """
+        Get the special analysis dictionary.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        dict
+            Dictionary of special analyses.
+
+        """
         return self.special_analysis
 
     def set_param(self, name=None, value=None):
         """
-        Sets the value of a parameter
+        Set the value of a parameter.
 
         Parameters
         ----------
         name : str
             Name of the parameter
-        value
+        value : any
             Value of the parameter
 
         Returns
@@ -127,7 +166,6 @@ class Configuration(object):
         None
 
         """
-
         if isinstance(name, str):
             self.parameters[name] = value
         else:
@@ -135,21 +173,22 @@ class Configuration(object):
 
     def get_params(self, name=None):
         """
-        Gets the value of parameter. If a list of parameter names are provided,
-        a list of values are returned.
+        Get the value of parameter.
+
+        If a list of parameter names are provided,
+        then a list of values are returned.
 
         Parameters
         ----------
         name : str or list of str
-            Name of the parameter(s)       
+            Name of the parameter(s)
 
         Returns
         -------
         params
-            Paramater value(s)
+            Parameter value(s)
 
         """
-
         if isinstance(name, list):
             params = {}
             not_found = []
@@ -170,7 +209,7 @@ class Configuration(object):
 
     def get_params_by_analysis(self, analysis=None):
         """
-        Returns the paramters and their values
+        Return the parameters and their values for a given analysis.
 
         Parameters
         ----------
@@ -196,7 +235,7 @@ class Configuration(object):
 
     def set_analysis(self, name=None, value=None):
         """
-        Sets the selection of an analysis
+        Set the selection of an analysis.
 
         Parameters
         ----------
@@ -210,7 +249,6 @@ class Configuration(object):
         None
 
         """
-
         if name == 'all' and isinstance(value, bool):
             for name in self.analyses.keys():
                 self.analyses[name] = value
@@ -225,15 +263,15 @@ class Configuration(object):
 
     def get_analysis(self, name=None):
         """
-        Returns the selection of an analysis. If name is 'all', selction values
-        for all the analyses are returned
+        Return the selection of an analysis.
+
+        If name is 'all', selection values for all the analyses are returned.
 
         Parameters
         ----------
         name : str
-            Name of the analysis. 'all' for returning values for all the analyses
-        value : bool
-            Boolean value to indicate analysis selection
+            Name of the analysis.
+            Enter 'all' for returning values for all the analyses
 
         Returns
         -------
@@ -241,7 +279,6 @@ class Configuration(object):
             True if selected, False if not.
 
         """
-
         if name == 'all':
             return self.analyses.values()
         elif name in self.analyses.keys():
@@ -251,7 +288,7 @@ class Configuration(object):
 
     def get_param_list(self):
         """
-        Returns the list of all paramaeters
+        Return the list of all parameters.
 
         Parameters
         ----------
@@ -263,12 +300,11 @@ class Configuration(object):
             List of parameter names
 
         """
-
         return list(self.parameters.keys())
 
     def get_analysis_list(self):
         """
-        Returns a list of analysis
+        Return a list of analyses.
 
         Parameters
         ----------
@@ -277,14 +313,14 @@ class Configuration(object):
         Returns
         -------
         list
+            List of analysis names.
 
         """
-
         return list(self.analyses.keys())
 
     def set_data_format(self, file_format=None):
         """
-        Sets the format of the data or recording system
+        Set the format of the data or recording system.
 
         Parameters
         ----------
@@ -296,13 +332,12 @@ class Configuration(object):
         None
 
         """
-
         if file_format:
             self.format = file_format
 
     def get_data_format(self):
         """
-        Returns the data format or recording system
+        Return the data format or recording system.
 
         Parameters
         ----------
@@ -318,7 +353,7 @@ class Configuration(object):
 
     def set_analysis_mode(self, analysis_mode=None):
         """
-        Sets the mode of analysis
+        Set the mode of analysis.
 
         Parameters
         ----------
@@ -330,7 +365,6 @@ class Configuration(object):
         None
 
         """
-
         if analysis_mode in self.mode_dict.keys():
             self.analysis_mode = analysis_mode
             self.mode_id = self.mode_dict[analysis_mode]
@@ -344,26 +378,23 @@ class Configuration(object):
 
     def get_analysis_mode(self):
         """
-        Returns the mode of analysis and mode ID
+        Return the mode of analysis and mode ID.
 
         Parameters
         ----------
-        None        
+        None
 
         Returns
         -------
-        str
-            Analysis mode set
-        int
-            ID of analysis mode
+        (str, int)
+            Analysis mode set, ID of analysis mode
 
         """
-
         return self.analysis_mode, self.mode_id
 
     def get_all_modes(self):
         """
-        Returns the analysis modes in NeuroChaT
+        Return the analysis modes in NeuroChaT.
 
         Parameters
         ----------
@@ -375,24 +406,23 @@ class Configuration(object):
             Modes and their IDs
 
         """
-
         return self.mode_dict
 
     def set_graphic_format(self, graphic_format=None):
         """
-        Sets output graphics file format
+        Set output graphics file format.
 
         Parameters
         ----------
         graphic_format : str
-            Format of output graphic export. Options are 'PDF' or 'Postscript'
+            Format of output graphic export.
+            Options are 'PDF' or 'Postscript'.
 
         Returns
         -------
         None
 
         """
-
         if graphic_format in self.valid_graphics.keys():
             self.graphic_format = self.valid_graphics[graphic_format]
         elif graphic_format in self.valid_graphics.values():
@@ -402,7 +432,7 @@ class Configuration(object):
 
     def get_graphic_format(self):
         """
-        Returns output graphics file format
+        Return output graphics file format.
 
         Parameters
         ----------
@@ -418,25 +448,24 @@ class Configuration(object):
 
     def set_unit_no(self, unit_no=None):
         """
-        Sets the unit no to analyse in 'Single Unit' analysis
+        Set the unit no to analyse in 'Single Unit' analysis.
 
         Parameters
         ----------
         unit_no : int
-            Unit number the user is intended to analyse
+            Unit number the user is intending to analyse
 
         Returns
         -------
         None
 
         """
-
         if isinstance(unit_no, int):
             self.unit_no = unit_no
 
     def get_unit_no(self):
         """
-        Returns the unit number that is already set
+        Return the unit number that is already set.
 
         Parameters
         ----------
@@ -445,14 +474,14 @@ class Configuration(object):
         Returns
         -------
         str
-            Unit nmber
+            Unit number
 
         """
         return self.unit_no
 
     def set_cell_type(self, cell_type=None):
         """
-        Sets the type of cell to analyse
+        Set the type of cell to analyse.
 
         Parameters
         ----------
@@ -464,16 +493,15 @@ class Configuration(object):
         None
 
         """
-
         self.cell_type = cell_type
 
     def get_cell_type(self):
         """
-        Returns the type of cell set to analyse
+        Return the type of cell set to analyse.
 
         Parameters
         ----------
-        None        
+        None
 
         Returns
         -------
@@ -481,12 +509,11 @@ class Configuration(object):
             Cell type set for analyses
 
         """
-
         return self.cell_type
 
     def set_spike_file(self, spike_file=None):
         """
-        Sets filename of the spike data
+        Set filename of the spike data.
 
         Parameters
         ----------
@@ -498,13 +525,12 @@ class Configuration(object):
         None
 
         """
-
         if isinstance(spike_file, str):
             self.spike_file = spike_file
 
     def get_spike_file(self):
         """
-        Returns the filename of the spike data
+        Return the filename of the spike data.
 
         Parameters
         ----------
@@ -516,12 +542,11 @@ class Configuration(object):
             Filename of spike data
 
         """
-
         return self.spike_file
 
     def set_spatial_file(self, spatial_file=None):
         """
-        Sets filename of the spatial data
+        Set filename of the spatial data.
 
         Parameters
         ----------
@@ -538,7 +563,7 @@ class Configuration(object):
 
     def get_spatial_file(self):
         """
-        Returns the filename of the spatial data
+        Return the filename of the spatial data.
 
         Parameters
         ----------
@@ -550,12 +575,11 @@ class Configuration(object):
             Filename of the spatial data
 
         """
-
         return self.spatial_file
 
     def set_lfp_file(self, lfp_file=None):
         """
-        Sets filename of the lfp data
+        Set filename of the lfp data.
 
         Parameters
         ----------
@@ -567,13 +591,12 @@ class Configuration(object):
         None
 
         """
-
         if isinstance(lfp_file, str):
             self.lfp_file = lfp_file
 
     def get_lfp_file(self):
         """
-        Returns the filename of the lfp data
+        Return the filename of the lfp data.
 
         Parameters
         ----------
@@ -585,12 +608,11 @@ class Configuration(object):
             Filename of the lfp data
 
         """
-
         return self.lfp_file
 
     def set_nwb_file(self, nwb_file=None):
         """
-        Sets filename of the HDF5 data
+        Set filename of the HDF5 data.
 
         Parameters
         ----------
@@ -602,13 +624,12 @@ class Configuration(object):
         None
 
         """
-
         if isinstance(nwb_file, str):
             self.nwb_file = nwb_file
 
     def get_nwb_file(self):
         """
-        Returns the filename of the HDF5 data
+        Return the filename of the HDF5 data.
 
         Parameters
         ----------
@@ -620,12 +641,11 @@ class Configuration(object):
             Filename of the HDF5 data
 
         """
-
         return self.nwb_file
 
     def get_excel_file(self):
         """
-        Returns the filename of the Excel list
+        Return the filename of the Excel list.
 
         Parameters
         ----------
@@ -637,24 +657,22 @@ class Configuration(object):
             Filename of the Excel list
 
         """
-
         return self.excel_file
 
     def set_excel_file(self, excel_file=None):
         """
-        Sets filename of the Excel list
+        Set filename of the Excel list.
 
         Parameters
         ----------
         excel_file : str
-            Filename of the Excel list        
+            Filename of the Excel list
 
         Returns
         -------
         None
 
         """
-        # Check if this is a valid filename
         if excel_file:
             self.excel_file = excel_file
         else:
@@ -662,7 +680,7 @@ class Configuration(object):
 
     def set_data_dir(self, directory=None):
         """
-        Sets the data directory
+        Set the data directory.
 
         Parameters
         ----------
@@ -674,8 +692,6 @@ class Configuration(object):
         None
 
         """
-
-        # if if this is a valid directory
         if os.path.exists(directory):
             self.data_directory = directory
         else:
@@ -683,7 +699,7 @@ class Configuration(object):
 
     def get_data_dir(self):
         """
-        Returns the data directory
+        Return the data directory.
 
         Parameters
         ----------
@@ -695,12 +711,11 @@ class Configuration(object):
             Data directory
 
         """
-
         return self.data_directory
 
     def set_config_dir(self, directory=None):
         """
-        Sets the directory of configuration file
+        Set the directory of configuration file.
 
         Parameters
         ----------
@@ -712,7 +727,6 @@ class Configuration(object):
         None
 
         """
-
         if os.path.exists(directory):
             self.config_directory = directory
         else:
@@ -720,7 +734,7 @@ class Configuration(object):
 
     def get_config_dir(self):
         """
-        Returns the directory of configuration file
+        Return the directory of configuration file.
 
         Parameters
         ----------
@@ -732,29 +746,27 @@ class Configuration(object):
             Name of the configuration file
 
         """
-
         return self.config_directory
 
     def set_config_file(self, filename):
         """
-        Sets the name of the configuration file
+        Set the name of the configuration file.
 
         Parameters
         ----------
         directory : str
-            Directory of configuration file
+            Name of configuration file
 
         Returns
         -------
         None
 
         """
-
         self.filename = filename
 
     def get_config_file(self):
         """
-        Returns the name of the configuration file
+        Return the name of the configuration file.
 
         Parameters
         ----------
@@ -766,12 +778,11 @@ class Configuration(object):
             Name of configuration file
 
         """
-
         return self.filename
 
     def save_config(self, filename=None):
         """
-        Exports the configuration data to .ncfg file
+        Export the configuration data to .ncfg file.
 
         Parameters
         ----------
@@ -783,44 +794,36 @@ class Configuration(object):
         None
 
         """
-
         if filename:
             self.set_config_file(filename)
         if not self.filename:
             logging.warning('No/invalid filename')
         else:
-            # elseif verify valid filename try to save (through error) else error
             self._save()
 
     def load_config(self, filename=None):
         """
-        Imports the configuration data from a .ncfg file
+        Import the configuration data from a .ncfg file.
 
         Parameters
         ----------
-        None
+        filename: str
+            Name of the configuration file
 
         Returns
         -------
-        filename : str
-            Name of the configuration file
+        None
 
         """
-
         if filename:
             self.set_config_file(filename)
         if not self.filename:
             logging.warning('No/Invalid filename')
         else:
-            # elseif verify valid filename try to save (through error) else error
             self._load()
 
     def _save(self):
-        """
-        Saves configuration data to the specified .ncfg(YAML) file
-
-        """
-
+        """Save configuration data to the specified .ncfg(YAML) file."""
         try:
             with open(self.filename, 'w') as f:
                 settings = oDict([('format', self.format),
@@ -841,16 +844,12 @@ class Configuration(object):
                                  ('parameters', self.parameters)])
 
                 yaml.dump(cfgData, f, default_flow_style=False)
-        except:
+        except Exception:
             logging.error(
                 'Configuration cannot be saved in the specified file!')
 
     def _load(self):
-        """
-        Loads configuration data from the .ncfg(YAML) file
-
-        """
-
+        """Load configuration data from the .ncfg(YAML) file."""
         with open(self.filename, 'r') as f:
             cfgData = yaml.load(f, Loader=yaml.FullLoader)
             settings = cfgData.get('settings')

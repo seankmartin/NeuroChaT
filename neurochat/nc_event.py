@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Apr 11 13:37:30 2018
-
-@author: Raju
-"""
-# -*- coding: utf-8 -*-
-"""
-This module implements NEvent Class for NeuroChaT software
+This module implements the NEvent Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -26,20 +20,46 @@ from neurochat.nc_lfp import NLfp
 
 class NEvent(NBase):
     """
-    This data class is the placeholder for the dataset that contains information
-    about external events or stimulus.
-    Events are stored as names and tags. Each tag is a number representing particular event.
+    Store external events or stimuli and relate them to neural data.
+
+    This data class is the placeholder for the dataset that contains
+    information about external events or stimuli.
+    Events are stored as a name (str), tag (int) and a timestamp (float).
+    Each tag is a unique integer number representing a particular event.
+
+    Parameters
+    ----------
+    event_names: list of str, or np.ndarray
+        The name of each timestamped event.
+    timestamps: list of float, or np.ndarray
+        The time of each event.
+    event_train: list of int, or np.ndarry
+        The unique integer tag of each timestamped event.
+    **kwargs:
+        Keyword arguments passed to NBase init.
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(
+            self, event_names=[], timestamps=[], event_train=[],
+            **kwargs):
+        """See NEvent class description."""
         super().__init__(**kwargs)
         self._event_trig_averages = []
         self._curr_tag = []
         self._curr_name = []
-        self._event_names = np.array([], dtype='f')
-        self._timestamp = np.array([], dtype='f')
-        self._event_train = np.array([], dtype='f')
+        if isinstance(event_names, list):
+            self._event_names = np.array(event_names, dtype=object)
+        else:
+            self._event_names = event_names
+        if isinstance(timestamps, list):
+            self._timestamp = np.array(timestamps, dtype='f')
+        else:
+            self._timestamp = timestamps
+        if isinstance(event_train, list):
+            self._event_train = np.array(event_train, dtype=int)
+        else:
+            self._event_train = event_train
         self._type = 'event'
         self._timebase = None
         self._total_samples = None
@@ -47,7 +67,7 @@ class NEvent(NBase):
 
     def get_event_name(self, event_tag=None):
         """
-        Returns name of the event from its tag
+        Return name of the event from its tag.
 
         Parameters
         ----------
@@ -59,7 +79,6 @@ class NEvent(NBase):
             Name of the event
 
         """
-
         if event_tag is None:
             event_name = self._event_names
         elif event_tag in self._event_train:
@@ -71,7 +90,7 @@ class NEvent(NBase):
 
     def get_tag(self, event_name=None):
         """
-        Returns tag of the event from its name
+        Return tag of the event from its name.
 
         Parameters
         ----------
@@ -83,7 +102,6 @@ class NEvent(NBase):
             Tag of the event
 
         """
-
         if event_name is None:
             event_tag = self._curr_tag
         elif event_name == 'all':
@@ -98,19 +116,19 @@ class NEvent(NBase):
 
     def set_curr_tag(self, event):
         """
-        Sets current tag of to cosider for analysis
+        Set current tag of to consider for analysis.
 
         Parameters
         ----------
         event : str or int
-            If str, represent the name of the event. If int, represents event tag
+            If str, represent the name of the event.
+            If int, represents event tag.
 
         Returns
         -------
         None
 
         """
-
         if event is None:
             pass
         elif event in self._event_train:
@@ -122,7 +140,7 @@ class NEvent(NBase):
 
     def set_curr_name(self, name):
         """
-        Sets current event using event name
+        Set current event using event name.
 
         Parameters
         ----------
@@ -134,12 +152,11 @@ class NEvent(NBase):
         None
 
         """
-
         self.set_curr_tag(name)
 
     def set_timebase(self, timebase):
         """
-        Sets timebase 
+        Set timebase.
 
         Parameters
         ----------
@@ -155,7 +172,7 @@ class NEvent(NBase):
 
     def get_timebase(self):
         """
-        Gets timebase 
+        Get timebase.
 
         Returns
         -------
@@ -166,12 +183,13 @@ class NEvent(NBase):
 
     def get_event_stamp(self, event=None):
         """
-        Returns timestamps for a particular event
+        Return timestamps for a particular event.
 
         Parameters
         ----------
         event : str or int
-            If str, represent the name of the event. If int, represents event tag
+            If str, represent the name of the event.
+            If int, represents event tag.
 
         Returns
         -------
@@ -179,7 +197,6 @@ class NEvent(NBase):
             Timestamps of the event
 
         """
-
         if event is None:
             tag = self._curr_tag
         if event in self._event_names:
@@ -193,7 +210,7 @@ class NEvent(NBase):
 
     def get_timestamp(self):
         """
-        Returns timestamps for all events
+        Return timestamps for all events.
 
         Parameters
         ----------
@@ -205,29 +222,11 @@ class NEvent(NBase):
             Timestamps of all the events
 
         """
-
         return self._timestamp
-
-    def _set_timestamp(self, timestamp):
-        """
-        Sets timestamps for all events
-
-        Parameters
-        ----------
-        timestamp : ndarray
-
-        Returns
-        -------
-        timestamp : ndarray
-            Timestamps of all the events
-
-        """
-
-        self._timestamp = timestamp
 
     def get_event_train(self):
         """
-        Returns tags for all events in the same temporal order as they are presented
+        Return tags for all events in temporal order.
 
         Parameters
         ----------
@@ -239,20 +238,43 @@ class NEvent(NBase):
             Train of events as train of tags
 
         """
-
         return self._event_train
 
     def get_total_samples(self):
+        """
+        Return the total number of samples.
 
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        int
+            The number of samples.
+
+        """
         return self._total_samples
 
     def get_bytes_per_timestamp(self):
+        """
+        Return the number of bytes per timestamp.
 
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        int
+            The number of bytes per timestamp.
+
+        """
         return self._bytes_per_timestamp
 
     def _set_event_train(self, event_train):
         """
-        Sets tags for all events
+        Set tags for all events.
 
         Parameters
         ----------
@@ -264,12 +286,27 @@ class NEvent(NBase):
         None
 
         """
-
         self._event_train = event_train
+
+    def _set_timestamp(self, timestamp):
+        """
+        Set timestamps for all events.
+
+        Parameters
+        ----------
+        timestamp : ndarray
+
+        Returns
+        -------
+        timestamp : ndarray
+            Timestamps of all the events
+
+        """
+        self._timestamp = timestamp
 
     def _set_total_samples(self, nsamples):
         """
-        Sets tags for all events
+        Set tags for all events.
 
         Parameters
         ----------
@@ -281,24 +318,24 @@ class NEvent(NBase):
         None
 
         """
-
         self._total_samples = nsamples
 
     def _set_bytes_per_timestamp(self, bytes_per_timestamp):
-
         self._bytes_per_timestamp = bytes_per_timestamp
 
     def load(self, filename=None, system=None):
         """
-        Reads event file from the recording formats
-        (Currently not implemented)
+        Read event file from the recording formats.
+
+        This is currently only implemented for the Axona .stm format.
 
         Parameters
         ----------
         filename : str
-            Full file of the event data
+            Full filepath of the event data.
         system : str
-            Data formta or the recording system
+            Data format or the recording system.
+            Currently, only "Axona" is supported.
 
         Returns
         -------
@@ -318,7 +355,7 @@ class NEvent(NBase):
                     line = f.readline()
                     try:
                         line = line.decode('latin-1')
-                    except:
+                    except BaseException:
                         break
 
                     if line == '':
@@ -329,7 +366,7 @@ class NEvent(NBase):
                     if line.startswith('trial_time'):
                         self._set_time(line.split()[1])
                     if line.startswith('experimenter'):
-                        self._set_experiemnter(' '.join(line.split()[1:]))
+                        self._set_experimenter(' '.join(line.split()[1:]))
                     if line.startswith('comments'):
                         self._set_comments(' '.join(line.split()[1:]))
                     if line.startswith('duration'):
@@ -357,7 +394,7 @@ class NEvent(NBase):
                 while True:
                     try:
                         buff = f.read(10).decode('UTF-8')
-                    except:
+                    except BaseException:
                         break
                     if buff == 'data_start':
                         header_offset = f.tell()
@@ -366,7 +403,7 @@ class NEvent(NBase):
                         f.seek(-9, 1)
 
                 if not header_offset:
-                    print('Error: data_start marker not found!')
+                    raise ValueError('data_start marker not found!')
                 else:
                     f.seek(header_offset, 0)
                     byte_buffer = np.fromfile(f, dtype='uint8')
@@ -394,7 +431,9 @@ class NEvent(NBase):
 
     def _create_tag(self, name_train):
         """
-        Creates tags from event trains if the events are described with their names. 
+        Create tags from event trains and names.
+
+        This is useful if the events are described with only their names.
 
         Parameters
         ----------
@@ -406,7 +445,6 @@ class NEvent(NBase):
         None
 
         """
-
         self._event_trig_averages = list(range(0, len(self._event_names), 1))
         if type(name_train).__module__ == np.__name__:
             self._event_train = np.zeros(name_train.shape)
@@ -416,7 +454,7 @@ class NEvent(NBase):
 
     def add_spike(self, spike=None, **kwargs):
         """
-        Adds new spike node to current NEvent() object
+        Add new spike node to current NEvent() object.
 
         Parameters
         ----------
@@ -434,20 +472,21 @@ class NEvent(NBase):
 
     def load_spike(self, names='all'):
         """
-        Loads datasets of the spike nodes. Name of each node is used for obtaining the
-        filenames
+        Load datasets of the spike nodes.
+
+        The name of each node is used for obtaining the filenames.
 
         Parameters
         ----------
         names : list of str
-            Names of the nodes to load. If 'all', all the spike nodes are loaded
+            Names of the nodes to load.
+            If 'all', all the spike nodes are loaded.
 
         Returns
         -------
         None
 
         """
-
         if names == 'all':
             for spike in self._spikes:
                 spike.load()
@@ -456,7 +495,7 @@ class NEvent(NBase):
 
     def add_lfp(self, lfp=None, **kwargs):
         """
-        Adds new LFP node to current NEvent() object
+        Add a new LFP node to current NEvent() object.
 
         Parameters
         ----------
@@ -469,15 +508,15 @@ class NEvent(NBase):
             A new NLfp() object
 
         """
-
         new_lfp = self._add_node(NLfp, lfp, 'lfp', **kwargs)
 
         return new_lfp
 
     def load_lfp(self, names=None):
         """
-        Loads datasets of the LFP nodes. Name of each node is used for obtaining the
-        filenames
+        Load datasets of the LFP nodes.
+
+        The name of each node is used for obtaining the filenames.
 
         Parameters
         ----------
@@ -489,7 +528,6 @@ class NEvent(NBase):
         None
 
         """
-
         if names is None:
             self.load()
         elif names == 'all':
@@ -500,11 +538,11 @@ class NEvent(NBase):
 
     def psth(self, event=None, spike=None, **kwargs):
         """
-        Calculates peri-stimulus time histogram (PSTH)
+        Calculate peri-stimulus time histogram (PSTH).
 
         Parameters
         ----------
-        event 
+        event
             Event name or tag
         spike : NSpike
             NSpike object to characterize
@@ -518,7 +556,6 @@ class NEvent(NBase):
             Graphical data of the analysis
 
         """
-
         graph_data = oDict()
         if not event:
             event = self._curr_tag
@@ -537,12 +574,9 @@ class NEvent(NBase):
 
         return graph_data
 
-        # Do things on event tag
-     # def other functions; check Pradeep's code
-
     def phase_dist(self, lfp=None, **kwargs):
         """
-        Analysis of event to LFP phase distribution
+        Analysis of event to LFP phase distribution.
 
         Delegates to NLfp().phase_dist()
 
@@ -551,7 +585,7 @@ class NEvent(NBase):
         lfp : NLfp
             LFP object which contains the LFP data.
         **kwargs
-            Keywrod arguments
+            Keyword arguments
 
         Returns
         -------
@@ -563,7 +597,6 @@ class NEvent(NBase):
         nc_lfp.NLfp().phase_dist()
 
         """
-
         if lfp is None:
             logging.error('LFP data not specified!')
         else:
@@ -572,7 +605,7 @@ class NEvent(NBase):
 
     def plv(self, lfp=None, **kwargs):
         """
-        Calculates phase-locking value of event train to underlying LFP signal.
+        Calculate phase-locking value of event train to underlying LFP signal.
 
         Delegates to NLfp().plv()
 
@@ -593,16 +626,61 @@ class NEvent(NBase):
         nc_lfp.NLfp().plv()
 
         """
-
         if lfp is None:
             logging.error('LFP data not specified!')
         else:
             _lfp = self._get_instance(NLfp, lfp, 'lfp')
             _lfp.plv(self.get_event_stamp(self.get_tag()), **kwargs)
 
-#    def sfc(self, lfp=None, **kwargs):
-#        if lfp is None:
-#            logging.error('LFP data not specified!')
-#        else:
-#            _lfp = self._get_instance(NLfp, lfp, 'lfp')
-#            _lfp.sfc(self.get_event_stamp(self.get_tag()), **kwargs)
+    def __str__(self):
+        """
+        Return a user friendly (time, name, tag) string.
+
+        Only returns the first and last 10 events if more than 20
+        events.
+
+        """
+        output_str = ""
+        if len(self._timestamp) == 0:
+            output_str = str([])
+        else:
+            for i, (a, b, c) in enumerate(zip(
+                    self._timestamp, self._event_train, self._event_names)):
+                if i < 10:
+                    output_str = "{}{}: {}\n".format(
+                        output_str, i + 1, (a, b, c))
+                elif ((i == 10) and (len(self._timestamp) > 20)):
+                    output_str = "{}...\n".format(output_str)
+                elif (i >= len(self._timestamp) - 10):
+                    output_str = "{}{}: {}\n".format(
+                        output_str, i + 1, (a, b, c))
+            output_str = output_str[:-1]
+        return (
+            "Neurochat NEvent object with " +
+            "event info:\n{}".format(output_str))
+
+    def __repr__(self):
+        """Return a REPL string, eval(repr(self)) = self."""
+        return "{}({!r},{!r},{!r})".format(
+            self.__class__.__qualname__,
+            self._event_names, self._timestamp, self._event_train)
+
+    #    def sfc(self, lfp=None, **kwargs):
+    #        if lfp is None:
+    #            logging.error('LFP data not specified!')
+    #        else:
+    #            _lfp = self._get_instance(NLfp, lfp, 'lfp')
+    #            _lfp.sfc(self.get_event_stamp(self.get_tag()), **kwargs)
+
+
+if __name__ == "__main__":
+    event_times = np.random.rand(100) * 100
+    event_tags = np.random.randint(low=0, high=10, size=100)
+    event_names = np.array(["Name{}".format(x) for x in event_tags])
+
+    array = np.array
+    n_event = NEvent(event_names, event_times, event_tags)
+    rep = repr(n_event)
+    print("Representation is {}".format(rep))
+    ret_event = eval(rep)
+    print("Original event is {}".format(ret_event))

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module implements CircStat Class for NeuroChaT software
+This module implements CircStat Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -16,19 +16,58 @@ from neurochat.nc_utils import find
 
 class CircStat(object):
     """
-    This class is the placeholder for the circular data and provides functionalities
-    for calculating circular statistics.
+    This class is the placeholder for circular data.
+
+    It provides functionalities for calculating circular statistics.
+    For example, Rayleigh Z statistics of the circular data.
+
+    Currently the class only supports calculations in degrees.
+    As such, radians should be converted to degrees when entering theta.
+
+    The initialisation function should be passed with keyword arguments.
+
+    Keyword Arguments
+    -----------------
+        rho : ndarry
+            Polar co-ordinate rho, the radii of points.
+        theta : ndarray
+            Polar co-ordinate theta, the angle of points.
+
+    Attributes
+    ----------
+    _rho : ndarray
+        Polar co-ordinate rho, the radii of points.
+    _theta : ndarray
+        Polar co-ordinate theta, the angle of points.
+    _result : OrderedDict
+        Holds the result of many circular statistics functions.
 
     """
 
-    def __init__(self, **kwargs):  # Currently supports 'deg'. Will be extended for 'rad'
+    def __init__(self, **kwargs):
+        """
+        Create a circular statistics object.
+
+        Parameters
+        ----------
+        **kwargs: keyword arguments
+            rho : ndarry
+                Polar co-ordinate rho, the radii of points.
+            theta : ndarray
+                Polar co-ordinate theta, the angle of points.
+
+        Returns
+        -------
+        None
+
+        """
         self._rho = kwargs.get('rho', None)
         self._theta = kwargs.get('theta', None)
         self._result = oDict()
 
     def set_rho(self, rho=None):
         """
-        Sets the radial coordinates (rho) of the circular data
+        Set the radial coordinates (rho) of the circular data.
 
         Parameters
         ----------
@@ -40,13 +79,12 @@ class CircStat(object):
         None
 
         """
-
         if rho is not None:
             self._rho = rho
 
     def get_rho(self):
         """
-        Returns the radial coordinates (rho) of the circular data
+        Return the radial coordinates (rho) of the circular data.
 
         Parameters
         ----------
@@ -58,12 +96,11 @@ class CircStat(object):
             Radial coordinates of the circular data
 
         """
-
         return self._rho
 
     def set_theta(self, theta=None):
         """
-        Sets the angular coordinates (theta) of the circular data in degrees.
+        Set the angular coordinates (theta) of the circular data in degrees.
 
         Parameters
         ----------
@@ -75,13 +112,12 @@ class CircStat(object):
         None
 
         """
-
         if theta is not None:
             self._theta = theta
 
     def get_theta(self):
         """
-        Returns the angular coordinates (theta) of the circular data
+        Return the angular coordinates (theta) of the circular data.
 
         Parameters
         ----------
@@ -93,12 +129,13 @@ class CircStat(object):
             Angular coordinates of the circular data
 
         """
-
         return self._theta
 
     def get_mean_std(self):
         """
-        Returns the circular mean, standard deviation and resultant vector length of the data
+        Return the circular mean and standard deviation of the data.
+
+        Also return the resultant vector length of the data.
 
         Parameters
         ----------
@@ -107,17 +144,16 @@ class CircStat(object):
         Returns
         -------
         dict
-            Dictionary of mean, standard deviation and resultant vector length etc.
+            Dictionary of mean, standard deviation and resultant vector length.
 
         """
-
         if self._rho is None or not len(self._rho):
             self._rho = np.ones(self._theta.shape)
         return self._calc_mean_std()
 
     def _calc_mean_std(self):
         """
-        Returns the circular mean, standard deviation and resultant vector length of the data
+        Calculate mean, standard deviation, resultant vector length.
 
         Parameters
         ----------
@@ -126,10 +162,9 @@ class CircStat(object):
         Returns
         -------
         dict
-            Dictionary of mean, standard deviation and resultant vector length etc.
+            Dictionary of mean, standard deviation and resultant vector length.
 
         """
-
         result = {}
         if self._rho.shape[0] == self._theta.shape[0]:
             xm = np.sum(np.multiply(
@@ -150,8 +185,9 @@ class CircStat(object):
                     result['stdRho'] = 0
                 else:
                     result['stdRho'] = np.sqrt(x)
-            except:
-                result['stdRho'] = 0  # This except to proetct -ve inside sqrt
+            except BaseException:
+                # This except is to protect against -ve inside sqrt
+                result['stdRho'] = 0
 
         else:
             logging.warning('Size of rho and theta must be equal')
@@ -160,7 +196,7 @@ class CircStat(object):
 
     def get_rayl_stat(self):
         """
-        Returns the Rayleigh Z statistics of the circular data
+        Return the Rayleigh Z statistics of the circular data.
 
         Parameters
         ----------
@@ -172,12 +208,11 @@ class CircStat(object):
             Rayleigh Z statistics
 
         """
-
         return self._rayl_stat()
 
     def _rayl_stat(self):
         """
-        Returns the Rayleigh Z statistics of the circular data
+        Compute the Rayleigh Z statistics of the circular data.
 
         Parameters
         ----------
@@ -189,7 +224,6 @@ class CircStat(object):
             Rayleigh Z statistics
 
         """
-
         result = {}
         N = self._result['totalObs']
         Rn = self._result['resultant'] * N
@@ -201,7 +235,7 @@ class CircStat(object):
 
     def get_vonmises_stat(self):
         """
-        Returns the von Mises concentration parameter kappa
+        Return the von Mises concentration parameter kappa.
 
         Parameters
         ----------
@@ -213,12 +247,11 @@ class CircStat(object):
             Returns the von Mises concentration parameter kappa
 
         """
-
         return self._vonmises_stat()
 
     def _vonmises_stat(self):
         """
-        Returns the von Mises concentration parameter kappa
+        Calculate the von Mises concentration parameter kappa.
 
         Parameters
         ----------
@@ -230,7 +263,6 @@ class CircStat(object):
             Returns the von Mises concentration parameter kappa
 
         """
-
         result = {}
         R = self._result['resultant']
         N = self._result['totalObs']
@@ -251,7 +283,7 @@ class CircStat(object):
 
     def calc_stat(self):
         """
-        Calculates and returns all the circular statistics parameters
+        Calculate and return all the circular statistics parameters.
 
         Parameters
         ----------
@@ -260,10 +292,11 @@ class CircStat(object):
         Returns
         -------
         dict
-            Returns the von Mises concentration parameter kappa
+            Returns the mean, standard deviation, resultant vector length.
+            The Rayleigh Z statistics.
+            The von Mises concentration parameter Kappa.
 
         """
-
         result = self._calc_mean_std()
         self._update_result(result)
         result = self._rayl_stat()
@@ -278,13 +311,16 @@ class CircStat(object):
     def circ_regroup(x):
         """
         Circular regrouping of the angles. It unwraps the angular coordinates.
-        For example, if the input array is x = np.ndarray([270, 340, 350, 20, 40]),
-        the output will be y = [270, 340, 350, 380, 400] etc.
+
+        For example, if the input array x is
+        x = np.ndarray([270, 340, 350, 20, 40]),
+        the output will be
+        y = np.ndarray([270, 340, 350, 380, 400])
 
         Parameters
         ----------
         x : ndarray
-            Array containg the angular coordinates
+            Array containing the angular coordinates
 
         Returns
         -------
@@ -292,35 +328,35 @@ class CircStat(object):
             Regrouped or unwrapped angular coordinates
 
         """
-
         y = np.copy(x)
-        if any(np.logical_and(x >= 0, x <= 90)) and any(np.logical_and(x >= 180, x <= 360)):
-            y[np.logical_and(x >= 0, x <= 90)] = x[np.logical_and(
-                x >= 0, x <= 90)] + 360
+        if (any(np.logical_and(x >= 0, x <= 90)) and
+                any(np.logical_and(x >= 180, x <= 360))):
+            y[np.logical_and(x >= 0, x <= 90)] = (
+                x[np.logical_and(x >= 0, x <= 90)] + 360)
 
         return y
 
     def circ_histogram(self, bins=5):
         """
-        Calculates the circular histogram of the angular coordinates 
+        Calculate the circular histogram of the angular coordinates.
 
         Parameters
         ----------
-        bins : int
-            Angular binsize for the circular histogram
+        bins : int or ndarray
+            Angular binsize for the circular histogram if int.
+            Angular bins if ndarray.
 
         Returns
         -------
         count : ndarray
             Histogram bin count
         ind : ndarray
-            Indices of the bins to which each value in input array belongs. Similar to
-            the return values of the numpy.digitize function.
+            Indices of the bins to which each value in input array belongs.
+            Similar to the return values of the numpy.digitize function.
         bins : ndarray
             Histogram bins
 
         """
-
         if isinstance(bins, int):
             bins = np.arange(0, 360, bins)
 
@@ -344,13 +380,16 @@ class CircStat(object):
 
     def circ_smooth(self, filttype='b', filtsize=5):
         """
-        Calculates the circular average of theta with each sample replaced by the circular 
-        mean of length 'filtsize' and weights determined by the type of filter.
+        Calculate the circular average of theta.
+
+        Each sample is replaced by the circular mean of length 'filtsize'
+        and weights determined by the type of filter.
 
         Parameters
         ----------
         filttype : str
-            Type of smoothing filter. 'b' for Box filter, 'g' for Gaussian filter
+            Type of smoothing filter.
+            'b' for Box filter, or 'g' for Gaussian filter.
         filtsize : int
             Length of the averaging filter
 
@@ -360,7 +399,6 @@ class CircStat(object):
             Theta values after the smoothing
 
         """
-
         if filttype == 'g':
             halfwid = np.round(3 * filtsize)
             xx = np.arange(-halfwid, halfwid + 1, 1)
@@ -395,8 +433,10 @@ class CircStat(object):
 
     def circ_scatter(self, bins=2, step=0.05, rmax=None):
         """
-        Prepares data for circular scatter plot. For each theta in a bin, the radius
-        is increased by 'step' size capped at 'rmax'.
+        Prepare data for circular scatter plot.
+
+        For each theta in a bin, the radius is increased by 'step'
+        The size of step is capped at 'rmax'.
 
         Parameters
         ----------
@@ -410,13 +450,12 @@ class CircStat(object):
         Returns
         -------
         radius : ndarray
-            Radius for the theta values. For each new theta in a bin, the radius
-            is increased by 'step' size.
+            Radius for the theta values.
+            For each new theta in a bin, the radius is increased by 'step'.
         theta : ndarray
             Binned theta samples
 
         """
-        # Prepares the data for scatter plot.
         count, ind, bins = self.circ_histogram(bins=2)
         radius = np.ones(ind.shape)
         theta = np.zeros(ind.shape)
@@ -436,7 +475,7 @@ class CircStat(object):
 
     def _update_result(self, new_result={}):
         """
-        Updates the statistical results withe a new one.
+        Update the statistical results with a new dict of results.
 
         Parameters
         ----------
@@ -448,12 +487,11 @@ class CircStat(object):
         None
 
         """
-
         self._result.update(new_result)
 
     def get_result(self):
         """
-        Resturns the results of the circular statistics analyses
+        Return the results of the circular statistics analyses.
 
         Parameters
         ----------

@@ -1,4 +1,4 @@
-# NeuroChaT
+# NeuroChaT v1.1.1a0
 
 NeuroChaT (RRID:SCR_018020) is an open-source neuron characterisation toolbox. It is described in our paper on [Wellcome Open Research](https://wellcomeopenresearch.org/articles/4-196).
 
@@ -6,7 +6,7 @@ NeuroChaT (RRID:SCR_018020) is an open-source neuron characterisation toolbox. I
 
 Md Nurul Islam, Sean K. Martin, Shane M. O'Mara, and John P. Aggleton.
 
-**MNI**: Original conception and design of the software architecture, primary development of algorithms and subsequent implementation in Python, primary user’s manual development, iterative development of software based on user feedback, originator of NeuroChaT acronym.
+**MNI**: Original conception and design of the software architecture, primary development of algorithms and subsequent implementation in Python, primary user's manual development, iterative development of software based on user feedback, originator of NeuroChaT acronym.
 
 **MNI, SKM**: Developing analysis algorithms, MATLAB/Python script writing and validation, analysis and interpretation of data.
 
@@ -14,7 +14,7 @@ Md Nurul Islam, Sean K. Martin, Shane M. O'Mara, and John P. Aggleton.
 
 **SMOM**: Original conception and statement of software need, project guidance and feedback.
 
-**JPA, SMOM**: Grant-fundraising; analysis and interpretation of data.
+**JPA, SMOM**: Grant-fundraising, analysis and interpretation of data.
 
 ## Acknowledgments
 
@@ -32,7 +32,7 @@ Open command prompt and type/paste the following. It is recommended to install n
 git clone https://github.com/seankmartin/NeuroChaT
 cd NeuroChaT
 pip install .
-python neurochat_gui\neurochat_ui.py
+python cli.py
 ```
 
 ### Option 2: Use Pip, but don't install NeuroChaT
@@ -44,10 +44,21 @@ git clone https://github.com/seankmartin/NeuroChaT
 cd NeuroChaT
 pip install -r requirements.txt
 python modify_neuro_path.py
-python neurochat_gui\neurochat_ui.py
+python cli.py
 ```
 
 This method only allows the GUI program to function, any other file will need to modify the python path to use neurochat.
+
+### Install PyQt5 on linux
+
+If you are running NeuroChaT on linux, after installing the requirements you will need to install further qt programs.
+Most likely, you only need `python3-pyqt5`, but just in case it might be safest to install all three of these if you have the available disk space.
+
+```
+sudo apt-get install python3-pyqt5
+sudo apt-get install pyqt5-dev-tools
+sudo apt-get install qttools5-dev-tools
+```
 
 ## Getting Started
 
@@ -65,3 +76,11 @@ See the docs folder for a pdf user guide which should be the first port of call.
 ## Open Science Framework Storage
 
 Sample hdf5 datasets and results are stored on OSF, at https://osf.io/kqz8b/files/.
+
+## Version
+
+The NeuroChaT version number should be maintained in:
+
+1. `setup.py`
+2. `neurochat\__init__.py`
+3. `README.md`

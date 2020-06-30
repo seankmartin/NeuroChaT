@@ -2,30 +2,24 @@
 This module contains analysis functions for NDataContainer objects.
 
 @author: Sean Martin; martins7 at tcd dot ie
+
 """
 import gc
 import logging
-from itertools import compress
-from math import floor, ceil
 import os
-import gc
-import re
+from math import floor, ceil
 from collections.abc import Iterable
+
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+from matplotlib.pyplot import close
 
 from neurochat.nc_datacontainer import NDataContainer
 from neurochat.nc_data import NData
 from neurochat.nc_clust import NClust
-from neurochat.nc_utils import smooth_1d, find_true_ranges
-from neurochat.nc_utils import find_peaks
-from neurochat.nc_utils import window_rms
-from neurochat.nc_utils import distinct_window_rms
 from neurochat.nc_utils import make_dir_if_not_exists
 from neurochat.nc_utils import log_exception
 from neurochat.nc_plot import print_place_cells
-
-import numpy as np
-from scipy.optimize import linear_sum_assignment
-from matplotlib.pyplot import savefig, close
 
 
 def place_cell_summary(
@@ -35,53 +29,78 @@ def place_cell_summary(
         output=["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"],
         isi_bound=350, isi_bin_length=2, fixed_color=None,
         save_data=False, point_size=None, color_isi=True,
-        burst_thresh=5, hd_predict=False):
+        burst_thresh=5, hd_predict=False, one_by_one="auto"):
     """
-    Quick Png spatial information summary of each cell in collection.
+    Perform spatial information summary of each cell in collection.
+
+    The function is named as place_cell_summary as it can be a
+    quick visual way to look for place cells.
+    However, it can be used to look other spatial properties,
+    such as head directionality.
+
+    The output image (any matplotlib format is supported) contains
+    the information from and in the order of the output argument.
 
     Parameters
     ----------
     collection : NDataCollection
-        The collection to plot summaries of.
+        The collection to plot spatial summaries of.
     dpi : int, default 150
-        Dpi of the output figures.
+        Dpi of the output figures if the output_format supports dpi.
     out_dirname : str, default "nc_plots
-        The relative name of the dir to save pngs to
+        The relative name of the directory to save output to.
     filter_place_cells: bool, default True
-        Whether to filter out non spatial cells from the plots.
-        Considered non spatial if shuffled Skaggs, Coherency or Sparsity
-        is similar to actual values.
+        Whether to filter out non spatial place cells from the plots.
+        A unit is considered a spatial place cell if:
+        Sparsity < 0.3 and Coherence > 0.55.
+        Recommended filter_low_freq=True if this flag is True.
+        See https://www.nature.com/articles/ncomms11824.
     filter_low_freq: bool, default True
         Filter out cells with spike freq less than 0.1Hz
     opt_end : str, default ""
         A string to append to the file output just before the extension
+        Can be used if doing multiple runs to avoid overwriting output files.
     base_dir : str, default None
-        An optional directory to save the files to
-    output_format : str, default png
-        What format to save the output image in
+        An optional directory to save all the files to.
+        If not provided, the files will save to the location of the input data.
+    output_format : str, default "png"
+        What format to save the output image in.
     output : List of str,
         default ["Wave", "Path", "Place", "HD", "LowAC", "Theta", "HighISI"]
-        Input should be some subset and/or permutation of these
-    isi_bound: int, default 350
-        How long in ms to plot the ISI to
-    isi_bin_length: int, default 1
-        How long in ms the ISI bins should be
-    save_data: bool, default False
-        Whether to save out the information used for the plot
-    color_isi: bool, default True
-        Whether the ISI should be black or blue
-    burst_thresh: int, default 5
+        Provided argument should be some subset and/or permutation of these.
+    isi_bound : int, default 350
+        How long in ms to plot the ISI for.
+    isi_bin_length : int, default 2
+        How long in ms the ISI bins should be.
+    fixed_color : str, default None
+        If provided, will plot all units with this color instead of auto color.
+        Can be any matplotlib compatible color.
+    save_data : bool, default False
+        Whether to save out the information used for the plot.
+        If True, will produce a csv with all the data used for plotting.
+    point_size : int, default None
+        If provided, the size of the matplotlib points to use in spatial plots.
+        If None, the point size is dpi / 7.
+    color_isi : bool, default True
+        Whether the ISI should be black (False) or blue (True).
+    burst_thresh : int, default 5
         How long in ms to consider the window for burst to be
-    hd_predict: bool, default False
+    hd_predict : bool, default False
         Whether the head directional graph should be plotted with predicted HD.
+    one_by_one : bool or str, default "auto"
+        Whether to plot all units in each tetrode file to single plot. Options:
+        True   - plot each unit to a seperate file.
+        False  - plot all units on a tetrode to the same file.
+        "auto" - Determine T/F based on output_format. pdf and svg are True.
 
     Returns
     -------
     None
-    """
 
+    """
+    # This function is used to save out the plotting data to a csv.
     def save_dicts_to_csv(filename, dicts_arr):
-        """Saves the last element of each arr in dicts_arr to file"""
+        """Save the last element of each arr in dicts_arr to file."""
         with open(filename, "w") as f:
             for d_arr in dicts_arr:
                 if d_arr is not None:
@@ -99,6 +118,7 @@ def place_cell_summary(
                             out_str += "," + str(v)
                         f.write(out_str + "\n")
 
+    # Set up the arrays to hold the data for plotting.
     good_placedata = []
     good_graphdata = []
     good_wavedata = []
@@ -117,6 +137,7 @@ def place_cell_summary(
 
     if point_size is None:
         point_size = dpi / 7
+
     for i, data in enumerate(collection):
         try:
             data_idx, unit_idx = collection._index_to_data_pos(i)
@@ -180,6 +201,7 @@ def place_cell_summary(
                     thetadata = bad_thetadata
                     isidata = bad_isidata
 
+                # In case somehow there is a double counting bug
                 if (
                     (len(bad_units) + len(good_units)) >
                         len(collection.get_units(data_idx))):
@@ -203,7 +225,8 @@ def place_cell_summary(
                     raise Exception(
                         "Accumlated more units than possible " +
                         "bad {} good {} total {}".format(
-                            save_bad, save_good, collection.get_units(data_idx)))
+                            save_bad, save_good,
+                            collection.get_units(data_idx)))
 
                 if "Place" in output:
                     placedata.append(data.place())
@@ -309,8 +332,9 @@ def place_cell_summary(
                     bad_named_units = []
 
                 # Save figures one by one if using pdf or svg
-                one_by_one = (output_format == "pdf") or (
-                    output_format == "svg")
+                if one_by_one == "auto":
+                    one_by_one = (output_format == "pdf") or (
+                        output_format == "svg")
 
                 if len(named_units) > 0:
                     if filter_place_cells:
@@ -393,7 +417,7 @@ def place_cell_summary(
                             out_name = os.path.join(
                                 main_dir, out_dirname, "bad", iname)
 
-                            logging.info("Saving place cell figure to {}".format(
+                            logging.info("Saving place cell fig to {}".format(
                                 out_name))
                             make_dir_if_not_exists(out_name)
                             f.savefig(out_name, dpi=dpi,
@@ -402,7 +426,7 @@ def place_cell_summary(
                     else:
                         out_name = os.path.join(
                             main_dir, out_dirname, "bad", out_basename)
-                        logging.info("Saving place cell figure to {}".format(
+                        logging.info("Saving place cell fig to {}".format(
                             out_name))
                         make_dir_if_not_exists(out_name)
                         fig.savefig(out_name, dpi=dpi,
@@ -439,8 +463,8 @@ def evaluate_clusters(collection, idx1, idx2, set_units=False):
     """
     Find which units are closest in terms of clustering.
 
-    Uses the Hungarian (Munkres) cost optimisation based on Hellinger distance
-    between the clusters.
+    Uses the Hungarian (Munkres) cost optimisation based on the
+    Hellinger distance between the clusters.
 
     Parameters
     ----------
@@ -450,12 +474,15 @@ def evaluate_clusters(collection, idx1, idx2, set_units=False):
         The first data point in the collection to consider
     idx2 : int
         The second data point in the collection to consider
+    set_units : bool, default False
+        Whether to set the list of units to analyse in the container
+        at idx1 and idx2 to the best matches found in this function.
 
     Returns
     -------
     dict
-        For each unit in data[idx1] (key), a tuple consisting of the
-        best matching unit from data[idx2] and the distance for this (val)
+        For each key, or unit in data[idx1], val is a tuple consisting of the
+        best matching unit from data[idx2] and the distance for this.
 
     """
     nclust1 = NClust()
@@ -493,7 +520,8 @@ def evaluate_clusters(collection, idx1, idx2, set_units=False):
     if set_units:
         run_units = [key for key in best_matches.keys()]
         best_units = [val[0] for _, val in best_matches.items()]
-        collection.set_units([run_units, best_units])
+        collection._units[idx1] = run_units
+        collection._units[idx2] = best_units
     return best_matches
 
 
@@ -508,13 +536,17 @@ def count_units_in_bins(
         The collection of units to count over
     bin_length : float
         The length of the bins in seconds
-    in_range : tuple
+    in_range : tuple, default None
         The range of time to count units over
+    multi_ranges : list of tuple, default None
+        A different range to count units over
+        for each item in the collection.
 
     Returns
     -------
     list of tuples:
-        (unit counts in bins, bin_centres) for each data object in the collection
+        [(unit counts in bins, bin_centres)
+            for each data object in collection]
 
     """
     result = []
@@ -545,32 +577,6 @@ def count_units_in_bins(
         result.append(mua_tuple)
 
     return result
-
-
-# def smooth_speeds(collection, allow_multiple=False):
-#     """
-#     Smooth all the speed data in the collection.
-
-#     Parameters
-#     ----------
-#     collection : NDataContainer
-#         Container to get the information from
-#     allows_multiple : bool
-#         Allow smoothing multiple times, default False
-
-#     Returns
-#     -------
-#     None
-
-#     """
-#     if collection._smoothed_speed and not allow_multiple:
-#         logging.warning(
-#             "NDataContainer has already been speed smoothed, not smoothing")
-
-#     for i in range(collection.get_num_data()):
-#         data = collection.get_data(i)
-#         data.smooth_speed()
-#         collection._smoothed_speed = True
 
 
 def spike_positions(collection, should_sort=True, mode="vertical"):
@@ -660,7 +666,36 @@ def spike_times(collection, filter_speed=False, **kwargs):
             times.append(time_data)
     return times
 
-    # def multi_unit_activity(collection, time_range=None, strip=False, **kwargs):
+# def smooth_speeds(collection, allow_multiple=False):
+    # """
+    # Smooth all the speed data in the collection.
+
+    # This function has been commented out since NeuroChaT
+    # Generally smooths speed automatically.
+    # But it would be useful if that behaviour changed.
+
+    # Parameters
+    # ----------
+    # collection : NDataContainer
+    #     Container to get the information from
+    # allows_multiple : bool
+    #     Allow smoothing multiple times, default False
+
+    # Returns
+    # -------
+    # None
+
+    # """
+    # if collection._smoothed_speed and not allow_multiple:
+    #     logging.warning(
+    #         "NDataContainer has already been speed smoothed, not smoothing")
+
+    # for i in range(collection.get_num_data()):
+    #     data = collection.get_data(i)
+    #     data.smooth_speed()
+    #     collection._smoothed_speed = True
+
+# def multi_unit_activity(collection, time_range=None, strip=False, **kwargs):
     # """
     # For each recording in the collection, detect periods of MUA.
 
@@ -685,7 +720,8 @@ def spike_times(collection, filter_speed=False, **kwargs):
     #     The std_dev of the gaussian used for filtering in seconds
     # mua_mode : str
     #     "rms_peaks" - calculate rms window and find peaks in this
-    #     or "raw" - calculate mua histogram, extract bins with all cells active
+    #     or "raw" - calculate mua histogram and
+    #                extract bins with all cells active
     #     or "high_activity" - calculate rms window and
     #                          look for sustained high activity in this
     # mua_length : float
@@ -762,9 +798,11 @@ def spike_times(collection, filter_speed=False, **kwargs):
 
     # return result
 
-    # def replay(collection, run_idx, sleep_idx, **kwargs):
+# def replay(collection, run_idx, sleep_idx, **kwargs):
     # """
     # Run and sleep session comparison.
+
+    # THIS IS A WORK IN PROG AND HAS BEEN COMMENTED AS SUCH.
 
     # Set the units of interest in the collection before running.
 

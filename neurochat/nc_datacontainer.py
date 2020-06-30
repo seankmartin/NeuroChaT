@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-This module implements a container for the Ndata class to simplify multi experiment analyses.
+This module implements a container for the NData class.
+
+This module is intended to simplify multi experiment analyses.
 
 @author: Sean Martin; martins7 at tcd dot ie
+
 """
 
 from enum import Enum
@@ -14,19 +17,22 @@ import re
 
 import pandas as pd
 import numpy as np
-import pprint
 
 from neurochat.nc_data import NData
 from neurochat.nc_utils import get_all_files_in_dir, make_dir_if_not_exists
-from neurochat.nc_utils import has_ext, log_exception, remove_extension
+from neurochat.nc_utils import log_exception, remove_extension
 
 
 class NDataContainerIterator():
+    """A custom iterator for the NDataContainer class."""
+
     def __init__(self, container):
+        """Start the container at index 0."""
         self._index = 0
         self._container = container
 
     def __next__(self):
+        """Increase the container index by 1."""
         if self._index < len(self._container):
             self._index += 1
             return self._container[self._index - 1]
@@ -35,36 +41,49 @@ class NDataContainerIterator():
 
 class NDataContainer():
     """
-    Class for storing multiple file locations for ndata objects.
+    Class for storing multiple file locations for NData objects.
 
-    Additionally the ndata objects themselves can be stored.
+    Optionally, the NData objects themselves can be stored.
+
+    Parameters
+    ----------
+    share_positions : bool
+        Share the same position file between the data objects
+    load_on_fly : bool
+        If True, don't store all the data in memory,
+        instead load it as needed, or on the fly
+    share_stms : bool
+        Share the same stimulation file between the data objects
+
+    Attributes
+    ----------
+    _file_names_dict : Dict
+        A dictionary containing all the file names
+    _container : List
+        The underlying NData object list
+    _units : List
+        The list of all units available for these data objects
+    _unit_count : List
+        The number of units available for these data objects
+    _share_positions : bool
+        Whether to share positional data between the data objects
+    _share_stms : bool
+        Whether to share stimulation data between the data objects
+    _load_on_fly : bool
+        Whether all the data should be stored in memory or loaded as needed
+    _smoothed_speed : bool
+        Stores has the data been smoothed yet.
+        This is usually not needed as NeuroChaT automatically smooths speed
+    _last_data_pt : tuple (int, NData)
+        A cached version of the last data point used from the collection.
+        This is stored to avoid reloading if the same object is used multiple
+        times in succession.
+
     """
 
     def __init__(
             self, share_positions=False, load_on_fly=False, share_stms=False):
-        """
-        Initialise the class.
-
-        Parameters
-        ----------
-        share_positions : bool
-            Share the same position file between the data objects
-        load_on_fly : bool
-            Don't store all the data in memory,
-            instead load it as needed, on the fly
-
-        Attributes
-        ----------
-        _container : List
-        _file_names_dict : Dict
-        _units : List
-        _unit_count : List
-        _share_positions : bool
-        _load_on_fly : bool
-        _smoothed_speed : bool
-        _last_data_pt : tuple (int, NData)
-
-        """
+        """See the class description."""
         self._file_names_dict = {}
         self._units = []
         self._container = []
@@ -83,6 +102,13 @@ class NDataContainer():
         LFP = 3
         STM = 4
 
+    def setup(self):
+        """Perform data initialisation based on the input filenames."""
+        if self._load_on_fly:
+            self._last_data_pt = (1, None)
+        else:
+            self._load_all_data()
+
     def get_num_data(self):
         """Return the number of Ndata objects in the container."""
         if self._load_on_fly:
@@ -91,7 +117,21 @@ class NDataContainer():
         return len(self._container)
 
     def get_file_dict(self, key=None):
-        """Return the key value filename dictionary for this collection."""
+        """
+        Return the key value filename dictionary for this collection.
+
+        Parameters
+        ----------
+        key : str, optional
+            The key to retrieve the filenames for.
+            See EFileType for options.
+            Defaults to None, in which case the whole dict is returned.
+
+        Returns
+        -------
+        list or dict
+
+        """
         if key:
             return self._file_names_dict.get(key, None)
         return self._file_names_dict
@@ -102,8 +142,9 @@ class NDataContainer():
 
         Parameters
         ----------
-        index : int
-            Optional collection data index to get the units for
+        index : int, optional
+            Collection data index to get the units for.
+            Defaults to None. If None all units are returned.
 
         Returns
         -------
@@ -119,16 +160,69 @@ class NDataContainer():
             return
         return self._units[index]
 
+    def set_units(self, units='all'):
+        """
+        Set the list of units for the collection.
+
+        Parameters
+        ----------
+        units : list or str:
+            If a list, indicates the units to use for each data object
+            stored in the collection. "all" is accepted as a single element.
+            Otherwise, a string "all" is expected, which sets all available
+            units picked up from clustering files.
+        """
+        self._units = []
+        if self.get_file_dict() == {}:
+            raise ValueError("Can't set units for empty collection")
+        if units == 'all':
+            if self._load_on_fly:
+                vals = self.get_file_dict()["Spike"]
+                for descriptor in vals:
+                    result = NData()
+                    self._load("Spike", descriptor, ndata=result)
+                    self._units.append(result.get_unit_list())
+            else:
+                for data in self.get_data():
+                    self._units.append(data.get_unit_list())
+
+        elif isinstance(units, list):
+            for idx, unit in enumerate(units):
+                if unit == 'all':
+                    if self._load_on_fly:
+                        vals = self.get_file_dict()["Spike"]
+                        descriptor = vals[idx]
+                        result = NData()
+                        self._load("Spike", descriptor, ndata=result)
+                        all_units = result.get_unit_list()
+                    else:
+                        all_units = self.get_data(idx).get_unit_list()
+                    self._units.append(all_units)
+                elif isinstance(unit, int):
+                    self._units.append([unit])
+                elif isinstance(unit, list):
+                    self._units.append(unit)
+                else:
+                    logging.error(
+                        "Unrecognised type {} passed to set units".format(
+                            type(unit)))
+
+        else:
+            logging.error(
+                "Unrecognised type {} passed to set units".format(type(units)))
+        self._unit_count = self._count_num_units()
+
     def get_data(self, index=None):
         """
         Return the NData objects in this collection, or a specific object.
 
-        Do not call this with no index if loading data on the fly
+        Do not call this with no index if loading data on the fly.
 
         Parameters
         ----------
         index : int
             Optional index to get data at
+            Defaults to None, in which case all data is returned.
 
         Returns
         -------
@@ -151,25 +245,19 @@ class NDataContainer():
         return self._container[index]
 
     def add_data(self, data):
-        """Add an NData object to this container."""
+        """
+        Add an NData object to this container.
+
+        Parameters
+        ----------
+        data : NData
+            The NData object to add to this container.
+        """
         if isinstance(data, NData):
             self._container.append(data)
         else:
             logging.error("Adding incorrect object to data container")
             return
-
-    def list_all_units(self):
-        """Print all the units in the container."""
-        if self._load_on_fly:
-            for key, vals in self.get_file_dict().items():
-                if key == "Spike":
-                    for descriptor in vals:
-                        result = NData()
-                        self._load(key, descriptor, ndata=result)
-                        print("units are {}".format(result.get_unit_list()))
-        else:
-            for data in self._container:
-                print("units are {}".format(data.get_unit_list()))
 
     def add_files(self, f_type, descriptors):
         """
@@ -180,8 +268,9 @@ class NDataContainer():
         f_type : EFileType:
             The type of file being added (Spike, LFP, Position)
         descriptors : list
-            Either a list of filenames, or a list of tuples in the order
-            (filenames, obj_names, data_sytem). Filenames should be absolute
+            Either a list of filenames, or a tuple of lists in the order
+            (filenames_list, obj_names_list, data_system_list).
+            Filenames should be absolute.
 
         Returns
         -------
@@ -197,7 +286,8 @@ class NDataContainer():
                 "given {}".format(f_type))
             return
 
-        if f_type.name == "Position" and self._share_positions and len(filenames) == 1:
+        if f_type.name == "Position" and self._share_positions and len(
+                filenames) == 1:
             for _ in range(len(self.get_file_dict()["Spike"]) - 1):
                 filenames.append(filenames[0])
 
@@ -206,12 +296,12 @@ class NDataContainer():
                 filenames.append(filenames[0])
 
         # Ensure lists are empty or of equal size
-        for l in descriptors:
-            if l is not None:
-                if len(l) != len(filenames):
+        for desc in descriptors:
+            if desc is not None:
+                if len(desc) != len(filenames):
                     logging.error(
-                        "add_files called with differing number of filenames and other data"
-                    )
+                        "add_files called with differing number of filenames"
+                        + " and other data")
                     return
 
         for idx in range(len(filenames)):
@@ -245,54 +335,6 @@ class NDataContainer():
         self.add_files(self.EFileType.Position, spats)
         self.add_files(self.EFileType.Spike, spikes)
         self.add_files(self.EFileType.LFP, lfps)
-
-    def set_units(self, units='all'):
-        """Set the list of units for the collection."""
-        self._units = []
-        if self.get_file_dict() == {}:
-            raise ValueError("Can't set units for empty collection")
-        if units == 'all':
-            if self._load_on_fly:
-                vals = self.get_file_dict()["Spike"]
-                for descriptor in vals:
-                    result = NData()
-                    self._load("Spike", descriptor, ndata=result)
-                    self._units.append(result.get_unit_list())
-            else:
-                for data in self.get_data():
-                    self._units.append(data.get_unit_list())
-
-        elif isinstance(units, list):
-            for idx, unit in enumerate(units):
-                if unit == 'all':
-                    if self._load_on_fly:
-                        vals = self.get_file_dict()["Spike"]
-                        descriptor = vals[idx]
-                        result = NData()
-                        self._load("Spike", descriptor, ndata=result)
-                        all_units = result.get_unit_list()
-                    else:
-                        all_units = self.get_data(idx).get_unit_list()
-                    self._units.append(all_units)
-                elif isinstance(unit, int):
-                    self._units.append([unit])
-                elif isinstance(unit, list):
-                    self._units.append(unit)
-                else:
-                    logging.error(
-                        "Unrecognised type {} passed to set units".format(type(unit)))
-
-        else:
-            logging.error(
-                "Unrecognised type {} passed to set units".format(type(units)))
-        self._unit_count = self._count_num_units()
-
-    def setup(self):
-        """Perform data initialisation based on the input filenames."""
-        if self._load_on_fly:
-            self._last_data_pt = (1, None)
-        else:
-            self._load_all_data()
 
     def add_files_from_excel(self, file_loc, unit_sep=" "):
         """
@@ -392,38 +434,52 @@ class NDataContainer():
             logging.error('Excel file does not exist!')
             return None
 
-    # Created by Sean Martin with help from Matheus Cafalchio
     def add_axona_files_from_dir(
             self, directory, recursive=False, verbose=False, **kwargs):
         """
-        Go through a directory, extracting files from it.
+        Go through a directory, extracting Axona files from it automatically.
 
         Parameters
         ----------
         directory : str
             The directory to parse through
-        recursive : bool, optional. Defaults to False.
+        recursive : bool, optional.
+            Defaults to False.
             Whether to recurse through dirs
-        verbose: bool, optional. Defaults to False.
+        verbose: bool, optional.
+            Defaults to False.
             Whether to print the files being added.
 
         **kwargs: keyword arguments
             tetrode_list : list
                 list of tetrodes to consider
-            data_extension : str default .set
-            cluster_extension : str default .cut
-            pos_extension : str default .txt
-            lfp_extension : str default .eeg
-            re_filter : str default None 
+                default is 1 to 16
+            data_extension : str
+                default .set
+            cluster_extension : str
+                default .cut
+            pos_extension : str
+                default .txt
+            lfp_extension : str
+                default .eeg
+            re_filter : str
+                default None - no regex performed
                 regex string for matching filenames
-            save_result : bool default True
+            save_result : bool
+                default True
                 should save the resulting collection to a file
             unit_cutoff : tuple of ints
                 don't consider any recordings with units outside this range
+                e.g. if the cutoff is set at 10, any clustering containing
+                11 or more units will not be considered valid and won't be
+                added to the container.
 
         Returns
         -------
-        None
+        List or str:
+            If save_result is true,
+            returns a string indicated where the result was saved
+            Otherwise returns a list of the cluster files which were used.
 
         """
         default_tetrode_list = [
@@ -476,7 +532,8 @@ class NDataContainer():
                         os.path.isfile(os.path.join(directory, cut_name)) or
                         os.path.isfile(os.path.join(directory, clu_name))):
                     logging.info(
-                        "Skipping tetrode {} - no cluster file named {} or {}".format(tetrode, cut_name, os.path.basename(clu_name)))
+                        "Skipping tetrode {} - no clust file {} or {}".format(
+                            tetrode, cut_name, os.path.basename(clu_name)))
                     continue
 
                 for fname in txt_files:
@@ -486,7 +543,8 @@ class NDataContainer():
 
                 else:
                     logging.info(
-                        "Skipping tetrode {} - no position file for {}".format(tetrode, filename))
+                        "Skipping tetrode {} - no position file {}".format(
+                            tetrode, filename))
                     continue
 
                 for fname in stm_files:
@@ -511,14 +569,17 @@ class NDataContainer():
                 self.add_files(NDataContainer.EFileType.Position, [pos_name])
                 self.add_files(NDataContainer.EFileType.LFP, [lfp_name])
                 self.add_files(NDataContainer.EFileType.STM, [stm_name])
+
         if num_found == 0:
             logging.warning("Did not find any Axona files to add")
             return
+
         self.set_units()
 
         if unit_cutoff:
             self.remove_recordings_units(
                 unit_cutoff[0], unit_cutoff[1], verbose=verbose)
+
         if save_result:
             friendly_re = ""
             if re_filter:
@@ -534,95 +595,8 @@ class NDataContainer():
             logging.info(
                 "Wrote list of files considered to {}".format(out_loc))
             return out_loc
+
         return cluster_files
-
-    def merge(self, indices, force_equal_units=True):
-        """
-        Merge the data from multiple indices together into the first index.
-
-        ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY - DOES NOT MERGE LFP.
-        Only call this after loading the data, and not while loading on the fly
-
-        Parameters
-        ----------
-        indices: list
-            The list of indices in the data to merge together
-        force_equal_units:
-            The merged indexes must have the same unit numbers available
-
-        Returns
-        -------
-        The merged data point
-
-        """
-        if self._load_on_fly:
-            logging.error("Don't call merge when loading on the fly")
-            return
-
-        target_index = indices[0]
-
-        data_to_merge = []
-        target_data = self.get_data(target_index)
-        for idx in indices[1:]:
-            data = self.get_data(idx)
-            data_to_merge.append(data)
-
-        units1 = self.get_units(target_index)
-        for idx, data in zip(indices[1:], data_to_merge):
-            units2 = self.get_units(idx)
-            if force_equal_units and (not units1 == units2):
-                logging.error(
-                    "Can't merge files with unequal units\n" +
-                    "Units are {} , {}".format(units1, units2))
-                return
-
-            # Merge the spikes based on times (waveforms not done yet)
-            new_spike_times = (
-                data.spike.get_timestamp() +
-                target_data.spike.get_duration())
-            new_duration = (
-                target_data.spike.get_duration() +
-                data.spike.get_duration())
-            new_tags = data.spike.get_unit_tags()
-
-            # Merge the spatial information based on times
-            new_spat_times = (
-                data.spatial._time +
-                target_data.spike.get_duration())
-            new_pos_x = data.spatial._pos_x
-            new_pos_y = data.spatial._pos_y
-            new_direction = data.spatial._direction
-            new_speed = data.spatial._speed
-
-            target_data.spike._timestamp = np.append(
-                target_data.spike._timestamp, new_spike_times)
-            target_data.spike._unit_Tags = np.append(
-                target_data.spike._unit_Tags, new_tags)
-            target_data.spike._set_duration(new_duration)
-
-            target_data.spatial._time = np.append(
-                target_data.spatial._time, new_spat_times)
-            # NB this may not work properly due to different borders
-            target_data.spatial._pos_x = np.append(
-                target_data.spatial._pos_x, new_pos_x)
-            target_data.spatial._pos_y = np.append(
-                target_data.spatial._pos_y, new_pos_y)
-            target_data.spatial._direction = np.append(
-                target_data.spatial._direction, new_direction)
-            target_data.spatial._speed = np.append(
-                target_data.spatial._speed, new_speed)
-
-        self._container[target_index] = target_data
-
-        for idx in indices[1:]:
-            self._container.pop(idx)
-            self._units.pop(idx)
-            indices[1:] = [a - 1 for a in indices[1:]]
-        self._unit_count = self._count_num_units()
-
-        self._container[target_index].set_unit_no(
-            self.get_units(target_index)[0])
-        return self.get_data(target_index)
 
     def subsample(self, key):
         """
@@ -731,10 +705,16 @@ class NDataContainer():
     def string_repr(self, pretty=True):
         """
         Return a string representation of this class.
+
         Parameters
         ----------
         pretty : str, Default True
             Should return a pretty version or all the info.
+
+        Returns
+        -------
+        str
+
         """
         if pretty:
             return self._pretty_string()
@@ -743,8 +723,29 @@ class NDataContainer():
 
     def remove_recordings_units(
             self, unit_lb=0, unit_ub=10000, verbose=False):
+        """
+        Remove data objects in this recording with units outside bounds.
+
+        Parameters
+        ----------
+        unit_lb : int, optional.
+            Lower bound on the number of allowed units.
+            Defaults to 0.
+        unit_ub : int, optional.
+            Upper bound on the number of allowed units.
+            Defaults to 10000.
+        verbose : bool, optional.
+            Whether to print extra information on what is being removed.
+            Defaults to False.
+
+        Returns
+        -------
+        None
+
+        """
         start_size = self.get_num_data()
         start_total = len(self)
+
         for i in range(self.get_num_data() - 1, -1, -1):
             unit_count = len(self.get_units(i))
             if (unit_count > unit_ub) or (unit_count < unit_lb):
@@ -773,6 +774,22 @@ class NDataContainer():
                 start_size, start_total))
 
     def get_data_at(self, data_index, unit_index):
+        """
+        Return an NData object from the given indices.
+
+        Parameters
+        ----------
+        data_index : int
+            The index in the container to return data at.
+        unit_index : int
+            The unit number to set on the returned data.
+
+        Returns
+        -------
+        NData
+            The ndata object at data_index with unit number unit_index
+
+        """
         if self._load_on_fly:
             try:
                 if (data_index == self._last_data_pt[0] and
@@ -797,6 +814,36 @@ class NDataContainer():
 
     def get_name_at_idx(
             self, idx, ext, opt_end="", base_dir=None, out_dirname="nc_plots"):
+        """
+        Get the filename to save an index in the collection to.
+
+        Parameters
+        ----------
+        idx : int
+            The index of the collection to get the filename for.
+        ext : str
+            The extension to append to the filename.
+        opt_end : str, optional.
+            Used like this default_name + opt_end + ext
+        base_dir : str, optional.
+            One can specify a directory that all files originated from.
+            It is used like so:
+            Say data1 is in test/foo/data.txt
+            and data2 is in test/bar/data.txt
+            Then passing base_dir as test
+            Would set the names to
+            out_dirname/foo--data.txt
+            out_dirname/bar--data.txt
+        outdirname : str, optional
+            The directory to save the plots to.
+            This is relative to the directory of the filename
+            if base dir is None.
+
+        Returns
+        -------
+        str
+
+        """
         data_idx, unit_idx = self._index_to_data_pos(idx)
         filename = self.get_file_dict()["Spike"][data_idx][0]
         unit_number = self.get_units(data_idx)[unit_idx]
@@ -819,6 +866,19 @@ class NDataContainer():
             main_dir, out_dirname, data_basename)
         make_dir_if_not_exists(out_name)
         return out_name
+
+    def list_all_units(self):
+        """Print all the units in the container."""
+        if self._load_on_fly:
+            for key, vals in self.get_file_dict().items():
+                if key == "Spike":
+                    for descriptor in vals:
+                        result = NData()
+                        self._load(key, descriptor, ndata=result)
+                        print("units are {}".format(result.get_unit_list()))
+        else:
+            for data in self._container:
+                print("units are {}".format(data.get_unit_list()))
 
     # Methods from here on should be for private class use
     def _pretty_string(self):
@@ -918,7 +978,7 @@ class NDataContainer():
             key_fn_pairs[key][0](filename)
             key_fn_pairs[key][2]()
 
-    def __repr__(self):
+    def __str__(self):
         """Return a string representation of the collection."""
         return self.string_repr(pretty=True)
 
@@ -963,9 +1023,8 @@ class NDataContainer():
             self._unit_count = self._count_num_units()
             counts = self._unit_count
         if index >= len(self):
-            print("Error, index {} is out of range {} for {}".format(
+            raise IndexError("index {} is out of range {} for {}".format(
                 index, len(self) - 1, self))
-            raise IndexError
         else:
             running_sum, running_idx = 0, 0
             for count in counts:
@@ -976,4 +1035,94 @@ class NDataContainer():
                     running_idx += 1
 
     def __iter__(self):
+        """Iterate over all units in the container."""
         return NDataContainerIterator(self)
+
+    # def merge(self, indices, force_equal_units=True):
+        #     """
+        #     Merge the data from multiple indices together into the first index.
+
+        #     ONLY FUNCTIONS FOR POSITIONS AND SPIKES CURRENTLY - DOES NOT MERGE LFP.
+        #     ALSO DOES NOT MERGE THE SPIKE WAVEFORMS, MERELY THE SPIKE TIMES.
+        #     Only call this after loading the data, and not while loading on the fly
+
+        #     Parameters
+        #     ----------
+        #     indices: list
+        #         The list of indices in the data to merge together
+        #     force_equal_units:
+        #         The merged indexes must have the same unit numbers available
+
+        #     Returns
+        #     -------
+        #     The merged data point
+
+        #     """
+        #     if self._load_on_fly:
+        #         logging.error("Don't call merge when loading on the fly")
+        #         return
+
+        #     target_index = indices[0]
+
+        #     data_to_merge = []
+        #     target_data = self.get_data(target_index)
+        #     for idx in indices[1:]:
+        #         data = self.get_data(idx)
+        #         data_to_merge.append(data)
+
+        #     units1 = self.get_units(target_index)
+        #     for idx, data in zip(indices[1:], data_to_merge):
+        #         units2 = self.get_units(idx)
+        #         if force_equal_units and (not units1 == units2):
+        #             logging.error(
+        #                 "Can't merge files with unequal units\n" +
+        #                 "Units are {} , {}".format(units1, units2))
+        #             return
+
+        #         # Merge the spikes based on times (waveforms not done yet)
+        #         new_spike_times = (
+        #             data.spike.get_timestamp() +
+        #             target_data.spike.get_duration())
+        #         new_duration = (
+        #             target_data.spike.get_duration() +
+        #             data.spike.get_duration())
+        #         new_tags = data.spike.get_unit_tags()
+
+        #         target_data.spike._timestamp = np.append(
+        #             target_data.spike._timestamp, new_spike_times)
+        #         target_data.spike._unit_Tags = np.append(
+        #             target_data.spike._unit_Tags, new_tags)
+        #         target_data.spike._set_duration(new_duration)
+
+        #         # Merge the spatial information based on times
+        #         new_spat_times = (
+        #             data.spatial._time +
+        #             target_data.spike.get_duration())
+        #         new_pos_x = data.spatial._pos_x
+        #         new_pos_y = data.spatial._pos_y
+        #         new_direction = data.spatial._direction
+        #         new_speed = data.spatial._speed
+
+        #         target_data.spatial._time = np.append(
+        #             target_data.spatial._time, new_spat_times)
+        #         # NB this may not work properly due to different borders
+        #         target_data.spatial._pos_x = np.append(
+        #             target_data.spatial._pos_x, new_pos_x)
+        #         target_data.spatial._pos_y = np.append(
+        #             target_data.spatial._pos_y, new_pos_y)
+        #         target_data.spatial._direction = np.append(
+        #             target_data.spatial._direction, new_direction)
+        #         target_data.spatial._speed = np.append(
+        #             target_data.spatial._speed, new_speed)
+
+        #     self._container[target_index] = target_data
+
+        #     for idx in indices[1:]:
+        #         self._container.pop(idx)
+        #         self._units.pop(idx)
+        #         indices[1:] = [a - 1 for a in indices[1:]]
+        #     self._unit_count = self._count_num_units()
+
+        #     self._container[target_index].set_unit_no(
+        #         self.get_units(target_index)[0])
+        #     return self.get_data(target_index)

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This module implements NData Class for NeuroChaT software
+This module implements NData Class for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
+
 """
 import logging
 from collections import OrderedDict as oDict
@@ -18,31 +19,30 @@ from neurochat.nc_lfp import NLfp
 
 class NData():
     """
-    The NData object is composed of data objects (NSpike(), NSpatial(), NLfp(),
-    and Nhdf()) and is built upon the composite structural object pattern. 
+    The NData class composes (NSpike(), NSpatial(), NLfp(), and Nhdf()).
 
-    This data class is the main data element in NeuroChaT which delegates the 
-    analysis and other operations to respective objects.
+    The NData class is built upon the composite structural object pattern.
+    This data class is the main data element in NeuroChaT which
+    delegates the analysis and other operations to respective objects.
 
+    Attributes
+    ----------
+    spatial: NSpatial
+        Spatial data object
+    spike: NSpike
+        Spike data object
+    lfp: Nlfp
+        LFP data object
+    hdf: NHdf
+        Object for manipulating HDF5 file
+    data_format: str
+        Recording system or format of the data file
+    _results: OrderedDict
+        The results of the analysis are written to this.
     """
 
     def __init__(self):
-        """
-        Attributes
-        ----------
-        spatial : NSpatial
-            Spatial data object
-        spike : NSpike
-            Spike data object
-        lfp : Nlfp
-            LFP data object
-        hdf : NHdf
-            Object for manipulating HDF5 file
-        data_format : str
-            Recording system or format of the data file
-
-        """
-
+        """See NData class description."""
         super().__init__()
         self.spike = NSpike(name='C0')
         self.spatial = NSpatial(name='S0')
@@ -55,7 +55,7 @@ class NData():
 
     def subsample(self, sample_range):
         """
-        Split up a data object in the collection into parts.
+        Sample a time range in seconds from the overall data.
 
         Parameters
         ----------
@@ -66,6 +66,7 @@ class NData():
         -------
         NData
             subsampled version of initial ndata object
+
         """
         ndata = NData()
         if self.lfp.get_duration() != 0:
@@ -82,7 +83,7 @@ class NData():
 
     def get_type(self):
         """
-        Returns the type of object. For NData, this is always `data` type
+        Return the type of object. For NData, this is always `data` type.
 
         Parameters
         ----------
@@ -97,11 +98,14 @@ class NData():
 
     def get_results(self, spaces_to_underscores=False):
         """
-        Returns the parametric results of the analyses
+        Return the parametric results of the analyses.
 
         Parameters
         ----------
-        None
+        spaces_to_underscores: bool
+            If True, any keys in the results dicts with spaces
+            will be converted to keys with underscores
+            this is useful for compatibility with R, as an example.
 
         Returns
         -------
@@ -109,14 +113,15 @@ class NData():
 
         """
         if spaces_to_underscores:
-            results = {x.replace(' ', '_'): v
-                       for x, v in self._results.items()}
+            results = oDict()
+            for x, v in self._results.items():
+                results[x.replace(' ', '_')] = v
             return results
         return self._results
 
     def update_results(self, results):
         """
-        Adds new parametric results of the analyses
+        Add new parametric results of the analyses.
 
         Parameters
         ----------
@@ -128,12 +133,11 @@ class NData():
         None
 
         """
-
         self._results.update(results)
 
     def reset_results(self):
         """
-        Reset the NData results to an empty OrderedDict
+        Reset the NData results to an empty OrderedDict.
 
         Parameters
         ----------
@@ -144,7 +148,6 @@ class NData():
         None
 
         """
-
         self._results = oDict()
         # self.spike.reset_results()
         # self.spatial.reset_results()
@@ -152,7 +155,7 @@ class NData():
 
     def get_data_format(self):
         """
-        Returns the recording system or data format
+        Return the recording system or data format.
 
         Parameters
         ----------
@@ -167,7 +170,7 @@ class NData():
 
     def set_data_format(self, data_format=None):
         """
-        Returns the parametric results of the analyses
+        Return the parametric results of the analyses.
 
         Parameters
         ----------
@@ -179,7 +182,6 @@ class NData():
         None
 
         """
-
         if data_format is None:
             data_format = self.get_data_format()
         self.data_format = data_format
@@ -189,8 +191,9 @@ class NData():
 
     def load(self):
         """
-        Loads the data from the filenames in each constituing objects, i.e, 
-        spatial,  spike and LFP 
+        Load the data from the filenames in each constituting object.
+
+        This loads the spatial, spike and LFP objects.
 
         Parameters
         ----------
@@ -207,7 +210,7 @@ class NData():
 
     def save_to_hdf5(self):
         """
-        Stores the spatial, spike and LFP datasets to HDF5 file 
+        Store the spatial, spike and LFP datasets to HDF5 file.
 
         Parameters
         ----------
@@ -218,28 +221,27 @@ class NData():
         None
 
         """
-
         try:
             self.hdf.save_object(obj=self.spike)
-        except:
+        except BaseException:
             logging.warning(
                 'Error in exporting NSpike data from NData object to the hdf5 file!')
 
         try:
             self.hdf.save_object(obj=self.spatial)
-        except:
+        except BaseException:
             logging.warning(
                 'Error in exporting NSpatial data from NData object to the hdf5 file!')
 
         try:
             self.hdf.save_object(obj=self.lfp)
-        except:
+        except BaseException:
             logging.warning(
                 'Error in exporting NLfp data from NData object to the hdf5 file!')
 
     def set_unit_no(self, unit_no):
         """
-        Sets the unit number of the spike dataset to analyse
+        Set the unit number of the spike dataset to analyse.
 
         Parameters
         ----------
@@ -251,12 +253,11 @@ class NData():
         None
 
         """
-
         self.spike.set_unit_no(unit_no)
 
     def set_spike_name(self, name='C0'):
         """
-        Sets the name of the spike dataset
+        Set the name of the spike dataset.
 
         Parameters
         ----------
@@ -268,12 +269,11 @@ class NData():
         None
 
         """
-
         self.spike.set_name(name)
 
     def set_spike_file(self, filename):
         """
-        Sets the filename of the spike dataset
+        Set the filename of the spike dataset.
 
         Parameters
         ----------
@@ -285,12 +285,11 @@ class NData():
         None
 
         """
-
         self.spike.set_filename(filename)
 
     def get_spike_file(self):
         """
-        Gets the filename of the spike dataset
+        Get the filename of the spike dataset.
 
         Parameters
         ----------
@@ -300,28 +299,28 @@ class NData():
         -------
         str
             Filename of the spike dataset
-        """
 
+        """
         return self.spike.get_filename()
 
     def load_spike(self):
         """
-        Loads spike dataset from the file to NSpike() object
+        Load spike dataset from the file to NSpike() object.
 
         Parameters
         ----------
-        None        
+        None
+
         Returns
         -------
         None
 
         """
-
         self.spike.load()
 
     def set_spatial_file(self, filename):
         """
-        Sets the filename of the spatial dataset
+        Set the filename of the spatial dataset.
 
         Parameters
         ----------
@@ -337,7 +336,7 @@ class NData():
 
     def get_spatial_file(self):
         """
-        Gets the filename of the spatial dataset
+        Get the filename of the spatial dataset.
 
         Parameters
         ----------
@@ -353,7 +352,7 @@ class NData():
 
     def set_spatial_name(self, name):
         """
-        Sets the name of the spatial dataset
+        Set the name of the spatial dataset.
 
         Parameters
         ----------
@@ -365,12 +364,11 @@ class NData():
         None
 
         """
-
         self.spatial.set_name(name)
 
     def load_spatial(self):
         """
-        Loads spatial dataset from the file to NSpatial() object
+        Load spatial dataset from the file to NSpatial() object.
 
         Parameters
         ----------
@@ -386,7 +384,7 @@ class NData():
 
     def set_lfp_file(self, filename):
         """
-        Sets the filename of the LFP dataset
+        Set the filename of the LFP dataset.
 
         Parameters
         ----------
@@ -402,7 +400,7 @@ class NData():
 
     def get_lfp_file(self):
         """
-        Gets the filename of the LFP dataset
+        Get the filename of the LFP dataset.
 
         Parameters
         ----------
@@ -412,13 +410,13 @@ class NData():
         -------
         str
             Filename of the LFP dataset
-        """
 
+        """
         return self.lfp.get_filename()
 
     def set_lfp_name(self, name):
         """
-        Sets the name of the NLfp() object
+        Set the name of the NLfp() object.
 
         Parameters
         ----------
@@ -430,12 +428,11 @@ class NData():
         None
 
         """
-
         self.lfp.set_name(name)
 
     def load_lfp(self):
         """
-        Loads LFP dataset to NLfp() object
+        Load LFP dataset to NLfp() object.
 
         Parameters
         ----------
@@ -446,19 +443,18 @@ class NData():
         None
 
         """
-
         self.lfp.load()
 
     # Forwarding to analysis
     def wave_property(self):
         """
-        Analysis of wavefor characteristics of the spikes of a unit
+        Analysis of waveform characteristics of the spikes of a unit.
 
         Delegates to NSpike().wave_property()
 
         Parameters
         ----------
-        None        
+        None
 
         Returns
         -------
@@ -470,7 +466,6 @@ class NData():
         nc_spike.NSpike().wave_property
 
         """
-
         gdata = self.spike.wave_property()
         self.update_results(self.spike.get_results())
 
@@ -479,7 +474,7 @@ class NData():
     def isi(self, bins='auto', bound=None, density=False,
             refractory_threshold=2):
         """
-        Analysis of ISI histogram
+        Analysis of ISI histogram.
 
         Delegates to NSpike().isi()
 
@@ -487,7 +482,6 @@ class NData():
         ----------
         bins : str or int
             Number of ISI histogram bins. If 'auto', NumPy default is used
-
         bound : int
             Length of the ISI histogram in msec
         density : bool
@@ -512,7 +506,7 @@ class NData():
 
     def isi_auto_corr(self, spike=None, **kwargs):
         """
-        Analysis of ISI autocrrelation histogram
+        Analysis of ISI autocrrelation histogram.
 
         Delegates to NSpike().isi_corr()
 
@@ -534,14 +528,13 @@ class NData():
         nc_spike.NSpike().isi_corr, nc_spike.NSpike().psth
 
         """
-
         gdata = self.spike.isi_corr(spike, **kwargs)
 
         return gdata
 
     def burst(self, burst_thresh=5, ibi_thresh=50):
         """
-        Burst analysis of spik-train
+        Burst analysis of spike-train.
 
         Delegates to NSpike().burst()
 
@@ -562,13 +555,12 @@ class NData():
         nc_spike.NSpike().burst
 
         """
-
         self.spike.burst(burst_thresh, ibi_thresh=ibi_thresh)
         self.update_results(self.spike.get_results())
 
     def theta_index(self, **kwargs):
         """
-        Calculates theta-modulation of spike-train ISI autocorrelation histogram.
+        Theta-modulation of spike-train ISI autocorrelation histogram.
 
         Delegates to NSpike().theta_index()
 
@@ -587,7 +579,6 @@ class NData():
         nc_spike.NSpike().theta_index()
 
         """
-
         gdata = self.spike.theta_index(**kwargs)
         self.update_results(self.spike.get_results())
 
@@ -595,7 +586,7 @@ class NData():
 
     def theta_skip_index(self, **kwargs):
         """
-        Calculates theta-skipping of spike-train ISI autocorrelation histogram.
+        Calculate theta-skipping of spike-train ISI autocorrelation histogram.
 
         Delegates to NSpike().theta_skip_index()
 
@@ -614,7 +605,6 @@ class NData():
         nc_spike.NSpike().theta_skip_index()
 
         """
-
         gdata = self.spike.theta_skip_index(**kwargs)
         self.update_results(self.spike.get_results())
 
@@ -625,25 +615,37 @@ class NData():
         Calculate the ratio in power between two bandpass filtered signals.
 
         Delegates to NLfp.bandpower_ratio()
-        Suggested [5, 11] and [1.5, 4 bands]
-
+        For example [5, 11] and [1.5, 4 bands] for theta delta ratio.
 
         Parameters
         ----------
-        first_band, second_band, win_sec, **kwargs
+        first_band : list | tuple
+            The frequency band of the ratio numerator [lower, upper].
+        second_band : list | tuple
+            The frequency band of the ratio denominator [lower, upper].
+        win_sec : float
+            The length of the window in seconds for power computation.
+        **kwargs : keyword arguments
+            Passed to nc_lfp.NLfp.bandpower_ratio()
+
+        Returns
+        -------
+        float
+            The ratio between the band powers first_band / second_band.
 
         See also
         --------
         nc_lfp.NLfp.bandpower_ratio()
-        """
 
-        self.lfp.bandpower_ratio(
+        """
+        bp = self.lfp.bandpower_ratio(
             first_band, second_band, win_sec, **kwargs)
         self.update_results(self.lfp.get_results())
+        return bp
 
     def spectrum(self, **kwargs):
         """
-        Analyses frequency spectrum of the LFP signal
+        Analyses frequency spectrum of the LFP signal.
 
         Delegates to NLfp().spectrum()
 
@@ -662,14 +664,13 @@ class NData():
         nc_lfp.NLfp().spectrum()
 
         """
-
         gdata = self.lfp.spectrum(**kwargs)
 
         return gdata
 
     def phase_dist(self, **kwargs):
         """
-        Analysis of spike to LFP phase distribution
+        Analysis of spike to LFP phase distribution.
 
         Delegates to NLfp().phase_dist()
 
@@ -688,7 +689,6 @@ class NData():
         nc_lfp.NLfp().phase_dist()
 
         """
-
         gdata = self.lfp.phase_dist(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.lfp.get_results())
 
@@ -696,7 +696,7 @@ class NData():
 
     def phase_at_spikes(self, **kwargs):
         """
-        Analysis of spike to LFP phase distribution
+        Analysis of spike to LFP phase distribution.
 
         Delegates to NLfp().phase_dist()
 
@@ -749,7 +749,7 @@ class NData():
 
     def plv(self, **kwargs):
         """
-        Calculates phase-locking value of the spike train to underlying LFP signal.
+        Phase-locking value of the spike train to underlying LFP signal.
 
         Delegates to NLfp().plv()
 
@@ -768,14 +768,14 @@ class NData():
         nc_lfp.NLfp().plv()
 
         """
-
         gdata = self.lfp.plv(self.spike.get_unit_stamp(), **kwargs)
 
         return gdata
 
     # def sfc(self, **kwargs):
         # """
-        # Calculates spike-field coherence of spike train with underlying LFP signal.
+        # Calculates spike-field coherence of spike train with underlying LFP
+        # signal.
 
         # Delegates to NLfp().sfc()
 
@@ -801,7 +801,7 @@ class NData():
 
     def event_trig_average(self, **kwargs):
         """
-        Averaging event-triggered LFP signals
+        Averaging event-triggered LFP signals based on spike times.
 
         Delegates to NLfp().event_trig_average()
 
@@ -820,7 +820,6 @@ class NData():
         nc_lfp.NLfp().event_trig_average()
 
         """
-
         gdata = self.lfp.event_trig_average(
             self.spike.get_unit_stamp(), **kwargs)
 
@@ -828,7 +827,7 @@ class NData():
 
     def spike_lfp_causality(self, **kwargs):
         """
-        Analyses spike to underlying LFP causality
+        Analyses spike to underlying LFP causality.
 
         Delegates to NLfp().spike_lfp_causality()
 
@@ -847,7 +846,6 @@ class NData():
         nc_lfp.NLfp().spike_lfp_causality()
 
         """
-
         gdata = self.lfp.spike_lfp_causality(
             self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.lfp.get_results())
@@ -856,7 +854,7 @@ class NData():
 
     def speed(self, **kwargs):
         """
-        Analysis of unit correlation with running speed
+        Analysis of unit correlation with running speed.
 
         Delegates to NSpatial().speed()
 
@@ -875,7 +873,6 @@ class NData():
         nc_spatial.NSpatial().speed()
 
         """
-
         gdata = self.spatial.speed(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -883,7 +880,7 @@ class NData():
 
     def angular_velocity(self, **kwargs):
         """
-        Analysis of unit correlation to angular head velocity (AHV) of the animal
+        Analyse unit correlation to angular head velocity (AHV) of the animal.
 
         Delegates to NSpatial().angular_velocity()
 
@@ -902,7 +899,6 @@ class NData():
         nc_spatial.NSpatial().angular_velocity()
 
         """
-
         gdata = self.spatial.angular_velocity(
             self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
@@ -911,7 +907,7 @@ class NData():
 
     def place(self, **kwargs):
         """
-        Analysis of place cell firing characteristics
+        Analysis of place cell firing characteristics.
 
         Delegates to NSpatial().place()
 
@@ -930,45 +926,16 @@ class NData():
         nc_spatial.NSpatial().place()
 
         """
-
         gdata = self.spatial.place(self.spike.get_unit_stamp(), **kwargs)
-        self.update_results(self.spatial.get_results())
-
-        return gdata
-
-    # Created by Sean Martin: 13/02/2019
-    def place_field_centroid_zscore(self, **kwargs):
-        """
-        Calculates a very simple centroid of place field
-
-        Delegates to NSpatial().place_field()
-
-        Parameters
-        ----------
-        **kwargs
-            Keyword arguments
-
-        Returns
-        -------
-        ndarray
-            Centroid of the place field
-
-        See also
-        --------
-        nc_spatial.NSpatial().place_field()
-
-        """
-
-        gdata = self.spatial.place_field_centroid_zscore(
-            self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
         return gdata
 
     def loc_time_lapse(self, **kwargs):
         """
-        Time-lapse firing proeprties of the unit with respect to location
+        Time-lapse firing properties of the unit with respect to location.
 
+        This means that the recording is split into multiple continuous samples.
         Delegates to NSpatial().loc_time_lapse()
 
         Parameters
@@ -993,8 +960,10 @@ class NData():
 
     def loc_shuffle(self, **kwargs):
         """
-        Shuffling analysis of the unit to  see if the locational firing specifity
-        is by chance or actually correlated to the location of the animal
+        Shuffling analysis of the unit for spatial properties.
+
+        This should be performed to see if the locational firing specificity
+        is by chance or actually correlated to the location of the animal.
 
         Delegates to NSpatial().loc_shuffle()
 
@@ -1013,7 +982,6 @@ class NData():
         nc_spatial.NSpatial().loc_shuffle()
 
         """
-
         gdata = self.spatial.loc_shuffle(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -1021,18 +989,21 @@ class NData():
 
     def loc_shift(self, shift_ind=np.arange(-10, 11), **kwargs):
         """
-        Analysis of firing specificity of the unit with respect to animal's location
-        to oberve whether it represents past location of the animal or anicipates a
-        future location.
+        Linear time shifting analysis of the unit for spatial properties.
+
+        Analysis of firing specificity of the unit with respect to animal's
+        location to observe whether it represents past location of the animal
+        or anticipates a future location.
 
         Delegates to NSpatial().loc_shift()
 
         Parameters
         ----------
         shift_ind : ndarray
-            Index of spatial resolution shift for the spike event time. Shift -1
-            implies shift to the past by 1 spatial time resolution, and +2 implies
-            shift to the future by 2 spatial time resoultion.
+            Index of spatial resolution shift for the spike event time.
+            For example if shift_ind = np.array([-1, +2])
+            Shift -1 implies shift to the past by 1 spatial time resolution,
+            and +2 implies shift to the future by 2 spatial time resolution.
         **kwargs
             Keyword arguments
 
@@ -1046,7 +1017,6 @@ class NData():
         nc_spatial.NSpatial().loc_shift()
 
         """
-
         gdata = self.spatial.loc_shift(
             self.spike.get_unit_stamp(), shift_ind=shift_ind, **kwargs)
         self.update_results(self.spatial.get_results())
@@ -1055,8 +1025,10 @@ class NData():
 
     def loc_auto_corr(self, **kwargs):
         """
-        Calculates the two-dimensional correlation of firing map which is the
-        map of the firing rate of the animal with respect to its location
+        Calculate the two-dimensional correlation of the firing map.
+
+        The firing map is the map of the firing rate
+        of the animal with respect to its location.
 
         Delegates to NSpatial().loc_auto_corr()
 
@@ -1082,8 +1054,10 @@ class NData():
 
     def loc_rot_corr(self, **kwargs):
         """
-        Calculates the rotational correlation of the locational firing rate of the animal with
-        respect to location, also called firing map
+        Calculate the rotational correlation of the firing map.
+
+        The locational firing rate of the animal with respect to location,
+        is what is meant by the firing map.
 
         Delegates to NSpatial().loc_rot_corr()
 
@@ -1102,7 +1076,6 @@ class NData():
         nc_spatial.NSpatial().loc_rot_corr()
 
         """
-
         gdata = self.spatial.loc_rot_corr(
             self.spike.get_unit_stamp(), **kwargs)
 
@@ -1110,8 +1083,7 @@ class NData():
 
     def hd_rate(self, **kwargs):
         """
-        Analysis of the firing characteristics of a unit with respect to animal's
-        head-direction
+        Analysis the firing of a unit with respect to animal's head-direction.
 
         Delegates to NSpatial().hd_rate()
 
@@ -1130,7 +1102,6 @@ class NData():
         nc_spatial.NSpatial().hd_rate()
 
         """
-
         gdata = self.spatial.hd_rate(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -1138,8 +1109,11 @@ class NData():
 
     def hd_rate_ccw(self, **kwargs):
         """
-        Analysis of the firing characteristics of a unit with respect to animal's
-        head-direction split into clockwise and counterclockwised directions
+        Analysis of head directional tuning split into CW and CCW.
+
+        Analysis of the firing characteristics of a unit with respect to
+        animal's head-direction split into clockwise and counterclockwise
+        directions.
 
         Delegates to NSpatial().hd_rate_ccw()
 
@@ -1158,7 +1132,6 @@ class NData():
         nc_spatial.NSpatial().hd_rate_ccw()
 
         """
-
         gdata = self.spatial.hd_rate_ccw(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -1166,8 +1139,9 @@ class NData():
 
     def hd_time_lapse(self):
         """
-        Time-lapse firing proeprties of the unit with respect to the head-direction
-        of the animal
+        Time-lapse firing properties of the unit with respect to HD.
+
+        HD stands for Head-Direction.
 
         Delegates to NSpatial().hd_time_lapse()
 
@@ -1186,15 +1160,17 @@ class NData():
         nc_spatial.NSpatial().hd_time_lapse()
 
         """
-
         gdata = self.spatial.hd_time_lapse(self.spike.get_unit_stamp())
 
         return gdata
 
     def hd_shuffle(self, **kwargs):
         """
-        Shuffling analysis of the unit to see if the head-directional firing specifity
-        is by chance or actually correlated to the head-direction of the animal
+        Shuffling analysis of the unit for head-directional firing.
+
+        This should be performed to see if the head-directional firing
+        specificity is by chance or actually correlated to the head-direction
+        of the animal.
 
         Delegates to NSpatial().hd_shuffle()
 
@@ -1213,7 +1189,6 @@ class NData():
         nc_spatial.NSpatial().hd_shuffle()
 
         """
-
         gdata = self.spatial.hd_shuffle(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -1221,18 +1196,20 @@ class NData():
 
     def hd_shift(self, shift_ind=np.arange(-10, 11), **kwargs):
         """
-        Analysis of firing specificity of the unit with respect to animal's head
-        direction to oberve whether it represents past direction or anicipates a
-        future direction.
+        Time shift analysis performed on head-directional firing.
+
+        Analysis of firing specificity of the unit with respect to animal's
+        head direction to observe whether it represents past direction or
+        anticipates a future direction.
 
         Delegates to NSpatial().hd_shift()
 
         Parameters
         ----------
         shift_ind : ndarray
-            Index of spatial resolution shift for the spike event time. Shift -1
-            implies shift to the past by 1 spatial time resolution, and +2 implies
-            shift to the future by 2 spatial time resoultion.
+            Index of spatial resolution shift for the spike event time.
+            Shift -1 implies shift to the past by 1 spatial time resolution
+            and +2 implies shift to the future by 2 spatial time resolution.
         **kwargs
             Keyword arguments
 
@@ -1246,7 +1223,6 @@ class NData():
         nc_spatial.NSpatial().speed()
 
         """
-
         gdata = self.spatial.hd_shift(
             self.spike.get_unit_stamp(), shift_ind=shift_ind)
         self.update_results(self.spatial.get_results())
@@ -1255,8 +1231,7 @@ class NData():
 
     def border(self, **kwargs):
         """
-        Analysis of the firing characteristic of a unit with respect to the
-        environmental border
+        Analysis of the firing of a unit related to the environmental border.
 
         Delegates to NSpatial().border()
 
@@ -1275,7 +1250,6 @@ class NData():
         nc_spatial.NSpatial().border()
 
         """
-
         gdata = self.spatial.border(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -1283,8 +1257,11 @@ class NData():
 
     def gradient(self, **kwargs):
         """
-        Analysis of gradient cell, a unit whose firing rate gradually increases 
-        as the animal traverses from the border to the cneter of the environment
+        Analysis of gradient cell.
+
+        A gradient cell is a unit whose firing rate gradually increases
+        as the animal traverses from the border to the center of the
+        environment.
 
         Delegates to NSpatial().gradient()
 
@@ -1303,7 +1280,6 @@ class NData():
         nc_spatial.NSpatial().gradient()
 
         """
-
         gdata = self.spatial.gradient(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -1311,8 +1287,10 @@ class NData():
 
     def grid(self, **kwargs):
         """
-        Analysis of Grid cells characterised by formation of grid-like pattern
-        of high activity in the firing-rate map
+        Analysis of Grid cells.
+
+        Grid cells are characterised by formation of grid-like pattern
+        of high activity in the firing-rate map.
 
         Delegates to NSpatial().grid()
 
@@ -1331,7 +1309,6 @@ class NData():
         nc_spatial.NSpatial().grid()
 
         """
-
         gdata = self.spatial.grid(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
@@ -1339,9 +1316,11 @@ class NData():
 
     def multiple_regression(self, **kwargs):
         """
-        Multiple-rgression analysis where firing rate for each variable, namely
-        location, head-direction, speed, AHV, and distance from border, are used
-        to regress the instantaneous firing rate of the unit.
+        Multiple-regression analysis to predict firing rate of the unit.
+
+        Specifically, the firing rate for each variable, namely
+        location, head-direction, speed, AHV, and distance from border, are
+        used to regress the instantaneous firing rate of the unit.
 
         Delegates to NSpatial().multiple_regression()
 
@@ -1368,9 +1347,11 @@ class NData():
 
     def interdependence(self, **kwargs):
         """
-        Interdependence analysis where firing rate of each variable is predicted
-        from another variable and the distributive ratio is measured between the
-        predicted firing rate and the caclulated firing rate.
+        Interdependence analysis between variables.
+
+        The firing rate of each variable is
+        predicted from another variable and the distributive ratio is measured
+        between the predicted firing rate and the calculated firing rate.
 
         Delegates to NSpatial().interdependence()
 
@@ -1388,20 +1369,19 @@ class NData():
         nc_spatial.NSpatial().interdependence()
 
         """
-
         self.spatial.interdependence(self.spike.get_unit_stamp(), **kwargs)
         self.update_results(self.spatial.get_results())
 
     def __getattr__(self, arg):
         """
-        Sets precedence for delegation with NSpike() > NLfp() > NSpatial()
+        Set precedence for delegation with NSpike() > NLfp() > NSpatial().
+
         Parameters
         ----------
         arg : str
-            Name of the function ot attributes to look for
+            Name of the function attributes to look for
 
         """
-
         if hasattr(self.spike, arg):
             return getattr(self.spike, arg)
         elif hasattr(self.lfp, arg):
@@ -1410,4 +1390,14 @@ class NData():
             return getattr(self.spatial, arg)
         else:
             logging.warning(
-                'No ' + arg + ' method or attribute in NeuroData or in composing data class')
+                'No ' + arg + ' method or attribute in NeuroData' +
+                'or in composing data class')
+
+    def __str__(self):
+        """Return a friendly string representation of the object."""
+        return "{} object in {} format containing:\n\t{}\n\t{}\n\t{}".format(
+            "NeuroChaT NData", self.data_format,
+            self.spike,
+            self.spatial,
+            self.lfp
+        )

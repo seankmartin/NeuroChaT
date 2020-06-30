@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module implements utility functions and classes for NeuroChaT software
+This module implements utility functions and classes for NeuroChaT software.
 
 @author: Md Nurul Islam; islammn at tcd dot ie
 
@@ -8,6 +8,8 @@ This module implements utility functions and classes for NeuroChaT software
 
 import logging
 import time
+import datetime
+import traceback
 from collections import OrderedDict as oDict
 import os
 from os import listdir
@@ -23,88 +25,90 @@ import scipy.stats as stats
 import scipy.signal as sg
 from scipy.fftpack import fft
 
+
 class NLog(logging.Handler):
     """
-    Class for handling log information (messages, errors and warnings) for NeuroChaT.
-    It formats the incoming message in HTML and sends it to the log interface of NeuroChaT.
-    
+    Class for handling log information (messages, errors and warnings).
+
+    It formats the incoming message in HTML and sends it to the log
+    interface of NeuroChaT.
+
     """
+
     def __init__(self):
         super().__init__()
         self.setup()
+
     def setup(self):
         """
-        Removes all the logging handlers and sets up a new logger with HTML formatting.
-        
+        Remove all the logging handlers and set up a logger in HTML format.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
-        
+
         """
-        
         log = logging.getLogger()
         for hdlr in log.handlers[:]:  # remove all old handlers
             log.removeHandler(hdlr)
-        fmt = logging.Formatter('%(asctime)s (%(filename)s)  %(levelname)s--  %(message)s', '%H:%M:%S')
+        fmt = logging.Formatter(
+            '%(asctime)s (%(filename)s)  %(levelname)s--  %(message)s', '%H:%M:%S')
         self.setFormatter(fmt)
         log.addHandler(self)
         # You can control the logging level
         log.setLevel(logging.DEBUG)
         logging.addLevelName(20, '')
-        
+
     def emit(self, record):
         """
-        Formats the incoming record and 
-        
+        Format the incoming record and display it.
+
         Parameters
         ----------
         record
-            Log record to dispkay or store
-        
+            Log record to display or store
+
         Returns
         -------
         None
-        
+
         """
-        
         msg = self.format(record)
         level = record.levelname
-        msg = level+ ':'+ msg
+        msg = level + ':' + msg
         print(msg)
         time.sleep(0.25)
-#        self.emit(QtCore.SIGNAL('update_log(QString)'), msg)
+
 
 class Singleton(object):
-    """
-    Creates a Singleton object created from a subclass of this class
-    
-    """
-    
+    """Create a Singleton object created from a subclass of this class."""
+
     def __new__(cls, *arg, **kwarg):
+        """Create a Singleton object created from a subclass of this class."""
         if not hasattr(cls, '_instance'):
             cls._instance = super().__new__(cls, *arg, **kwarg)
         return cls._instance
 
+
 def bhatt(X1, X2):
     """
-    Calculates Bhattacharyya coefficient and Bhattacharyya distance between two distributions
-    
+    Calculate Bhattacharyya coefficient and distance between distributions.
+
     Parameters
     ----------
-    X1, X2 : ndarray 
+    X1, X2 : ndarray
         Distributions under consideration
-    
+
     Returns
     -------
     bc, d : float
         Bhattacharyya coefficient and Bhattacharyya distance
-    
+
     """
-    
     r1, c1 = X1.shape
     r2, c2 = X2.shape
     if c1 == c2:
@@ -112,50 +116,53 @@ def bhatt(X1, X2):
         mu2 = X2.mean(axis=0)
         C1 = np.cov(X1.T)
         C2 = np.cov(X2.T)
-        C = (C1+ C2)/2
+        C = (C1 + C2) / 2
         chol = nalg.cholesky(C).T
-        dmu = (mu1- mu2)@nalg.inv(chol)
+        dmu = (mu1 - mu2) @ nalg.inv(chol)
         try:
-            d = 0.125*dmu@(dmu.T)+ 0.5*np.log(nalg.det(C)/np.sqrt(nalg.det(C1)*nalg.det(C2)))
-        except:
-            d = 0.125*dmu@(dmu.T)+ 0.5*np.log(np.abs(nalg.det(C@nalg.inv(scipy.linalg.sqrtm(C1@C2)))))
-        bc = np.exp(-1*d)
+            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(
+                nalg.det(C) / np.sqrt(nalg.det(C1) * nalg.det(C2)))
+        except BaseException:
+            d = 0.125 * dmu @ (dmu.T) + 0.5 * np.log(
+                np.abs(nalg.det(C @ nalg.inv(scipy.linalg.sqrtm(C1 @ C2)))))
+        bc = np.exp(-1 * d)
 
         return bc, d
     else:
-        logging.error('Cannot measure Bhattacharyya distance, column sizes do not match!')
+        logging.error(
+            'Cannot measure Bhattacharyya distance, column sizes do not match!')
+
 
 def butter_filter(x, Fs, *args):
     """
-    Filtering function using bidirectional zero-phase shift Butterworth filter.
-    
+    Filter using bidirectional zero-phase shift Butterworth filter.
+
     Parameters
     ----------
-    x : ndarray 
+    x : ndarray
         Data or signal to filter
     Fs : Sampling frequency
     *kwargs
         Arguments with filter paramters
-    
+
     Returns
     -------
     ndarray
         Filtered signal
-        
+
     """
-    
-    gstop = 20 # minimum dB attenuation at stopabnd
-    gpass = 3 # maximum dB loss during ripple
-#    order= args[0]
+    gstop = 20  # minimum dB attenuation at stopabnd
+    gpass = 3  # maximum dB loss during ripple
     for arg in args:
         if isinstance(arg, str):
             filttype = arg
     if filttype == 'lowpass' or filttype == 'highpass':
-        wp = args[1]/(Fs/2)
+        wp = args[1] / (Fs / 2)
         if wp > 1:
             wp = 1
             if filttype == 'lowpass':
-                logging.warning('Butterworth filter critical freqeuncy Wp is capped at 1')
+                logging.warning(
+                    'Butterworth filter critical frequency Wp is capped at 1')
             else:
                 logging.error('Cannot highpass filter over Nyquist frequency!')
 
@@ -163,12 +170,14 @@ def butter_filter(x, Fs, *args):
         if len(args) < 4:
             logging.error('Insufficient Butterworth filter arguments')
         else:
-            wp = np.array(args[1:3])/(Fs/2)
+            wp = np.array(args[1:3]) / (Fs / 2)
             if wp[0] >= wp[1]:
-                logging.error('Butterworth filter lower cutoff frequency must be smaller than upper cutoff freqeuncy!')
+                logging.error(
+                    'Butterworth filter lower cutoff frequency must be smaller than upper cutoff frequency!')
 
             if wp[0] == 0 and wp[1] >= 1:
-                logging.error('Invalid filter specifications, check cutt off frequencies and sampling frequency!')
+                logging.error(
+                    'Invalid filter specifications, check cut off frequencies and sampling frequency!')
             elif wp[0] == 0:
                 wp = wp[1]
                 filttype = 'lowpass'
@@ -179,36 +188,37 @@ def butter_filter(x, Fs, *args):
                 logging.warning('Butterworth filter type selected: highpass')
 
     if filttype == 'lowpass':
-        ws = min([wp+ 0.1, 1])
+        ws = min([wp + 0.1, 1])
     elif filttype == 'highpass':
-        ws = max([wp- 0.1, 0.01/(Fs/2)])
+        ws = max([wp - 0.1, 0.01 / (Fs / 2)])
     elif filttype == 'bandpass':
         ws = np.zeros_like(wp)
-        ws[0] = max([wp[0]- 0.1, 0.01/(Fs/2)])
-        ws[1] = min([wp[1]+ 0.1, 1])
+        ws[0] = max([wp[0] - 0.1, 0.01 / (Fs / 2)])
+        ws[1] = min([wp[1] + 0.1, 1])
 
     min_order, min_wp = sg.buttord(wp, ws, gpass, gstop)
-#    if order<= min_order:
-#        order= min_order
-#        wp= min_wp
 
     b, a = sg.butter(min_order, min_wp, btype=filttype, output='ba')
 
     return sg.filtfilt(b, a, x)
 
+
 def chop_edges(x, xlen, ylen):
     """
-    Chope the edges of a firing rate map if they are not visited at ll or with zero firing rate
-    
+    Chop the edges of a firing rate map.
+
+    They are considered to be the edges if they are not
+    visited at all or with zero firing rate.
+
     Parameters
     ----------
-    x : ndarray 
+    x : ndarray
         Matrix of firing rate
     xlen : int
         Maximum length of the x-axis
     ylen : int
         Maximum length of the y-axis
-    
+
     Returns
     -------
     low_ind : list of int
@@ -217,9 +227,8 @@ def chop_edges(x, xlen, ylen):
         Index of high end of valid edges
     y : ndarray
         Chopped firing map
-    
+
     """
-    
     y = np.copy(x)
     low_ind = [0, 0]
     high_ind = [x.shape[0], x.shape[1]]
@@ -240,11 +249,6 @@ def chop_edges(x, xlen, ylen):
         else:
             MOVEON = False
 
-# Following is the old MATLAB logic, we have changed it to remove the edges with zero count
-#        if no_filled_bins1< no_filled_bins2:
-#            low_ind[1] += 1
-#        else:
-#            high_ind[1] -= 1
         y = x[low_ind[0]: high_ind[0], low_ind[1]:high_ind[1]]
 
     MOVEON = True
@@ -263,48 +267,44 @@ def chop_edges(x, xlen, ylen):
         else:
             MOVEON = False
 
-# Following is the old MATLAB logic, we have changed it to remove the edges with zero count
-#        if no_filled_bins1< no_filled_bins2:
-#            low_ind[0] += 1
-#        else:
-#            high_ind[0]-=1
         y = x[low_ind[0]: high_ind[0], low_ind[1]:high_ind[1]]
 
     return low_ind, high_ind, y
 
+
 def corr_coeff(x1, x2):
     """
     Correlation coefficient between two numeric series or two signals.
-    
+
     Parameters
     ----------
     x1, x2 : ndarray
         Input numeric array or signals
-    
+
     Returns
     -------
     float
         Correlation coefficient of input arrays
-    
+
     """
-    
     try:
-        return np.sum(np.multiply(x1- x1.mean(), x2- x2.mean()))/ \
-            np.sqrt(np.sum((x1- x1.mean())**2)*np.sum((x2- x2.mean())**2))
-    except:
+        return np.sum(np.multiply(x1 - x1.mean(), x2 - x2.mean())) / \
+            np.sqrt(np.sum((x1 - x1.mean())**2) * np.sum((x2 - x2.mean())**2))
+    except BaseException:
         return 0
+
 
 def extrema(x, mincap=None, maxcap=None):
     """
-    Finds the extrema in a numeric array or a signal
-    
+    Find the extrema in a numeric array or a signal.
+
     Parameters
     ----------
     mincap
         Maximum value for the minima
     maxcap
         Minimum value for the maxima
-    
+
     Returns
     -------
     xmax : ndarray
@@ -315,25 +315,24 @@ def extrema(x, mincap=None, maxcap=None):
         Minima values
     imin : ndarray
         Minima indices
-    
+
     """
-    
     x = np.array(x)
     # Flat peaks at the end of the series are not considered yet
     dx = np.diff(x)
     if not np.any(dx):
         return [], [], [], []
 
-    a = find(dx != 0) # indices where x changes
-    lm = find(np.diff(a) != 1)+1 # indices where a is not sequential
-    d = a[lm]- a[lm-1]
-    a[lm] = a[lm]- np.floor(d//2)
+    a = find(dx != 0)  # indices where x changes
+    lm = find(np.diff(a) != 1) + 1  # indices where a is not sequential
+    d = a[lm] - a[lm - 1]
+    a[lm] = a[lm] - np.floor(d // 2)
 
-    xa = x[a] # series without flat peaks
-    d = np.sign(xa[1:-1]- xa[:-2])- np.sign(xa[2:]- xa[1:-1])
-    imax = a[find(d > 0)+1]
+    xa = x[a]  # series without flat peaks
+    d = np.sign(xa[1:-1] - xa[:-2]) - np.sign(xa[2:] - xa[1:-1])
+    imax = a[find(d > 0) + 1]
     xmax = x[imax]
-    imin = a[find(d < 0)+1]
+    imin = a[find(d < 0) + 1]
     xmin = x[imin]
 
     if mincap:
@@ -345,10 +344,11 @@ def extrema(x, mincap=None, maxcap=None):
 
     return xmax, imax, xmin, imin
 
+
 def fft_psd(x, Fs, nfft=None, side='one', ptype='psd'):
     """
-    Calculates the Fast Fourier Transform (FFT) of a signal.
-    
+    Calculate the Fast Fourier Transform (FFT) of a signal.
+
     Parameters
     ----------
     x : ndarray
@@ -361,22 +361,20 @@ def fft_psd(x, Fs, nfft=None, side='one', ptype='psd'):
         'one'-sided or 'two'-sided FFT
     ptype : str
         Calculates power-spectral density if set to 'psd'
-    
+
     Returns
     -------
     x_fft : ndarray
         FFT of input
     f : ndarray
         FFt frequency
-    
+
     """
-
-
     if nfft is None:
-        nfft = 2**(np.floor(np.log2(len(x)))+1)
+        nfft = 2**(np.floor(np.log2(len(x))) + 1)
 
     if nfft < Fs:
-        nfft = 2**(np.floor(np.log2(Fs))+1)
+        nfft = 2**(np.floor(np.log2(Fs)) + 1)
     nfft = int(nfft)
     dummy = np.zeros(nfft)
     if nfft > len(x):
@@ -384,22 +382,22 @@ def fft_psd(x, Fs, nfft=None, side='one', ptype='psd'):
         x = dummy
 
     winfun = np.hanning(nfft)
-    xf = np.arange(0, Fs, Fs/nfft)
-    f = xf[0: int(nfft/2)+ 1]
-
+    xf = np.arange(0, Fs, Fs / nfft)
+    f = xf[0: int(nfft / 2) + 1]
 
     if side == 'one':
         x_fft = fft(np.multiply(x, winfun), nfft)
         if ptype == 'psd':
-            x_fft = np.absolute(x_fft[0: int(nfft/2)+ 1])**2/nfft**2
-            x_fft[1:-1] = 2*x_fft[1:-1]
+            x_fft = np.absolute(x_fft[0: int(nfft / 2) + 1])**2 / nfft**2
+            x_fft[1:-1] = 2 * x_fft[1:-1]
 
     return x_fft, f
 
+
 def find(X, n=None, direction='all'):
     """
-    Finds the non-zero entries of a signal or array.
-    
+    Find the non-zero entries of a signal or array.
+
     Parameters
     ----------
     X : ndarray or list
@@ -407,16 +405,16 @@ def find(X, n=None, direction='all'):
     n : int
         Number of such entries
     direction : str
-        If 'all', all entries of length n are returned. If 'first', first n entries
-        are returned. If 'last', last n entrues are returned.
-    
+        If 'all', all entries of length n are returned.
+        If 'first', first n entries are returned.
+        If 'last', last n entries are returned.
+
     Returns
     -------
     ndarray
         Indices of non-zero entries.
-    
+
     """
-    
     if isinstance(X, list):
         X = np.array(X)
     X = X.flatten()
@@ -427,35 +425,35 @@ def find(X, n=None, direction='all'):
         if direction == 'all' or direction == 'first':
             ind = ind[:n]
         elif direction == 'last':
-            ind = ind[np.flipud(np.arange(-1, -(n+1), - 1))]
+            ind = ind[np.flipud(np.arange(-1, -(n + 1), - 1))]
     return np.array(ind)
+
 
 def find2d(X, n=None):
     """
-    Finds the non-zero entries of a matrix.
-    
+    Find the non-zero entries of a matrix.
+
     Parameters
     ----------
     X : ndarray
         Matrix whose non-zero entries need to find out
     n : int
         Number of such entries
-    
+
     Returns
     -------
     ndarray
         x-indices of non-zero entries.
     ndarray
         y-indices of non-zero entries.
-    
+
     """
-    
     if len(X.shape) == 2:
         J = []
         I = []
         for r in np.arange(X.shape[0]):
             I.extend(find(X[r, ]))
-            J.extend(r*np.ones((len(find(X[r, ])), ), dtype=int))
+            J.extend(r * np.ones((len(find(X[r, ])), ), dtype=int))
         if len(I):
             if n is not None and n < len(I):
                 I = I[:n]
@@ -465,25 +463,26 @@ def find2d(X, n=None):
     else:
         logging.error('ndrray is not 2D. Check shape attributes of the input!')
 
+
 def find_chunk(x):
     """
-    Finds size and indeices of chunks of non-zero segments in an array
-    
+    Find size and indices of chunks of non-zero segments in an array.
+
     Parameters
     ----------
     x : ndarray
         Inout array whose non-zero chunks are to be explored
-    
+
     Returns
     -------
     segsize : ndarray
         Lengths of non-zero chunks
     segind : ndarray
         Indices of non-zero chunks
-    
+
     """
-    
-    # x is a binary array input i.e. x= data> 0.5 will find all the chunks in data where data is greater than 0.5
+    # x is a binary array input i.e. x= data> 0.5 will find all the chunks in
+    # data where data is greater than 0.5
     i = 0
     segsize = []
     segind = np.zeros(x.shape)
@@ -498,61 +497,70 @@ def find_chunk(x):
                 else:
                     break
             segsize.append(c)
-            segind[j:i] = c # indexing by size of the chunk
+            segind[j:i] = c  # indexing by size of the chunk
         i += 1
     return segsize, segind
 
+
 def hellinger(X1, X2):
     """
-    Calculates Hellinger distance between two distributions.
-    
+    Calculate Hellinger distance between two distributions.
+
     Parameters
     ----------
-    X1, X2 : ndarray 
+    X1, X2 : ndarray
         Distributions under consideration
-    
+
     Returns
     -------
     d : float
-        Calculated Hellinger distance    
-    
-    """    
-    
-    if X1.shape[1] != X2.shape[1]:
-        logging.error('Hellinger distance cannot be computed, column sizes do not match!')
-    else:
-        return np.sqrt(1- bhatt(X1, X2)[0])
+        Calculated Hellinger distance
 
-def histogram(x, bins):    
     """
-    Calculates the histogram count of input array
-    
+    if X1.shape[1] != X2.shape[1]:
+        logging.error(
+            'Hellinger distance cannot be computed, column sizes do not match!')
+    else:
+        return np.sqrt(1 - bhatt(X1, X2)[0])
+
+
+def histogram(x, bins):
+    """
+    Calculate the histogram count of input array.
+
+    This function is not a replacement of np.histogram;
+    it is created for convenience of binned-based rate calculations
+    and mimicking matlab histc that includes digitized indices
+
     Parameters
     ----------
-    x : ndarray 
+    x : ndarray
         Array whose histogram needs to be calculated
     bins
         Number of histogram bins
-    
+
     Returns
     -------
     ndarray
         Histogram count
     ndarray
         Histogram bins(lowers edges)
-    
-    """     
-    # This function is not a replacement of np.histogram; it is created for convenience
-    # of binned-based rate calculations and mimicking matlab histc that includes digitized indices
+
+    """
     if isinstance(bins, int):
-        bins = np.arange(np.min(x), np.max(x), (np.max(x)- np.min(x))/bins)
-    bins = np.append(bins, bins[-1]+ np.mean(np.diff(bins)))
-    return np.histogram(x, bins)[0], np.digitize(x, bins)-1, bins[:- 1]
+        bins = np.arange(np.min(x), np.max(x), (np.max(x) - np.min(x)) / bins)
+    bins = np.append(bins, bins[-1] + np.mean(np.diff(bins)))
+    return np.histogram(x, bins)[0], np.digitize(x, bins) - 1, bins[:- 1]
+
 
 def histogram2d(y, x, ybins, xbins):
     """
-    Calculates the joint histogram count of two arrays
-    
+    Calculate the joint histogram count of two arrays.
+
+    This function is not a replacement of np.histogram2d;
+    it is created for convenience of binned-based rate calculations
+    and mimicking matlab histc that includes digitized indices
+
     Parameters
     ----------
     y, x : ndarray
@@ -561,7 +569,7 @@ def histogram2d(y, x, ybins, xbins):
         Number of histogram bins in y-axis
     xbins
         Number of histogram bins in x-axis
-    
+
     Returns
     -------
     ndarray
@@ -570,23 +578,24 @@ def histogram2d(y, x, ybins, xbins):
         Histogram bins in x-axis (lowers edges)
     ndarray
         Histogram bins in y-axis (lowers edges)
-    
+
     """
-    
-    # This function is not a repalcement of np.histogram
     if isinstance(xbins, int):
-        xbins = np.arange(np.min(x), np.max(x), (np.max(x)- np.min(x))/xbins)
-    xbins = np.append(xbins, xbins[-1]+ np.mean(np.diff(xbins)))
+        xbins = np.arange(np.min(x), np.max(
+            x), (np.max(x) - np.min(x)) / xbins)
+    xbins = np.append(xbins, xbins[-1] + np.mean(np.diff(xbins)))
     if isinstance(ybins, int):
-        ybins = np.arange(np.min(y), np.max(y), (np.max(y)- np.min(y))/ybins)
-    ybins = np.append(ybins, ybins[-1]+ np.mean(np.diff(ybins)))
+        ybins = np.arange(np.min(y), np.max(
+            y), (np.max(y) - np.min(y)) / ybins)
+    ybins = np.append(ybins, ybins[-1] + np.mean(np.diff(ybins)))
 
     return np.histogram2d(y, x, [ybins, xbins])[0], ybins[:-1], xbins[:-1]
 
+
 def linfit(X, Y, getPartial=False):
     """
-    Calculates the linear regression coefficients in least-square sense.
-    
+    Calculate the linear regression coefficients in least-square sense.
+
     Parameters
     ----------
     X : ndarray
@@ -595,14 +604,13 @@ def linfit(X, Y, getPartial=False):
         Array of oservation data
     getPartial : bool
         Get the partial correlation coefficients if 'True'
-    
+
     Returns
     -------
     _results : dict
         Dictionary with results of least-square optimization of linear regression
-        
-    """    
-    
+
+    """
     _results = oDict()
     if len(X.shape) == 2:
         Nd, Nobs = X.shape
@@ -621,19 +629,20 @@ def linfit(X, Y, getPartial=False):
         logging.error('linfit: Number of rows in X and Y does not match!')
 
     if Nd > 1 and getPartial:
-        semiCorr = np.zeros(Nd) # Semi partial correlation
+        semiCorr = np.zeros(Nd)  # Semi partial correlation
         for d in np.arange(Nd):
             part_results = linfit(np.delete(X, 1, axis=0), Y, getPartial=False)
-            semiCorr[d] = _results['Rsq']- part_results['Rsq']
+            semiCorr[d] = _results['Rsq'] - part_results['Rsq']
         _results['semiCorr'] = semiCorr
 
     return _results
 
+
 def nxl_write(
-    file_name, data_frame, sheet_name='Sheet1', startRow=0, startColumn=0):
+        file_name, data_frame, sheet_name='Sheet1', startRow=0, startColumn=0):
     """
-    Write Pandas DataFrame to excel file. It is a wrapper for Pandas.ExcelWriter()
-    
+    Write Pandas DataFrame to excel file, wraps Pandas.ExcelWriter().
+
     Parameters
     ----------
     filename : str
@@ -645,12 +654,12 @@ def nxl_write(
     startRow : int
         Which row in the file the data writing should start
     startColumn : int
-        Which column in the file the data writing should start        
-    
+        Which column in the file the data writing should start
+
     Returns
     -------
-    None    
-    
+    None
+
     """
     # Create a Pandas Excel writer using XlsxWriter as the engine.
     writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
@@ -659,11 +668,13 @@ def nxl_write(
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()
 
+
 def residual_stat(y, y_fit, p):
     """
-    Calculates the goodness of fit and other residual statistics between observed
-    and fitted values from a model
-    
+    Calculate the goodness of fit and other residual statistics.
+
+    These are calculated between observed and fitted values from a model.
+
     Parameters
     ----------
     y : ndarray
@@ -672,21 +683,20 @@ def residual_stat(y, y_fit, p):
         Fitted data to a linear model
     p : int
         Model order
-    
+
     Returns
     -------
     _results : dict
         Dictionary of residual statistics
-    
+
     """
-    
-   # p= total explanatory variables excluding constants
+    # p= total explanatory variables excluding constants
     _results = oDict()
-    res = y- y_fit
+    res = y - y_fit
     ss_res = np.sum(res**2)
-    ss_tot = np.sum((y- np.mean(y))**2)
-    r_sq = 1- ss_res/ss_tot
-    adj_r_sq = 1- (ss_res/ ss_tot)* ((len(y)-1)/(len(y)- p-1))
+    ss_tot = np.sum((y - np.mean(y))**2)
+    r_sq = 1 - ss_res / ss_tot
+    adj_r_sq = 1 - (ss_res / ss_tot) * ((len(y) - 1) / (len(y) - p - 1))
     _results['Pearson R'], _results['Pearson P'] = stats.pearsonr(y, y_fit)
 
     _results['Rsq'] = r_sq
@@ -694,44 +704,51 @@ def residual_stat(y, y_fit, p):
 
     return _results
 
+
 def rot_2d(x, theta):
     """
-    Rotates a firing map by a specified angle
-    
+    Rotate a firing map by a specified angle.
+
     Parameters
     ----------
     x : ndarray
         Matrix of firing rate map
     theta
         Angle of rotation in theta
-        
+
     Returns
     -------
     ndarray
         Rotated matrix
-    
-    """
-    
-    return scipy.ndimage.interpolation.rotate(x, theta, reshape=False, mode='constant', cval=np.min(x))
 
-# Created by Sean Martin 14/02/2019
+    """
+    return scipy.ndimage.interpolation.rotate(
+        x, theta, reshape=False, mode='constant', cval=np.min(x))
+
+
 def angle_between_points(a, b, c):
     """
-    Returns the angle between the lines ab and bc, <abc
-    
+    Return the angle between the lines ab and bc, <abc.
+
+    This function always returns an angle less than 180degrees.
+    The orientation of the lines can be used to determine which
+    side of the lines this angle is formed from.
+
+    Returns np.nan if ab and bc are the same point.
+
     Parameters
     ----------
     a : ndarray
         The first point
-    b : ndarray 
+    b : ndarray
         The second point
     c : the last point
-        
+
     Returns
     -------
     float
         The angle in degrees
-    
+
     """
     ba = a - b
     bc = c - b
@@ -750,14 +767,18 @@ def angle_between_points(a, b, c):
 
     return np.degrees(angle)
 
+
 def centre_of_mass(co_ords, weights, axis=0):
     """
-    Calculates the co-ordinate centre of mass for a system of particles with co ords and weights
+    Calculate the co-ordinate centre of mass for a 2D system of particles.
+
+    The particles all have co-ords and weights.
 
     Parameters
     ----------
     co_ords : ndarray
-        Array of co-ordinate positions, assumed to have co_ords.shape[axis] co-ordinates
+        Array of co-ordinate positions,
+        assumed to have co_ords.shape[axis] co-ordinates.
     weights : ndarray
         Array of corresponding weights
     axis : int, default 0
@@ -767,50 +788,53 @@ def centre_of_mass(co_ords, weights, axis=0):
     -------
     ndarray
         Co-ordinate of the centre of mass
+
     """
     shape = co_ords.shape
     if axis == 0:
         weighted = np.multiply(
-            co_ords, 
+            co_ords,
             np.repeat(weights, shape[1]).reshape(shape))
     elif axis == 1:
         weighted = np.multiply(
-            co_ords, 
-            np.tile(weights, shape[0]).reshape(shape)) 
+            co_ords,
+            np.tile(weights, shape[0]).reshape(shape))
     else:
         logging.error("centre_of_mass: Expected axis to be 0 or 1")
     return np.sum(weighted, axis=axis) / np.sum(weights)
-    
+
+
 def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
     """
-    Filters a 1D array or signal.
-    
+    Filter a 1D array or signal.
+
     Parameters
     ----------
     x : ndarray
-        Array or signal to be filtered. If matrix, each column or row is filtered
+        Array or signal to be filtered.
+        If matrix, each column or row is filtered
         individually depending on 'dir' parameter that takes either '0' for along-column
         and '1' for along-row filtering.
     filttype : str
         'b' for moving average or box filter. 'g' for Gaussian filter
     filtsize
         Box size for box filter and sigma for Gaussian filter
-        
+
     Returns
     -------
     ndarray
         Filtered data
-    
+
     """
-    
     x = np.array(x)
-    direction = kwargs.get('dir', 0) # default along column
+    direction = kwargs.get('dir', 0)  # default along column
     if filttype == 'g':
-        halfwid = np.round(3*filtsize)
-        xx = np.arange(-halfwid, halfwid+1, 1)
-        filt = np.exp(-(xx**2)/(2*filtsize**2))/(np.sqrt(2*np.pi)*filtsize)
+        halfwid = np.round(3 * filtsize)
+        xx = np.arange(-halfwid, halfwid + 1, 1)
+        filt = np.exp(-(xx**2) / (2 * filtsize**2)) / \
+            (np.sqrt(2 * np.pi) * filtsize)
     elif filttype == 'b':
-        filt = np.ones(filtsize, )/filtsize
+        filt = np.ones(filtsize, ) / filtsize
 
     if len(x.shape) == 1:
         result = np.convolve(x, filt, mode='same')
@@ -824,10 +848,11 @@ def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
                 result[:, i] = np.convolve(x[:, i], filt, mode='same')
     return result
 
+
 def smooth_2d(x, filttype='b', filtsize=5):
     """
-    Filters a 2D array or signal.
-    
+    Filter a 2D array or signal.
+
     Parameters
     ----------
     x : ndarray
@@ -836,34 +861,41 @@ def smooth_2d(x, filttype='b', filtsize=5):
         'b' for moving average or box filter. 'g' for Gaussian filter
     filtsize
         Box size for box filter and sigma for Gaussian filter
-        
+
     Returns
     -------
     smoothX
         Filtered matrix
-    
+
     """
-    
     nanInd = np.isnan(x)
     x[nanInd] = 0
     if filttype == 'g':
-        halfwid = np.round(3*filtsize)
-        xx, yy = np.meshgrid(np.arange(-halfwid, halfwid+1, 1), np.arange(-halfwid, halfwid+1, 1), copy=False)
-        filt = np.exp(-(xx**2+ yy**2)/(2*filtsize**2)) # /(2*np.pi*filtsize**2) # This is the scaling used before;
-                                                        #But tested with ones(50, 50); gives a hogher value
-        filt = filt/ np.sum(filt)
+        halfwid = np.round(3 * filtsize)
+        xx, yy = np.meshgrid(np.arange(-halfwid, halfwid + 1, 1),
+                             np.arange(-halfwid, halfwid + 1, 1), copy=False)
+        # /(2*np.pi*filtsize**2) # This is the scaling used before;
+        filt = np.exp(-(xx**2 + yy**2) / (2 * filtsize**2))
+        # But tested with ones(50, 50); gives a hogher value
+        filt = filt / np.sum(filt)
     elif filttype == 'b':
-        filt = np.ones((filtsize, filtsize))/filtsize**2
+        filt = np.ones((filtsize, filtsize)) / filtsize**2
 
     smoothX = sg.convolve2d(x, filt, mode='same')
     smoothX[nanInd] = np.nan
 
     return smoothX
 
+
 def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     """
-    Returns a list of ranges where truth values occur and the corresponding
-    values from arr, arr is assumed to be a sorted list
+    Return a list of ranges where truth values occur in sorted array.
+
+    Also return the corresponding values from the input array.
+
+    Note
+    ----
+    The input array arr is assumed to be a sorted list.
 
     Parameters
     ----------
@@ -871,15 +903,15 @@ def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
         list of values to get ranges from, equal in length to truth_arr
     truth_arr : ndarray
         list of truth values to make the ranges
-    min_range : int or float 
+    min_range : int or float
         the minimum length of range
 
     Returns
     -------
     list
         A list of tuples, ranges in arr where truth values are truth_arr
-    """
 
+    """
     in_range = False
     ranges = []
     range_idxs = []
@@ -901,143 +933,188 @@ def find_true_ranges(arr, truth_arr, min_range, return_idxs=False):
     else:
         return ranges, range_idxs
 
+
 def find_peaks(data, **kwargs):
     """
-    Returns the peaks in the data based on gradient calculations
+    Return the peaks in the data based on gradient calculations.
 
     Parameters
     ----------
     kwargs
-        start : int 
+        start : int
             Where to start looking for peaks in the data, default 0
         end : int
             Where to stop looking for peaks in the data, default data.size - 1
         thresh : float
             Don't consider any peaks with a value below this, default 0
-    """
 
+    """
     data = np.array(data)
     slope = np.diff(data)
     start_at = kwargs.get('start', 0)
     end_at = kwargs.get('end', slope.size)
     thresh = kwargs.get('thresh', 0)
 
-    peak_loc = [j for j in np.arange(start_at, end_at-1) \
-                if slope[j] > 0 and slope[j+1] <= 0]
+    peak_loc = [j for j in np.arange(start_at, end_at - 1)
+                if slope[j] > 0 and slope[j + 1] <= 0]
     peak_val = [data[peak_loc[i]] for i in range(0, len(peak_loc))]
 
     valid_loc = [
         i for i in range(0, len(peak_loc)) if peak_val[i] >= thresh]
     if len(valid_loc) == 0:
         return []
-    peak_val, peak_loc= zip(*((peak_val[i], peak_loc[i]) for i in valid_loc))
+    peak_val, peak_loc = zip(*((peak_val[i], peak_loc[i]) for i in valid_loc))
     return np.array(peak_val), np.array(peak_loc)
 
 
 def log_exception(ex, more_info=""):
     """
-    Log an expection and additional info
+    Log an expection and additional info.
 
     Parameters
     ----------
     ex : Exception
         The python exception that occured
-    more_info : 
+    more_info :
         Additional string to log
-    
+
     Returns
     -------
     None
-    
-    """
 
-    template = "{0} because exception of type {1} occurred. Arguments:\n{2!r}"
-    message = template.format(more_info, type(ex).__name__, ex.args)
-    logging.error(message)
+    """
+    default_loc = os.path.join(
+        os.path.expanduser("~"), ".nc_saved", "nc_caught.txt")
+    now = datetime.datetime.now()
+    # tb = traceback.format_tb(ex.__traceback__)
+    make_dir_if_not_exists(default_loc)
+    with open(default_loc, "a+") as f:
+        f.write("\n----------Caught Exception at {}----------\n".format(now))
+        traceback.print_exc(file=f)
+    logging.error(
+        "{} failed with caught exception.\nSee {} for more information.".format(
+            more_info, default_loc), exc_info=False)
+    # template = "{0} because exception of type {1} occurred. Arguments:\n{2!r}"
+    # message = template.format(more_info, type(ex).__name__, ex.args)
+    # logging.error(message)
+
 
 def window_rms(a, window_size, mode="same"):
     """
-    Calculate the rms envelope, similar to matlab.  
-    
-    mode determines how many points are output
-    mode valid will have no border effects
-    mode same will produce a value for each input
+    Calculate the rms envelope, similar to matlab.
+
+    Parameters
+    ----------
+    a : ndarray
+        The input signal to envelope.
+    window_size : int
+        The length of the window to convolve the signal with.
+    mode : str
+        The mode determines how many points are output
+        mode "valid" will have no border effects
+        mode "same" will produce a value for each input
+        See np.convolve for more information.
+
+    Returns
+    -------
+    np.ndarray
+        The RMS envelope of the signal
+
     """
-    a2 = np.power(a,2)
-    window = np.ones(window_size)/float(window_size)
+    a2 = np.power(a, 2)
+    window = np.ones(window_size) / float(window_size)
     return np.sqrt(np.convolve(a2, window, mode))
+
 
 def distinct_window_rms(a, N):
     """
-    Calculate the rms of a in windows of N data points.
+    Calculate the rms of an array in windows of N data points.
+
+    Parameters
+    ----------
+    a : np.ndarray
+        The input array to compute the RMS of.
+    N : int
+        The length of the window to compute RMS in.
+
+    Returns
+    -------
+    list
+        The RMS in each window.
+
     """
     a = np.array(a)
     a = np.square(a) / float(N)
     rms_array = []
     rms = 0
-    
+
     # For now, just throw away the last window if it does not fit
     for idx, point in enumerate(a):
         rms += point
-        if idx % N == N-1:
+        if idx % N == N - 1:
             rms_array.append(np.sqrt(rms))
             rms = 0
     return rms_array
 
+
 def static_vars(**kwargs):
+    """Return decorator to create a function with static variables."""
     def decorate(func):
         for k in kwargs:
             setattr(func, k, kwargs[k])
         return func
     return decorate
 
+
 @static_vars(colorcells=[])
 def get_axona_colours(index=None):
     """
     Create Axona cell colours.
-    
+
     Parameters
     ----------
     index : int
         Optional integer to get colours at
+
     Returns
     -------
-    list :
-        A list of colours as rgb tuples with values in 0 to 1
-    """
+    list | tuple
+        A list of colours as rgb tuples with values in 0 to 1.
+        Or a single rgb tuple if index is specified.
 
+    """
     if len(get_axona_colours.colorcells) == 0:
-    # crget_axona_colours.eate Axona cell colours if don't exist
-        get_axona_colours.colorcells.append((0,0,200/255))
-        get_axona_colours.colorcells.append((80/255,1,80/255))
-        get_axona_colours.colorcells.append((1,0,0))
-        get_axona_colours.colorcells.append((245/255,0,1))
-        get_axona_colours.colorcells.append((75/255,200/255,255/255))
-        get_axona_colours.colorcells.append((0/255, 185/255,0/255))
-        get_axona_colours.colorcells.append((255/255, 185/255,50/255))
-        get_axona_colours.colorcells.append((0/255, 150/255,175/255))
-        get_axona_colours.colorcells.append((150/255, 0/255,175/255))
-        get_axona_colours.colorcells.append((170/255, 170/255,0/255))
-        get_axona_colours.colorcells.append((200/255, 0/255,0/255))
-        get_axona_colours.colorcells.append((255/255, 255/255,0/255))
-        get_axona_colours.colorcells.append((140/255, 140/255,140/255))
-        get_axona_colours.colorcells.append((0/255, 255/255,255/255))
-        get_axona_colours.colorcells.append((255/255, 0/255,160/255))
-        get_axona_colours.colorcells.append((175/255, 75/255, 75/255))
-        get_axona_colours.colorcells.append((255/255, 155/255, 175/255))
-        get_axona_colours.colorcells.append((190/255, 190/255, 190/255))
-        get_axona_colours.colorcells.append((255/255, 255/255, 75/255))
-        get_axona_colours.colorcells.append((154/255, 205/255, 50/255))
-        get_axona_colours.colorcells.append((255/255, 99/255, 71/255))
-        get_axona_colours.colorcells.append((0/255, 255/255, 127/255))
-        get_axona_colours.colorcells.append((255/255, 140/255, 0/255))
-        get_axona_colours.colorcells.append((32/255, 178/255, 170/255))
-        get_axona_colours.colorcells.append((255/255, 69/255, 0/255))
-        get_axona_colours.colorcells.append((240/255, 230/255, 140/255))
-        get_axona_colours.colorcells.append((100/255, 145/255, 237/255))
-        get_axona_colours.colorcells.append((255/255, 218/255, 185/255))
-        get_axona_colours.colorcells.append((153/255, 50/255, 204/255))
-        get_axona_colours.colorcells.append((250/255, 128/255, 114/255))
+        # create Axona cell colours if don't exist
+        get_axona_colours.colorcells.append((0, 0, 200 / 255))
+        get_axona_colours.colorcells.append((80 / 255, 1, 80 / 255))
+        get_axona_colours.colorcells.append((1, 0, 0))
+        get_axona_colours.colorcells.append((245 / 255, 0, 1))
+        get_axona_colours.colorcells.append((75 / 255, 200 / 255, 255 / 255))
+        get_axona_colours.colorcells.append((0 / 255, 185 / 255, 0 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 185 / 255, 50 / 255))
+        get_axona_colours.colorcells.append((0 / 255, 150 / 255, 175 / 255))
+        get_axona_colours.colorcells.append((150 / 255, 0 / 255, 175 / 255))
+        get_axona_colours.colorcells.append((170 / 255, 170 / 255, 0 / 255))
+        get_axona_colours.colorcells.append((200 / 255, 0 / 255, 0 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 255 / 255, 0 / 255))
+        get_axona_colours.colorcells.append((140 / 255, 140 / 255, 140 / 255))
+        get_axona_colours.colorcells.append((0 / 255, 255 / 255, 255 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 0 / 255, 160 / 255))
+        get_axona_colours.colorcells.append((175 / 255, 75 / 255, 75 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 155 / 255, 175 / 255))
+        get_axona_colours.colorcells.append((190 / 255, 190 / 255, 190 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 255 / 255, 75 / 255))
+        get_axona_colours.colorcells.append((154 / 255, 205 / 255, 50 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 99 / 255, 71 / 255))
+        get_axona_colours.colorcells.append((0 / 255, 255 / 255, 127 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 140 / 255, 0 / 255))
+        get_axona_colours.colorcells.append((32 / 255, 178 / 255, 170 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 69 / 255, 0 / 255))
+        get_axona_colours.colorcells.append((240 / 255, 230 / 255, 140 / 255))
+        get_axona_colours.colorcells.append((100 / 255, 145 / 255, 237 / 255))
+        get_axona_colours.colorcells.append((255 / 255, 218 / 255, 185 / 255))
+        get_axona_colours.colorcells.append((153 / 255, 50 / 255, 204 / 255))
+        get_axona_colours.colorcells.append((250 / 255, 128 / 255, 114 / 255))
 
     if index is None:
         return get_axona_colours.colorcells
@@ -1050,8 +1127,8 @@ def get_axona_colours(index=None):
 
 def has_ext(filename, ext, case_sensitive_ext=False):
     """
-    Check if the filename ends in the extension
-    
+    Check if the filename ends in the extension.
+
     Parameters
     ----------
     filename : str
@@ -1060,13 +1137,13 @@ def has_ext(filename, ext, case_sensitive_ext=False):
         The extension, may have leading dot (e.g txt == .txt)
     case_sensitive_ext: bool, optional. Defaults to False,
         Whether to match the case of the file extension
-    
+
     Returns
     -------
     bool indicating if the filename has the extension
 
     """
-    if ext == None:
+    if ext is None:
         return True
     if ext[0] != ".":
         ext = "." + ext
@@ -1077,12 +1154,12 @@ def has_ext(filename, ext, case_sensitive_ext=False):
 
 
 def get_all_files_in_dir(
-        in_dir, ext=None, return_absolute=True, 
-        recursive=False, verbose=False, re_filter=None, 
+        in_dir, ext=None, return_absolute=True,
+        recursive=False, verbose=False, re_filter=None,
         case_sensitive_ext=False):
     """
     Get all files in the directory with the given extension.
-    
+
     Parameters
     ----------
     in_dir : str
@@ -1091,18 +1168,20 @@ def get_all_files_in_dir(
         The extension of files to get.
     return_absolute : bool, optional. Defaults to True.
         Whether to return the absolute filename or not.
-    recursive: bool, optional. Defaults to False.
+    recursive : bool, optional. Defaults to False.
         Whether to recurse through directories.
-    verbose: bool, optional. Defaults to False.
+    verbose : bool, optional. Defaults to False.
         Whether to print the files found.
-    re_filter: str, optional. Defaults to None
+    re_filter : str, optional. Defaults to None
         a regular expression used to filter the results
-    case_sensitive_ext: bool, optional. Defaults to False,
+    case_sensitive_ext : bool, optional. Defaults to False,
         Whether to match the case of the file extension
 
     Returns
     -------
-    List : A list of filenames
+    list 
+        A list of filenames
+
     """
     if not isdir(in_dir):
         print("Non existant directory " + str(in_dir))
@@ -1120,7 +1199,7 @@ def get_all_files_in_dir(
         good_filter = match_filter(f)
         return good_ext and good_file and good_filter
 
-    def convert_to_path(root_dir, f): 
+    def convert_to_path(root_dir, f):
         return join(root_dir, f) if return_absolute else f
 
     if verbose:
@@ -1156,11 +1235,34 @@ def get_all_files_in_dir(
         print()
     return onlyfiles
 
+
 def make_dir_if_not_exists(location):
-    """Makes directory structure for given location"""
+    """Make directory structure for given location."""
     os.makedirs(os.path.dirname(location), exist_ok=True)
 
+
 def remove_extension(filename, keep_dot=True, return_ext=False):
+    """
+    Return the filename without the extension.
+
+    Very similar to os.path.splitext()
+
+    Parameters
+    ----------
+    filename : str
+        The filename to remove extension from.
+    keep_dot : bool
+        Whether to return filename + ".".
+    return_ext : bool
+        Whether to return filename or filename, ext.
+
+    Returns
+    -------
+    str | tuple
+        str if return_ext is False, the filename with no ext
+        (str, str) if return_ext is True, (filename, ext)
+
+    """
     modifier = 0 if keep_dot else 1
     ext = filename.split(".")[-1]
     remove = len(ext) + modifier

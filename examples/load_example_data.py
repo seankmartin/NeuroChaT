@@ -17,3 +17,7 @@ def load_data():
     ndata.set_unit_no(unit_no)
 
     return ndata
+
+
+if __name__ == "__main__":
+    load_data()
