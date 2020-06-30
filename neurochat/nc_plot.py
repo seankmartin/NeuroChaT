@@ -1128,8 +1128,10 @@ def hd_rate_time_lapse(hd_data):
 
 def _nice_lapse_key(key):
     parts = key.split("To")
-    end = parts[1][-3:] if parts[1][-3:].lower() == "end" else (
-        parts[1][0] + " " + parts[1][-3:])
+    if parts[1][-3:].lower() == "end":
+        end = "end"
+    else:
+        end = parts[1][:-3] + " " + parts[1][-3:]
     nice_key = parts[0] + " to " + end
     return nice_key
 
@@ -1238,7 +1240,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
 
     By default, colormap="viridis", style="contour".
     However, the old NC style was colormap="default", style="digitized".
-    The old style produces very nice maps, but not colorblind.
+    The old style produces very nice maps, but not colorblind friendly.
 
     Parameters
     ----------
