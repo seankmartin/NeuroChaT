@@ -343,7 +343,7 @@ class NeuroChaT(QtCore.QThread):
         Read data and perform analysis based on the mode set in config.
 
         This is the principle method in NeuroChaT.
-        The method reads the specifications and analyzes data according to the
+        The method reads the specifications and analyses data according to the
         mode that is set in the Configuration file.
 
         This sets the input and output data files and sets the NData() object.
@@ -590,9 +590,9 @@ class NeuroChaT(QtCore.QThread):
                 self.ndata.save_to_hdf5()  # Saving data to hdf file
 
                 self.__count += 1
-                logging.info('Units already analyzed = ' + str(self.__count))
+                logging.info('Units already analysed = ' + str(self.__count))
 
-        logging.info('Total cells analyzed: ' + str(self.__count))
+        logging.info('Total cells analysed: ' + str(self.__count))
         self.cellid = info['cellid']
         self.nwb_files = info['nwb']
         self.graphic_files = info['graphics']
@@ -767,7 +767,7 @@ class NeuroChaT(QtCore.QThread):
                 logging.error(
                     "Spike data is required for burst analysis")
             else:
-                logging.info('Analyzing bursting property...')
+                logging.info('Analysing bursting properties...')
                 try:
                     params = self.get_params_by_analysis('burst')
 
@@ -776,7 +776,7 @@ class NeuroChaT(QtCore.QThread):
                         ibi_thresh=params['ibi_thresh'])
 
                 except BaseException as ex:
-                    log_exception(ex, 'Analysing bursting property')
+                    log_exception(ex, 'Analysing bursting properties')
 
         if self.get_analysis('speed'):
             if self.ndata.spike.get_filename() == ".no_spike.NONE":
@@ -1275,7 +1275,7 @@ class NeuroChaT(QtCore.QThread):
                     "LFP data is required for spectrum analysis")
             else:
                 logging.info(
-                    "Analysing LFP power spectrum.")
+                    "Analysing LFP power spectrum...")
                 try:
                     params = self.get_params_by_analysis('lfp_spectrum')
 
@@ -1332,7 +1332,7 @@ class NeuroChaT(QtCore.QThread):
                         first_name=first_name, second_name=second_name)
 
                 except BaseException as ex:
-                    log_exception(ex, 'Analyzing lfp spectrum')
+                    log_exception(ex, 'Analysing lfp spectrum')
 
         if self.get_analysis('spike_phase'):
             if self.ndata.lfp.get_filename() == ".no_lfp.NONE":
