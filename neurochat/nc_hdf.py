@@ -221,6 +221,14 @@ class Nhdf(object):
         system = data.get_system()
         if system == 'NWB':
             hdf_name = file_name.split('+')[0]
+        elif system == 'SpikeInterface':
+            if os.path.exists(file_name):
+                f_path, f_name = os.path.split(file_name)
+                hdf_name = os.path.join(
+                    f_path, os.path.splitext(f_name)[0] + "_NC_NWB.h5")
+            else:
+                hdf_name = "NC_NWB.h5"
+
         if os.path.exists(file_name):
             f_path, f_name = os.path.split(file_name)
             if system == 'Axona':
@@ -235,10 +243,6 @@ class Nhdf(object):
             elif system == 'Neuralynx':
                 hdf_name = os.sep.join(
                     [f_path, f_path.split(os.sep)[-1] + '.hdf5'])
-            # TODO this will need to be reviewed
-            elif system == 'SpikeInterface':
-                hdf_name = os.path.join(
-                    f_path, os.path.basename(f_path) + "_NC_NWB.hdf5")
 
         return hdf_name
 

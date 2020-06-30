@@ -66,14 +66,14 @@ if __name__ == '__main__':
     mpl_logger.setLevel(level=logging.WARNING)
 
     if to_write:
-        write_name = r"/media/sean/Elements/Ham_Data/Batch_2/A9_CAR-SA1/CAR-SA1_20191130_1_PreBox/phy_klusta"
+        write_name = r"D:\Ham_Data\Batch_2\A9_CAR-SA1\CAR-SA1_20191130_1_PreBox\phy_klusta"
         from neurochat.nc_control import NeuroChaT
-        plot_waveforms = True
+        plot_waveforms = False
         sorting = spikeinterface_test(write_name)
         NeuroChaT.sortingextractor_to_nwb(
             sorting, plot_waveforms=plot_waveforms)
 
     if to_read:
-        read_name = r"/media/sean/Elements/Ham_Data/Batch_2/A9_CAR-SA1/CAR-SA1_20191130_1_PreBox/CAR-SA1_20191130_1_PreBox_NC_NWB.hdf5"
+        read_name = r"D:\Ham_Data\Batch_2\A9_CAR-SA1\CAR-SA1_20191130_1_PreBox\CAR-SA1_2019-11-30_PreBox_shuff_NC_NWB.h5"
         spike = read_hdf(read_name)
         print(spike)
