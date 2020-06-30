@@ -413,7 +413,8 @@ def lfp_spectrum_tr(plot_data, ax=None, **kwargs):
         c_map = colormap
 
     pcm = ax.pcolormesh(
-        plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map)
+        plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map,
+        edgecolors="none")
     _extent = [
         plot_data['t'].min(), plot_data['t'].max(), 0, plot_data['f'].max()]
     plt.axis(_extent)

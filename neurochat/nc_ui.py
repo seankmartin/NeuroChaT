@@ -2931,7 +2931,7 @@ class UiParameters(QtWidgets.QDialog):
         self.spatial_corr_colormap = add_combo_box(
             obj_name="spatial_corr_colormap")
         self.spatial_corr_colormap.addItems(
-            ["viridis", "default", "bwr", "seismic",
+            ["seismic", "default", "bwr", "viridis",
              "gray", "plasma",
              "inferno", "magma", "cividis"])
         self.spatial_corr_contour_levels = add_spin_box(
@@ -3278,8 +3278,8 @@ class UiParameters(QtWidgets.QDialog):
         self.lfp_spectrum_colormap = add_combo_box(
             obj_name="lfp_spectrum_colormap")
         self.lfp_spectrum_colormap.addItems(
-            ["viridis", "default", "gray", "plasma",
-             "inferno", "magma", "cividis"])
+            ["magma", "default", "gray", "plasma",
+             "inferno", "viridis", "cividis"])
         self.lfp_spectrum_gb5 = add_group_box(
             title="Plotting Style", obj_name="lfp_spectrum_gb5")
         box_layout = ParamBoxLayout()
