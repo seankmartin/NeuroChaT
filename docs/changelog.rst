@@ -35,6 +35,7 @@ Bugs
 - Reading an excel file for a list of files can now support blank cells in the spreadsheet.
 - Fixed rare bug with ISI being a float after ceil operation instead of int.
 - Fixed bug with outputting the wrong statistics for the head direction firing rate analysis split into Clockwise and CounterClockwise firing.
+- Fixed bug with angular velocity information not being correctly loaded after the spatial file changes if angular velocity information was previously loaded.
 
 Version 1.1.1a0
 ===============
