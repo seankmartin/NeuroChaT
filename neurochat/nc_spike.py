@@ -148,6 +148,10 @@ class NSpike(NBase):
         self._unit_list = list(map(int, set(self._unit_Tags)))
         if 0 in self._unit_list:
             self._unit_list.remove(0)
+        try:
+            self._unit_list = sorted(self._unit_list)
+        except BaseException:
+            self._unit_list = self._unit_list
 
     def set_unit_no(self, unit_no=None, spike_name=None):
         """
@@ -1857,6 +1861,163 @@ class NSpike(NBase):
             self._set_timestamp(spike_time)
             self._set_waveform(spike_wave)
             self.set_unit_tags(unit_ID)
+
+    def load_spike_spikeinterface(
+            self, sorting, channel_scaling=None, group=None):
+        """
+        Load spike information from any Sorting Extractor object.
+
+        This extracts timestamps, tags, and waveforms from a sorting object.
+        Then stores them into NeuroChaT NSpike attributes.
+
+        Parameters
+        ----------
+        sorting : spikeinterface.extractors.SortingExtractor
+            The sorting extractor object to load from.
+        channel_scaling : list | np.ndarray
+            This is used to apply gains.
+            There should be one entry for each channel if provided.
+            Applied as waveform_channel_i * channel_scaling[i].
+            Defaults to unit gain for each channel.
+        group : int | str
+            The group in the sorting extractor to consider.
+            This can be used to split the data into tetrodes or probes.
+
+        Returns
+        -------
+        None
+
+        Note
+        ----
+        NC assumes that unit 0 is not present in the sorting.
+        However, other sorters don't assume this.
+        As such, if your sorter contains 0 as a unit,
+        ALL unit numbers will be incremented by 1.
+
+        Example
+        -------
+        .. highlight:: python
+        .. code-block:: python
+
+            # This would convert from Phy to NeuroChaT native NWB
+            import spikeinterface.extractors as se
+            to_exclude = ["mua", "noise"]
+            sorting = se.PhySortingExtractor(
+                "phy_folder", exclude_cluster_groups=to_exclude,
+                load_waveforms=True, verbose=False)
+            spike = NSpike()
+            hdf_path = "test.h5"
+            nhdf = Nhdf(filename=hdf_path)
+
+            groups = []
+            unit_ids = sorting.get_unit_ids()
+            for unit in unit_ids:
+                try:
+                    tetrode = sorting.get_unit_property(unit, "group")
+                except BaseException:
+                    try:
+                        tetrode = sorting.get_unit_property(unit, "ch_group")
+                    except BaseException:
+                        tetrode = None
+                if tetrode is not None:
+                    if tetrode not in groups:
+                        groups.append(tetrode)
+
+            for g in groups:
+            spike.load_spike_spikeinterface(sorting, group=g)
+                spike.set_unit_no(spike.get_unit_list()[0])
+                print(spike)
+                nhdf.save_spike(spike=spike)
+
+        """
+        unit_ids = sorting.get_unit_ids()
+        should_increment = (0 in unit_ids)
+
+        if group is not None:
+            units_to_use = []
+            for unit in unit_ids:
+                try:
+                    tetrode = sorting.get_unit_property(unit, "group")
+                except BaseException:
+                    try:
+                        tetrode = sorting.get_unit_property(unit, "ch_group")
+                    except BaseException:
+                        logging.warning(
+                            "Did not find any channel groups in sorting")
+                        units_to_use = unit_ids
+                        group = None
+                        tetrode = None
+                        break
+                if tetrode is not None:
+                    if group == tetrode:
+                        units_to_use.append(unit)
+        else:
+            units_to_use = unit_ids
+
+        sample_rate = sorting.params['sample_rate']
+        all_unit_trains = [
+            sorting.get_unit_spike_train(uid) for uid in units_to_use]
+        timestamps = np.concatenate(all_unit_trains) / float(sample_rate)
+        total_spikes = len(timestamps)
+
+        # Set up the empty numpy arrays to hold the data
+        unit_tags = np.zeros(total_spikes)
+        waveform_eg = sorting.get_unit_spike_features(
+            units_to_use[0], "waveforms")
+        samples_per_spike = waveform_eg.shape[2]
+        total_channels = waveform_eg.shape[1]
+        out_waveforms = oDict()
+
+        if channel_scaling is None:
+            channel_scaling = np.ones([total_channels, ])
+
+        for j in range(total_channels):
+            out_waveforms["ch{}".format(j + 1)] = np.zeros(
+                shape=(total_spikes, samples_per_spike),
+                dtype=np.float64)
+
+        # Establish the tag of each and waveform
+        start = 0
+        for u_i, u in enumerate(units_to_use):
+            end = start + all_unit_trains[u_i].size
+            unit_tags[start:end] = u
+
+            wf = sorting.get_unit_spike_features(u, "waveforms")
+            for j in range(total_channels):
+                try:
+                    wave = wf[:, j, :]
+                except BaseException:
+                    wave = wf[j, :]
+                out_waveforms["ch{}".format(j + 1)][start:end] = (
+                    wave * channel_scaling[j])
+
+            start = end
+
+        # NC assumes unit 0 not in data
+        if should_increment:
+            unit_tags = unit_tags + 1
+
+        # Order spikes based on time
+        ordering = timestamps.argsort()
+        timestamps = timestamps[ordering]
+        unit_tags = unit_tags[ordering].astype(np.uint64)
+        for j in range(total_channels):
+            out_waveforms["ch{}".format(j + 1)] = (
+                out_waveforms["ch{}".format(j + 1)][ordering])
+
+        self._set_total_channels(total_channels)
+        self._set_total_spikes(total_spikes)
+        self._set_duration(timestamps.max())
+        self._set_samples_per_spike(samples_per_spike)
+        self._set_timestamp(timestamps)
+        self._set_sampling_rate(sorting._sampling_frequency)
+        self.set_unit_tags(unit_tags)
+        self._set_waveform(out_waveforms)
+        self.set_filename(sorting.params["dat_path"])
+        self.set_system("SpikeInterface")
+        self._set_source_format(type(sorting).__name__)
+        self._set_channel_ids([i for i in range(total_channels)])
+        self._spikeinterface_group = group
 
     def __str__(self):
         """Return a friendly string representation of this object."""

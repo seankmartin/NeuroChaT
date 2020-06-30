@@ -792,8 +792,7 @@ class NSpatial(NAbstract):
         except BaseException:
             logging.warning(self.get_system() +
                             ' files may not have speed data!')
-        if not np.array(self._ang_vel).any():
-            self.set_ang_vel(self.calc_ang_vel())
+        self.set_ang_vel(self.calc_ang_vel())
         self.set_border(self.calc_border())
 
     def load_spatial_Axona(self, file_name):
@@ -1889,8 +1888,6 @@ class NSpatial(NAbstract):
         ccw_dir = direction[self.get_ang_vel()[vidInd] < -thresh]
         cw_dir = direction[self.get_ang_vel()[vidInd] > thresh]
 
-        binInterp = np.arange(360)
-
         tcount, ind, bins = histogram(cw_dir, edges)
         tcount = tcount / self.get_sampling_rate()
         spike_count = histogram(cwSpike_hd, edges)[0].astype(tcount.dtype)
@@ -1904,7 +1901,6 @@ class NSpatial(NAbstract):
         smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
         smoothRate = smoothRate[2:len(smoothRate) - 2]
         smoothcwRate = smoothRate
-        cwRate = smoothcwRate
 
         tcount, ind, bins = histogram(ccw_dir, edges)
         tcount = tcount / self.get_sampling_rate()
@@ -1918,20 +1914,27 @@ class NSpatial(NAbstract):
         smoothRate = smooth_1d(to_smooth_hd, filttype, filtsize)
         smoothRate = smoothRate[2:len(smoothRate) - 2]
         smoothccwRate = smoothRate
-        ccwRate = smoothccwRate
 
         if update:
-            _results['HD Delta'] = binInterp[np.argmax(
-                ccwRate)] - binInterp[np.argmax(cwRate)]
-            _results['HD Peak CW'] = np.argmax(cwRate)
-            _results['HD Peak CCW'] = np.argmax(ccwRate)
-            _results['HD Peak Rate CW'] = np.amax(cwRate)
-            _results['HD Peak Rate CCW'] = np.amax(ccwRate)
+            binInterp = np.arange(360)
+            rateInterp = np.interp(binInterp, bins, cwRate)
+            peak_rate_cw = np.amax(rateInterp)
+            peak_cw = binInterp[np.argmax(rateInterp)]
+
+            rateInterp = np.interp(binInterp, bins, ccwRate)
+            peak_rate_ccw = np.amax(rateInterp)
+            peak_ccw = binInterp[np.argmax(rateInterp)]
+
+            _results['HD Delta'] = (peak_rate_ccw - peak_rate_cw)
+            _results['HD Peak CW'] = peak_cw
+            _results['HD Peak CCW'] = peak_ccw
+            _results['HD Peak Rate CW'] = peak_rate_cw
+            _results['HD Peak Rate CCW'] = peak_rate_ccw
             self.update_result(_results)
 
         graph_data['bins'] = bins
-        graph_data['hdRateCW'] = cwRate
-        graph_data['hdRateCCW'] = ccwRate
+        graph_data['hdRateCW'] = smoothcwRate
+        graph_data['hdRateCCW'] = smoothccwRate
 
         return graph_data
 

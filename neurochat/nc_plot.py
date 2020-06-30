@@ -215,7 +215,7 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     max_axis = isi_data['isiBins'].max()
-    max_axisLog = np.ceil(np.log10(max_axis))
+    max_axisLog = int(np.ceil(np.log10(max_axis)))
 
     # ISI scatterplot
     ax, fig2 = _make_ax_if_none(axes[1])
@@ -384,7 +384,7 @@ def lfp_spectrum(plot_data, ax=None, color=None, style="Solid"):
     return fig1
 
 
-def lfp_spectrum_tr(plot_data, ax=None):
+def lfp_spectrum_tr(plot_data, ax=None, **kwargs):
     """
     Plot time-resolved LFP spectrum analysis data.
 
@@ -392,6 +392,11 @@ def lfp_spectrum_tr(plot_data, ax=None):
     ----------
     plot_data : dict
         Graphical data from the ISI correlation
+    ax : matplotlib axis
+        An optional matplotlib axis object to plot to.
+    kwargs :
+        colormap : str
+            The colormap to use. Defaults to "viridis".
 
     Returns
     -------
@@ -400,10 +405,16 @@ def lfp_spectrum_tr(plot_data, ax=None):
 
     """
     ax, fig1 = _make_ax_if_none(ax)
+    colormap = kwargs.get("colormap", "viridis")
 
-    c_map = plt.cm.jet
+    if colormap == "default":
+        c_map = plt.cm.jet
+    else:
+        c_map = colormap
+
     pcm = ax.pcolormesh(
-        plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map)
+        plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map,
+        edgecolors="none")
     _extent = [
         plot_data['t'].min(), plot_data['t'].max(), 0, plot_data['f'].max()]
     plt.axis(_extent)
@@ -859,11 +870,24 @@ def hd_rate_pred(hd_data, ax=None, **kwargs):
     bins = np.append(hd_data['bins'], hd_data['bins'][0])
     predRate = np.append(
         hd_data['hdPred'], hd_data['hdPred'][0])
-    ax.plot(np.radians(bins), predRate, color='green')
+    ax.plot(
+        np.radians(bins), predRate, color='green',
+        label="Predicted rate")
     rate = np.append(hd_data['smoothRate'], hd_data['smoothRate'][0])
-    ax.plot(np.radians(bins), rate, color=BLUE)
+    ax.plot(
+        np.radians(bins), rate, color=BLUE,
+        label="Actual rate")
+    ax.set_rmax(max([hd_data['smoothRate'].max(), hd_data['hdPred'].max()]))
     ax.set_rticks(
-        [hd_data['hdRate'].max(), hd_data['hdPred'].max()])
+        [hd_data['smoothRate'].max(), hd_data['hdPred'].max()])
+
+    legend = kwargs.get('legend', True)
+    if legend:
+        ax.legend(
+            loc="upper right",
+            bbox_to_anchor=(1.1, 1.05),
+            fontsize="small",
+        )
 
     return ax
 
@@ -918,10 +942,14 @@ def hd_firing(hd_data):
 
     """
     fig1 = plt.figure()
-    hd_spike(hd_data, ax=plt.gca(polar=True))
+    ax = fig1.add_axes(
+        [0.1, 0.1, 0.8, 0.8], projection='polar')
+    hd_spike(hd_data, ax=ax)
 
     fig2 = plt.figure()
-    ax2 = hd_rate_pred(hd_data, ax=plt.gca(polar=True))
+    ax = fig2.add_axes(
+        [0.1, 0.1, 0.8, 0.8], projection='polar')
+    hd_rate_pred(hd_data, ax=ax)
     return fig1, fig2
 
 
@@ -948,12 +976,30 @@ def hd_rate_ccw(hd_data):
     bins = np.append(hd_data['bins'], hd_data['bins'][0])
     predRate = np.append(
         hd_data['hdRateCW'], hd_data['hdRateCW'][0])
-    ax.plot(np.radians(bins), predRate, color=BLUE)
+    ax.plot(
+        np.radians(bins), predRate, color=BLUE,
+        label="Clockwise rate")
     predRate = np.append(
         hd_data['hdRateCCW'], hd_data['hdRateCCW'][0])
-    ax.plot(np.radians(bins), predRate, color=RED)
+    ax.plot(
+        np.radians(bins), predRate, color=RED,
+        label="Counterclockwise rate")
     ax.set_title('Counter/clockwise firing rate')
-    ax.set_rticks([hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()])
+    if abs(hd_data['hdRateCW'].max() - hd_data['hdRateCCW'].max()) < 1.5:
+        to_use = max(
+            (hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()))
+        ax.set_rmax(to_use)
+        ax.set_rticks([to_use, ])
+    else:
+        ax.set_rmax(
+            max([hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()]))
+        ax.set_rticks(
+            [hd_data['hdRateCW'].max(), hd_data['hdRateCCW'].max()])
+    ax.legend(
+        loc="upper right",
+        bbox_to_anchor=(1.25, 1.05),
+        fontsize="small",
+    )
 
     return fig1
 
@@ -965,14 +1011,14 @@ def hd_shuffle(hd_shuffle_data):
     Parameters
     ----------
     hd_shuffle_data : dict
-        Graphical data from head-directional shuffling anlaysis
+        Graphical data from head-directional shuffling analysis
 
     Returns
     -------
     fig1 : matplotlib.pyplot.Figure
         Distribution of Rayleigh Z statistics
     fig2 : matplotlib.pyplot.Figure
-        Distribution of Von Mises concentration parameter Kapppa
+        Distribution of Von Mises concentration parameter Kappa
 
     """
     fig1 = plt.figure()
@@ -1130,7 +1176,8 @@ def hd_time_shift(hd_shift_data):
     ax.plot(hd_shift_data['shiftTime'], hd_shift_data['deltaFit'],
             color=BLUE, linewidth=1.5, zorder=1)
     ax.plot(hd_shift_data['shiftTime'], np.zeros(
-        hd_shift_data['shiftTime'].size), color='k', linestyle='--', linewidth=1.5, zorder=2)
+        hd_shift_data['shiftTime'].size), color='k',
+        linestyle='--', linewidth=1.5, zorder=2)
     ax.set_xlabel('Shift time (ms)')
     ax.set_ylabel('Delta (degree)')
     ax.set_title('Delta of hd firing in shifted time of spiking events')
@@ -1148,6 +1195,11 @@ def loc_spike(place_data, ax=None, **kwargs):
         Graphical data from the correlation of unit firing to location of the animal
     ax : matplotlib.pyplot.axis
         Axis object. If specified, the figure is plotted in this axis.
+    kwargs :
+        color : matplotlib colour
+            default red
+        point_size : float
+            default 2
 
     Returns
     -------
@@ -1183,6 +1235,10 @@ def loc_spike(place_data, ax=None, **kwargs):
 def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     """
     Plot location vs spike rate.
+
+    By default, colormap="viridis", style="contour".
+    However, the old NC style was colormap="default", style="digitized".
+    The old style produces very nice maps, but not colorblind.
 
     Parameters
     ----------
@@ -1254,6 +1310,7 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
             splits = np.linspace(vmin, vmax, levels + 1)
         else:
             splits = np.array([vmin, vmin * 2])
+        splits = np.around(splits, decimals=1)
         x_edges = np.append(
             place_data["xedges"] - dx / 2,
             place_data["xedges"][-1] + dx / 2)
@@ -1282,11 +1339,6 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
     ax.invert_yaxis()
     cbar = plt.colorbar(
         res, cax=cax, orientation='vertical', use_gridspec=True)
-    # cbar.ax.set_ticks(levels)
-    # cbar.ax.set_yticklabels(np.around(levels, decimals=1))
-    if splits is not None:
-        split_text = np.around(splits, decimals=1)
-        cbar.ax.set_yticklabels(split_text)
 
     return ax
 
@@ -1411,7 +1463,7 @@ def loc_place_field(place_data, ax=None):
 
 def loc_place_centroid(place_data, centroid):
     """
-    Plot firing map with the centroid of the largest place field.
+    Plot firing map with the centroid of the highest firing place field.
 
     The path of the animal in the arena is also returned.
 
@@ -1647,14 +1699,28 @@ def loc_time_shift(loc_shift_data):
     return fig1, fig2, fig3
 
 
-def loc_auto_corr(locAuto_data):
+def loc_auto_corr(locAuto_data, **kwargs):
     """
     Plot the analysis outcome of locational firing rate autocorrelation.
+
+    By default, colormap="viridis", style="contour".
+    However, the old NC style was colormap="default", style="digitized".
+    The old style produces very nice maps, but not colorblind.
 
     Parameters
     ----------
     locAuto_data : dict
         Graphical data from spatial correlation of firing map
+    kwargs :
+        colormap : str
+            viridis is used if not specified
+            "default" uses the standard red green intensity colours
+            but these are bad for colorblindness.
+        style : str
+            What kind of map to plot - can be
+            "contour", "digitized" or "interpolated"
+        levels : int
+            The number of levels in the contour plot
 
     Returns
     -------
@@ -1662,28 +1728,64 @@ def loc_auto_corr(locAuto_data):
         Spatial correlation map
 
     """
-    clist = [(1.0, 1.0, 1.0),
-             (0.0, 0.0, 0.5),
-             (0.0, 0.0, 1.0),
-             (0.0, 0.5, 1.0),
-             (0.0, 0.75, 1.0),
-             (0.5, 1.0, 0.0),
-             (0.9, 1.0, 0.0),
-             (1.0, 0.75, 0.0),
-             (1.0, 0.4, 0.0),
-             (1.0, 0.0, 0.0),
-             (0.5, 0.0, 0.0)]
+    colormap = kwargs.get("colormap", "viridis")
+    style = kwargs.get("style", "contour")
+    levels = kwargs.get("levels", 5)
+    if colormap == "default":
+        clist = [
+            (1.0, 1.0, 1.0),
+            (0.0, 0.0, 0.5),
+            (0.0, 0.0, 1.0),
+            (0.0, 0.5, 1.0),
+            (0.0, 0.75, 1.0),
+            (0.5, 1.0, 0.0),
+            (0.9, 1.0, 0.0),
+            (1.0, 0.75, 0.0),
+            (1.0, 0.4, 0.0),
+            (1.0, 0.0, 0.0),
+            (0.5, 0.0, 0.0)]
 
-    c_map = mcol.ListedColormap(clist)
+        c_map = mcol.ListedColormap(clist)
+    else:
+        c_map = colormap
 
     fig1 = plt.figure()
     ax = fig1.gca()
-    pc = ax.pcolormesh(
-        locAuto_data['xshift'], locAuto_data['yshift'],
-        np.ma.array(locAuto_data['corrMap'],
-                    mask=np.isnan(locAuto_data['corrMap'])),
-        cmap=c_map, rasterized=True)
-    ax.set_title('Spatial correlation of firing intensity map)')
+
+    if style == "digitized":
+        pc = ax.pcolormesh(
+            locAuto_data['xshift'], locAuto_data['yshift'],
+            np.ma.array(locAuto_data['corrMap'],
+                        mask=np.isnan(locAuto_data['corrMap'])),
+            cmap=c_map, rasterized=True)
+
+    elif style == "contour":
+        dx = np.mean(np.diff(locAuto_data['xshift']))
+        dy = np.mean(np.diff(locAuto_data['yshift']))
+        pad_map = np.pad(
+            locAuto_data['corrMap'][:-1, :-1],
+            ((1, 1), (1, 1)), "edge")
+        vmin, vmax = np.nanmin(pad_map), np.nanmax(pad_map)
+        if vmin != vmax:
+            splits = np.linspace(vmin, vmax, levels + 1)
+        else:
+            splits = np.array([vmin, vmin * 2])
+        splits = np.around(splits, decimals=1)
+        x_edges = np.append(
+            locAuto_data['xshift'] - dx / 2,
+            locAuto_data['xshift'][-1] + dx / 2)
+        y_edges = np.append(
+            locAuto_data['yshift'] - dy / 2,
+            locAuto_data['yshift'][-1] + dy / 2)
+        pc = ax.contourf(
+            x_edges, y_edges,
+            np.ma.array(pad_map, mask=np.isnan(pad_map)),
+            levels=splits, cmap=c_map, corner_mask=True)
+    else:
+        logging.warning(
+            "Unrecognised style passed to loc_auto_corr, using digitized")
+
+    ax.set_title('Spatial correlation of firing intensity map')
     ax.set_xlabel('X-lag')
     ax.set_ylabel('Y-lag')
     ax.set_aspect('equal')
@@ -1810,15 +1912,19 @@ def border(border_data):
     """
     fig1 = plt.figure()
     ax = fig1.add_subplot(211)
-    ax.bar(border_data['distBins'], border_data['distCount'], color='slateblue', alpha=0.6,
-           width=0.5 * np.diff(border_data['distBins']).mean())
+    ax.bar(
+        border_data['distBins'], border_data['distCount'],
+        color='slateblue', alpha=0.6,
+        width=0.5 * np.diff(border_data['distBins']).mean())
     ax.set_title('Histogram of taxicab distance of active pixels')
     ax.set_xlabel('Taxicab distance(cm)')
     ax.set_ylabel('Active pixel count')
 
     ax = fig1.add_subplot(212)
-    ax.bar(border_data['circBins'], border_data['angDistCount'], color='slateblue', alpha=0.6,
-           width=0.5 * np.diff(border_data['circBins']).mean())
+    ax.bar(
+        border_data['circBins'], border_data['angDistCount'],
+        color='slateblue', alpha=0.6,
+        width=0.5 * np.diff(border_data['circBins']).mean())
     ax.set_title('Angular distance vs Active pixel count')
     ax.set_xlabel('Angular distance')
     ax.set_ylabel('Active pixel count')
@@ -1877,7 +1983,7 @@ def gradient(gradient_data):
     return fig1, fig2, fig3
 
 
-def grid(grid_data):
+def grid(grid_data, **kwargs):
     """
     Plot the result from grid analysis.
 
@@ -1885,6 +1991,8 @@ def grid(grid_data):
     ----------
     grid_data : dict
         Graphical data from border analysis
+    kwargs :
+        Keyword arguments passed to loc_auto_corr
 
     Returns
     -------
@@ -1894,7 +2002,7 @@ def grid(grid_data):
         Rotational correlation of autocorrelation map
 
     """
-    fig1 = loc_auto_corr(grid_data)
+    fig1 = loc_auto_corr(grid_data, **kwargs)
     ax = fig1.axes[0]
 
     xmax = grid_data['xmax']

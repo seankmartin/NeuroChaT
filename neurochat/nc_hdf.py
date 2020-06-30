@@ -14,6 +14,8 @@ import numpy as np
 
 import h5py
 
+from neurochat.nc_utils import log_exception
+
 
 class Nhdf(object):
     """
@@ -130,8 +132,8 @@ class Nhdf(object):
         try:
             self.f = h5py.File(self._filename, 'a')
             self.initialize()
-        except BaseException:
-            logging.error('Cannot open ' + self._filename)
+        except BaseException as e:
+            log_exception(e, 'Opening hdf file' + self._filename)
 
         return self.f
 
@@ -189,7 +191,7 @@ class Nhdf(object):
         if path in self.f:
             items = list(self.f[path].keys())
         else:
-            logging.warning('No groups in the path:' + path)
+            logging.warning('No groups in the path: ' + path)
 
         return items
 
@@ -233,6 +235,10 @@ class Nhdf(object):
             elif system == 'Neuralynx':
                 hdf_name = os.sep.join(
                     [f_path, f_path.split(os.sep)[-1] + '.hdf5'])
+            # TODO this will need to be reviewed
+            elif system == 'SpikeInterface':
+                hdf_name = os.path.join(
+                    f_path, os.path.basename(f_path) + "_NC_NWB.hdf5")
 
         return hdf_name
 
@@ -305,6 +311,11 @@ class Nhdf(object):
                     tag = ext
                 elif system == 'Neuralynx':
                     tag = name
+                elif system == "SpikeInterface":
+                    if data._spikeinterface_group is not None:
+                        tag = data._spikeinterface_group
+                    else:
+                        tag = name
         return tag
 
     def resolve_analysis_path(self, spike=None, lfp=None):
@@ -389,8 +400,8 @@ class Nhdf(object):
                     pass
             try:
                 g.create_dataset(name=name, data=data)
-            except BaseException:
-                logging.error('Error in creating ' +
+            except BaseException as e:
+                log_exception(e, 'Saving ' +
                               name + ' dataset to hdf5 file')
         else:
             logging.error('hdf5 file path can be created or restored!')
@@ -517,15 +528,16 @@ class Nhdf(object):
         """
         try:
             obj_type = obj.get_type()
-        except BaseException:
-            logging.error(
-                'Cannot get object! It is not of one of the neurochat data types!')
+        except BaseException as e:
+            log_exception(
+                e, 'Object passed is not a neurochat data type')
 
         try:
-            fun = getattr(self, 'save_' + obj_type)
-            fun(obj)
-        except BaseException:
-            logging.error('Failed to save the dataset!')
+            if os.path.isfile(obj.get_filename()):
+                fun = getattr(self, 'save_' + obj_type)
+                fun(obj)
+        except BaseException as e:
+            log_exception(e, 'Saving hdf5 dataset')
 
     def save_spatial(self, spatial=None):
         """
@@ -545,6 +557,9 @@ class Nhdf(object):
         self.set_filename(self.resolve_hdfname(data=spatial))
         # Get the lfp data path/group
         path = self.resolve_datapath(data=spatial)
+
+        # logging.info("Saving spatial info to {} path {}".format(
+        #     self._filename, path))
         # delete old data
         if path in self.f:
             del self.f[path]
@@ -606,6 +621,10 @@ class Nhdf(object):
         self.set_filename(self.resolve_hdfname(data=lfp))
         # Get the lfp data path/group
         path = self.resolve_datapath(data=lfp)
+
+        # logging.info("Saving lfp info to {} path {}".format(
+        #     self._filename, path))
+
         # delete old data
         if path in self.f:
             del self.f[path]
@@ -639,6 +658,9 @@ class Nhdf(object):
         self.set_filename(self.resolve_hdfname(data=spike))
         # Get the spike data path/group
         path = self.resolve_datapath(data=spike)
+
+        # logging.info("Saving spike info to {} path {}".format(
+        #     self._filename, path))
 
         # delete old data
         if path in self.f:
@@ -697,3 +719,35 @@ class Nhdf(object):
         # group
 
         logging.warning('save_cluster() method is not implemented yet!')
+
+    def path_exists(self, path):
+        """
+        Return True if self.f exists and path is in it.
+
+        path can be either a path in the hdf5 file.
+        or the full name of a hdf5 file.
+
+        Parameters
+        ----------
+        path : str
+            The path to check for.
+
+        Returns
+        -------
+        bool
+            Whether or not the path is exists
+
+        See also
+        --------
+        neurochat.nc_control.exist_hdf_path
+
+        """
+        if path == "":
+            return False
+        if "+" in path:
+            name, path = path.split("+")
+            if os.path.isfile(name):
+                self.set_filename(name)
+            else:
+                return False
+        return path in self.f

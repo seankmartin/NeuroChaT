@@ -18,6 +18,7 @@ import os
 import sys
 import logging
 import webbrowser
+from datetime import datetime
 
 
 from PyQt5 import QtCore, QtWidgets, QtGui
@@ -60,6 +61,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self._mode_dict = self._control.get_all_modes()
         self._default_loc = os.path.join(
             os.path.expanduser("~"), ".nc_saved", "last_dir_location.txt")
+        self._last_excel_loc = ""
         make_dir_if_not_exists(self._default_loc)
         if os.path.isfile(self._default_loc):
             with open(self._default_loc, "r") as f:
@@ -71,12 +73,17 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         else:
             self._curr_dir = "/home/"
         self.setup_ui()
+        self._should_clear_backend = True
 
     def setup_ui(self):
         """Set up the elements of NeuroChaT_ui class."""
         self.setObjectName(xlt_from_utf8("MainWindow"))
         self.setEnabled(True)
-        self.setFixedSize(800, 480)
+        # For windows
+        if os.name == 'nt':
+            self.setFixedSize(900, 560)
+        else:
+            self.setFixedSize(1000, 600)
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName(xlt_from_utf8("centralwidget"))
 
@@ -106,14 +113,37 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         layer_5_1.addLayout(layer_6_2)
         layer_5_1.addLayout(layer_6_3)
 
-        layer_5_2 = QtWidgets.QHBoxLayout()
-        self.browse_button = add_push_button(
-            text="Browse", obj_name="browseButton")
-        self.filename_line = add_line_edit(
-            obj_name="filenameLine",
-            text="Select spike(.n) &/or position file(.txt)")
-        layer_5_2.addWidget(self.browse_button)
-        layer_5_2.addWidget(self.filename_line)
+        # Spike browser
+        layer_5_2_1 = QtWidgets.QHBoxLayout()
+        self.browse_button_spike = add_push_button(
+            text="Browse Spike  ", obj_name="browseButtonSpike")
+        self.filename_line_spike = add_line_edit(
+            obj_name="filenameLineSpike", text="")
+        layer_5_2_1.addWidget(self.browse_button_spike)
+        layer_5_2_1.addWidget(self.filename_line_spike)
+
+        # LFP Browser
+        layer_5_2_2 = QtWidgets.QHBoxLayout()
+        self.browse_button_lfp = add_push_button(
+            text="Browse LFP     ", obj_name="browseButtonLFP")
+        self.filename_line_lfp = add_line_edit(
+            obj_name="filenameLineLFP", text="")
+        layer_5_2_2.addWidget(self.browse_button_lfp)
+        layer_5_2_2.addWidget(self.filename_line_lfp)
+
+        # Spatial Browser
+        layer_5_2_3 = QtWidgets.QHBoxLayout()
+        self.browse_button_spatial = add_push_button(
+            text="Browse Spatial", obj_name="browseButtonSpatial")
+        self.filename_line_spatial = add_line_edit(
+            obj_name="filenameLineSpatial", text="")
+        layer_5_2_3.addWidget(self.browse_button_spatial)
+        layer_5_2_3.addWidget(self.filename_line_spatial)
+
+        layer_5_2 = QtWidgets.QVBoxLayout()
+        layer_5_2.addLayout(layer_5_2_1)
+        layer_5_2.addLayout(layer_5_2_2)
+        layer_5_2.addLayout(layer_5_2_3)
 
         layer_4_1 = QtWidgets.QVBoxLayout()
         layer_4_1.addLayout(layer_5_1)
@@ -189,6 +219,9 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         # Set the callbacks
         self.behaviour_ui()
 
+        # Set the initial text
+        self._set_dictation()
+
     def behaviour_ui(self):
         """Set up the behaviour of NeuroChaT_ui widgets."""
         # self.connect(self.nout, QtCore.SIGNAL('update_log(QString)'), self.update_log)
@@ -202,10 +235,14 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.unit_no_box.currentIndexChanged[int].connect(self.set_unit_no)
         self.lfp_chan_box.currentIndexChanged[int].connect(self.set_lfp_chan)
         self.select_all_box.stateChanged.connect(self.select_all)
-        self.browse_button.clicked.connect(self.browse)
+        self.browse_button_spike.clicked.connect(self.browse_spike)
+        self.browse_button_lfp.clicked.connect(self.browse_lfp)
+        self.browse_button_spatial.clicked.connect(self.browse_spatial)
         self.clear_log_button.clicked.connect(self.clear_log)
         self.save_log_button.clicked.connect(self.save_log)
-        self.open_file_act.triggered.connect(self.browse)
+        self.open_file_act.triggered.connect(self.browse_all)
+        self.clear_files_act.triggered.connect(self.clear_files)
+        self.append_excel_act.triggered.connect(self.append_excel)
         self.save_session_act.triggered.connect(self.save_session)
         self.load_session_act.triggered.connect(self.load_session)
 
@@ -216,11 +253,12 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.export_results_act.triggered.connect(self.export_results)
         self.export_graphic_info_act.triggered.connect(
             self.export_graphic_info)
+        self.view_results_act.triggered.connect(self.restore_start_button)
 
         self.merge_act.triggered.connect(self.merge_output)
         self.accumulate_act.triggered.connect(self.accumulate_output)
 
-        self.angle_act.triggered.connect(self.angle_calculation)
+        # self.angle_act.triggered.connect(self.angle_calculation)
         self.multi_place_cell_act.triggered.connect(self.place_cell_plots)
 
         self.view_help_act.triggered.connect(self.view_help)
@@ -267,6 +305,15 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         self.file_menu.addSeparator()
 
+        self.append_excel_act = self.file_menu.addAction(
+            "Add files to spreadsheet...")
+        self.append_excel_act.setShortcut(QtGui.QKeySequence("Ctrl+A"))
+
+        self.clear_files_act = self.file_menu.addAction(
+            "Clear selected files...")
+
+        self.file_menu.addSeparator()
+
         self.exit_act = self.file_menu.addAction("Exit")
         self.exit_act.setShortcut(QtGui.QKeySequence("Ctrl+Q"))
 
@@ -280,6 +327,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.export_graphic_info_act = self.utilities_menu.addAction(
             "Export graphic file info")
         self.export_graphic_info_act.setShortcut(QtGui.QKeySequence("Ctrl+G"))
+
+        self.view_results_act = self.utilities_menu.addAction(
+            "View results")
+        self.view_results_act.setShortcut(QtGui.QKeySequence("Ctrl+V"))
 
         self.utilities_menu.addSeparator()
 
@@ -297,17 +348,18 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self.convert_files_act = self.utilities_menu.addAction(
             "Convert to NWB format")
 
-        self.angle_act = self.multifile_menu.addAction(
-            "Centroid angle calculation")
-        self.angle_act.setStatusTip(
-            "Select an excel file which specifies files " +
-            "in the order of: " +
-            "directory | position_file | spike_file | unit_no | eeg extension")
+        # self.angle_act = self.multifile_menu.addAction(
+        #     "Centroid angle calculation")
+        # self.angle_act.setStatusTip(
+        #     "Select an excel file which specifies files " +
+        #     "in the order of: " +
+        #     "directory | position_file | spike_file | unit_no | eeg extension")
 
         self.multi_place_cell_act = self.multifile_menu.addAction(
-            "Directory place cell summary")
+            "Axona recursive spatial analysis")
         self.multi_place_cell_act.setStatusTip(
-            "Select a folder to analyse units for place cells")
+            "Select a folder to recursively analyse units for spatial properties " +
+            "-- Currently only supports Axona")
 
         self.view_help_act = self.help_menu.addAction(
             "NeuroChaT user interface guide")
@@ -564,10 +616,30 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         exports the results in the table to the file
 
         """
+
+        try:
+            if self.mode_box.currentIndex() == 0:
+                default_filename = (
+                    os.path.splitext(self._control._pdf_file)[0] + ".xlsx")
+            elif self.mode_box.currentIndex() == 1:
+                default_filename = (
+                    os.path.splitext(self._control.hdf._filename)[0] + ".xlsx")
+            else:
+                default_filename = (
+                    os.path.splitext(self._control.get_excel_file()[0] +
+                                     "_results.xlsx"))
+
+        except BaseException as ex:
+            now = datetime.now()
+            whole_time = now.strftime("%Y-%m-%d--%H-%M-%S")
+            log_exception(
+                ex, "Automatically generating results name")
+            default_filename = 'nc_results--' + whole_time + '.xlsx'
+
         excel_file = QtCore.QDir.toNativeSeparators(
             QtWidgets.QFileDialog.getSaveFileName(
                 self, 'Export analysis results to...',
-                os.getcwd() + os.sep + 'nc_results.xlsx',
+                os.getcwd() + os.sep + default_filename,
                 "Excel Files (*.xlsx .*xls)")[0]
         )
         if not excel_file:
@@ -670,6 +742,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self._control.set_data_format(data_format)
         logging.info("Input data format set to: " + data_format)
         self._set_dictation()
+        self.clear_backend_files()
         if data_format == 'Axona' or data_format == 'Neuralynx':
             self._control.set_nwb_file('')
 
@@ -683,6 +756,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         self._control.set_analysis_mode(ind)
         logging.info("Analysis mode set to: " + self.mode_box.itemText(ind))
         self._set_dictation()
+        self.clear_backend_files()
 
     def graphic_format_select(self):
         """
@@ -760,8 +834,15 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         else:
             items = [str(i) for i in list(range(256))]
 
+        self._first_chan_call = True
         self.lfp_chan_box.clear()
         self.lfp_chan_box.addItems(items)
+        self._first_chan_call = False
+
+        if len(items) == 0:
+            self.filename_line_lfp.setText(
+                "No LFP information found")
+            self._control.set_lfp_file("")
 
     def unit_getitems(self):
         """Return the list of units once spike data is set."""
@@ -770,16 +851,32 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 self.file_format_box.currentIndex())
             if file_format == "NWB":
                 self._control.open_hdf_file()
-                _, path = self._control.get_spike_file().split("+")
-                path = path + '/Clustering/cluster_nums'
-                items = self._control.hdf.f[path]
+                if "+" in self._control.get_spike_file():
+                    _, path = self._control.get_spike_file().split("+")
+                    path = path + '/Clustering/cluster_nums'
+                    items = self._control.hdf.f[path]
+                else:
+                    logging.warning("No spike information found in hdf5 file")
+                    items = [str(i) for i in range(256)]
+                    if self._control.get_unit_no() != 0:
+                        self.unit_no_box.clear()
+                        self.unit_no_box.addItems(items)
             else:
                 from neurochat.nc_spike import NSpike
                 spike_file = self._control.get_spike_file()
                 system = self._control.format
-                spike_obj = NSpike(filename=spike_file, system=system)
-                spike_obj.load()
-                items = spike_obj.get_unit_list()
+                if os.path.isfile(spike_file):
+                    spike_obj = NSpike(filename=spike_file, system=system)
+                    spike_obj.load()
+                    items = spike_obj.get_unit_list()
+                else:
+                    logging.warning(
+                        "No spike information found in {} file".format(
+                            file_format))
+                    items = [str(i) for i in range(256)]
+                    if self._control.get_unit_no() != 0:
+                        self.unit_no_box.clear()
+                        self.unit_no_box.addItems(items)
             if len(items) == 0:
                 logging.error("No units in this file.")
                 items = [i for i in range(256)]
@@ -790,17 +887,17 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 self._control.close_hdf_file()
         except Exception as e:
             log_exception(
-                e, "Populating unit list failed - you can still manually select a unit -")
+                e, "Populating unit list failed - you can still manually select a unit.")
             items = [str(i) for i in range(256)]
             self.unit_no_box.clear()
             self.unit_no_box.addItems(items)
 
-    def browse(self):
+    def browse_spike(self):
         """
-        Open a file dialog asking the user to select data files.
+        Open a file dialog for selecting a spike file.
 
-        Once selected, it also set the LFP channels in the 'LFP Ch No'
-        combo box.
+        Depending on the mode, also browses Excel or HDF5 files.
+        Also populates a set of units and lfps available on selection.
 
         """
         mode_id = self.mode_box.currentIndex()
@@ -810,13 +907,11 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 if file_format == "Axona":
                     spike_filter = "".join(
                         ["*." + str(x) + ";;" for x in list(range(1, 129))])
-                    spatial_filter = "*.txt"
                 elif file_format == "Neuralynx":
                     spike_filter = "*.ntt;; *.nst;; *.nse"
-                    spatial_filter = "*.nvt"
                 spike_file = QtCore.QDir.toNativeSeparators(
                     QtWidgets.QFileDialog.getOpenFileName(
-                        self, 'Select spike file...',
+                        self, 'Select {} spike file...'.format(file_format),
                         os.getcwd(), spike_filter)[0])
                 if not spike_file:
                     logging.warning("No spike file selected")
@@ -827,18 +922,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                     self._control.set_spike_file(spike_file)
                     self._control.ndata.set_spike_file(spike_file)
                     logging.info("New spike file added: " + words[-1])
-                    spatial_file = QtCore.QDir.toNativeSeparators(
-                        QtWidgets.QFileDialog.getOpenFileName(
-                            self, 'Select spatial file...',
-                            os.getcwd(), spatial_filter)[0])
-                    if not spatial_file:
-                        logging.warning("No spatial file selected")
-                    else:
-                        words = spatial_file.rstrip("\n\r").split(os.sep)
-                        self._control.set_spatial_file(spatial_file)
-                        logging.info("New spatial file added: " + words[-1])
-                    self.lfp_chan_getitems()
+                    self.filename_line_spike.setText(
+                        "Selected {}".format(spike_file))
                     self.unit_getitems()
+                    self.lfp_chan_getitems()
 
             elif file_format == "NWB":
                 nwb_file = QtCore.QDir.toNativeSeparators(
@@ -847,22 +934,18 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 if not nwb_file:
                     logging.warning("No NWB file selected")
                 else:
+                    self.clear_backend_files()
                     words = nwb_file.rstrip("\n\r").split(os.sep)
                     directory = os.sep.join(words[0:-1])
                     os.chdir(directory)
                     self._control.set_nwb_file(nwb_file)
                     logging.info("New NWB file added: " + words[-1])
+                    self.filename_line_spike.setText(
+                        "Selected {}".format(nwb_file))
                     try:
                         path = '/processing/Shank'
                         self._control.open_hdf_file()
                         items = self._control.get_hdf_groups(path=path)
-                        # hdf = Nhdf()
-                        # hdf.set_filename(nwb_file)
-                        # path = '/processing/Shank'
-                        # if path in hdf.f:
-                        #     items = list(hdf.f[path].keys())
-                        # else:
-                        #     logging.warning('No Shank data stored in the path:'+ path)
                         if items:
                             item, ok = QtWidgets.QInputDialog.getItem(
                                 self, "Select electrode group",
@@ -873,24 +956,31 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                                 logging.info(
                                     'Spike data set to electrode group: '
                                     + path + '/' + item)
+                                self.filename_line_spike.setText(
+                                    "Selected {} with electrodes {}".format(
+                                        os.path.basename(nwb_file), path + '/' + item))
 
-                                path = '/processing/Behavioural/Position'
-                                if self._control.exist_hdf_path(path=path):
-                                    self._control.set_spatial_file(
-                                        nwb_file + '+' + path)
-                                    logging.info(
-                                        'Position data set to group: ' + path)
-                                else:
-                                    logging.warning(
-                                        path +
-                                        ' not found! Spatial data not set.')
+                        path = '/processing/Behavioural/Position'
+                        if self._control.exist_hdf_path(path=path):
+                            self._control.set_spatial_file(
+                                nwb_file + '+' + path)
+                            logging.info(
+                                'Position data set to group: ' + path)
+                            self.filename_line_spatial.setText(
+                                "Selected HDF5 Path {}".format(path))
+                        else:
+                            logging.warning(
+                                path +
+                                ' not found. Spatial data not set.')
+                            self.filename_line_spatial.setText(
+                                "No spatial data found")
                         self._control.close_hdf_file()
                     except Exception as e:
                         log_exception(
                             e, "Cannot read hdf file in nc_ui browse")
 
-                    self.lfp_chan_getitems()
                     self.unit_getitems()
+                    self.lfp_chan_getitems()
 
         elif mode_id == 2:
             excel_file = QtCore.QDir.toNativeSeparators(
@@ -904,14 +994,111 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 os.chdir(directory)
                 self._control.set_excel_file(excel_file)
                 logging.info("New excel file added: " + words[-1])
+                self.filename_line_spike.setText(
+                    "Selected {}".format(excel_file))
+
         # elif mode_id == 3:
-        #     data_directory = QtCore.QDir.toNativeSeparators(QtWidgets.QFileDialog.getExistingDirectory(self, \
+        #     data_directory = QtCore.QDir.toNativeSeparators(
+        # QtWidgets.QFileDialog.getExistingDirectory(self,
         #                     'Select data directory...', os.getcwd()))
         #     if not data_directory:
         #         logging.warning("No data directory selected")
         #     else:
         #         self._control.set_dataDir(data_directory)
         #         logging.info("New directory added: "+ data_directory)
+
+    def browse_lfp(self):
+        """
+        Open a file dialog for selecting an lfp file.
+
+        This is disabled, depending on the mode and file format.
+
+        """
+        mode_id = self.mode_box.currentIndex()
+        file_format = self._control.get_data_format()
+        if mode_id == 0 or mode_id == 1:
+            if file_format == "Axona" or file_format == "Neuralynx":
+                if file_format == "Axona":
+                    lfp_filter = "*.eeg*;; *.egf*"
+                elif file_format == "Neuralynx":
+                    lfp_filter = "*.ncs"
+                lfp_file = QtCore.QDir.toNativeSeparators(
+                    QtWidgets.QFileDialog.getOpenFileName(
+                        self, 'Select {} lfp file...'.format(file_format),
+                        os.getcwd(), lfp_filter)[0])
+                if not lfp_file:
+                    logging.warning("No lfp file selected")
+                else:
+                    words = lfp_file.rstrip("\n\r").split(os.sep)
+                    directory = os.sep.join(words[0:-1])
+                    os.chdir(directory)
+                    logging.info("New lfp file added: " + words[-1])
+                    self._control.set_lfp_file(lfp_file)
+                    self.filename_line_lfp.setText(
+                        "Selected {}".format(lfp_file))
+                    self.lfp_chan_getitems()
+
+    def browse_spatial(self):
+        """
+        Open a file dialog for selecting a spatial file.
+
+        This is disabled, depending on the mode and file format.
+
+        """
+        mode_id = self.mode_box.currentIndex()
+        file_format = self._control.get_data_format()
+        if mode_id == 0 or mode_id == 1:
+            if file_format == "Axona" or file_format == "Neuralynx":
+                if file_format == "Axona":
+                    spatial_filter = "*.txt"
+                elif file_format == "Neuralynx":
+                    spatial_filter = "*.nvt"
+                spatial_file = QtCore.QDir.toNativeSeparators(
+                    QtWidgets.QFileDialog.getOpenFileName(
+                        self, 'Select {} spatial file...'.format(file_format),
+                        os.getcwd(), spatial_filter)[0])
+                if not spatial_file:
+                    logging.warning("No spatial file selected")
+                else:
+                    words = spatial_file.rstrip("\n\r").split(os.sep)
+                    directory = os.sep.join(words[0:-1])
+                    os.chdir(directory)
+                    self._control.set_spatial_file(spatial_file)
+                    logging.info("New spatial file added: " + words[-1])
+                    self.filename_line_spatial.setText(
+                        "Selected {}".format(spatial_file))
+
+    def browse_all(self):
+        """
+        In turn, browse spike, lfp and spatial.
+
+        See also
+        --------
+        neurochat.nc_ui.browse_spike
+        neurochat.nc_ui.browse_spatial
+        neurochat.nc_ui.browse_lfp
+
+        """
+        if self.browse_button_spike.isEnabled():
+            self.browse_spike()
+        if self.browse_button_lfp.isEnabled():
+            self.browse_lfp()
+        if self.browse_button_spatial.isEnabled():
+            self.browse_spatial()
+
+    def append_excel(self):
+        if os.path.isfile(self._last_excel_loc):
+            _default = os.path.dirname(self._last_excel_loc)
+        else:
+            _default = os.getcwd()
+        excel_file = QtCore.QDir.toNativeSeparators(
+            QtWidgets.QFileDialog.getSaveFileName(
+                self, 'Select Excel file...',
+                _default, "*.xlsx;; .*xls")[0])
+        if excel_file != "":
+            if not os.path.splitext(excel_file)[1] in [".xlsx", ".xls"]:
+                excel_file = excel_file + ".xlsx"
+            self._control.append_selection_to_excel(excel_file)
 
     def update_log(self, msg):
         """
@@ -975,23 +1162,61 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
 
         """
         lfpID = self.lfp_chan_box.itemText(value)
+        should_set = True
 
-        if lfpID:
+        if self._first_chan_call:
+            data_format = self._control.get_data_format()
+            lfp_file = self._control.get_lfp_file()
+            if data_format == 'Axona':
+                if os.path.isfile(lfp_file):
+                    _, lfpID = remove_extension(lfp_file, return_ext=True)
+                    should_set = False
+            elif data_format == 'Neuralynx':
+                if os.path.isfile(lfp_file):
+                    lfpID = os.path.basename(lfp_file)
+                    should_set = False
+            elif data_format == 'NWB':
+                should_set = True
+            else:
+                logging.error('Input data format not supported for file')
+            index = self.lfp_chan_box.findText(lfpID)
+            if index >= 0:
+                self.lfp_chan_box.setCurrentIndex(index)
+
+        if lfpID and should_set:
             logging.info("Selected LFP channel: " + lfpID)
             data_format = self._control.get_data_format()
             if data_format == 'Axona':
                 spike_file = self._control.get_spike_file()
-                lfp_file = remove_extension(spike_file) + lfpID
+                lfp_file = self._control.get_lfp_file()
+                if spike_file != "":
+                    lfp_file = remove_extension(spike_file) + lfpID
+                elif lfp_file != "":
+                    lfp_file = remove_extension(lfp_file) + lfpID
+                if not os.path.isfile(lfp_file):
+                    raise ValueError("LFP file {} not found".format(lfp_file))
             elif data_format == 'Neuralynx':
                 spike_file = self._control.get_spike_file()
-                lfp_file = os.sep.join(spike_file.split(os.sep)[
-                                       :-1]) + os.sep + lfpID
+                lfp_file = self._control.get_lfp_file()
+                if spike_file != "":
+                    lfp_file = (os.sep.join(
+                        spike_file.split(os.sep)[:-1]) + os.sep + lfpID)
+                elif lfp_file != "":
+                    lfp_file = os.path.join(os.path.dirname(lfp_file), lfpID)
+                if not os.path.isfile(lfp_file):
+                    raise ValueError("LFP file {} not found".format(lfp_file))
             elif data_format == 'NWB':
                 nwb_file = self._control.get_nwb_file()
-                lfp_file = nwb_file + '+' + '/processing/Neural Continuous/LFP' + '/' + lfpID
+                lfp_file = (
+                    nwb_file + '+' + '/processing/Neural Continuous/LFP' + '/' + lfpID)
             else:
-                logging.error('The input data format not supported!')
+                logging.error('Input data format not supported!')
             self._control.set_lfp_file(lfp_file)
+            if data_format == "NWB":
+                self.filename_line_lfp.setText("Selected HDF5 Path {}".format(
+                    lfp_file.split("+")[1]))
+            else:
+                self.filename_line_lfp.setText("Selected {}".format(lfp_file))
 
     def view_help(self):
         """Display user guide pdf on GitHub."""
@@ -1023,24 +1248,64 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         This is used for the browse button as the input data format changes.
 
         """
-        _dictation = ["Select spike(.n) &/or position file(.txt)",
-                      "Select spike(.n) &/or position file(.txt)",
-                      "Select excel(.xls/.xlsx) file with unit list",
-                      "Select folder"]
         file_format = self._control.get_data_format()
         analysis_mode, mode_id = self._control.get_analysis_mode()
-        if file_format == "Neuralynx":
-            _dictation[:2] = [
-                "Select spike(.ntt/.nst/.nse) &/or position file(.nvt)"] * 2
+
+        # Set dictation for spike browse button
+        _dictation_spike = [
+            "Select spike(.n) file",
+            "Select spike(.n) file",
+            "Select excel(.xls/.xlsx) file with unit list",
+            "Select folder"]
+        _dictation_lfp = [
+            "Select lfp(.eeg/.egf) file",
+            "Select lfp(.eeg/.egf) file",
+            "Unused in this mode",
+            "Unused in this mode"]
+        _dictation_spatial = [
+            "Select position(.txt) file produced by TINT",
+            "Select position(.txt) file produced by TINT",
+            "Unused in this mode",
+            "Unused in this mode"]
+
+        if file_format == "Axona":
+            self.browse_button_lfp.setEnabled(True)
+            self.browse_button_spatial.setEnabled(True)
+        elif file_format == "Neuralynx":
+            _dictation_spike[:2] = ["Select spike(.ntt/.nst/.nse) file"] * 2
+            _dictation_lfp[:2] = ["Select lfp(.ncs) file"] * 2
+            _dictation_spatial[:2] = ["Select postion(.nvt) file"] * 2
+            self.browse_button_lfp.setEnabled(True)
+            self.browse_button_spatial.setEnabled(True)
         elif file_format == "NWB":
-            _dictation[:2] = ["Select .hdf5 file"] * 2
-        self.filename_line.setText(_dictation[mode_id])
+            _dictation_spike[:2] = ["Select .hdf5 file"] * 2
+            _dictation_lfp[:2] = ["Unused in this mode"] * 2
+            _dictation_spatial[:2] = ["Unused in this mode"] * 2
+            self.browse_button_lfp.setEnabled(False)
+            self.browse_button_spatial.setEnabled(False)
+
+        if mode_id >= 2:
+            self.browse_button_lfp.setEnabled(False)
+            self.browse_button_spatial.setEnabled(False)
+
+        if mode_id == 2:
+            self.browse_button_spike.setText("Browse Excel  ")
+        else:
+            if file_format == "NWB":
+                self.browse_button_spike.setText("Browse HDF5  ")
+            else:
+                self.browse_button_spike.setText("Browse Spike  ")
+
+        # Set the text boxes
+        self.filename_line_spike.setText(_dictation_spike[mode_id])
+        self.filename_line_lfp.setText(_dictation_lfp[mode_id])
+        self.filename_line_spatial.setText(_dictation_spatial[mode_id])
 
     def _get_config(self):
         """
         Retrive all the configurations from the GUI elements.
 
-        After retreival, it sets them to the Configuration() object
+        After retrieval, it sets them to the Configuration() object
         through the NeuroChaT() object.
 
         """
@@ -1097,8 +1362,12 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
             QtWidgets.QFileDialog.getOpenFileName(
                 self, 'Select NCFG file...', os.getcwd(), "(*.ncfg)")[0])
         if not ncfg_file:
-            logging.error("No saved session selected! Loading failed!")
+            logging.warning("No saved session selected.")
+            return
         else:
+            self._should_clear_backend = True
+            self.clear_backend_files()
+            self._should_clear_backend = False
             self._control.load_config(ncfg_file)
             os.chdir(os.path.dirname(ncfg_file))
 
@@ -1116,7 +1385,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         old_unit_no = self._control.get_unit_no()
         self.unit_getitems()
         index = self.unit_no_box.findText(str(old_unit_no))
-        if index >= 0 & index < 256:
+        if index >= 0:
             self._control.set_unit_no(old_unit_no)
             self.unit_no_box.setCurrentIndex(index)
 
@@ -1128,6 +1397,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         elif self._control.get_data_format() == 'NWB':
             file_tag = file.split('/')[-1]
 
+        if os.path.isfile(self._control.get_spike_file()):
+            os.chdir(os.path.dirname(self._control.get_spike_file()))
+        elif os.path.isfile(self._control.get_lfp_file()):
+            os.chdir(os.path.dirname(self._control.get_lfp_file()))
         self.lfp_chan_getitems()
         index = self.lfp_chan_box.findText(file_tag)
         if index >= 0:
@@ -1157,6 +1430,19 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 param_widget.setChecked(self._control.get_params(name))
             else:
                 param_widget.setValue(self._control.get_params(name))
+
+        lfp_file = self._control.get_lfp_file()
+        if os.path.isfile(lfp_file):
+            self.filename_line_lfp.setText("Selected {}".format(lfp_file))
+        spike_file = self._control.get_spike_file()
+        if os.path.isfile(spike_file):
+            self.filename_line_spike.setText("Selected {}".format(spike_file))
+        position_file = self._control.get_spatial_file()
+        if os.path.isfile(position_file):
+            self.filename_line_spatial.setText(
+                "Selected {}".format(position_file))
+
+        self._should_clear_backend = True
 
     def merge_output(self):
         """Open the UiMerge() object to merge PDF or PS files."""
@@ -1202,6 +1488,34 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         excel_data = pd.read_excel(excel_file)
         print('Create an excel read warpper from PANDAS')
         print(excel_data)
+
+    def clear_backend_files(self):
+        """Reset all file selections to default."""
+        if self._should_clear_backend:
+            # Clear names on the config object
+            self._control.set_lfp_file("")
+            self._control.set_spike_file("")
+            self._control.set_spatial_file("")
+            self._control.set_nwb_file("")
+            self.unit_no_box.clear()
+            items = [str(i) for i in range(256)]
+            self.unit_no_box.addItems(items)
+            self._control.set_unit_no(0)
+
+            # Clear names on the data object
+            self._control.ndata.set_lfp_file("")
+            self._control.ndata.set_spike_file("")
+            self._control.ndata.set_spatial_file("")
+
+            self._set_dictation()
+
+    def clear_files(self):
+        """Call to clear_backend_files."""
+        temp = self._should_clear_backend
+        self._should_clear_backend = True
+        logging.info("Clearing selected files and units")
+        self.clear_backend_files()
+        self._should_clear_backend = temp
 
     def angle_calculation(self):
         """
@@ -2362,7 +2676,7 @@ class UiParameters(QtWidgets.QDialog):
         widget = ScrollableWidget()
         # Box- 1
         self.loc_rate_gb1 = add_group_box(
-            title="Analyses Parameters", obj_name="loc_rate_gb1")
+            title="Firing Map", obj_name="loc_rate_gb1")
 
         self.loc_pixel_size = add_spin_box(
             min_val=1, max_val=100, obj_name="loc_pixel_size")
@@ -2372,41 +2686,46 @@ class UiParameters(QtWidgets.QDialog):
             min_val=3, max_val=20, obj_name="loc_chop_bound")
         self.loc_chop_bound.setValue(5)
 
-        self.loc_field_thresh = add_double_spin_box(
-            min_val=0.0, max_val=1.0, obj_name="loc_field_thresh")
-        self.loc_field_thresh.setValue(0.20)
-        self.loc_field_thresh.setSingleStep(0.01)
-
-        self.loc_field_smooth = add_check_box(obj_name='loc_field_smooth')
-        self.loc_field_smooth.setChecked(False)
-
-        self.loc_style = add_combo_box(obj_name="loc_style")
-        self.loc_style.addItems(
-            ["contour", "digitized", "interpolated"])
-
-        self.loc_colormap = add_combo_box(obj_name="loc_colormap")
-        self.loc_colormap.addItems(
-            ["viridis", "default", "gray", "plasma",
-             "inferno", "magma", "cividis"])
-
         box_layout = ParamBoxLayout()
         box_layout.addRow(
             "Pixel Size", self.loc_pixel_size, "cm [range: 1-100]")
         box_layout.addRow(
             "Bound for Chopping Edges",
             self.loc_chop_bound, "pixels [range: 3-20]")
-        box_layout.addRow(
-            "Place Field Threshold",
-            self.loc_field_thresh, "ratio [range: 0-1, step: 0.01]")
-        box_layout.addRow(
-            "Whether to Smooth Firing Map Before Centroid Calculation",
-            self.loc_field_smooth, "True or False")
-
         self.loc_rate_gb1.setLayout(box_layout)
 
-        # Box- 2
+        # Box 2
         self.loc_rate_gb2 = add_group_box(
-            title="Smoothing Box Kernel", obj_name="loc_rate_gb2")
+            title="Place Field", obj_name="loc_rate_gb2")
+
+        self.loc_field_thresh = add_double_spin_box(
+            min_val=0.01, max_val=1.0, obj_name="loc_field_thresh")
+        self.loc_field_thresh.setValue(0.20)
+        self.loc_field_thresh.setSingleStep(0.01)
+
+        self.loc_field_smooth = add_check_box(obj_name='loc_field_smooth')
+        self.loc_field_smooth.setChecked(False)
+
+        self.loc_field_bins = add_spin_box(
+            min_val=3, max_val=50, obj_name="loc_field_bins")
+        self.loc_field_bins.setValue(9)
+
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Place Field Threshold",
+            self.loc_field_thresh, "[range: 0.01-1, step: 0.01]")
+        box_layout.addRow(
+            "Compute Place Field from Smoothed Map",
+            self.loc_field_smooth, "True or False")
+        box_layout.addRow(
+            "Required Adjacent Bins for Place Field",
+            self.loc_field_bins, "[range: 5-50]")
+
+        self.loc_rate_gb2.setLayout(box_layout)
+
+        # Box- 3
+        self.loc_rate_gb3 = add_group_box(
+            title="Smoothing Box Kernel", obj_name="loc_rate_gb3")
 
         self.loc_rate_filter = add_combo_box(obj_name="loc_rate_filter")
         self.loc_rate_filter.addItems(["Box", "Gaussian"])
@@ -2424,22 +2743,38 @@ class UiParameters(QtWidgets.QDialog):
             "Spike Rate Pixels/Sigma",
             self.loc_rate_kern_len, "[range: 1-11]\n\r Box: odds")
 
-        self.loc_rate_gb2.setLayout(box_layout)
+        self.loc_rate_gb3.setLayout(box_layout)
 
-        # Box 3
-        self.loc_rate_gb3 = add_group_box(
-            title="Plotting Style", obj_name="loc_rate_gb3")
+        # Box 4
+        self.loc_style = add_combo_box(obj_name="loc_style")
+        self.loc_style.addItems(
+            ["contour", "digitized", "interpolated"])
+
+        self.loc_colormap = add_combo_box(obj_name="loc_colormap")
+        self.loc_colormap.addItems(
+            ["viridis", "default", "gray", "plasma",
+             "inferno", "magma", "cividis"])
+
+        self.loc_contour_levels = add_spin_box(
+            min_val=4, max_val=12, obj_name="loc_contour_levels")
+        self.loc_contour_levels.setValue(5)
+        self.loc_rate_gb4 = add_group_box(
+            title="Plotting Style", obj_name="loc_rate_gb4")
         box_layout = ParamBoxLayout()
         box_layout.addRow(
             "Firing Rate Map Style", self.loc_style, "")
         box_layout.addRow(
             "Firing Rate Map Colormap", self.loc_colormap, "")
-        self.loc_rate_gb3.setLayout(box_layout)
+        box_layout.addRow(
+            "Firing Rate Map Contour Levels",
+            self.loc_contour_levels, "range [4-12]")
+        self.loc_rate_gb4.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.loc_rate_gb1)
         layout.addWidget(self.loc_rate_gb2)
         layout.addWidget(self.loc_rate_gb3)
+        layout.addWidget(self.loc_rate_gb4)
 
         widget.setContents(layout)
 
@@ -2537,6 +2872,7 @@ class UiParameters(QtWidgets.QDialog):
     def spatial_corr_page(self):
         """Set the ui elements for the 'spatial_corr' analysis parameters."""
         widget = ScrollableWidget()
+
         # Box- 1
         self.spatial_corr_gb1 = add_group_box(
             title="2D Correlation", obj_name="spatial_corr_gb1")
@@ -2587,10 +2923,37 @@ class UiParameters(QtWidgets.QDialog):
 
         self.spatial_corr_gb3.setLayout(box_layout)
 
+        # Box- 4
+        self.spatial_corr_style = add_combo_box(
+            obj_name="spatial_corr_style")
+        self.spatial_corr_style.addItems(
+            ["contour", "digitized"])
+        self.spatial_corr_colormap = add_combo_box(
+            obj_name="spatial_corr_colormap")
+        self.spatial_corr_colormap.addItems(
+            ["seismic", "default", "bwr", "viridis",
+             "gray", "plasma",
+             "inferno", "magma", "cividis"])
+        self.spatial_corr_contour_levels = add_spin_box(
+            min_val=4, max_val=12, obj_name="spatial_corr_contour_levels")
+        self.spatial_corr_contour_levels.setValue(10)
+        self.spatial_corr_gb4 = add_group_box(
+            title="Plotting Style", obj_name="spatial_corr_gb4")
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Correlation Map Style", self.spatial_corr_style, "")
+        box_layout.addRow(
+            "Correlation Map Colormap", self.spatial_corr_colormap, "")
+        box_layout.addRow(
+            "Correlation Map Contour Levels", self.spatial_corr_contour_levels,
+            "range [4-12]")
+        self.spatial_corr_gb4.setLayout(box_layout)
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.spatial_corr_gb1)
         layout.addWidget(self.spatial_corr_gb2)
         layout.addWidget(self.spatial_corr_gb3)
+        layout.addWidget(self.spatial_corr_gb4)
 
         widget.setContents(layout)
 
@@ -2619,8 +2982,17 @@ class UiParameters(QtWidgets.QDialog):
 
         self.grid_gb1.setLayout(box_layout)
 
+        self.grid_gb2 = add_group_box(
+            title="Plotting Style", obj_name="grid_gb2")
+        box_layout = ParamBoxLayout()
+        box_layout.addWidget(QtWidgets.QLabel(
+            "Plotting Style is managed in Spatial Autocorrelation"))
+
+        self.grid_gb2.setLayout(box_layout)
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.grid_gb1)
+        layout.addWidget(self.grid_gb2)
 
         widget.setContents(layout)
         return widget
@@ -2747,7 +3119,7 @@ class UiParameters(QtWidgets.QDialog):
 
         box_layout = QtWidgets.QVBoxLayout()
         box_layout.addWidget(QtWidgets.QLabel(
-            "Uses the parameters from other anlyses"))
+            "Uses the parameters from other analyses"))
         self.inter_depend_gb1.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
@@ -2764,7 +3136,7 @@ class UiParameters(QtWidgets.QDialog):
             title="Pre-filter (Butterworth) Properties", obj_name="lfp_spectrum_gb1")
 
         self.lfp_prefilt_lowcut = add_double_spin_box(
-            min_val=0.1, max_val=4, obj_name="lfp_prefilt_lowcut")
+            min_val=1.0, max_val=4, obj_name="lfp_prefilt_lowcut")
         self.lfp_prefilt_lowcut.setValue(1.5)
         self.lfp_prefilt_lowcut.setSingleStep(0.1)
 
@@ -2779,7 +3151,7 @@ class UiParameters(QtWidgets.QDialog):
 
         box_layout = ParamBoxLayout()
         box_layout.addRow("Lower Cutoff Frequency",
-                          self.lfp_prefilt_lowcut, "Hz [range: 0.1-4, step: 0.1]")
+                          self.lfp_prefilt_lowcut, "Hz [range: 1.0-4, step: 0.1]")
         box_layout.addRow("Higher Cutoff Frequency",
                           self.lfp_prefilt_highcut, "Hz [range: 10-500, step: 5]")
         box_layout.addRow(
@@ -2860,10 +3232,67 @@ class UiParameters(QtWidgets.QDialog):
 
         self.lfp_spectrum_gb3.setLayout(box_layout)
 
+        # Box 4
+        self.lfp_lowband_lowcut = add_double_spin_box(
+            min_val=0.5, max_val=100, obj_name="lfp_lowband_lowcut")
+        self.lfp_lowband_lowcut.setValue(1.5)
+        self.lfp_lowband_lowcut.setSingleStep(0.5)
+
+        self.lfp_lowband_highcut = add_double_spin_box(
+            min_val=3, max_val=500, obj_name="lfp_lowband_highcut")
+        self.lfp_lowband_highcut.setValue(4)
+        self.lfp_lowband_highcut.setSingleStep(0.5)
+
+        self.lfp_highband_lowcut = add_double_spin_box(
+            min_val=0.5, max_val=100, obj_name="lfp_highband_lowcut")
+        self.lfp_highband_lowcut.setValue(5)
+        self.lfp_highband_lowcut.setSingleStep(0.5)
+
+        self.lfp_highband_highcut = add_double_spin_box(
+            min_val=3, max_val=500, obj_name="lfp_highband_highcut")
+        self.lfp_highband_highcut.setValue(11)
+        self.lfp_highband_highcut.setSingleStep(0.5)
+
+        self.lfp_band_win_len = add_double_spin_box(
+            min_val=0.5, max_val=5, obj_name="lfp_band_win_len")
+        self.lfp_band_win_len.setValue(1.6)
+        self.lfp_band_win_len.setSingleStep(0.1)
+
+        box_layout = ParamBoxLayout()
+        box_layout.addRow("Lower Band Low Cutoff",
+                          self.lfp_lowband_lowcut, "Hz [range: 0.5-100, step: 0.5]")
+        box_layout.addRow("Lower Band High Cutoff",
+                          self.lfp_lowband_highcut, "Hz [range: 3-500, step: 0.5]")
+        box_layout.addRow("Upper Band Low Cutoff",
+                          self.lfp_highband_lowcut, "Hz [range: 0.5-100, step: 0.5]")
+        box_layout.addRow("Upper Band High Cutoff",
+                          self.lfp_highband_highcut, "Hz [range: 3-500, step: 0.5]")
+        box_layout.addRow("Band Power Window Length",
+                          self.lfp_band_win_len, "sec [range 0.5 - 5, step: 0.1]")
+
+        self.lfp_spectrum_gb4 = add_group_box(
+            title="Band Power Settings", obj_name="lfp_spectrum_gb4")
+        self.lfp_spectrum_gb4.setLayout(box_layout)
+
+        # Box 5
+        self.lfp_spectrum_colormap = add_combo_box(
+            obj_name="lfp_spectrum_colormap")
+        self.lfp_spectrum_colormap.addItems(
+            ["magma", "default", "gray", "plasma",
+             "inferno", "viridis", "cividis"])
+        self.lfp_spectrum_gb5 = add_group_box(
+            title="Plotting Style", obj_name="lfp_spectrum_gb5")
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Spectogram Colormap", self.lfp_spectrum_colormap, "")
+        self.lfp_spectrum_gb5.setLayout(box_layout)
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.lfp_spectrum_gb1)
         layout.addWidget(self.lfp_spectrum_gb2)
         layout.addWidget(self.lfp_spectrum_gb3)
+        layout.addWidget(self.lfp_spectrum_gb4)
+        layout.addWidget(self.lfp_spectrum_gb5)
 
         widget.setContents(layout)
 

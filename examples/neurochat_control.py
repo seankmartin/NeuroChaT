@@ -4,13 +4,10 @@ from neurochat.nc_config import Configuration
 from neurochat.nc_control import NeuroChaT
 
 
-def main():
+def main(config_loc):
     nc = NeuroChaT()
     config = Configuration()
 
-    root = r"C:\Users\smartin5\Neuroscience\NC_cfgs"
-    name = "all_spat.ncfg"
-    config_loc = os.path.join(root, name)
     config.set_config_file(config_loc)
     config.load_config()
 
@@ -31,4 +28,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     mpl_logger = logging.getLogger("matplotlib")
     mpl_logger.setLevel(level=logging.WARNING)
-    main()
+
+    # Set up path to the ncfg file
+    root = r"C:\Users\smartin5\Neuroscience\NC_cfgs"
+    name = "all_spat.ncfg"
+    config_loc = os.path.join(root, name)
+    main(config_loc)
