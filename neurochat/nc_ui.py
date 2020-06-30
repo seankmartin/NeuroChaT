@@ -813,14 +813,36 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         file_format = self.file_format_box.itemText(
             self.file_format_box.currentIndex())
         items = [""]
+
         if file_format == "Neuralynx":
             files = os.listdir(os.getcwd())
             items = [f for f in files if f.endswith('ncs')]
 
         elif file_format == "Axona":
+            def get_int_eeg(x):
+                if len(x) == 3:
+                    return 1
+                else:
+                    return int(x[3:])
             files = os.listdir(os.getcwd())
-            items = [f.split('.')[-1]
-                     for f in files if '.eeg' in f or '.egf' in f]
+            eeg_items = []
+            egf_items = []
+            for f in files:
+                if '.eeg' in f:
+                    eeg_items.append(f.split('.')[-1])
+                if '.egf' in f:
+                    egf_items.append(f.split('.')[-1])
+            try:
+                eeg_items = sorted(eeg_items, key=get_int_eeg)
+            except BaseException:
+                eeg_items = eeg_items
+
+            try:
+                egf_items = sorted(egf_items, key=get_int_eeg)
+            except BaseException:
+                egf_items = egf_items
+
+            items = eeg_items + egf_items
 
         elif file_format == "NWB":
             try:
