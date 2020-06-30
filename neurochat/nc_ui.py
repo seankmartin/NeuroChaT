@@ -356,9 +356,9 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         #     "directory | position_file | spike_file | unit_no | eeg extension")
 
         self.multi_place_cell_act = self.multifile_menu.addAction(
-            "Directory place cell summary")
+            "Axona recursive spatial analysis")
         self.multi_place_cell_act.setStatusTip(
-            "Select a folder to recursively analyse units for place cells " +
+            "Select a folder to recursively analyse units for spatial properties " +
             "-- Currently only supports Axona")
 
         self.view_help_act = self.help_menu.addAction(
@@ -1396,6 +1396,10 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
         elif self._control.get_data_format() == 'NWB':
             file_tag = file.split('/')[-1]
 
+        if os.path.isfile(self._control.get_spike_file()):
+            os.chdir(os.path.dirname(self._control.get_spike_file()))
+        elif os.path.isfile(self._control.get_lfp_file()):
+            os.chdir(os.path.dirname(self._control.get_lfp_file()))
         self.lfp_chan_getitems()
         index = self.lfp_chan_box.findText(file_tag)
         if index >= 0:
