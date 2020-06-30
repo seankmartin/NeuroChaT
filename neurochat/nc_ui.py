@@ -1363,6 +1363,7 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                 self, 'Select NCFG file...', os.getcwd(), "(*.ncfg)")[0])
         if not ncfg_file:
             logging.warning("No saved session selected.")
+            return
         else:
             self._should_clear_backend = True
             self.clear_backend_files()
@@ -2756,7 +2757,7 @@ class UiParameters(QtWidgets.QDialog):
 
         self.loc_contour_levels = add_spin_box(
             min_val=4, max_val=12, obj_name="loc_contour_levels")
-        self.loc_contour_levels.setValue(5)
+        self.loc_contour_levels.setValue(10)
         self.loc_rate_gb4 = add_group_box(
             title="Plotting Style", obj_name="loc_rate_gb4")
         box_layout = ParamBoxLayout()
