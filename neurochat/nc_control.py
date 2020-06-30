@@ -1024,6 +1024,7 @@ class NeuroChaT(QtCore.QThread):
                 logging.info('Time-lapse analysis of locational tuning...')
                 try:
                     params = self.get_params_by_analysis('loc_time_lapse')
+                    params2 = self.get_params_by_analysis('loc_rate')
 
                     if params['loc_rate_filter'] == 'Gaussian':
                         filttype = 'g'
@@ -1039,7 +1040,10 @@ class NeuroChaT(QtCore.QThread):
                     fig = nc_plot.loc_spike_time_lapse(graph_data)
                     self.close_fig(fig)
 
-                    fig = nc_plot.loc_rate_time_lapse(graph_data)
+                    fig = nc_plot.loc_rate_time_lapse(
+                        graph_data, colormap=params2['loc_colormap'],
+                        style=params2['loc_style'],
+                        levels=params2['loc_contour_levels'])
                     self.close_fig(fig)
                     self.plot_data_to_hdf(
                         name=name + '/loc_time_lapse/', graph_data=graph_data)

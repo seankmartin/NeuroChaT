@@ -1533,7 +1533,7 @@ def loc_spike_time_lapse(place_data):
     return fig
 
 
-def loc_rate_time_lapse(place_data):
+def loc_rate_time_lapse(place_data, **kwargs):
     """
     Plot the analysis outcome of locational time-lapse analysis.
 
@@ -1541,6 +1541,8 @@ def loc_rate_time_lapse(place_data):
     ----------
     place_data : dict
         Graphical data from locational time-lapsed anlaysis
+    kwargs :
+        keyword arguments passed to loc_rate
 
     Returns
     -------
@@ -1563,7 +1565,7 @@ def loc_rate_time_lapse(place_data):
     for i, ax in enumerate(axs):
         if i < len(keys):
             key = keys[i]
-            loc_rate(place_data[key], ax=ax)
+            loc_rate(place_data[key], ax=ax, **kwargs)
             nice_key = _nice_lapse_key(key)
             ax.set_title(nice_key)
         else:

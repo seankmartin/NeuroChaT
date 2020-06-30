@@ -2848,7 +2848,8 @@ class UiParameters(QtWidgets.QDialog):
             title="", obj_name="loc_time_lapse_gb1")
 
         box_layout = QtWidgets.QVBoxLayout()
-        box_layout.addWidget(QtWidgets.QLabel("No parameter to set"))
+        box_layout.addWidget(QtWidgets.QLabel(
+            "No parameters to set, plotting style is in Spike Rate vs Location"))
         self.loc_time_lapse_gb1.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()
