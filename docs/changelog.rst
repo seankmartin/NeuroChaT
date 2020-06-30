@@ -26,6 +26,7 @@ Changes
 - Can control number of levels in contour plots from the UI. For example, on place cell analysis.
 - Added a legend to polar plots of head direction firing.
 - Excel results file in UI is automatically named based on the input files.
+- Changed peak head direction calculation to be performed on smoothed data.
 
 Bugs
 ----
