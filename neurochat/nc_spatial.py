@@ -1790,7 +1790,7 @@ class NSpatial(NAbstract):
             _results['HD Res Vect'] = results['resultant']
 
             binInterp = np.arange(360)
-            rateInterp = np.interp(binInterp, bins, hd_rate)
+            rateInterp = np.interp(binInterp, bins, smoothRate)
 
             _results['HD Peak Rate'] = np.amax(rateInterp)
             _results['HD Peak'] = binInterp[np.argmax(rateInterp)]
@@ -1917,11 +1917,11 @@ class NSpatial(NAbstract):
 
         if update:
             binInterp = np.arange(360)
-            rateInterp = np.interp(binInterp, bins, cwRate)
+            rateInterp = np.interp(binInterp, bins, smoothcwRate)
             peak_rate_cw = np.amax(rateInterp)
             peak_cw = binInterp[np.argmax(rateInterp)]
 
-            rateInterp = np.interp(binInterp, bins, ccwRate)
+            rateInterp = np.interp(binInterp, bins, smoothccwRate)
             peak_rate_ccw = np.amax(rateInterp)
             peak_ccw = binInterp[np.argmax(rateInterp)]
 
