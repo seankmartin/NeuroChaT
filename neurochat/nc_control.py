@@ -2069,7 +2069,8 @@ class NeuroChaT(QtCore.QThread):
                 directory, tetrode_list=[i for i in range(1, 17)])
             nca.place_cell_summary(
                 container, dpi=dpi,
-                filter_place_cells=False, filter_low_freq=False)
+                filter_place_cells=False, filter_low_freq=False,
+                point_size=10)
         except Exception as ex:
             log_exception(
                 ex, "In walking a directory for place cell summaries")
