@@ -1306,11 +1306,16 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
         dy = np.mean(np.diff(place_data['yedges']))
         pad_map = np.pad(fmap[:-1, :-1], ((1, 1), (1, 1)), "edge")
         vmin, vmax = np.nanmin(pad_map), np.nanmax(pad_map)
-        if vmin != vmax:
+        if vmax - vmin > 0.1:
             splits = np.linspace(vmin, vmax, levels + 1)
         else:
-            splits = np.array([vmin, vmin * 2])
+            splits = np.linspace(vmin, vmin + 0.1*levels, levels+1)
         splits = np.around(splits, decimals=1)
+        to_delete = []
+        for i in range(len(splits) - 1):
+            if splits[i] >= splits[i+1]:
+                to_delete.append(i)
+        splits = np.delete(splits, to_delete)
         x_edges = np.append(
             place_data["xedges"] - dx / 2,
             place_data["xedges"][-1] + dx / 2)
