@@ -558,8 +558,8 @@ class Nhdf(object):
         # Get the lfp data path/group
         path = self.resolve_datapath(data=spatial)
 
-        logging.info("Saving spatial info to {} path {}".format(
-            self._filename, path))
+        # logging.info("Saving spatial info to {} path {}".format(
+        #     self._filename, path))
         # delete old data
         if path in self.f:
             del self.f[path]
@@ -622,8 +622,8 @@ class Nhdf(object):
         # Get the lfp data path/group
         path = self.resolve_datapath(data=lfp)
 
-        logging.info("Saving lfp info to {} path {}".format(
-            self._filename, path))
+        # logging.info("Saving lfp info to {} path {}".format(
+        #     self._filename, path))
 
         # delete old data
         if path in self.f:
@@ -659,8 +659,8 @@ class Nhdf(object):
         # Get the spike data path/group
         path = self.resolve_datapath(data=spike)
 
-        logging.info("Saving spike info to {} path {}".format(
-            self._filename, path))
+        # logging.info("Saving spike info to {} path {}".format(
+        #     self._filename, path))
 
         # delete old data
         if path in self.f:
