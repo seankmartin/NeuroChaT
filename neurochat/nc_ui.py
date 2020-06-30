@@ -2757,7 +2757,7 @@ class UiParameters(QtWidgets.QDialog):
 
         self.loc_contour_levels = add_spin_box(
             min_val=4, max_val=12, obj_name="loc_contour_levels")
-        self.loc_contour_levels.setValue(10)
+        self.loc_contour_levels.setValue(5)
         self.loc_rate_gb4 = add_group_box(
             title="Plotting Style", obj_name="loc_rate_gb4")
         box_layout = ParamBoxLayout()
@@ -2936,7 +2936,7 @@ class UiParameters(QtWidgets.QDialog):
              "inferno", "magma", "cividis"])
         self.spatial_corr_contour_levels = add_spin_box(
             min_val=4, max_val=12, obj_name="spatial_corr_contour_levels")
-        self.spatial_corr_contour_levels.setValue(5)
+        self.spatial_corr_contour_levels.setValue(10)
         self.spatial_corr_gb4 = add_group_box(
             title="Plotting Style", obj_name="spatial_corr_gb4")
         box_layout = ParamBoxLayout()
@@ -2982,8 +2982,17 @@ class UiParameters(QtWidgets.QDialog):
 
         self.grid_gb1.setLayout(box_layout)
 
+        self.grid_gb2 = add_group_box(
+            title="Plotting Style", obj_name="grid_gb2")
+        box_layout = ParamBoxLayout()
+        box_layout.addWidget(QtWidgets.QLabel(
+            "Plotting Style is managed in Spatial Autocorrelation"))
+
+        self.grid_gb2.setLayout(box_layout)
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.grid_gb1)
+        layout.addWidget(self.grid_gb2)
 
         widget.setContents(layout)
         return widget
@@ -3110,7 +3119,7 @@ class UiParameters(QtWidgets.QDialog):
 
         box_layout = QtWidgets.QVBoxLayout()
         box_layout.addWidget(QtWidgets.QLabel(
-            "Uses the parameters from other anlyses"))
+            "Uses the parameters from other analyses"))
         self.inter_depend_gb1.setLayout(box_layout)
 
         layout = QtWidgets.QVBoxLayout()

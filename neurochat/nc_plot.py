@@ -1982,7 +1982,7 @@ def gradient(gradient_data):
     return fig1, fig2, fig3
 
 
-def grid(grid_data):
+def grid(grid_data, **kwargs):
     """
     Plot the result from grid analysis.
 
@@ -1990,6 +1990,8 @@ def grid(grid_data):
     ----------
     grid_data : dict
         Graphical data from border analysis
+    kwargs :
+        Keyword arguments passed to loc_auto_corr
 
     Returns
     -------
@@ -1999,7 +2001,7 @@ def grid(grid_data):
         Rotational correlation of autocorrelation map
 
     """
-    fig1 = loc_auto_corr(grid_data)
+    fig1 = loc_auto_corr(grid_data, **kwargs)
     ax = fig1.axes[0]
 
     xmax = grid_data['xmax']

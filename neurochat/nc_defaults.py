@@ -106,7 +106,7 @@ PARAMETERS = {
         "loc_field_bins": 9,
         "loc_style": "contour",
         "loc_colormap": "viridis",
-        "loc_contour_levels": 10
+        "loc_contour_levels": 5
     },
     "loc_shuffle": {
         "loc_shuffle_limit": 0,
@@ -141,7 +141,7 @@ PARAMETERS = {
         "spatial_corr_min_obs": 20,
         "spatial_corr_style": "contour",
         "spatial_corr_colormap": "viridis",
-        "spatial_corr_contour_levels": 5,
+        "spatial_corr_contour_levels": 10,
     },
     "grid": {
         "grid_ang_bin": 3,

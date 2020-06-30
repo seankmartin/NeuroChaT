@@ -1138,6 +1138,7 @@ class NeuroChaT(QtCore.QThread):
                 logging.info('Assessing gridness...')
                 try:
                     params = self.get_params_by_analysis('grid')
+                    params2 = self.get_params_by_analysis('spatial_corr')
 
                     if params['spatial_corr_filter'] == 'Gaussian':
                         filttype = 'g'
@@ -1152,7 +1153,10 @@ class NeuroChaT(QtCore.QThread):
                         filter=[filttype, params['spatial_corr_kern_len']],
                         minPixel=params['spatial_corr_min_obs'],
                         brAdjust=True)  # Add other paramaters
-                    fig = nc_plot.grid(graph_data)
+                    fig = nc_plot.grid(
+                        graph_data, colormap=params2['spatial_corr_colormap'],
+                        style=params2['spatial_corr_style'],
+                        levels=params2['spatial_corr_contour_levels'])
                     self.close_fig(fig)
                     self.plot_data_to_hdf(
                         name=name + '/grid/', graph_data=graph_data)
