@@ -1928,8 +1928,6 @@ class NSpatial(NAbstract):
 
             _results['HD Delta'] = (peak_rate_ccw - peak_rate_cw)
             _results['HD Peak CW'] = peak_cw
-            logging.info(peak_rate_ccw)
-            logging.info(peak_ccw)
             _results['HD Peak CCW'] = peak_ccw
             _results['HD Peak Rate CW'] = peak_rate_cw
             _results['HD Peak Rate CCW'] = peak_rate_ccw
