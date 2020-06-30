@@ -792,8 +792,7 @@ class NSpatial(NAbstract):
         except BaseException:
             logging.warning(self.get_system() +
                             ' files may not have speed data!')
-        if not np.array(self._ang_vel).any():
-            self.set_ang_vel(self.calc_ang_vel())
+        self.set_ang_vel(self.calc_ang_vel())
         self.set_border(self.calc_border())
 
     def load_spatial_Axona(self, file_name):
