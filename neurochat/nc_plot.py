@@ -414,7 +414,7 @@ def lfp_spectrum_tr(plot_data, ax=None, **kwargs):
 
     pcm = ax.pcolormesh(
         plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map,
-        edgecolors="none")
+        edgecolors="none", rasterized=True)
     _extent = [
         plot_data['t'].min(), plot_data['t'].max(), 0, plot_data['f'].max()]
     plt.axis(_extent)
@@ -1311,11 +1311,11 @@ def loc_rate(place_data, ax=None, smooth=True, **kwargs):
         if vmax - vmin > 0.1:
             splits = np.linspace(vmin, vmax, levels + 1)
         else:
-            splits = np.linspace(vmin, vmin + 0.1*levels, levels+1)
+            splits = np.linspace(vmin, vmin + 0.1 * levels, levels + 1)
         splits = np.around(splits, decimals=1)
         to_delete = []
         for i in range(len(splits) - 1):
-            if splits[i] >= splits[i+1]:
+            if splits[i] >= splits[i + 1]:
                 to_delete.append(i)
         splits = np.delete(splits, to_delete)
         x_edges = np.append(
@@ -1779,7 +1779,7 @@ def loc_auto_corr(locAuto_data, **kwargs):
             splits = np.linspace(vmin, vmax, levels + 1)
         else:
             splits = np.array([vmin, vmin * 2])
-        splits = np.around(splits, decimals=1)
+        splits = np.around(splits, decimals=2)
         x_edges = np.append(
             locAuto_data['xshift'] - dx / 2,
             locAuto_data['xshift'][-1] + dx / 2)
