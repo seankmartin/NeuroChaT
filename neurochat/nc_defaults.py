@@ -220,5 +220,6 @@ PARAMETERS = {
         "phase_loc_win_up": 0.4,
         "phase_power_thresh": 0.1,
         "phase_raster_bin": 2,
+        "phase_loc_colormap": "magma"
     },
 }

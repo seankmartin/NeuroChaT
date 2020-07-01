@@ -1397,7 +1397,8 @@ class NeuroChaT(QtCore.QThread):
                         'mode': 'tr'}
 
                     graph_data = self.plv(**reparam)
-                    fig = nc_plot.plv_tr(graph_data)
+                    fig = nc_plot.plv_tr(
+                        graph_data, colormap=params["phase_loc_colormap"])
                     self.close_fig(fig)
                     self.plot_data_to_hdf(
                         name=name + '/phase_lock_TR/', graph_data=graph_data)

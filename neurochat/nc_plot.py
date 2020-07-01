@@ -396,7 +396,7 @@ def lfp_spectrum_tr(plot_data, ax=None, **kwargs):
         An optional matplotlib axis object to plot to.
     kwargs :
         colormap : str
-            The colormap to use. Defaults to "viridis".
+            The colormap to use. Defaults to "magma".
 
     Returns
     -------
@@ -405,7 +405,7 @@ def lfp_spectrum_tr(plot_data, ax=None, **kwargs):
 
     """
     ax, fig1 = _make_ax_if_none(ax)
-    colormap = kwargs.get("colormap", "viridis")
+    colormap = kwargs.get("colormap", "magma")
 
     if colormap == "default":
         c_map = plt.cm.jet
@@ -493,7 +493,7 @@ def plv(plv_data):
     return fig1, fig2
 
 
-def plv_tr(plv_data):
+def plv_tr(plv_data, **kwargs):
     """
     Plot the analysis of time-resolved Phase-locking value (PLV).
 
@@ -501,6 +501,11 @@ def plv_tr(plv_data):
     ----------
     plv_data : dict
         Graphical data from the time-resolved PLV analysis
+    kwargs : keyword arguments
+        colormap : str
+            magma is used if not specified
+            "default" uses the standard red green intensity colours
+            but these are bad for colorblindness.
 
     Returns
     -------
@@ -512,6 +517,8 @@ def plv_tr(plv_data):
         Plot of SFC
 
     """
+    colormap = kwargs.get("colormap", "magma")
+
     offset = plv_data['offset']
     f = plv_data['f']
     fSTA = plv_data['fSTA']
@@ -521,7 +528,12 @@ def plv_tr(plv_data):
 
     fig1 = plt.figure()
     ax = plt.gca()
-    c_map = plt.cm.jet
+
+    if colormap == "default":
+        c_map = plt.cm.jet
+    else:
+        c_map = colormap
+
     pcm = ax.pcolormesh(offset, f, fSTA, cmap=c_map, rasterized=True)
     plt.title('Time-resolved fSTA')
     ax.set_xlabel('Time (sec)')
@@ -530,7 +542,6 @@ def plv_tr(plv_data):
 
     fig2 = plt.figure()
     ax = plt.gca()
-    c_map = plt.cm.jet
     pcm = ax.pcolormesh(offset, f, SFC, cmap=c_map, rasterized=True)
     plt.title('Time-resolved SFC')
     ax.set_xlabel('Time (sec)')
@@ -539,7 +550,6 @@ def plv_tr(plv_data):
 
     fig3 = plt.figure()
     ax = plt.gca()
-    c_map = plt.cm.jet
     pcm = ax.pcolormesh(offset, f, PLV, cmap=c_map, rasterized=True)
     plt.title('Time-resolved PLV')
     ax.set_xlabel('Time (sec)')
@@ -1712,7 +1722,7 @@ def loc_auto_corr(locAuto_data, **kwargs):
     """
     Plot the analysis outcome of locational firing rate autocorrelation.
 
-    By default, colormap="viridis", style="contour".
+    By default, colormap="coolwarm", style="contour".
     However, the old NC style was colormap="default", style="digitized".
     The old style produces very nice maps, but not colorblind.
 
@@ -1722,7 +1732,7 @@ def loc_auto_corr(locAuto_data, **kwargs):
         Graphical data from spatial correlation of firing map
     kwargs :
         colormap : str
-            viridis is used if not specified
+            coolwarm is used if not specified
             "default" uses the standard red green intensity colours
             but these are bad for colorblindness.
         style : str
@@ -1730,6 +1740,7 @@ def loc_auto_corr(locAuto_data, **kwargs):
             "contour", "digitized" or "interpolated"
         levels : int
             The number of levels in the contour plot
+            Defaults to 8
 
     Returns
     -------
@@ -1737,9 +1748,9 @@ def loc_auto_corr(locAuto_data, **kwargs):
         Spatial correlation map
 
     """
-    colormap = kwargs.get("colormap", "viridis")
+    colormap = kwargs.get("colormap", "coolwarm")
     style = kwargs.get("style", "contour")
-    levels = kwargs.get("levels", 5)
+    levels = kwargs.get("levels", 8)
     if colormap == "default":
         clist = [
             (1.0, 1.0, 1.0),

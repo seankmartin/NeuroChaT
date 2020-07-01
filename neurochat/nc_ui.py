@@ -3417,8 +3417,22 @@ class UiParameters(QtWidgets.QDialog):
 
         self.phase_lock_gb1.setLayout(box_layout)
 
+        self.phase_lock_gb2 = add_group_box(
+            title="Plotting Style", obj_name="phase_lock_gb2")
+        self.phase_loc_colormap = add_combo_box(
+            obj_name="phase_loc_colormap")
+        self.phase_loc_colormap.addItems(
+            ["magma", "default", "gray", "plasma",
+             "inferno", "viridis", "cividis"])
+
+        box_layout = ParamBoxLayout()
+        box_layout.addRow(
+            "Phase Locking Colormap", self.phase_loc_colormap, "")
+        self.phase_lock_gb2.setLayout(box_layout)
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.phase_lock_gb1)
+        layout.addWidget(self.phase_lock_gb2)
 
         widget.setContents(layout)
 
