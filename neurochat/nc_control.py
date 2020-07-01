@@ -1810,7 +1810,7 @@ class NeuroChaT(QtCore.QThread):
             excel_info.to_excel(excel_file, index=False)
             logging.info('Verification process completed!')
         else:
-            logging.error('Excel  file does not exist!')
+            logging.error('Excel file does not exist!')
 
     def angle_calculation(self, excel_file=None, should_plot=True):
         """
@@ -1930,8 +1930,8 @@ class NeuroChaT(QtCore.QThread):
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
             for row in excel_info.itertuples():
-                spike_file = row[1] + os.sep + row[2]
-                unit_no = int(row[3])
+                spike_file = row[1] + os.sep + row[3]
+                unit_no = int(row[4])
                 if self.get_data_format() == 'NWB':
                     # excel list: directory| spike group| unit_no
                     hdf_name = row[1] + os.sep + row[2] + '.hdf5'
@@ -1978,6 +1978,15 @@ class NeuroChaT(QtCore.QThread):
         -------
         None
 
+        Note
+        ----
+        There should be 8 columns overall in the sheet, regardless of format.
+        So the input excel sheet should have column format:
+        directory1 | hdf5_file1 (leave entry blank for non NWB) |
+        spike_file1 or h5_group1 | unit_no1 |
+        directory2 | hdf5_file2 (leave entry blank for non NWB) |
+        spike_file2 or h5_group2 | unit_no2
+
         """
         nclust_1 = NClust()
         nclust_2 = NClust()
@@ -1985,8 +1994,8 @@ class NeuroChaT(QtCore.QThread):
         if os.path.exists(excel_file):
             excel_info = pd.read_excel(excel_file)
             for row in excel_info.itertuples():
-                spike_file = row[1] + os.sep + row[2]
-                unit_1 = int(row[3])
+                spike_file = row[1] + os.sep + row[3]
+                unit_1 = int(row[4])
                 if self.get_data_format() == 'NWB':
                     # excel list: directory| spike group| unit_no
                     hdf_name = row[1] + os.sep + row[2] + '.hdf5'
@@ -1994,12 +2003,12 @@ class NeuroChaT(QtCore.QThread):
                 info['spike_1'].append(spike_file)
                 info['unit_1'].append(unit_1)
 
-                spike_file = row[4] + os.sep + row[5]
-                unit_2 = int(row[6])
+                spike_file = row[5] + os.sep + row[7]
+                unit_2 = int(row[8])
                 if self.get_data_format() == 'NWB':
                     # excel list: directory| spike group| unit_no
-                    hdf_name = row[4] + os.sep + row[5] + '.hdf5'
-                    spike_file = hdf_name + '+/processing/Shank' + '/' + row[6]
+                    hdf_name = row[5] + os.sep + row[6] + '.hdf5'
+                    spike_file = hdf_name + '+/processing/Shank' + '/' + row[7]
                 info['spike_2'].append(spike_file)
                 info['unit_2'].append(unit_2)
 
