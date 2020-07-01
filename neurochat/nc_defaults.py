@@ -85,6 +85,7 @@ PARAMETERS = {
         "loc_pixel_size": 3,
         "hd_ang_vel_cutoff": 30,
         "hd_rate_kern_len": 5,
+        "hd_show_predicted": True
     },
     "hd_shuffle": {
         "hd_shuffle_limit": 0,

@@ -831,7 +831,12 @@ def hd_rate(hd_data, ax=None, **kwargs):
         Graphical data from the unit firing to head-direction correlation
     ax : matplotlib.axes.Axes
         Polar Axes object. If specified, the figure is plotted in this axes.
-    kwargs : title - str, default "Head directional firing rate"
+    kwargs : keyword arguments
+        title : str
+            default "Head directional firing rate"
+        do_ticks : bool
+            default False
+            Show ticks on the plot.
 
     Returns
     -------
@@ -840,6 +845,7 @@ def hd_rate(hd_data, ax=None, **kwargs):
 
     """
     title = kwargs.get("title", "Head directional firing rate")
+    do_ticks = kwargs.get("do_ticks", False)
     if not ax:
         plt.figure()
         ax = plt.gca(polar=True)
@@ -849,7 +855,10 @@ def hd_rate(hd_data, ax=None, **kwargs):
     ax.plot(np.radians(bins), rate, color=BLUE)
 
     ax.set_title(title)
-    ax.set_rticks([hd_data['hdRate'].max()])
+
+    if do_ticks:
+        ax.set_rmax(hd_data['smoothRate'].max())
+        ax.set_rticks([hd_data['smoothRate'].max(), ])
 
     return ax
 
@@ -933,7 +942,7 @@ def hd_spike(hd_data, ax=None):
     return ax
 
 
-def hd_firing(hd_data):
+def hd_firing(hd_data, **kwargs):
     """
     Plot the analysis of head directional correlation to spike-rate.
 
@@ -941,6 +950,9 @@ def hd_firing(hd_data):
     ----------
     hd_data : dict
         Graphical data from the unit firing to head-directional correlation
+    kwargs : keyword arguments
+        show_predicted : bool
+            Whether to show predicted head direction
 
     Returns
     -------
@@ -951,6 +963,7 @@ def hd_firing(hd_data):
         Predicted firing rate is also plotted.
 
     """
+    show_predicted = kwargs.get("show_predicted", True)
     fig1 = plt.figure()
     ax = fig1.add_axes(
         [0.1, 0.1, 0.8, 0.8], projection='polar')
@@ -959,7 +972,11 @@ def hd_firing(hd_data):
     fig2 = plt.figure()
     ax = fig2.add_axes(
         [0.1, 0.1, 0.8, 0.8], projection='polar')
-    hd_rate_pred(hd_data, ax=ax)
+
+    if show_predicted:
+        hd_rate_pred(hd_data, ax=ax, **kwargs)
+    else:
+        hd_rate(hd_data, ax=ax, **kwargs)
     return fig1, fig2
 
 

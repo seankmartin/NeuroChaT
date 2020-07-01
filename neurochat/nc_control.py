@@ -845,7 +845,9 @@ class NeuroChaT(QtCore.QThread):
                         filter=['b', params['hd_rate_kern_len']],
                         pixel=params['loc_pixel_size'],
                         update=True)
-                    fig = nc_plot.hd_firing(hdData)
+                    fig = nc_plot.hd_firing(
+                        hdData, show_predicted=params["hd_show_predicted"],
+                        do_ticks=True)
                     self.close_fig(fig)
                     self.plot_data_to_hdf(
                         name=name + '/hd_rate/', graph_data=hdData)

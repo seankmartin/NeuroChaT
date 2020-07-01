@@ -2574,11 +2574,16 @@ class UiParameters(QtWidgets.QDialog):
             min_val=0, max_val=100, obj_name="hd_ang_vel_cutoff")
         self.hd_ang_vel_cutoff.setValue(10)
         self.hd_ang_vel_cutoff.setSingleStep(5)
+        self.hd_show_predicted = add_check_box(obj_name='hd_show_predicted')
+        self.hd_show_predicted.setChecked(True)
 
         box_layout = ParamBoxLayout()
         box_layout.addRow("Head Directional Binsize", self.hd_bin, "degree")
         box_layout.addRow("Angular Velocity Cutoff",
                           self.hd_ang_vel_cutoff, "deg/sec [range: 0-100, step: 5]")
+        box_layout.addRow(
+            "Show predicted head directional rate",
+            self.hd_show_predicted, "Boolean value")
 
         self.hd_rate_gb1.setLayout(box_layout)
 
