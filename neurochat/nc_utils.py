@@ -804,7 +804,7 @@ def centre_of_mass(co_ords, weights, axis=0):
     return np.sum(weighted, axis=axis) / np.sum(weights)
 
 
-def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
+def smooth_1d(x, kernel_type='b', kernel_size=5, axis=0, **kwargs):
     """
     Filter a 1D array or signal.
 
@@ -815,10 +815,14 @@ def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
         If matrix, each column or row is filtered
         individually depending on 'dir' parameter that takes either '0' for along-column
         and '1' for along-row filtering.
-    filttype : str
-        'b' for moving average or box filter. 'g' for Gaussian filter
-    filtsize
+    kernel_type : str
+        'b' for moving average or box filter. 'g' for Gaussian filter.
+        'hs' for Heaviside filter
+        'hg' for half-Gaussian filter
+    kernel_size : int
         Box size for box filter and sigma for Gaussian filter
+    axis : int
+        Defaults to 0. The axis along which to smooth matrices.
 
     Returns
     -------
@@ -826,26 +830,48 @@ def smooth_1d(x, filttype='b', filtsize=5, **kwargs):
         Filtered data
 
     """
-    x = np.array(x)
-    direction = kwargs.get('dir', 0)  # default along column
-    if filttype == 'g':
-        halfwid = np.round(3 * filtsize)
-        xx = np.arange(-halfwid, halfwid + 1, 1)
-        filt = np.exp(-(xx**2) / (2 * filtsize**2)) / \
-            (np.sqrt(2 * np.pi) * filtsize)
-    elif filttype == 'b':
-        filt = np.ones(filtsize, ) / filtsize
+    def pad_and_convolve(xx, kernel):
+        npad = len(kernel)
+        xx = np.pad(xx, (npad, npad), 'edge')
+        yy = np.convolve(xx, kernel, mode='same')
+        return yy[npad:-npad]
 
-    if len(x.shape) == 1:
-        result = np.convolve(x, filt, mode='same')
-    elif len([x.shape]) == 2:
-        result = np.zeros(x.shape)
-        if direction:
-            for i in np.arange(0, x.shape[0]):
-                result[i, :] = np.convolve(x[i, :], filt, mode='same')
-        else:
-            for i in np.arange(0, x.shape[0]):
-                result[:, i] = np.convolve(x[:, i], filt, mode='same')
+    x = np.array(x)
+    half_width = kernel_size / 2
+    xx = np.arange(-half_width, half_width + 1, 1)
+    if kernel_type == 'g':
+        half_width = kernel_size / 2
+        xx = np.arange(-half_width, half_width + 1, 1)
+        sigma = kernel_size / (2 * 2.7)
+        kernel = np.exp(-(xx**2) / (2 * sigma**2)) / \
+            (np.sqrt(2 * np.pi) * sigma)
+
+    elif kernel_type == 'b':
+        half_width = kernel_size / 2
+        xx = np.arange(-half_width, half_width + 1, 1)
+        sigma = kernel_size / 2 / np.sqrt(3)
+        kernel = (0.5 / (np.sqrt(3) * sigma)) * \
+            (np.abs(xx) < np.sqrt(3) * sigma)
+
+    elif kernel_type == 'hs':
+        half_width = kernel_size
+        xx = np.arange(-half_width, half_width + 1, 1)
+        sigma = kernel_size / 2 / np.sqrt(3)
+        kernel = (0.5 / (np.sqrt(3) * sigma)) * \
+            (xx < 2 * np.sqrt(3) * sigma and xx >= 0)
+
+    elif kernel_type == 'hg':
+        half_width = kernel_size
+        xx = np.arange(-half_width, half_width + 1, 1)
+        sigma = 2 * kernel_size / 2 / np.sqrt(3)
+        kernel = np.exp(-(xx**2) / (2 * sigma**2)) / \
+            (np.sqrt(2 * np.pi) * sigma)
+        kernel[xx < 0] = 0
+        kernel[xx > 0] = 2 * kernel[xx > 0]
+
+    result = np.apply_along_axis(
+        lambda xx: pad_and_convolve(xx, kernel), axis, x)
+
     return result
 
 
@@ -858,7 +884,7 @@ def smooth_2d(x, filttype='b', filtsize=5):
     x : ndarray
         Matrix to be filtered
     filttype : str
-        'b' for moving average or box filter. 'g' for Gaussian filter
+        'b' for moving average or box filter. 'g' for Gaussian filter.
     filtsize
         Box size for box filter and sigma for Gaussian filter
 
