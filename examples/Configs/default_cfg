@@ -59,6 +59,7 @@ parameters:
   hd_shift_max: 10
   hd_shift_min: -10
   hd_shift_step: 1
+  hd_show_predicted: true
   hd_shuffle_bins: 100
   hd_shuffle_limit: 0
   hd_shuffle_total: 500
@@ -70,6 +71,11 @@ parameters:
   isi_corr_len_short: 10
   isi_length: 350
   isi_refractory: 2
+  lfp_band_win_len: 1.6
+  lfp_highband_highcut: 11
+  lfp_highband_lowcut: 5
+  lfp_lowband_highcut: 4
+  lfp_lowband_lowcut: 1.5
   lfp_prefilt_highcut: 40
   lfp_prefilt_lowcut: 1.5
   lfp_prefilt_order: 10
@@ -77,12 +83,15 @@ parameters:
   lfp_pwelch_nfft: 1024
   lfp_pwelch_overlap: 1.0
   lfp_pwelch_seg_size: 2.0
+  lfp_spectrum_colormap: magma
   lfp_stft_freq_max: 40
   lfp_stft_nfft: 1024
   lfp_stft_overlap: 1.0
   lfp_stft_seg_size: 2.0
   loc_chop_bound: 5
   loc_colormap: viridis
+  loc_contour_levels: 5
+  loc_field_bins: 9
   loc_field_smooth: false
   loc_field_thresh: 0.2
   loc_pixel_size: 3
@@ -102,6 +111,7 @@ parameters:
   phase_bin: 5
   phase_freq_max: 12.0
   phase_freq_min: 6.0
+  phase_loc_colormap: magma
   phase_loc_freq_max: 40
   phase_loc_nfft: 1024
   phase_loc_win_low: -0.4
@@ -109,9 +119,12 @@ parameters:
   phase_power_thresh: 0.1
   phase_raster_bin: 2
   rot_corr_bin: 3
+  spatial_corr_colormap: coolwarm
+  spatial_corr_contour_levels: 10
   spatial_corr_filter: Box
   spatial_corr_kern_len: 5
   spatial_corr_min_obs: 20
+  spatial_corr_style: contour
   speed_bin: 1
   speed_max: 40
   speed_min: 0
