@@ -1814,7 +1814,7 @@ class NSpatial(NAbstract):
                 else binInterp[right_idx] - binInterp[left_idx]
 
             pixel = kwargs.get('pixel', 3)
-            placeData = self.place(ftimes, pixel=pixel)
+            placeData = self.place(ftimes, pixel=pixel, update=False)
             fmap = placeData['smoothMap']
             fmap[np.isnan(fmap)] = 0
             hdPred = np.zeros(bins.size)
