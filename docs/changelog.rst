@@ -21,12 +21,13 @@ Changes
 - Added a spike interface sorting loader, which supports any Sorting Extractor, and can save this to NWB format for later use.
 - Added option to UI to clear the selected files.
 - Added button to UI to append the currently selected files to an excel spreadsheet to facilitate batch analysis.
-- Added further options to the UI the control the lfp spectral analysis and place field analysis.
+- Added further options to the UI the control the lfp spectral analysis and place field analysis, and also head direction firing analysis.
 - Added support for colorblind friendly perceptually uniform colormaps from the NeuroChaT UI. These have been changed to the default output type.
 - Can control number of levels in contour plots from the UI. For example, on place cell analysis.
 - Added a legend to polar plots of head direction firing.
 - Excel results file in UI is automatically named based on the input files.
 - Changed peak head direction calculation to be performed on smoothed data.
+- Improved smoothing performance and added Heaviside and half Gaussian smoothing.
 
 Bugs
 ----
