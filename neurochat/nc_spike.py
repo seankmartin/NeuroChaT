@@ -1906,7 +1906,7 @@ class NSpike(NBase):
                 "phy_folder", exclude_cluster_groups=to_exclude,
                 load_waveforms=True, verbose=False)
             spike = NSpike()
-            hdf_path = "test.h5"
+            hdf_path = "test.hdf5"
             nhdf = Nhdf(filename=hdf_path)
 
             groups = []

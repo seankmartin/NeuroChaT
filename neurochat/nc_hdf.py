@@ -225,9 +225,9 @@ class Nhdf(object):
             if os.path.exists(file_name):
                 f_path, f_name = os.path.split(file_name)
                 hdf_name = os.path.join(
-                    f_path, os.path.splitext(f_name)[0] + "_NC_NWB.h5")
+                    f_path, os.path.splitext(f_name)[0] + "_NC_NWB.hdf5")
             else:
-                hdf_name = "NC_NWB.h5"
+                hdf_name = "NC_NWB.hdf5"
 
         if os.path.exists(file_name):
             f_path, f_name = os.path.split(file_name)

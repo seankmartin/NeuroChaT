@@ -1725,10 +1725,10 @@ class NeuroChaT(QtCore.QThread):
         if os.path.isdir(os.path.dirname(sorting_path)):
             out_folder = os.path.dirname(sorting_path)
             out_name = (
-                os.path.splitext(os.path.basename(sorting_path))[0] + "_NC_NWB.h5")
+                os.path.splitext(os.path.basename(sorting_path))[0] + "_NC_NWB.hdf5")
         else:
             out_folder = os.getcwd()
-            out_name = "NC_NWB.h5"
+            out_name = "NC_NWB.hdf5"
             logging.warning(
                 "Sorting Extractor has no data path, saving waveforms to cwd")
 

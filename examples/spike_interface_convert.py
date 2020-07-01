@@ -74,6 +74,6 @@ if __name__ == '__main__':
             sorting, plot_waveforms=plot_waveforms)
 
     if to_read:
-        read_name = r"D:\Ham_Data\Batch_2\A9_CAR-SA1\CAR-SA1_20191130_1_PreBox\CAR-SA1_2019-11-30_PreBox_shuff_NC_NWB.h5"
+        read_name = r"D:\Ham_Data\Batch_2\A9_CAR-SA1\CAR-SA1_20191130_1_PreBox\CAR-SA1_2019-11-30_PreBox_shuff_NC_NWB.hdf5"
         spike = read_hdf(read_name)
         print(spike)
