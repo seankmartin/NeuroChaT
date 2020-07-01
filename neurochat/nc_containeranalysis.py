@@ -758,7 +758,7 @@ def spike_times(collection, filter_speed=False, **kwargs):
     #         collection, mua_bin_length, time_range)[0]
     #     if filter_mua:
     #         unit_hist = (
-    #             smooth_1d(unit_hist[0], filttype='g', filtsize=sigma),
+    #             smooth_1d(unit_hist[0], 'g', sigma),
     #             unit_hist[1])
     #     result["mua hists"].append(unit_hist)
 
