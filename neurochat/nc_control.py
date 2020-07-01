@@ -405,27 +405,7 @@ class NeuroChaT(QtCore.QThread):
                     excel_info = excel_info.replace(
                         to_replace=np.nan, value="__EMPTY__")
                     for pd_row in excel_info.itertuples():
-                        row = []
-                        for val in pd_row:
-                            row.append(val)
-                        if row[1] == "__EMPTY__":
-                            logging.error("Directory is not set in excel file")
-                            raise ValueError(
-                                "Directory is not set in excel file")
-                        if row[2] == "__EMPTY__":
-                            if self.get_data_format() == 'NWB':
-                                logging.error(
-                                    "HDF5 filename is not set in excel file")
-                                raise ValueError(
-                                    "HDF5 filename is not set in excel file")
-                            else:
-                                row[2] = ".no_spatial.None"
-                        if row[3] == "__EMPTY__":
-                            row[3] = ".no_spike.NONE"
-                        if row[4] == "__EMPTY__":
-                            row[4] = 0
-                        if row[5] == "__EMPTY__":
-                            row[5] = ".no_lfp.NONE"
+                        row = self.modify_excel_row(pd_row)
 
                         spike_file = row[1] + os.sep + row[3]
                         unit_no = int(row[4])
@@ -2212,6 +2192,30 @@ class NeuroChaT(QtCore.QThread):
         except PermissionError:
             logging.error(
                 "Please close {} before saving".format(excel_file))
+
+    def modify_excel_row(self, pd_row):
+        row = []
+        for val in pd_row:
+            row.append(val)
+        if row[1] == "__EMPTY__":
+            logging.error("Directory is not set in excel file")
+            raise ValueError(
+                "Directory is not set in excel file")
+        if row[2] == "__EMPTY__":
+            if self.get_data_format() == 'NWB':
+                logging.error(
+                    "HDF5 filename is not set in excel file")
+                raise ValueError(
+                    "HDF5 filename is not set in excel file")
+            else:
+                row[2] = ".no_spatial.None"
+        if row[3] == "__EMPTY__":
+            row[3] = ".no_spike.NONE"
+        if row[4] == "__EMPTY__":
+            row[4] = 0
+        if row[5] == "__EMPTY__":
+            row[5] = ".no_lfp.NONE"
+        return row
 
     def __getattr__(self, arg):
         """Forward __getattr__ to configuration class."""
