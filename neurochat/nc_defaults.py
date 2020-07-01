@@ -140,7 +140,7 @@ PARAMETERS = {
         "spatial_corr_kern_len": 5,
         "spatial_corr_min_obs": 20,
         "spatial_corr_style": "contour",
-        "spatial_corr_colormap": "seismic",
+        "spatial_corr_colormap": "coolwarm",
         "spatial_corr_contour_levels": 10,
     },
     "grid": {

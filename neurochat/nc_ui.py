@@ -2954,9 +2954,8 @@ class UiParameters(QtWidgets.QDialog):
         self.spatial_corr_colormap = add_combo_box(
             obj_name="spatial_corr_colormap")
         self.spatial_corr_colormap.addItems(
-            ["seismic", "default", "bwr", "viridis",
-             "gray", "plasma",
-             "inferno", "magma", "cividis"])
+            ["coolwarm", "default", "seismic", "bwr", "RdBu",
+             "viridis", "gray", "plasma", "magma", "cividis"])
         self.spatial_corr_contour_levels = add_spin_box(
             min_val=4, max_val=12, obj_name="spatial_corr_contour_levels")
         self.spatial_corr_contour_levels.setValue(10)
