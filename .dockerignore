@@ -1,0 +1,30 @@
+# Object file
+*.o
+
+# Ada Library Information
+*.ali
+
+# Compiled files
+*.pyc
+
+# Notebook checkpoints
+notebooks/.ipynb_checkpoints/
+notebooks/Tests.ipynb
+notebooks/*.png
+
+# Build related files
+build/
+dist/
+*.spec
+
+# vscode
+.vscode/
+
+# A general folder to place ignored items
+ignore/*
+
+neurochat.egg-info/
+
+# Sphinx documentation
+docs/_build/
+docs/reference/
