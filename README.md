@@ -37,14 +37,27 @@ python cli.py
 
 ### Option 2: Use Docker
 
-This option is aimed towards Linux users, and is not tested on Windows. Firstly, install [Docker](https://docs.docker.com/get-docker/) and then run the following in command prompt:
+This option is aimed towards Linux users, and is not tested on Windows. Firstly, install [Docker](https://docs.docker.com/get-docker/), and then run the following in command prompt:
 
 ```
 docker pull seankmartin/neurochat
 xhost local:root
 export QT_X11_NO_MITSHM=1
-docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY seankmartin/neurochat
+docker run --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=unix$DISPLAY --name=neurochat seankmartin/neurochat
 ```
+
+To access your host data in the Docker container, mount the data in the run command, like so
+```
+docker run --mount type=bind,source=/home/username/my-data,target=/mnt/my-data --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=unix$DISPLAY --name=neurochat seankmartin/neurochat
+```
+To build a docker image of the master branch, instead of running `docker pull`, run the below command, and replace seankmartin/neurochat by neurochat:master
+
+```
+git clone https://github.com/seankmartin/NeuroChaT
+cd NeuroChaT
+docker build -t neurochat:master .
+```
+
 
 ### Option 3: Use Pip, but don't install NeuroChaT
 
