@@ -8,8 +8,10 @@ This module implements plotting functions for NeuroChaT analyses.
 
 import itertools
 import logging
+import copy
 
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcol
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -242,10 +244,10 @@ def isi(isi_data, axes=[None, None, None], **kwargs):
 
     # ax = fig2.add_subplot(212, aspect= 'equal')
     ax, fig3 = _make_ax_if_none(axes[2])
-    c_map = plt.cm.jet
+    c_map = copy.copy(mpl.cm.get_cmap("jet"))
     c_map.set_under('white')
     ax.pcolormesh(xedges[0:-1], yedges[0:-1], joint_count,
-                  cmap=c_map, vmin=1, rasterized=raster)
+                  cmap=c_map, vmin=1, rasterized=raster, shading='auto')
     ax.plot(
         ax.get_xlim(), [burst_ms, burst_ms],
         linestyle='dashed', linewidth=2, color='red')
@@ -414,7 +416,7 @@ def lfp_spectrum_tr(plot_data, ax=None, **kwargs):
 
     pcm = ax.pcolormesh(
         plot_data['t'], plot_data['f'], plot_data['Sxx'], cmap=c_map,
-        edgecolors="none", rasterized=True)
+        edgecolors="none", rasterized=True, shading='auto')
     _extent = [
         plot_data['t'].min(), plot_data['t'].max(), 0, plot_data['f'].max()]
     plt.axis(_extent)
