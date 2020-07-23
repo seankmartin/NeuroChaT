@@ -35,7 +35,18 @@ pip install .
 python cli.py
 ```
 
-### Option 2: Use Pip, but don't install NeuroChaT
+### Option 2: Use Docker
+
+This option is aimed towards Linux users, and is not tested on Windows. Firstly, install [Docker](https://docs.docker.com/get-docker/) and then run the following in command prompt:
+
+```
+docker pull seankmartin/neurochat
+xhost local:root
+export QT_X11_NO_MITSHM=1
+docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY seankmartin/neurochat
+```
+
+### Option 3: Use Pip, but don't install NeuroChaT
 
 Open command prompt and type/paste the following.
 
