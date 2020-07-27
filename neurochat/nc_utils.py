@@ -1001,8 +1001,8 @@ def log_exception(ex, more_info=""):
     ----------
     ex : Exception
         The python exception that occured
-    more_info :
-        Additional string to log
+    more_info : str, optional
+        Additional string to log. Default is "".
 
     Returns
     -------
