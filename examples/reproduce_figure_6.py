@@ -1,6 +1,6 @@
 """
 Use this file to reproduce Figure 6 in the NeuroChaT paper
-Please change line 13 to reflect the directory you saved 040512_1.hdf5 in
+Please change line 13 to reflect the directory you saved 040512_1.hdf5 in https://osf.io/kqz8b/
 """
 import os
 import numpy as np
