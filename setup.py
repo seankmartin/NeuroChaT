@@ -1,4 +1,5 @@
 import os
+from setuptools import setup
 
 
 def read(fname):
@@ -14,8 +15,8 @@ DISTNAME = 'neurochat'
 MAINTAINER = 'Md Nurul Islam and Sean Martin'
 MAINTAINER_EMAIL = 'martins7@tcd.ie'
 URL = 'https://github.com/seankmartin/NeuroChaT'
-DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT/archive/v1.1.1a0.tar.gz'
-VERSION = '1.1.1a0'
+DOWNLOAD_URL = 'https://github.com/seankmartin/NeuroChaT/archive/v1.2.0.tar.gz'
+VERSION = '1.2.0'
 
 INSTALL_REQUIRES = [
     'PyPDF2 >= 1.26.0',
@@ -49,7 +50,6 @@ CLASSIFIERS = [
 
 ]
 
-from setuptools import setup
 
 if __name__ == "__main__":
 

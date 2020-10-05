@@ -1,4 +1,4 @@
-# NeuroChaT v1.1.1a0
+# NeuroChaT v1.2.0
 
 NeuroChaT (RRID:SCR_018020) is an open-source neuron characterisation toolbox. It is described in our paper on [Wellcome Open Research](https://wellcomeopenresearch.org/articles/4-196).
 
@@ -22,7 +22,8 @@ This work was supported by a Joint Senior Investigator Award made by The Wellcom
 
 ## Installation
 
-Python version 3.5 upwards is required to install neurochat. Installation steps are listed in detail below:
+If you are on Windows, it is possible to use a Graphical version of neurochat, that can be downloaded as a single [executable file](https://github.com/seankmartin/NeuroChaT/releases/tag/v1.1.0).
+Otherwise, Python version 3.5 upwards is required to install neurochat. Installation steps are listed in detail below:
 
 ### Option 1: Use Pip
 
@@ -75,7 +76,7 @@ This method only allows the GUI program to function, any other file will need to
 
 ### Install PyQt5 on linux
 
-If you are running NeuroChaT on linux, after installing the requirements you will need to install further qt programs.
+If you are running NeuroChaT GUI on linux, after installing the requirements you will need to install further qt programs.
 Most likely, you only need `python3-pyqt5`, but just in case it might be safest to install all three of these if you have the available disk space.
 
 ```
@@ -95,7 +96,7 @@ We are open to collaborators, questions, etc. so feel free to get in touch!
 
 ## Documentation
 
-See the docs folder for a pdf user guide which should be the first port of call. There is also html docs available for the neurochat package, which can be accessed by opening docs/index.html in a browser, or from the NeuroChaT UI help menu, or on [Github Pages](https://seankmartin.github.io/NeuroChaT/docs/html/neurochat/index.html).
+See our [Read the docs website](neurochat.readthedocs.io) for documentation and examples.
 
 ## Open Science Framework Storage
 

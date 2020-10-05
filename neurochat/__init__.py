@@ -7,4 +7,4 @@ It is a toolbox for analysing data from neural recording systems,
 particularly for spatial coding.
 
 """
-__version__ = "1.1.1a0"
+__version__ = "1.2.0"
