@@ -4,11 +4,11 @@ Development Roadmap
 
 Priority
 ========
-- I will put all reviewer comments that could not immediately be addressed here.
+- Additional analyses suggested by the reviewers from the Wellcome Trust paper.
 
 
-Nice to haves
-=============
+Secondary
+=========
 - Add SpikeInterface conversion to UI.
 - Complete the in progress .pos reader from Axona in NSpatial.
 - Fix Retranslate_ui mode to display the NeuroChaT icon in .exe mode.

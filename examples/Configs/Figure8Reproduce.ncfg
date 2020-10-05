@@ -4,11 +4,11 @@ settings:
   mode_id: 0
   graphic_format: pdf
   unit_no: 1
-  lfp_file: C:\Users\smartin5\Recordings\NC_eg\112512_1.hdf5+/processing/Neural Continuous/LFP/eeg
+  lfp_file: /home/sean/Downloads/112512_1.hdf5+/processing/Neural Continuous/LFP/eeg
   cell_type: ''
-  spike_file: C:\Users\smartin5\Recordings\NC_eg\112512_1.hdf5+/processing/Shank/5
-  spatial_file: C:\Users\smartin5\Recordings\NC_eg\112512_1.hdf5+/processing/Behavioural/Position
-  nwb_file: C:\Users\smartin5\Recordings\NC_eg\112512_1.hdf5
+  spike_file: /home/sean/Downloads/112512_1.hdf5+/processing/Shank/5
+  spatial_file: /home/sean/Downloads/12512_1.hdf5+/processing/Behavioural/Position
+  nwb_file: /home/sean/Downloads/Recordings\NC_eg\112512_1.hdf5
   excel_file: ''
   data_directory: ''
 analyses:
@@ -84,6 +84,7 @@ parameters:
   lfp_stft_nfft: 1024
   lfp_stft_overlap: 1.0
   lfp_stft_seg_size: 2.0
+  lfp_spectrum_colormap: default
   loc_chop_bound: 5
   loc_colormap: viridis
   loc_field_smooth: false
@@ -111,6 +112,7 @@ parameters:
   phase_loc_win_up: 0.4
   phase_power_thresh: 0.1
   phase_raster_bin: 2
+  phase_loc_colormap: default
   rot_corr_bin: 3
   spatial_corr_filter: Box
   spatial_corr_kern_len: 5

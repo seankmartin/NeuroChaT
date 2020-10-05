@@ -44,9 +44,12 @@ We are open to contributions and would greatly appreciate any input. Please form
 
 Getting started
 ===============
-Sample hdf5 datasets and results are stored on OSF, at https://osf.io/kqz8b/files/.
-Include the other things from Github README and point out guides here etc.
-Also need to point out the User guide and any possible youtube videos.
+The best ways to get started with NeuroChaT are:
+
+For using the UI, download the `executable file for Windows <https://github.com/seankmartin/NeuroChaT/releases>`_ and check out the `user manual <https://github.com/seankmartin/NeuroChaT/blob/master/docs/NeuroChaT%20User%20Guide.pdf>`_.
+For using the Python Code, check out the `introductory notebook <https://neurochat.readthedocs.io/en/latest/api_use_guide.html>`_, and `examples on this website <https://neurochat.readthedocs.io/en/latest/examples.html>`_ and `other examples on GitHub <https://github.com/seankmartin/NeuroChaT_API_Scripts>`_.
+Additionally, Sample hdf5 datasets and results are stored on `OSF <https://osf.io/kqz8b/files/>`_.
+We are open to collaborators, questions, etc. so feel free to get in touch!
 
 .. toctree::
    :maxdepth: 2

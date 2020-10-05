@@ -1,8 +1,9 @@
 """
 Use this file to reproduce Figure 8 in the NeuroChaT paper.
 Please replace all instances of 
-C:\\Users\\smartin5\\Recordings\\NC_eg\\ with the folder
-that you downloaded 112512_1.hdf5 to
+C:\\Users\\smartin5\\Recordings\\NC_eg\\ in the .ncfg file 
+that is the Configs folder with the folder
+that you downloaded 112512_1.hdf5 to from https://osf.io/kqz8b/
 """
 
 import os
