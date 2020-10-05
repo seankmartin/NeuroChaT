@@ -96,7 +96,7 @@ We are open to collaborators, questions, etc. so feel free to get in touch!
 
 ## Documentation
 
-See our [Read the docs website](neurochat.readthedocs.io) for documentation and examples.
+See our [Read the docs website](https://neurochat.readthedocs.io) for documentation and examples.
 
 ## Open Science Framework Storage
 
