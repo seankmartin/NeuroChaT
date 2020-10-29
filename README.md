@@ -109,3 +109,7 @@ The NeuroChaT version number should be maintained in:
 1. `setup.py`
 2. `neurochat\__init__.py`
 3. `README.md`
+
+## Troubleshooting
+
+If you are trying to run NeuroChaT from Python source code, and are having problems, the first port of call should be to install the requirements from fixed_requirements.txt instead of the normal source.
