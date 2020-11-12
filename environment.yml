@@ -1,0 +1,17 @@
+name: neurochat_test
+channels:
+- defaults
+- anaconda
+- conda-forge
+dependencies:
+- PyPDF2
+- pyqt
+- h5py
+- matplotlib
+- numpy
+- pandas
+- scipy
+- scikit-learn
+- PyYAML
+- xlrd
+- openpyxl

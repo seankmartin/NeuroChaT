@@ -74,6 +74,19 @@ python cli.py
 
 This method only allows the GUI program to function, any other file will need to modify the python path to use neurochat.
 
+
+### Option 4: Use `conda`
+
+It is also possible to install *NeuroChaT* into a `conda` (Anaconda) environment
+
+```
+git clone https://github.com/seankmartin/NeuroChaT
+cd NeuroChaT
+conda create -f environment.yml
+pip install .
+python cli.py
+```
+
 ### Install PyQt5 on linux
 
 If you are running NeuroChaT GUI on linux, after installing the requirements you will need to install further qt programs.
