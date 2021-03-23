@@ -653,7 +653,6 @@ class NSpike(NBase):
         ----------
         bins : str or int
             Number of ISI histogram bins. If 'auto', NumPy default is used
-
         bound : int
             Length of the ISI histogram in msec
         density : bool
@@ -684,7 +683,11 @@ class NSpike(NBase):
         graph_data['isiAfter'] = isi[1:]
 
         _results["Mean ISI"] = isi.mean()
+        _results["Median ISI"] = np.median(isi)
         _results["Std ISI"] = isi.std()
+        _results["CV ISI"] = _results["Std ISI"] / _results["Mean ISI"]
+        _results["Mean Log ISI"] = np.log10(isi).mean()
+        _results["Std Log ISI"] = np.log10(isi).std()
         _results["Refractory violation"] = (
             below_refractory.size / unitStamp.size)
 
