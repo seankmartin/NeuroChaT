@@ -537,9 +537,14 @@ class NDataContainer():
                     continue
 
                 for fname in txt_files:
-                    if fname[:(len(filename) + 1)] == filename + "_":
-                        pos_name = fname
-                        break
+                    if pos_extension == ".txt":
+                        if fname[:(len(filename) + 1)] == filename + "_":
+                            pos_name = fname
+                            break
+                    elif pos_extension == ".pos":
+                        if fname[:(len(filename))] == filename:
+                            pos_name = fname
+                            break
 
                 else:
                     logging.info(
