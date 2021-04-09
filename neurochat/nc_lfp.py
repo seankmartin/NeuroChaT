@@ -1459,9 +1459,11 @@ class NLfp(NBase):
 
                 f.seek(0, 0)
                 header_offset = []
+                num_iters = 0
                 while True:
                     try:
                         buff = f.read(10).decode('UTF-8')
+                        num_iters += 1
                     except BaseException:
                         break
                     if buff == 'data_start':
@@ -1469,6 +1471,10 @@ class NLfp(NBase):
                         break
                     else:
                         f.seek(-9, 1)
+                    if num_iters > 5000:
+                        raise RuntimeError(
+                            "Failed load lfp from {} - no data_start.".format(
+                                file_name))
 
                 eeg_ID = re.findall(r'\d+', file_extension)
                 self.set_file_tag(1 if not eeg_ID else int(eeg_ID[0]))
