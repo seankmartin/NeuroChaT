@@ -847,11 +847,7 @@ def smooth_1d(x, kernel_type='b', kernel_size=5, axis=0, **kwargs):
             (np.sqrt(2 * np.pi) * sigma)
 
     elif kernel_type == 'b':
-        half_width = kernel_size / 2
-        xx = np.arange(-half_width, half_width + 1, 1)
-        sigma = kernel_size / 2 / np.sqrt(3)
-        kernel = (0.5 / (np.sqrt(3) * sigma)) * \
-            (np.abs(xx) < np.sqrt(3) * sigma)
+        kernel = np.ones(kernel_size) / kernel_size
 
     elif kernel_type == 'hs':
         half_width = kernel_size
