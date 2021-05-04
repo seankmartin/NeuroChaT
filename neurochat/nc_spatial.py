@@ -17,7 +17,7 @@ from copy import deepcopy
 from neurochat.nc_utils import chop_edges, corr_coeff, extrema,\
     find, find2d, find_chunk, histogram, histogram2d, \
     linfit, residual_stat, rot_2d, smooth_1d, smooth_2d, \
-    centre_of_mass, find_true_ranges
+    centre_of_mass, find_true_ranges, RecPos
 
 from neurochat.nc_base import NAbstract
 from neurochat.nc_circular import CircStat
@@ -809,26 +809,42 @@ class NSpatial(NAbstract):
 
         """
         try:
-            f = open(file_name, 'rt')
             self._set_data_source(file_name)
             self._set_source_format('Axona')
-            while True:
-                line = f.readline()
-                if line == '':
-                    break
-                elif line.startswith('time'):
-                    spatial_data = np.loadtxt(
-                        f, dtype='float', usecols=range(5))
-            self._set_time(spatial_data[:, 0])
-            self._set_pos_x(spatial_data[:, 1] - np.min(spatial_data[:, 1]))
-            self._set_pos_y(spatial_data[:, 2] - np.min(spatial_data[:, 2]))
-            self._set_direction(spatial_data[:, 3])
-            self._set_speed(spatial_data[:, 4])
-            f.seek(0, 0)
-            pixel_size = list(
-                map(float, re.findall(r"\d+.\d+|\d+", f.readline())))
-            self.set_pixel_size(pixel_size)
-            self.smooth_direction()
+            if file_name.endswith(".txt"):
+                f = open(file_name, 'rt')
+                while True:
+                    line = f.readline()
+                    if line == '':
+                        break
+                    elif line.startswith('time'):
+                        spatial_data = np.loadtxt(
+                            f, dtype='float', usecols=range(5))
+                self._set_time(spatial_data[:, 0])
+                self._set_pos_x(spatial_data[:, 1] - np.min(spatial_data[:, 1]))
+                self._set_pos_y(spatial_data[:, 2] - np.min(spatial_data[:, 2]))
+                self._set_direction(spatial_data[:, 3])
+                self._set_speed(spatial_data[:, 4])
+                f.seek(0, 0)
+                pixel_size = list(
+                    map(float, re.findall(r"\d+.\d+|\d+", f.readline())))
+                self.set_pixel_size(pixel_size)
+                self.smooth_direction()
+                f.close()
+            elif file_name.endswith(".pos"):
+                rc = RecPos(file_name=file_name, load=True)
+                time = np.array([0.02 * i for i in range(rc.total_samples)])
+                self._set_time(time)
+                x, y = rc.get_position()
+                self._set_pos_x(x - np.min(x))
+                self._set_pos_y(y - np.min(y))
+                self._set_direction(rc.get_angular_pos())
+                self._set_speed(rc.get_speed())
+                self.set_pixel_size(rc.pixels_per_cm)
+                self.smooth_direction()
+            else:
+                logging.error("Position data only supports .pos or .txt")
+                return
         except BaseException:
             logging.error('File does not exist or is open in another process!')
 
