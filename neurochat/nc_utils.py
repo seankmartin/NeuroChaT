@@ -1605,8 +1605,8 @@ class RecPos:
                     np.put(x, np.arange(from_end, len(x), 1), x[-back])
                     np.put(y, np.arange(from_end, len(x), 1), y[-back])
 
-            self.x = x
-            self.y = y
+            self.x = x / self.pixels_per_cm
+            self.y = y / self.pixels_per_cm
             return x, y
 
         except BaseException:
@@ -1641,11 +1641,11 @@ class RecPos:
         t_rate = 0.02 * s_rate
         duration = len(x) * 0.02
         for i in range(s_rate * 3 // 2, len(x), s_rate):
-            pixel_dist = math.sqrt(
+            cm_dist = math.sqrt(
                 (x[i] - x[i - s_rate]) ** 2 + (y[i] - y[i - s_rate]) ** 2
             )
             # (pixel/s) - 300 pixels per metre * 100 (cm/s)
-            cms_speed = pixel_dist / (self.pixels_per_cm * t_rate)
+            cms_speed = cm_dist / t_rate
             speed.append(cms_speed)
         xp = np.array(
             [0.0] + [0.02 * i for i in range(s_rate, len(x) - (s_rate // 2), s_rate)]
