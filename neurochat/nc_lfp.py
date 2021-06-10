@@ -955,14 +955,22 @@ class NLfp(NBase):
 
             sta_data = self.event_trig_average(event_stamp, **kwargs)
             STA = sta_data['ETA']
+            STA_detrended = STA - np.mean(STA)
+            detrended_slep_STA = np.multiply(STA_detrended, slep_win)
 
-            fSTA = fft(np.multiply(STA, slep_win), nfft)
+            fSTA = fft(detrended_slep_STA, nfft)
 
             fSTA = np.absolute(fSTA[0: int(nfft / 2) + 1])**2 / nfft**2
             fSTA[1:-1] = 2 * fSTA[1:-1]
 
-            fLFP = np.array([fft(np.multiply(lfp[x + win], slep_win), nfft)
-                             for x in center])
+            fLFP = []
+            for x in center:
+                lfp_sig = lfp[x + win]
+                lfp_sig_detrended = lfp_sig - np.mean(lfp_sig)
+                lfp_sig_slep = np.multiply(lfp_sig_detrended, slep_win)
+                fft_lfp = fft(lfp_sig_slep, nfft)
+                fLFP.append(fft_lfp)
+            fLFP = np.array(fLFP)
 
             STP = np.absolute(fLFP[:, 0: int(nfft / 2) + 1])**2 / nfft**2
             STP[:, 1:-1] = 2 * STP[:, 1:-1]
