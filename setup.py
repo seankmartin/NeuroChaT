@@ -50,6 +50,12 @@ CLASSIFIERS = [
 
 ]
 
+ENTRY_POINTS = {
+    "console_scripts": [
+        "neurochat = neurochat_gui.neurochat_ui:main"
+    ]
+}
+
 
 if __name__ == "__main__":
 
@@ -68,4 +74,5 @@ if __name__ == "__main__":
           include_package_data=True,
           packages=PACKAGES,
           classifiers=CLASSIFIERS,
+          entry_points=ENTRY_POINTS,
           )
