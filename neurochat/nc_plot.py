@@ -536,7 +536,7 @@ def plv_tr(plv_data, **kwargs):
     else:
         c_map = colormap
 
-    pcm = ax.pcolormesh(offset, f, fSTA, cmap=c_map, rasterized=True)
+    pcm = ax.pcolormesh(offset, f, fSTA, cmap=c_map, rasterized=True, shading="auto")
     plt.title('Time-resolved fSTA')
     ax.set_xlabel('Time (sec)')
     ax.set_ylabel('Frequency (Hz)')
@@ -544,7 +544,7 @@ def plv_tr(plv_data, **kwargs):
 
     fig2 = plt.figure()
     ax = plt.gca()
-    pcm = ax.pcolormesh(offset, f, SFC, cmap=c_map, rasterized=True)
+    pcm = ax.pcolormesh(offset, f, SFC, cmap=c_map, rasterized=True, shading="auto")
     plt.title('Time-resolved SFC')
     ax.set_xlabel('Time (sec)')
     ax.set_ylabel('Frequency (Hz)')
@@ -552,7 +552,7 @@ def plv_tr(plv_data, **kwargs):
 
     fig3 = plt.figure()
     ax = plt.gca()
-    pcm = ax.pcolormesh(offset, f, PLV, cmap=c_map, rasterized=True)
+    pcm = ax.pcolormesh(offset, f, PLV, cmap=c_map, rasterized=True, shading="auto")
     plt.title('Time-resolved PLV')
     ax.set_xlabel('Time (sec)')
     ax.set_ylabel('Frequency (Hz)')
@@ -703,7 +703,8 @@ def spike_phase(phase_data):
     #       'white': (0, 0, 0)}
     # c_map = mcol.LinearSegmentedColormap('my_colormap', cdict, 256)
     ax.pcolormesh(phase_data['rasterbins'], np.arange(0, phase_data['raster'].shape[0]),
-                  phase_data['raster'], cmap=plt.cm.binary, rasterized=True)
+                  phase_data['raster'], cmap=plt.cm.binary, rasterized=True,
+                  shading="auto")
 
     # Alternative idea for plotting, not currently working.
     # rasters = phase_data['raster']
