@@ -126,3 +126,7 @@ The NeuroChaT version number should be maintained in:
 ## Troubleshooting
 
 If you are trying to run NeuroChaT from Python source code, and are having problems, the first port of call should be to install the requirements from fixed_requirements.txt instead of the normal source.
+
+## Current known bugs
+1. From the GUI, if an LFP file is analysed, and then a subsequent LFP file is attempted to be loaded but fails - the program returns the results for the first LFP file analysed. This should be a relatively simple fix. This may only happen for 0 length LFP files, but needs further testing.
+2. Loading a config file with mode set to 2 fails to correctly load the excel file, but loads the parameters correctly.
