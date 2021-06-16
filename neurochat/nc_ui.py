@@ -626,8 +626,8 @@ class NeuroChaT_Ui(QtWidgets.QMainWindow):
                     os.path.splitext(self._control.hdf._filename)[0] + ".xlsx")
             else:
                 default_filename = (
-                    os.path.splitext(self._control.get_excel_file()[0] +
-                                     "_results.xlsx"))
+                    os.path.splitext(self._control.get_excel_file())[0] +
+                    "_results.xlsx")
 
         except BaseException as ex:
             now = datetime.now()
