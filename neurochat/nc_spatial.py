@@ -3075,7 +3075,7 @@ class NSpatial(NAbstract):
         a_size = np.round(self.get_duration(), 4)
         time = np.linspace(
             0, a_size, endpoint=True,
-            num=np.round(a_size / stamp) + 1)
+            num=int(np.round(a_size / stamp) + 1))
         time = np.round(time, 4)
         Y = histogram(ftimes, time)[0] * sampRate  # Instant firing rate
 
