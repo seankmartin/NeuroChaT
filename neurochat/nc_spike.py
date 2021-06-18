@@ -173,6 +173,14 @@ class NSpike(NBase):
             if unit_no in self.get_unit_list():
                 self._unit_no = unit_no
                 self._set_unit_stamp()
+            else:
+                self._unit_no = self.get_unit_list()[0]
+                self._set_unit_stamp()
+                logging.error(
+                    f"Unit number {unit_no} "
+                    f"is not a valid unit on {self._filename} " +
+                    f"with available units {self.get_unit_list()} " +
+                    f"analysing unit {self._unit_no} instead.")
         else:
             if spike_name is None:
                 spike_name = self.get_spike_names()
