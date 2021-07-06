@@ -698,7 +698,8 @@ class NData():
         """
         Analysis of spike to LFP phase distribution.
 
-        Delegates to NLfp().phase_dist()
+        Can use the spatial data to only consider
+        the phase information within the place field.
 
         Parameters
         ----------
@@ -716,7 +717,7 @@ class NData():
         """
         key = "keep_zero_idx"
         out_data = {}
-        if not key in kwargs.keys():
+        if key not in kwargs.keys():
             kwargs[key] = True
         should_filter = kwargs.get("should_filter", True)
 

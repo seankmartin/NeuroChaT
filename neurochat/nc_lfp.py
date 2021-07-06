@@ -710,11 +710,12 @@ class NLfp(NBase):
         mag2 = mag[1:-2]
         mag3 = mag[2:-1]
 
-        xind = np.union1d(find(np.logical_and(mag1 < xline, mag2 > xline)),
-                          find(np.logical_and(
-                              np.logical_and(mag1 < xline, mag2 == xline),
-                              mag3 > xline))
-                          )
+        xind = np.union1d(
+            find(np.logical_and(mag1 < xline, mag2 > xline)),
+            find(np.logical_and(
+                np.logical_and(mag1 < xline, mag2 == xline),
+                mag3 > xline))
+            )
 
         # Ignore segments <1/fmax
         i = 0
@@ -727,8 +728,10 @@ class NLfp(NBase):
         seg_count = 0
         while i < len(xind) - 1:
             k = i + 1
-            while time[xind[k]] - time[xind[i]] < 1 / \
-                    fmin and k < len(xind) - 1:
+            while (
+                ((time[xind[k]] - time[xind[i]]) < (1 / fmin))
+                and (k < len(xind) - 1)
+            ):
                 k += 1
             s_lfp = lfp[xind[i]: xind[k]]
             s_p2p = np.abs(np.max(s_lfp) - np.min(s_lfp))
@@ -815,10 +818,8 @@ class NLfp(NBase):
         fmax = fwin[1]
         fmin = fwin[0]
         _filter = [5, fmin, fmax, 'bandpass']
-        _prefilt = kwargs.get('filtset', [10, 1.5, 40, 'bandpass'])
 
         b_lfp = butter_filter(lfp, Fs, *_filter)  # band LFP
-        lfp = butter_filter(lfp, Fs, *_prefilt)
 
         # Measure phase
         hilb = sg.hilbert(b_lfp)
