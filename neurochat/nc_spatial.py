@@ -1516,11 +1516,8 @@ class NSpatial(NAbstract):
         # flip x and y
         centroid = centroid[::-1]
 
-        p_shape = pfield.shape
         maxes = [xedges.max(), yedges.max()]
-        scales = (
-            maxes[0] / p_shape[1],
-            maxes[1] / p_shape[0])
+        scales = (pixel, pixel)
         co_ords = np.array(np.where(pfield == largest_group))
         boundary = [[None, None], [None, None]]
         for i in range(2):
@@ -1528,13 +1525,22 @@ class NSpatial(NAbstract):
             boundary[i] = (
                 co_ords[j].min() * scales[i],
                 np.clip((co_ords[j].max() + 1) * scales[i], 0, maxes[i]))
-        inside_x = (
-            (boundary[0][0] <= spikeLoc[0]) &
-            (spikeLoc[0] <= boundary[0][1]))
-        inside_y = (
-            (boundary[1][0] <= spikeLoc[1]) &
-            (spikeLoc[1] <= boundary[1][1]))
-        co_ords = np.nonzero(np.logical_and(inside_x, inside_y))
+
+        spike_counts_place_field = spike_count[
+            co_ords[0], co_ords[1]]
+
+        number_of_spikes_in_place_field = np.sum(spike_counts_place_field)
+
+        max_firing_rate_in_place_field = pmap[
+            co_ords[0], co_ords[1]].max()
+
+        # inside_x = (
+        #     (boundary[0][0] <= spikeLoc[0]) &
+        #     (spikeLoc[0] <= boundary[0][1]))
+        # inside_y = (
+        #     (boundary[1][0] <= spikeLoc[1]) &
+        #     (spikeLoc[1] <= boundary[1][1]))
+        # co_ords = np.nonzero(np.logical_and(inside_x, inside_y))
 
         if update:
             _results['Spatial Skaggs'] = self.skaggs_info(fmap, tmap)
@@ -1547,9 +1553,12 @@ class NSpatial(NAbstract):
             _results['Place field Centroid y'] = centroid[1]
             _results['Place field Boundary x'] = boundary[0]
             _results['Place field Boundary y'] = boundary[1]
-            _results['Number of Spikes in Place Field'] = co_ords[0].size
-            _results['Percentage of Spikes in Place Field'] = co_ords[0].size * \
-                100 / ftimes.size
+            _results['Number of Spikes in Place Field'] = (
+                number_of_spikes_in_place_field)
+            _results['Percentage of Spikes in Place Field'] = (
+                number_of_spikes_in_place_field * 100 / ftimes.size)
+            _results['Max Firing Rate in Place Field'] = (
+                max_firing_rate_in_place_field)
             self.update_result(_results)
 
         smoothMap[tmap == 0] = None
@@ -1568,6 +1577,7 @@ class NSpatial(NAbstract):
         graph_data['placeBoundary'] = boundary
         graph_data['indicesInPlaceField'] = co_ords
         graph_data['centroid'] = centroid
+        graph_data['spikeCounts'] = spike_count
 
         return graph_data
 
