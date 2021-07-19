@@ -188,15 +188,20 @@ class UiMerge(QtWidgets.QDialog):
             QtWidgets.QFileDialog.getOpenFileName(
                 self,
                 'Select output graphic file list...', os.getcwd(), "*.xlsx;; .*xls")[0])
-        if not excel_file:
+        if not os.path.isfile(excel_file):
             logging.warning(
                 "No excel file selected! Merging/accumulating is unsuccessful!")
+            return
         else:
             self.filename_line.setText(excel_file)
             logging.info("New excel file added: " +
                          excel_file.rstrip("\n\r").split(os.sep)[-1])
         data = pd.read_excel(excel_file)
-        self.files = data.values.T.tolist()[0]
+        if len(data.columns) == 3:
+            self.files = data.values.T.tolist()[1]
+        else:
+            self.files = data.values.T.tolist()[0]
+
         for i, f in enumerate(self.files):
             if not os.path.exists(f):
                 self.files.pop(i)
@@ -280,6 +285,10 @@ class UiMerge(QtWidgets.QDialog):
                     logging.error('Cannot merge files to ' +
                                   self.dst_directory)
             else:
+                if self.dst_directory is None:
+                    logging.error(
+                        "Destination directory must be specified before merging.")
+                    return
                 if os.path.exists(self.dst_directory) and os.access(
                         self.dst_directory, os.W_OK):
                     for f in self.files:

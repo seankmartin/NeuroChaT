@@ -1486,7 +1486,7 @@ def loc_place_field(place_data, ax=None):
     mask = (place_data['placeField'] == 0)
     pmap = ax.pcolormesh(place_data['xedges'], place_data['yedges'],
                          np.ma.array(place_data['placeField'], mask=mask),
-                         cmap=c_map, rasterized=True)
+                         cmap=c_map, rasterized=True, shading='auto')
     ax.set_ylim([0, place_data['yedges'].max()])
     ax.set_xlim([0, place_data['xedges'].max()])
     ax.set_aspect('equal')
